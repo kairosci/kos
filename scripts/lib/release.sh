@@ -11,7 +11,7 @@ kos_release_profile() {
     repo-add "$repository/kos.db.tar.gz" "$repository/"*.pkg.tar.zst || return 1
     printf '\n[kos]\nSigLevel = Optional TrustAll\nServer = file://%s\n' "$repository" >> "$profile/pacman.conf" || return 1
     install -d -m 755 "$profile/airootfs"
-    for file in etc/os-release etc/mkinitcpio.conf.d/kos_hooks.conf etc/pacman.d/hooks/90-mkinitcpio-install.hook; do
+    for file in etc/os-release etc/mkinitcpio.conf.d/kos_hooks.conf etc/pacman.d/hooks/90-mkinitcpio-install.hook etc/skel/.bashrc; do
         [[ ! -e "$profile/airootfs/$file" ]] || rm "$profile/airootfs/$file" || return 1
         sed -i "/^\[options\]/a NoExtract = $file" "$profile/pacman.conf" || return 1
     done
