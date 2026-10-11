@@ -70,4 +70,22 @@ assert_true "runtime verifier accepts effective policy" 'responsiveness_runtime 
 assert_false "runtime verifier rejects daemon threshold drift" 'TEST_SWAP_LIMIT=90.00% responsiveness_runtime "$PROJECT_ROOT"'
 assert_false "runtime verifier rejects disabled application swap monitoring" 'TEST_SWAP_MODE=auto responsiveness_runtime "$PROJECT_ROOT"'
 assert_false "runtime verifier rejects unprotected session ancestors" 'TEST_PARENT_LOW=0 responsiveness_runtime "$PROJECT_ROOT"'
+sed 's/\$EUID/${RESPONSIVENESS_TEST_EUID}/g' "$PROJECT_ROOT/scripts/lib/responsiveness.sh" > "$SANDBOX/responsiveness.sh"
+source "$SANDBOX/responsiveness.sh"
+RESPONSIVENESS_TEST_EUID=0
+TARGET_USER=tester
+TARGET_UID=1000
+# shellcheck disable=SC2329
+id() { printf '1000\n'; }
+# shellcheck disable=SC2329
+runuser() {
+    [[ ${TEST_RUNUSER_FAIL:-0} == 0 ]] || return 1
+    [[ "$1" == -u && "$2" == tester && "$3" == -- && "$4" == env &&
+        "$5" == XDG_RUNTIME_DIR=/run/user/1000 &&
+        "$6" == DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus && "$7" == systemctl ]] || return 1
+    shift 7
+    systemctl "$@"
+}
+assert_true "root verifier inspects the target account with its session environment" 'responsiveness_runtime "$PROJECT_ROOT"'
+assert_false "root verifier propagates failure to enter the target account" 'TEST_RUNUSER_FAIL=1 responsiveness_runtime "$PROJECT_ROOT"'
 test_summary
