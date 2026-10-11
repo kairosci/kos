@@ -28,7 +28,7 @@ assert_false "profile rejects a missing runtime package" 'kos_release_profile "$
 assert_false "failed preflight leaves no partial profile" '[[ -e "$profile" ]]'
 assert_true "runtime package produces a release profile" 'kos_release_profile "$PROJECT_DIR" "$profile" "$package" "$releng"'
 assert_true "kos runtime package is installed through the build repository" 'grep -qx kos "$profile/packages.x86_64" && grep -qx linux "$profile/packages.x86_64" && grep -q "Server = file://" "$profile/pacman.conf"'
-assert_true "live initramfs retains Archiso hooks instead of installed system hooks" 'grep -q "NoExtract = etc/mkinitcpio.conf.d/kos_hooks.conf" "$profile/pacman.conf" && [[ ! -e "$profile/airootfs/etc/mkinitcpio.conf.d/kos_hooks.conf" && -L "$profile/airootfs/etc/pacman.d/hooks/80-limine-efi-deploy.hook" ]]'
+assert_true "live initramfs retains Archiso hooks instead of installed system hooks" 'grep -q "NoExtract = etc/mkinitcpio.conf.d/kos_hooks.conf" "$profile/pacman.conf" && grep -q "NoExtract = etc/skel/.bashrc" "$profile/pacman.conf" && [[ ! -e "$profile/airootfs/etc/mkinitcpio.conf.d/kos_hooks.conf" && -L "$profile/airootfs/etc/pacman.d/hooks/80-limine-efi-deploy.hook" ]]'
 assert_true "live boot entries and initramfs use the standard kernel" 'grep -q vmlinuz-linux "$profile/efiboot/loader/entries/live.conf" && grep -q initramfs-linux.img "$profile/airootfs/etc/mkinitcpio.d/linux.preset"'
 assert_true "installer receives runtime package" '[[ $(find "$profile/airootfs/opt/kos" -name "*.pkg.tar.zst" | wc -l) == 1 ]]'
 assert_true "live identity preserves the vendor package boundary" 'grep -qx ID=kos "$profile/airootfs/etc/os-release" && [[ ! -e "$profile/airootfs/usr/lib/os-release" && ! -e "$profile/airootfs/var/lib/kos/os-identity" ]]'
