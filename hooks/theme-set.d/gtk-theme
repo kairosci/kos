@@ -42,7 +42,7 @@ SURFACE=$BACKGROUND
 HOVER=$(mix_color 10)
 BORDER=$(mix_color 18)
 MUTED=$(mix_color 55)
-THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v5" | sha256sum)
+THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v8" | sha256sum)
 GTK_THEME_NAME="Omaconf-${THEME_HASH:0:16}"
 GTK_THEME_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/themes/$GTK_THEME_NAME"
 mkdir -p "$GTK_THEME_DIR/gtk-3.0" "$GTK_THEME_DIR/gtk-4.0"
@@ -83,12 +83,12 @@ for version in 3 4; do
 * { border-radius: 0; box-shadow: none; text-shadow: none; background-image: none; transition: none; }
 window, dialog, .background, menubar, menu, menuitem, notebook, notebook header, notebook tab, viewport, scrolledwindow, stack, .view, .card, .boxed-list, .boxed-list row, popover > contents, tooltip { background-color: $BACKGROUND; color: $FOREGROUND; }
 headerbar, toolbar, .sidebar { background-color: $SURFACE; color: $FOREGROUND; }
-view, treeview, iconview, textview, entry, button, list, row { background-color: $BACKGROUND; color: $FOREGROUND; }
+treeview, iconview, textview, entry, list { background-color: $BACKGROUND; color: $FOREGROUND; }
 view:selected, treeview:selected, iconview:selected, .view:selected, row:selected { background-color: $SELECTION; color: $FOREGROUND; }
 window, dialog, .background, .navigation-sidebar, .card, .boxed-list, .boxed-list row, popover > contents, menu, tooltip, headerbar, entry, button, notebook tab { border-radius: 0; box-shadow: none; background-image: none; }
 decoration { border-radius: 0; box-shadow: none; margin: 0; }
 headerbar, toolbar { min-height: 30px; padding: 3px 6px; box-shadow: none; border-bottom: 1px solid $BORDER; }
-headerbar windowcontrols, headerbar .titlebutton { opacity: 0; min-width: 0; min-height: 0; padding: 0; margin: 0; }
+headerbar windowcontrols { margin: 0; }
 button { border-radius: 0; border-color: $BORDER; background-image: none; box-shadow: none; padding: 4px 8px; }
 entry { border-radius: 0; min-height: 24px; padding: 3px 6px; }
 .navigation-sidebar row, .sidebar row { border-radius: 0; padding: 4px 8px; }
@@ -101,7 +101,28 @@ toolbar button { min-height: 20px; min-width: 20px; padding: 3px 5px; }
 separator { background-color: $BORDER; }
 notebook tab:checked { border-bottom: 2px solid $ACCENT; }
 button:checked, switch:checked, check:checked, radio:checked, scale highlight, progressbar progress { background-color: $ACCENT; color: $BACKGROUND; }
-*:disabled { opacity: 1; color: $MUTED; }
+button:disabled, entry:disabled { color: $MUTED; }
+button.flat, button.image-button, .sidebar row, .navigation-sidebar row { background-color: transparent; border-color: transparent; }
+button.flat:hover, button.image-button:hover, row:hover { background-color: $HOVER; }
+row:selected, row:selected:hover, .sidebar row:selected, .navigation-sidebar row:selected { background-color: $SELECTION; color: $FOREGROUND; }
+button.suggested-action { background-color: $ACCENT; color: $BACKGROUND; border-color: $ACCENT; }
+entry selection, textview text selection { background-color: $SELECTION; color: $FOREGROUND; }
+check, radio { border: 1px solid $BORDER; }
+check:checked, radio:checked { border-color: $ACCENT; }
+scale trough, progressbar trough { background-color: $HOVER; }
+scrollbar trough { background-color: transparent; }
+scrollbar slider { min-width: 8px; min-height: 8px; margin: 0; padding: 0; background-color: $MUTED; border: none; }
+scrollbar slider:hover { background-color: $ACCENT; }
+button, entry, spinbutton, searchentry, combobox, dropdown, row, menuitem, modelbutton, notebook tab, tabs tab, check, radio, switch, switch slider, scale slider, scrollbar slider, expander, link, .link {
+  transition: background-color 120ms ease-out, color 120ms ease-out, border-color 120ms ease-out, outline-color 120ms ease-out;
+}
+scale highlight, progressbar progress, levelbar block {
+  transition: background-color 140ms ease-out, border-color 140ms ease-out;
+}
+button:active, row:active, menuitem:active { transition-duration: 60ms; }
+button:disabled, entry:disabled, spinbutton:disabled, check:disabled, radio:disabled, switch:disabled { transition: none; }
+.link, link { color: $ACCENT; }
+
 EOF_CSS
     if [[ "$version" == 4 ]]; then
         cat >> "$temporary" <<EOF_CSS

@@ -184,8 +184,8 @@ tcheck "check.sysctl_persisted"         "[[ -f /etc/sysctl.d/99-security.conf ]]
 tcheck "check.coredump_disabled"             "[[ -f /etc/security/limits.d/99-no-core.conf ]]"
 
 section verify.sec_pam
-tcheck "check.faillock"    "[[ -f /etc/security/faillock.conf ]]"
-tcheck "check.pwquality"   "[[ -f /etc/security/pwquality.conf ]]"
+tcheck "check.faillock"    "[[ -f /etc/security/faillock.conf ]] && grep -q '^[^#].*pam_faillock.so' /etc/pam.d/system-auth && ! grep -Eq '^[^#].*pam_faillock.so.*(deny|unlock_time|conf)=' /etc/pam.d/system-auth"
+tcheck "check.pwquality"   "[[ -f /etc/security/pwquality.conf ]] && grep -Eq '^password[[:space:]]+requisite[[:space:]]+pam_pwquality.so' /etc/pam.d/system-auth && grep -Eq '^password.*pam_unix.so.*use_authtok' /etc/pam.d/system-auth"
 tcheck "check.access_conf" "[[ -f /etc/security/access.conf ]] && grep -q 'ALL:ALL' /etc/security/access.conf"
 
 section verify.sec_ssh
@@ -239,10 +239,17 @@ tcheck "check.kitty_terminal" "pacman -Q kitty &>/dev/null && ! pacman -Q foot &
 tcheck "check.webapps_removed" "! grep -rlE 'omarchy-(launch-webapp|webapp-handler)' /usr/share/omarchy/applications 2>/dev/null"
 
 section verify.sec_power
+if compgen -G '/sys/class/leds/*kbd_backlight*' >/dev/null; then
+    tcheck "check.keyboard_policy" "[[ -x /usr/local/libexec/omaconf-keyboard-backlight && -f /etc/systemd/system/omaconf-keyboard-backlight@.service && -f /etc/udev/rules.d/99-omaconf-keyboard-backlight.rules ]] && systemctl is-enabled --quiet omaconf-keyboard-backlight.service && systemctl is-enabled --quiet omaconf-keyboard-backlight.timer && systemctl is-active --quiet omaconf-keyboard-backlight.timer"
+    tcheck "check.keyboard_maximum" "bash '$SCRIPT_DIR/lib/keyboard-backlight.sh' --check"
+else
+    skip "$(t power.keyboard_unsupported)"
+fi
 tcheck "check.power_conf" "[[ -f /etc/omaconf/power.conf ]]"
 tcheck "check.battery_udev" "[[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]"
 tcheck "check.battery_tmpfiles" "[[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]"
 tcheck "check.battery_service" "systemctl is-enabled battery-charge-threshold.service &>/dev/null || [[ -L /etc/systemd/system/multi-user.target.wants/battery-charge-threshold.service ]]"
+tcheck "check.battery_service" "systemctl is-enabled --quiet battery-charge-threshold.timer && systemctl is-active --quiet battery-charge-threshold.timer"
 BATTERY_HELPER=/usr/local/libexec/omaconf-set-battery-charge-limit
 BATTERY_STATE_LIMIT=""
 BATTERY_FUNCTIONAL=""
@@ -257,7 +264,7 @@ BATTERY_POLICY=${BATTERY_POLICY:-75}
 
 if [[ -n "$BATTERY_STATE_LIMIT" && -n "$BATTERY_FUNCTIONAL" && -n "$BATTERY_DRIFT" ]]; then
     tcheck "check.battery_policy_applied" "[[ '$BATTERY_STATE_LIMIT' == '$BATTERY_POLICY' ]]"
-    if [[ "$BATTERY_FUNCTIONAL" == "0" ]]; then
+    if [[ "$BATTERY_FUNCTIONAL" == "0" && "$BATTERY_DRIFT" == "no" ]]; then
         skip "$(t verify.skip_charge_unsupported)"
     elif [[ "$BATTERY_DRIFT" == "no" ]]; then
         check "$(t check.battery_limit)" true
@@ -265,7 +272,7 @@ if [[ -n "$BATTERY_STATE_LIMIT" && -n "$BATTERY_FUNCTIONAL" && -n "$BATTERY_DRIF
         check "$(t check.battery_limit)" false
     fi
 else
-    skip "$(t verify.skip_charge_state)"
+    check "$(t verify.skip_charge_state)" false
 fi
 if [[ -r /sys/power/mem_sleep ]]; then
     if grep -q '\[deep\]' /sys/power/mem_sleep; then
@@ -306,7 +313,7 @@ tcheck "check.desktop_unique" "desktop_cleanup_unique \"\$HOME\""
 section verify.sec_debloat
 source "$SCRIPT_DIR/lib/package-pins.sh"
 tcheck "check.retained_updateable" "package_pins_retained_updateable"
-tcheck "check.ignorepkg" "grep -q '^IgnorePkg' /etc/pacman.conf"
+tcheck "check.ignorepkg" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 tcheck "check.icon_theme"      "gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | grep -q 'Qogir'"
 tcheck "check.cursor_theme"  "gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | grep -q 'capitaine-cursors'"
 tcheck "check.no_tela"         "! grep -rq 'Tela' $HOME/.config/omarchy/themes/ 2>/dev/null"
@@ -317,6 +324,12 @@ tcheck "check.desktop_no_foot" "pacman -Q foot &>/dev/null || [[ ! -f \"/usr/sha
 tcheck "check.desktop_disk_valid" "disk_entry_valid"
 tcheck "check.desktop_no_docker" "command -v lazydocker &>/dev/null || [[ ! -f \"/usr/share/omarchy/applications/Docker.desktop\" ]]"
 tcheck "check.desktop_hook" "[[ -f /etc/pacman.d/hooks/99-omaconf-desktop-cleanup.hook ]] && [[ -x /usr/local/libexec/omaconf-desktop-cleanup ]]"
+
+section verify.sec_performance
+# shellcheck source=scripts/lib/responsiveness.sh
+source "$SCRIPT_DIR/lib/responsiveness.sh"
+tcheck "check.performance_files" "responsiveness_files_match \"$(dirname "$SCRIPT_DIR")\""
+tcheck "check.performance_runtime" "responsiveness_runtime \"$(dirname "$SCRIPT_DIR")\""
 
 section verify.sec_aur
 tcheck "check.no_unverified_aur" "! grep -q 'aur_install ' '$SCRIPT_DIR/setup.sh'"

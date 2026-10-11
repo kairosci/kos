@@ -77,22 +77,8 @@ if [[ -w "$BASE_MANIFEST" ]]; then
 fi
 
 log "debloat.pin"
-mkdir -p /etc/pacman.d/omaconf
-chmod 755 /etc/pacman.d/omaconf 2>/dev/null || warn "debloat.omaconf_chmod_skipped"
-printf '%s\n' "${DEBLOAT[@]}" > /etc/pacman.d/omaconf/ignore-pkgs.list
-chmod 644 /etc/pacman.d/omaconf/ignore-pkgs.list 2>/dev/null || warn "debloat.ignore_chmod_skipped"
-source "$PROJECT_DIR/scripts/lib/package-pins.sh"
-EXISTING_PINS=$(package_pins_existing /etc/pacman.conf)
-MERGED_PINS="$EXISTING_PINS"
-for pkg in "${DEBLOAT[@]}"; do
-    grep -qw "$pkg" <<< " $MERGED_PINS " 2>/dev/null || MERGED_PINS="$MERGED_PINS $pkg"
-done
-MERGED_PINS=$(printf '%s\n' "$MERGED_PINS" | xargs)
-if grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf; then
-    sed -i -E "/^[[:space:]]*IgnorePkg[[:space:]]*=/d; /^\[options\]/a IgnorePkg = $MERGED_PINS" /etc/pacman.conf
-else
-    sed -i "/^\[options\]/a IgnorePkg = $MERGED_PINS" /etc/pacman.conf
-fi
+sed -i -E "/^[[:space:]]*IgnorePkg[[:space:]]*=/d" /etc/pacman.conf
+rm -f /etc/pacman.d/omaconf/ignore-pkgs.list
 
 log "debloat.foot_cleanup"
 if ! pacman -Q foot &>/dev/null && ! command -v foot &>/dev/null; then

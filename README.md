@@ -12,6 +12,12 @@ The repository is organized into functional components under dedicated paths, an
 
 ## Execution Workflows
 
+The root setup also installs desktop responsiveness protection through
+`92-responsiveness.sh`: earlier OOM intervention for application and background
+slices, plus resource priority for the core session. See
+[the policy and its limitations](conf/performance/README.md). Existing swap and
+hibernation remain intact. No configuration guarantees that a system never hangs.
+
 System operations run through the standard Makefile targets. Running `make setup` executes the full hardening and provisioning pipeline as root. Running `make verify` checks the security posture against the expected kernel, service and package assertions. Running `make test` executes the modular test suite. Running `make hook` installs the desktop theme hooks and the i18n runtime for the current user, while `make icons` forces an immediate color update for the active theme and `make theme` synchronizes folder icons together with editor themes for Zed. Running `make zed`, `make cli` installs an individual configuration module, and `make editors` installs all of them. Running `make lang` lists the supported languages and marks the active one, while `make i18n-status` reports the resolved catalog and message count and `make clean` purges local execution logs.
 
 ## Provisioning Modules
@@ -50,7 +56,7 @@ Authentication locks accounts after a configured number of consecutive failed at
 
 ## Desktop Parity and Debloat Strategy
 
-Theming keeps the system monitor, folder colors, the icon theme and the cursor in sync with the active palette, and generates Micro colorschemes dynamically from the current theme. Nautilus is the default graphical file manager; GTK provides desktop open and save dialogs. The pipeline removes unneeded stock packages and uses Brave Origin as the default browser, Zed as the editor for files and projects, Nautilus as the graphical file manager, a lightweight image viewer, a media player, a document viewer and a console system monitor. Removed packages stay pinned under `IgnorePkg` in `/etc/pacman.conf` so a later update cannot silently restore them, and obsolete web application shortcuts are cleaned from the application directories. MIME defaults are registered per user for the retained document, image and video types, and the shell bar gains the media plugin in the right section.
+Theming keeps the system monitor, folder colors, the icon theme and the cursor in sync with the active palette, and generates Micro colorschemes dynamically from the current theme. Nautilus is the default graphical file manager; GTK provides desktop open and save dialogs. The pipeline removes unneeded stock packages and uses Brave Origin as the default browser, Zed as the editor for files and projects, Nautilus as the graphical file manager, a lightweight image viewer, a media player, a document viewer and a console system monitor. No `IgnorePkg` entries are kept in `/etc/pacman.conf` so system and Omarchy updates flow without held packages, and obsolete web application shortcuts are cleaned from the application directories. MIME defaults are registered per user for the retained document, image and video types, and the shell bar gains the media plugin in the right section.
 
 ## Regression Prevention
 

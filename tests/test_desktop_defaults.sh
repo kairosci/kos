@@ -36,7 +36,8 @@ SHELL_PLUGINS_MODULE="$PROJECT_DIR/scripts/lib/modules/35-shell-plugins.sh"
 
 assert_file_not_contains "defaults never sets the browser as root" "$DEFAULTS_MODULE" 'omarchy default browser'
 
-assert_file_contains "debloat module merges pins instead of overwriting" "$DEBLOAT_MODULE" "EXISTING_PINS"
+assert_file_contains "debloat module removes IgnorePkg entries" "$DEBLOAT_MODULE" "IgnorePkg"
+assert_file_not_contains "debloat module keeps no merged pin list" "$DEBLOAT_MODULE" "EXISTING_PINS"
 assert_file_contains "debloat module installs persistence hooks" "$DEBLOAT_MODULE" "99-omaconf-persist"
 assert_file_contains "defaults module records file-manager state" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "defaults/file-manager"
 assert_file_contains "defaults module rebinds file manager keys to Nautilus" "$DEFAULTS_MODULE" "omaconf-nautilus-fm"
@@ -66,7 +67,7 @@ assert_file_contains "Makefile exposes the keyring selection target" "$PROJECT_D
 PERSIST_PRE="$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-omaconf-persist"
 assert_file_exists "pre-refresh persist hook exists in repo" "$PERSIST_PRE"
 assert_file_executable "pre-refresh persist hook executable" "$PERSIST_PRE"
-assert_file_contains "pre-refresh hook validates effective IgnorePkg" "$PERSIST_PRE" "pacman-conf IgnorePkg"
+assert_file_not_contains "pre-refresh hook keeps no IgnorePkg" "$PERSIST_PRE" "IgnorePkg"
 
 PERSIST_POST="$PROJECT_DIR/hooks/post-update.d/99-omaconf-persist"
 assert_file_exists "post-update persist hook exists in repo" "$PERSIST_POST"
@@ -76,22 +77,8 @@ assert_false "post-update excludes retired omasec pins" "grep -q '/etc/pacman.d/
 assert_file_not_contains "pre-refresh never escalates package policy changes" "$PERSIST_PRE" 'sudo'
 assert_file_not_contains "post-update never removes packages" "$PERSIST_POST" 'pacman -Rns'
 assert_file_contains "setup aborts on failed debloat" "$DEBLOAT_MODULE" 'err "debloat.partial_removal"'
-_pin_sandbox=$(mktemp -d)
-printf 'geany\nyazi\n' > "$_pin_sandbox/pins"
-# shellcheck disable=SC2329
-pacman-conf() { printf 'geany\nyazi\n'; }
-export -f pacman-conf
-assert_true "pre-refresh accepts matching effective pins" "OMACONF_PIN_FILE='$_pin_sandbox/pins' bash '$PERSIST_PRE'"
-# shellcheck disable=SC2329
-pacman-conf() { printf 'geany\n'; }
-export -f pacman-conf
-assert_false "pre-refresh rejects missing effective pins" "OMACONF_PIN_FILE='$_pin_sandbox/pins' bash '$PERSIST_PRE'"
-# shellcheck disable=SC2329
-pacman-conf() { return 42; }
-export -f pacman-conf
-assert_false "pre-refresh propagates config query failures" "OMACONF_PIN_FILE='$_pin_sandbox/pins' bash '$PERSIST_PRE'"
-unset -f pacman-conf
-rm -rf "$_pin_sandbox"
+assert_true "pre-refresh always succeeds without pins" "bash '$PERSIST_PRE'"
+assert_true "pre-refresh ignores a stale pin file" "OMACONF_PIN_FILE='/nonexistent/pins' bash '$PERSIST_PRE'"
 source "$PROJECT_DIR/scripts/lib/package-pins.sh"
 _pin_fixture=$(mktemp)
 printf 'IgnorePkg = nautilus brave-origin-bin linux-lts\n  IgnorePkg = linux-lts custom-hold # retained\n' > "$_pin_fixture"
@@ -105,6 +92,9 @@ assert_false "retained package holds fail verification" 'package_pins_retained_u
 # shellcheck disable=SC2329
 pacman-conf() { printf 'brave-*\n'; }
 assert_false "wildcard retained package holds fail verification" 'package_pins_retained_updateable'
+# shellcheck disable=SC2329
+pacman-conf() { printf ''; }
+assert_true "empty holds keep retained packages updateable" 'package_pins_retained_updateable'
 # shellcheck disable=SC2329
 pacman-conf() { return 42; }
 assert_false "retained package verification propagates query failure" 'package_pins_retained_updateable'
@@ -154,7 +144,7 @@ if [[ -x "$OMAQT_DIR/install.sh" ]]; then
     assert_file_contains "omaqt installer cleans stale KDE hooks" "$OMAQT_DIR/install.sh" "kde-folder-color"
 fi
 
-if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]] && [[ -f /etc/pacman.d/omaconf/ignore-pkgs.list ]]; then
+if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]]; then
     for app in nautilus zed loupe celluloid qogir-icon-theme; do
         assert_true "$app installed" "pacman -Q $app &>/dev/null"
     done

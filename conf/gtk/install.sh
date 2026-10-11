@@ -13,5 +13,23 @@ if [[ -f "$CONFIG_HOME/hypr/hyprland.lua" ]]; then
 require("omaconf-gtk")
 LUA
 fi
+for asset in "$SCRIPT_DIR/data/nerd-icons/"*; do
+    install_user_file "$asset" "$CONFIG_HOME/omaconf/nerd-icons/${asset##*/}"
+done
+legacy_hook="$CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons"
+if [[ -f "$legacy_hook" ]] && grep -qF 'exec /usr/bin/python "$HOME/.config/omaconf/gtk-unified.py"' "$legacy_hook"; then
+    install_user_file "$legacy_hook" "$CONFIG_HOME/omaconf/migrations/gtk-unified/theme-set"
+    rm -f "$legacy_hook"
+    legacy_generator="$CONFIG_HOME/omaconf/gtk-unified.py"
+    if [[ -f "$legacy_generator" ]]; then
+        install_user_file "$legacy_generator" "$CONFIG_HOME/omaconf/migrations/gtk-unified/generator.py"
+        rm -f "$legacy_generator"
+    fi
+    legacy_update="$CONFIG_HOME/omarchy/hooks/post-update.d/zz-unified-icons"
+    if [[ -f "$legacy_update" ]] && grep -qF 'exec "$HOME/.config/omarchy/hooks/theme-set.d/zz-unified-icons"' "$legacy_update"; then
+        install_user_file "$legacy_update" "$CONFIG_HOME/omaconf/migrations/gtk-unified/post-update"
+        rm -f "$legacy_update"
+    fi
+fi
 apply_user_gsettings "$SCRIPT_DIR/data/settings.tsv"
 log "gui.install_done" "GTK"

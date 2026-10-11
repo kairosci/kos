@@ -14,8 +14,9 @@ test_section "Debloat, Application Parity & Theming"
 
 assert_file_exists "debloat module exists" "$DEBLOAT_MODULE"
 assert_file_contains "debloat module defines package removal" "$DEBLOAT_MODULE" "pacman -Rns"
-assert_file_contains "debloat module defines IgnorePkg pinning" "$DEBLOAT_MODULE" "IgnorePkg.*MERGED_PINS"
-assert_file_contains "debloat module merges pins instead of overwriting" "$DEBLOAT_MODULE" "EXISTING_PINS"
+assert_file_contains "debloat module removes IgnorePkg entries" "$DEBLOAT_MODULE" "IgnorePkg"
+assert_file_not_contains "debloat module keeps no merged pin list" "$DEBLOAT_MODULE" "MERGED_PINS"
+assert_file_not_contains "debloat module preserves no existing pins" "$DEBLOAT_MODULE" "EXISTING_PINS"
 assert_file_contains "debloat module installs persistence hooks" "$DEBLOAT_MODULE" "99-omaconf-persist"
 assert_file_contains "debloat removes Neovim" "$DEBLOAT_MODULE" "neovim"
 assert_file_contains "debloat removes the Omarchy Neovim package" "$DEBLOAT_MODULE" "omarchy-nvim"
@@ -122,7 +123,7 @@ if command -v magick &>/dev/null; then
     rm -rf "$PREVIEW_SANDBOX"
 fi
 
-if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]] && [[ -f /etc/pacman.d/omaconf/ignore-pkgs.list ]]; then
+if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]]; then
     assert_true "herdr installed" "pacman -Q herdr &>/dev/null"
     assert_true "gum installed" "pacman -Q gum &>/dev/null"
     assert_true "Nautilus installed" "pacman -Q nautilus &>/dev/null"
@@ -143,9 +144,9 @@ if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]] && [[ -f /etc/pac
     assert_true "podman installed" "pacman -Q podman &>/dev/null"
 fi
 
-if [[ -f /etc/pacman.d/omaconf/ignore-pkgs.list ]]; then
-    assert_file_exists "pacman ignore-pkgs.list exists" "/etc/pacman.d/omaconf/ignore-pkgs.list"
-    assert_file_contains "pacman.conf has IgnorePkg" "/etc/pacman.conf" "^IgnorePkg"
+if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]]; then
+    assert_false "stale ignore-pkgs.list is gone" "[[ -f /etc/pacman.d/omaconf/ignore-pkgs.list ]]"
+    assert_false "pacman.conf carries no IgnorePkg" "grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 fi
 
 HOOK_FILE="$PROJECT_DIR/hooks/theme-set.d/folder-color"
@@ -156,7 +157,7 @@ assert_file_executable "folder-color hook executable" "$HOOK_FILE"
 PERSIST_PRE="$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-omaconf-persist"
 assert_file_exists "pre-refresh persist hook exists in repo" "$PERSIST_PRE"
 assert_file_executable "pre-refresh persist hook executable" "$PERSIST_PRE"
-assert_file_contains "pre-refresh hook re-merges IgnorePkg" "$PERSIST_PRE" "IgnorePkg"
+assert_file_not_contains "pre-refresh hook keeps no IgnorePkg" "$PERSIST_PRE" "IgnorePkg"
 
 PERSIST_POST="$PROJECT_DIR/hooks/post-update.d/99-omaconf-persist"
 assert_file_exists "post-update persist hook exists in repo" "$PERSIST_POST"

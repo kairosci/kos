@@ -109,7 +109,7 @@ done
 check "docker daemon absent" "! command -v dockerd &>/dev/null"
 
 section "Pacman Configuration & Pinning"
-check "IgnorePkg defined in /etc/pacman.conf" "grep -q '^IgnorePkg' /etc/pacman.conf"
+check "No IgnorePkg in /etc/pacman.conf" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 check "No syntax error in /etc/pacman.conf" "pacman -Q &>/dev/null"
 
 section "Security Daemon Non-Lockout Checks"

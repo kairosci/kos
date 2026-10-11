@@ -1,2 +1,2 @@
-org.gnome.desktop.interface	enable-animations	false
+org.gnome.desktop.interface	enable-animations	true
 org.gnome.desktop.wm.preferences	button-layout	':'

@@ -21,6 +21,9 @@ for suite in "$@"; do
             suite_failed=1
         fi
         cat "$SUITE_LOG"
+        if grep -q '^  fail ' "$SUITE_LOG"; then
+            suite_failed=1
+        fi
         assertion_count=$(awk '/^  (pass|fail|warn) / { count++ } END { print count + 0 }' "$SUITE_LOG")
         reported_count=$(sed -nE 's/.*Summary: Tests Executed: ([0-9]+) \|.*/\1/p' "$SUITE_LOG" | tail -n 1)
         TOTAL_ASSERTIONS=$((TOTAL_ASSERTIONS + assertion_count))

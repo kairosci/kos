@@ -50,6 +50,7 @@ MODULE_FILES=(
     "$MODULES_DIR/89-battery-charge.sh"
     "$MODULES_DIR/90-hardware-power.sh"
     "$MODULES_DIR/91-suspend-resume.sh"
+    "$MODULES_DIR/92-responsiveness.sh"
     "$MODULES_DIR/95-maintenance.sh"
 )
 
