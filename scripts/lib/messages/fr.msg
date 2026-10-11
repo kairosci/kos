@@ -444,3 +444,4 @@ power.keyboard_unsupported=Aucune interface de rétroéclairage du clavier dispo
 power.keyboard_invalid_args=Arguments de rétroéclairage du clavier non valides
 check.keyboard_policy=Politique de rétroéclairage maximal du clavier activée
 check.keyboard_maximum=Rétroéclairage du clavier au maximum matériel
+setup.keyboard_done=Restauration automatique du rétroéclairage du clavier configurée

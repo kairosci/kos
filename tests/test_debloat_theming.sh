@@ -123,7 +123,7 @@ if command -v magick &>/dev/null; then
     rm -rf "$PREVIEW_SANDBOX"
 fi
 
-if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]]; then
+if desktop_runtime_available; then
     assert_true "herdr installed" "pacman -Q herdr &>/dev/null"
     assert_true "gum installed" "pacman -Q gum &>/dev/null"
     assert_true "Nautilus installed" "pacman -Q nautilus &>/dev/null"

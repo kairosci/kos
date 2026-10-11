@@ -18,13 +18,38 @@ source "$SCRIPT_DIR/lib/target-user.sh"
 
 i18n_init
 
-if [[ "${1:-}" == --rebuild-previews ]]; then
-    OMACONF_REBUILD_PREVIEWS=1
-    shift
-fi
-(($# == 0)) || err "setup.invalid_args"
+SETUP_SCOPE=full
+scope_specified=0
+while (($#)); do
+    case "$1" in
+        --rebuild-previews)
+            OMACONF_REBUILD_PREVIEWS=1
+            shift
+            ;;
+        --scope)
+            [[ $# -ge 2 && $scope_specified -eq 0 ]] || err "setup.invalid_args"
+            SETUP_SCOPE="$2"
+            scope_specified=1
+            shift 2
+            ;;
+        *) err "setup.invalid_args" ;;
+    esac
+done
+case "$SETUP_SCOPE" in
+    full|keyboard) ;;
+    *) err "setup.invalid_args" ;;
+esac
+[[ "$SETUP_SCOPE" == full || "${OMACONF_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
 
 [[ $EUID -eq 0 ]] || err "__root_required"
+
+if [[ "$SETUP_SCOPE" == keyboard ]]; then
+    log "__stage" "keyboard-backlight-policy.sh"
+    # shellcheck source=lib/keyboard-backlight-policy.sh
+    source "$SCRIPT_DIR/lib/keyboard-backlight-policy.sh"
+    log "setup.keyboard_done"
+    exit 0
+fi
 
 PRIMARY_USER=$(target_user_resolve) || err "__cannot_determine_user"
 

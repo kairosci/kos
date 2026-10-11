@@ -144,7 +144,7 @@ if [[ -x "$OMAQT_DIR/install.sh" ]]; then
     assert_file_contains "omaqt installer cleans stale KDE hooks" "$OMAQT_DIR/install.sh" "kde-folder-color"
 fi
 
-if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]]; then
+if desktop_runtime_available; then
     for app in nautilus zed loupe celluloid qogir-icon-theme; do
         assert_true "$app installed" "pacman -Q $app &>/dev/null"
     done
@@ -154,7 +154,7 @@ if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]]; then
     done
 fi
 
-if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]] && [[ -f /etc/mime.types ]]; then
+if desktop_runtime_available && [[ -f /etc/mime.types ]]; then
     assert_true "pdf default is Papers" "xdg-mime query default application/pdf 2>/dev/null | grep -q 'org.gnome.Papers'"
     assert_true "image default is Loupe" "xdg-mime query default image/jpeg 2>/dev/null | grep -q 'org.gnome.Loupe'"
     assert_true "video default is Celluloid" "xdg-mime query default video/mp4 2>/dev/null | grep -q 'celluloid_player.Celluloid'"
