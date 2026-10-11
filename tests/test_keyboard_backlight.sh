@@ -99,6 +99,12 @@ boot_hash=$(sha256sum "$KEYBOARD_SANDBOX/root/etc/systemd/system/"* "$KEYBOARD_S
 assert_true "repeated keyboard setup produces identical units" "PROJECT_ROOT='$PROJECT_DIR' bash '$KEYBOARD_SANDBOX/provision.sh'; [[ \"\$boot_hash\" == \"\$(sha256sum '$KEYBOARD_SANDBOX/root/etc/systemd/system/'* '$KEYBOARD_SANDBOX/root/etc/udev/rules.d/'*)\" ]]"
 assert_false "failed systemd reconciliation stops keyboard setup" "KEYBOARD_CONTROL_FAIL=1 PROJECT_ROOT='$PROJECT_DIR' bash '$KEYBOARD_SANDBOX/provision.sh'"
 printf '0\n' > "$OMACONF_KEYBOARD_LEDS_ROOT/vendor::kbd_backlight/brightness"
+keyboard_runtime="$KEYBOARD_SANDBOX/root/usr/local/lib/omaconf"
+mkdir -p "$keyboard_runtime"
+cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$keyboard_runtime/"
+cp -r "$PROJECT_DIR/scripts/lib/messages" "$keyboard_runtime/"
+sed -e "s|/usr/local/lib/omaconf|$keyboard_runtime|g" -e 's/\$EUID/0/g' \
+    "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/root/usr/local/libexec/omaconf-keyboard-backlight"
 assert_true "device activation restores a level overwritten by native boot restore" "command=\$(sed -n 's/^ExecStart=//p' '$DEVICE_UNIT'); command=\${command/\/usr\/local\/libexec\/omaconf-keyboard-backlight/\$KEYBOARD_SANDBOX\/root\/usr\/local\/libexec\/omaconf-keyboard-backlight}; bash -c \"\$command\" && [[ \"\$(cat '$OMACONF_KEYBOARD_LEDS_ROOT/vendor::kbd_backlight/brightness')\" == 3 ]]"
 sed 's/\$EUID/${KEYBOARD_TEST_EUID}/g' "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/keyboard-root.sh"
 cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$KEYBOARD_SANDBOX/"
