@@ -109,6 +109,9 @@ jobs:
       - name: Run Application Policy Tests
         run: bash tests/test_application_policy.sh
 
+      - name: Run Update Hook Security Tests
+        run: bash tests/test_update_hooks.sh
+
   arch-container-validation:
     name: Arch Linux Container Full Run
     runs-on: ubuntu-latest
