@@ -453,3 +453,6 @@ release.done=kos Veröffentlichungsdateien erstellt in %s
 release.root=Das Erstellen der Veröffentlichung erfordert root
 debug.saved=Protokoll gespeichert in %s
 setup.release_done=kos Veröffentlichung erfolgreich erstellt
+make.iso=Eigenständiges kos-Installations-ISO erstellen (root)
+release.iso_start=Starte Erstellung des kos ISO-Abbilds
+release.iso_done=Erstellung des kos ISO-Abbilds abgeschlossen

@@ -453,3 +453,6 @@ release.done=Ficheiros da versão do kos gerados em %s
 release.root=A compilação da versão requer root
 debug.saved=Registo guardado em %s
 setup.release_done=Compilação da versão do kos concluída
+make.iso=Compilar a ISO de instalação autónoma do kos (root)
+release.iso_start=Iniciando a geração da ISO do kos
+release.iso_done=Geração da ISO do kos concluída

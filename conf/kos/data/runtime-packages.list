@@ -33,3 +33,8 @@ mkinitcpio
 efibootmgr
 libnotify
 fakeroot
+qt6-wayland
+xdg-desktop-portal
+xorg-xwayland
+pipewire-audio
+pipewire-alsa

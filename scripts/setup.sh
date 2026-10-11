@@ -36,7 +36,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|release|migrate|kernel) ;;
+    full|keyboard|release|iso|migrate|kernel) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ ( "$SETUP_SCOPE" == full || "$SETUP_SCOPE" == migrate ) || "${KOS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -49,8 +49,10 @@ if [[ "$SETUP_SCOPE" == kernel ]]; then
     exit 0
 fi
 
-if [[ "$SETUP_SCOPE" == release ]]; then
-    KOS_APPLY_PIPELINE=1 bash "$SCRIPT_DIR/build-release.sh"
+if [[ "$SETUP_SCOPE" == release || "$SETUP_SCOPE" == iso ]]; then
+    log "__stage" "96-release-iso.sh"
+    # shellcheck source=lib/modules/96-release-iso.sh
+    source "$MODULES_DIR/96-release-iso.sh"
     log setup.release_done
     exit 0
 fi
@@ -111,6 +113,7 @@ MODULE_FILES=(
     "$MODULES_DIR/91-suspend-resume.sh"
     "$MODULES_DIR/92-responsiveness.sh"
     "$MODULES_DIR/95-maintenance.sh"
+    "$MODULES_DIR/96-release-iso.sh"
 )
 
 for mod in "${MODULE_FILES[@]}"; do
