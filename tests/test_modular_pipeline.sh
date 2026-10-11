@@ -35,6 +35,7 @@ EXPECTED_MODULES=(
     "91-suspend-resume.sh"
     "92-responsiveness.sh"
     "95-maintenance.sh"
+    "96-release-iso.sh"
 )
 
 for m in "${EXPECTED_MODULES[@]}"; do
@@ -44,6 +45,10 @@ for m in "${EXPECTED_MODULES[@]}"; do
     assert_file_contains "module $m has strict mode" "$mpath" "set -euo pipefail"
     assert_file_contains "setup.sh references module $m" "$PROJECT_DIR/scripts/setup.sh" "$m"
 done
+
+assert_file_contains "96-release-iso checks scope or KOS_BUILD_ISO" "$MODULES_DIR/96-release-iso.sh" "KOS_BUILD_ISO"
+assert_file_contains "96-release-iso invokes build-release" "$MODULES_DIR/96-release-iso.sh" "build-release.sh"
+assert_true "96-release-iso skips execution in default full setup scope" "SETUP_SCOPE=full KOS_BUILD_ISO=0 bash -c 'source \"$MODULES_DIR/96-release-iso.sh\"'"
 
 assert_file_contains "00-env defines aur_verified_install" "$MODULES_DIR/00-env.sh" "aur_verified_install\(\)"
 assert_file_contains "00-env defines kos_as helper" "$MODULES_DIR/00-env.sh" "kos_as\(\)"

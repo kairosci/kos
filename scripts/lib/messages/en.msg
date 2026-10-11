@@ -453,3 +453,6 @@ release.done=kos release artifacts generated in %s
 release.root=Release builds require root
 debug.saved=Log saved in %s
 setup.release_done=kos release build completed
+make.iso=Build standalone kos installation ISO (root)
+release.iso_start=Starting kos ISO generation
+release.iso_done=kos ISO generation completed

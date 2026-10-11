@@ -16,7 +16,13 @@ else
 $(error BACKEND must be gnome-keyring)
 endif
 
-.PHONY: help setup keyring verify test hook icons theme zed cli herdr editors clean lang i18n-status lint
+.PHONY: help setup keyring verify test hook icons theme zed cli herdr editors clean lang i18n-status lint iso release
+
+iso:
+	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh --scope iso
+
+release:
+	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh --scope release
 
 lint:
 	@if ! command -v shellcheck &> /dev/null; then \
