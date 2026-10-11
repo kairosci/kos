@@ -28,4 +28,7 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_os_identity.sh" \
     "$SCRIPT_DIR/test_bluetooth_state.sh" \
     "$SCRIPT_DIR/test_power_state.sh" \
-    "$SCRIPT_DIR/test_responsiveness.sh"
+    "$SCRIPT_DIR/test_responsiveness.sh" \
+    "$SCRIPT_DIR/test_test_harness.sh" \
+    "$SCRIPT_DIR/test_update_hooks.sh" \
+    "$SCRIPT_DIR/test_keyboard_backlight.sh"
