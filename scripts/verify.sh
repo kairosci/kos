@@ -239,6 +239,12 @@ tcheck "check.kitty_terminal" "pacman -Q kitty &>/dev/null && ! pacman -Q foot &
 tcheck "check.webapps_removed" "! grep -rlE 'omarchy-(launch-webapp|webapp-handler)' /usr/share/omarchy/applications 2>/dev/null"
 
 section verify.sec_power
+if compgen -G '/sys/class/leds/*kbd_backlight*' >/dev/null; then
+    tcheck "check.keyboard_policy" "[[ -x /usr/local/libexec/omaconf-keyboard-backlight && -f /etc/systemd/system/omaconf-keyboard-backlight@.service && -f /etc/udev/rules.d/99-omaconf-keyboard-backlight.rules ]] && systemctl is-enabled --quiet omaconf-keyboard-backlight.service && systemctl is-enabled --quiet omaconf-keyboard-backlight.timer && systemctl is-active --quiet omaconf-keyboard-backlight.timer"
+    tcheck "check.keyboard_maximum" "bash '$SCRIPT_DIR/lib/keyboard-backlight.sh' --check"
+else
+    skip "$(t power.keyboard_unsupported)"
+fi
 tcheck "check.power_conf" "[[ -f /etc/omaconf/power.conf ]]"
 tcheck "check.battery_udev" "[[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]"
 tcheck "check.battery_tmpfiles" "[[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]"
@@ -307,7 +313,7 @@ tcheck "check.desktop_unique" "desktop_cleanup_unique \"\$HOME\""
 section verify.sec_debloat
 source "$SCRIPT_DIR/lib/package-pins.sh"
 tcheck "check.retained_updateable" "package_pins_retained_updateable"
-tcheck "check.ignorepkg" "grep -q '^IgnorePkg' /etc/pacman.conf"
+tcheck "check.ignorepkg" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 tcheck "check.icon_theme"      "gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | grep -q 'Qogir'"
 tcheck "check.cursor_theme"  "gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | grep -q 'capitaine-cursors'"
 tcheck "check.no_tela"         "! grep -rq 'Tela' $HOME/.config/omarchy/themes/ 2>/dev/null"

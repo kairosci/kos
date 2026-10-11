@@ -15,6 +15,7 @@ package_pins_existing() {
 package_pins_retained_updateable() {
     local pins pattern package
     pins=$(pacman-conf IgnorePkg) || return 1
+    [[ -z "${pins//[[:space:]]/}" ]] && return 0
     while IFS= read -r pattern; do
         [[ -n "$pattern" ]] || continue
         for package in nautilus brave-origin-bin; do
@@ -22,4 +23,5 @@ package_pins_retained_updateable() {
             [[ "$package" != $pattern ]] || return 1
         done
     done <<< "$pins"
+    return 0
 }
