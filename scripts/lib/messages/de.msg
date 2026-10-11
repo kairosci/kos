@@ -444,3 +444,4 @@ power.keyboard_unsupported=Keine Schnittstelle für die Tastaturbeleuchtung verf
 power.keyboard_invalid_args=Ungültige Argumente für die Tastaturbeleuchtung
 check.keyboard_policy=Richtlinie für maximale Tastaturbeleuchtung ist aktiviert
 check.keyboard_maximum=Tastaturbeleuchtung erreicht das Hardwaremaximum
+setup.keyboard_done=Automatische Tastaturbeleuchtung eingerichtet

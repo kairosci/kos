@@ -4,6 +4,7 @@ PROJECT_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 .DEFAULT_GOAL := help
 BACKEND ?= gnome-keyring
 REBUILD_PREVIEWS ?= 0
+SCOPE ?= full
 
 ifeq ($(filter $(REBUILD_PREVIEWS),0 1),)
 $(error REBUILD_PREVIEWS must be 0 or 1)
@@ -32,7 +33,7 @@ help:
 	@bash scripts/lib/help.sh
 
 setup:
-	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh $(if $(filter 1,$(REBUILD_PREVIEWS)),--rebuild-previews)
+	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh --scope "$(SCOPE)" $(if $(filter 1,$(REBUILD_PREVIEWS)),--rebuild-previews)
 
 keyring:
 	bash $(PROJECT_ROOT)/scripts/keyring-switch.sh "$(KEYRING_BACKEND)"

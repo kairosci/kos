@@ -444,3 +444,4 @@ power.keyboard_unsupported=No keyboard backlight interface is available
 power.keyboard_invalid_args=Invalid keyboard backlight arguments
 check.keyboard_policy=Maximum keyboard backlight policy is enabled
 check.keyboard_maximum=Keyboard backlight is at its hardware maximum
+setup.keyboard_done=Keyboard backlight reconciliation complete
