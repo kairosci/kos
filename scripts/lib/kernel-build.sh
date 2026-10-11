@@ -11,7 +11,13 @@ kos_kernel_build() {
         user="${user%%:*}"
     else
         user=kosbuild
-        useradd -m -u "$uid" "$user"
+        if ! useradd -m -u "$uid" "$user" 2>/dev/null; then
+            printf '%s:x:%s:%s::/home/%s:/bin/bash\n' "$user" "$uid" "$uid" "$user" >> /etc/passwd
+            printf '%s:!::0:::::\n' "$user" >> /etc/shadow
+            printf '%s:x:%s:\n' "$user" "$uid" >> /etc/group
+            printf '%s:!::\n' "$user" >> /etc/gshadow
+            install -d -m 700 -o "$uid" -g "$uid" "/home/$user"
+        fi
     fi
     [[ $(id -u "$user") == "$uid" ]] || err release.invalid
     install -d -m 755 "$output"
