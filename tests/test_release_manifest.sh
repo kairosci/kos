@@ -7,17 +7,17 @@ source "$SCRIPT_DIR/../scripts/lib/release-query.sh"
 SANDBOX=$(mktemp -d)
 trap 'rm -rf "$SANDBOX"' EXIT
 manifest="$SANDBOX/PACKAGES.json"
-jq -n '{release:"0.1.0", packages: ["kos", "linux-kos", "linux-kos-headers"] | map({name: ., version: "0.1.0-1", file: (. + "-0.1.0-1-x86_64.pkg.tar.zst"), sha256: ("a" * 64)})}' > "$manifest"
+jq -n '{release:"0.1.0", packages: ["kos"] | map({name: ., version: "0.1.0-1", file: (. + "-0.1.0-1-x86_64.pkg.tar.zst"), sha256: ("a" * 64)})}' > "$manifest"
 test_section "kos Release Verification"
 assert_true "complete exact package manifest is accepted" 'kos_manifest_valid "$manifest" 0.1.0'
 assert_false "different release version is rejected" 'kos_manifest_valid "$manifest" 0.2.0'
-jq '.packages[1].file = "../outside.pkg.tar.zst"' "$manifest" > "$SANDBOX/unsafe.json"
+jq '.packages[0].file = "../outside.pkg.tar.zst"' "$manifest" > "$SANDBOX/unsafe.json"
 assert_false "package path traversal is rejected" 'kos_manifest_valid "$SANDBOX/unsafe.json" 0.1.0'
-jq '.packages[1].name = "unexpected"' "$manifest" > "$SANDBOX/unsafe.json"
+jq '.packages[0].name = "unexpected"' "$manifest" > "$SANDBOX/unsafe.json"
 assert_false "unexpected package names are rejected" 'kos_manifest_valid "$SANDBOX/unsafe.json" 0.1.0'
-jq '.packages[1] = .packages[0]' "$manifest" > "$SANDBOX/unsafe.json"
+jq '.packages += [.packages[0]]' "$manifest" > "$SANDBOX/unsafe.json"
 assert_false "duplicates cannot replace a required package" 'kos_manifest_valid "$SANDBOX/unsafe.json" 0.1.0'
-jq '.packages[1].sha256 = "unverified"' "$manifest" > "$SANDBOX/unsafe.json"
+jq '.packages[0].sha256 = "unverified"' "$manifest" > "$SANDBOX/unsafe.json"
 assert_false "invalid checksums are rejected" 'kos_manifest_valid "$SANDBOX/unsafe.json" 0.1.0'
 curl() {
     local destination

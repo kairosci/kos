@@ -43,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           identity="https://github.com/$GITHUB_REPOSITORY/.github/workflows/release.yml@refs/heads/main"
-          for artifact in dist/kos-*.pkg.tar.zst dist/linux-kos-*.pkg.tar.zst dist/*.src.tar.* dist/kos-*.iso dist/PACKAGES.json; do
+          for artifact in dist/kos-*.pkg.tar.zst dist/*.src.tar.* dist/kos-*.iso dist/PACKAGES.json; do
             cosign sign-blob --yes --bundle "$artifact.sigstore.json" "$artifact"
             cosign verify-blob "$artifact" --bundle "$artifact.sigstore.json" \
               --certificate-identity "$identity" \
@@ -54,7 +54,6 @@ jobs:
           name: kos-release
           path: |
             dist/kos-*.pkg.tar.zst
-            dist/linux-kos-*.pkg.tar.zst
             dist/*.src.tar.*
             dist/kos-*.iso
             dist/*.sigstore.json
@@ -69,7 +68,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(cat conf/kos/data/version)
-          gh release create "v$version" dist/kos-*.pkg.tar.zst dist/linux-kos-*.pkg.tar.zst dist/*.src.tar.* dist/kos-*.iso dist/PACKAGES.json \
+          gh release create "v$version" dist/kos-*.pkg.tar.zst dist/*.src.tar.* dist/kos-*.iso dist/PACKAGES.json \
             dist/*.sigstore.json dist/SHA256SUMS \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "kos $version" --notes '' --prerelease

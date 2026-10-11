@@ -2,14 +2,12 @@
 
 kos_release_profile() {
     local project="$1" profile="$2" package="$3" releng="$4" version repository file
-    local -a kernels=("${package%/*}"/linux-kos-*.pkg.tar.zst)
     version=$(kos_version "$project") || return 1
     [[ ! -e "$profile" && -f "$package" && -f "$releng/profiledef.sh" ]] || return 1
-    [[ ${#kernels[@]} == 2 && -f ${kernels[0]} && -f ${kernels[1]} ]] || return 1
     cp -a "$releng" "$profile" || return 1
     repository="${profile%/*}/repository"
     install -d -m 755 "$repository"
-    cp "$package" "${kernels[@]}" "$repository/" || return 1
+    cp "$package" "$repository/" || return 1
     repo-add "$repository/kos.db.tar.gz" "$repository/"*.pkg.tar.zst || return 1
     printf '\n[kos]\nSigLevel = Optional TrustAll\nServer = file://%s\n' "$repository" >> "$profile/pacman.conf" || return 1
     install -d -m 755 "$profile/airootfs"
@@ -22,16 +20,9 @@ kos_release_profile() {
         ln -s /dev/null "$profile/airootfs/etc/pacman.d/hooks/$file" || return 1
     done
     install -d -m 755 "$profile/airootfs/opt/kos"
-    cp "$package" "${kernels[@]}" "$profile/airootfs/opt/kos/" || return 1
+    cp "$package" "$profile/airootfs/opt/kos/" || return 1
     cat "$project/conf/kos/data/runtime-packages.list" "$project/conf/kos/data/iso-packages.list" >> "$profile/packages.x86_64" || return 1
-    printf 'kos\nlinux-kos\n' >> "$profile/packages.x86_64" || return 1
-    sed -i '/^linux$/d' "$profile/packages.x86_64" || return 1
-    while IFS= read -r -d '' file; do
-        sed -i -e 's/vmlinuz-linux\b/vmlinuz-linux-kos/g' -e 's/initramfs-linux\b/initramfs-linux-kos/g' "$file" || return 1
-    done < <(find "$profile" -type f \( -name '*.cfg' -o -name '*.conf' -o -name '*.preset' \) -print0)
-    if [[ -f "$profile/airootfs/etc/mkinitcpio.d/linux.preset" ]]; then
-        mv "$profile/airootfs/etc/mkinitcpio.d/linux.preset" "$profile/airootfs/etc/mkinitcpio.d/linux-kos.preset" || return 1
-    fi
+    printf 'kos\nlinux\nlinux-headers\n' >> "$profile/packages.x86_64" || return 1
     LC_ALL=C sort -u "$profile/packages.x86_64" -o "$profile/packages.x86_64" || return 1
     cat >> "$profile/profiledef.sh" <<PROFILE
 iso_name="kos"
@@ -60,8 +51,6 @@ kos_release_build() {
     for tool in mkarchiso bsdtar zstd repo-add; do
         command -v "$tool" >/dev/null || err release.tools "$tool"
     done
-    source "$project/scripts/lib/kernel-build.sh"
-    kos_kernel_build "$project" "$output"
     package=$(kos_package_build "$project" "$output") || err release.invalid
     source "$project/scripts/lib/release-manifest.sh"
     kos_manifest_create "$output" "$(kos_version "$project")" || err release.invalid
@@ -71,7 +60,7 @@ kos_release_build() {
     mkarchiso -v -w "$work/work" -o "$output" "$work/profile"
     (
         cd "$output" || exit 1
-        sha256sum -- kos-*.pkg.tar.zst linux-kos-*.pkg.tar.zst *.src.tar.* kos-*.iso > SHA256SUMS
+        sha256sum -- kos-*.pkg.tar.zst *.src.tar.* kos-*.iso > SHA256SUMS
     )
     rm -rf "$work"
     chmod 644 "$output"/kos-*.pkg.tar.zst "$output"/kos-*.iso "$output/SHA256SUMS"

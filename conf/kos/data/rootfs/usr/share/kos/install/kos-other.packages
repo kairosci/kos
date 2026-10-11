@@ -21,8 +21,8 @@ limine
 limine-mkinitcpio-hook
 limine-snapper-sync
 linux-firmware
-linux-kos
-linux-kos-headers
+linux
+linux-headers
 macbook12-spi-driver-dkms
 nvidia-580xx-dkms
 nvidia-dkms

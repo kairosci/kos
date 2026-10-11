@@ -79,12 +79,10 @@ if [[ "$SETUP_SCOPE" == migrate ]]; then
         kos_migrate_preflight "$_home" "$_legacy_desktop" "$_legacy_automation" || err release.invalid
     done
     source "$SCRIPT_DIR/lib/distribution.sh"
-    source "$SCRIPT_DIR/lib/kernel-build.sh"
-    kos_kernel_build "$PROJECT_ROOT" "$PROJECT_ROOT/dist"
     _runtime_package=$(kos_package_build "$PROJECT_ROOT" "$PROJECT_ROOT/dist") || err release.invalid
     mapfile -t _runtime_packages < "$PROJECT_ROOT/conf/kos/data/runtime-packages.list"
     pacman -Syu --needed --noconfirm "${_runtime_packages[@]}"
-    pacman -U --noconfirm "$_runtime_package" "$PROJECT_ROOT/dist/"linux-kos-*.pkg.tar.zst
+    pacman -U --noconfirm "$_runtime_package"
 fi
 
 MODULE_FILES=(
