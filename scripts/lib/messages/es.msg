@@ -444,3 +444,4 @@ power.keyboard_unsupported=No hay una interfaz de iluminación del teclado dispo
 power.keyboard_invalid_args=Argumentos de iluminación del teclado no válidos
 check.keyboard_policy=Política de iluminación máxima del teclado activa
 check.keyboard_maximum=Iluminación del teclado al máximo del hardware
+setup.keyboard_done=Restauración automática de la iluminación del teclado configurada

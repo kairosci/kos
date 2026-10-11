@@ -85,9 +85,10 @@ printf 'udev %s\n' "$*" >> "$KEYBOARD_COMMANDS"
 MOCK
 chmod 755 "$KEYBOARD_SANDBOX/bin/udevadm"
 printf '%s\n' '#!/bin/bash' 'set -euo pipefail' 'source "$OMACONF_I18N_BOOT"' 'i18n_init' > "$KEYBOARD_SANDBOX/provision.sh"
-awk '/^rm -f / && found { exit } /^log "power.keyboard"$/ { found=1 } found { print }' \
-    "$PROJECT_DIR/scripts/lib/modules/91-suspend-resume.sh" | \
+sed '1,2d' "$PROJECT_DIR/scripts/lib/keyboard-backlight-policy.sh" | \
     sed -e "s|/usr/local/libexec/|$KEYBOARD_SANDBOX/root/usr/local/libexec/|g" \
+        -e "s|/usr/local/lib/omaconf/|$KEYBOARD_SANDBOX/root/usr/local/lib/omaconf/|g" \
+        -e 's/ -o root -g root//g' \
         -e "s|/usr/lib/systemd/system-sleep/|$KEYBOARD_SANDBOX/root/usr/lib/systemd/system-sleep/|g" \
         -e "s|/etc/|$KEYBOARD_SANDBOX/root/etc/|g" >> "$KEYBOARD_SANDBOX/provision.sh"
 assert_true "setup installs keyboard boot and device services in an isolated root" "PROJECT_ROOT='$PROJECT_DIR' bash '$KEYBOARD_SANDBOX/provision.sh'"
@@ -100,9 +101,7 @@ assert_true "repeated keyboard setup produces identical units" "PROJECT_ROOT='$P
 assert_false "failed systemd reconciliation stops keyboard setup" "KEYBOARD_CONTROL_FAIL=1 PROJECT_ROOT='$PROJECT_DIR' bash '$KEYBOARD_SANDBOX/provision.sh'"
 printf '0\n' > "$OMACONF_KEYBOARD_LEDS_ROOT/vendor::kbd_backlight/brightness"
 keyboard_runtime="$KEYBOARD_SANDBOX/root/usr/local/lib/omaconf"
-mkdir -p "$keyboard_runtime"
-cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$keyboard_runtime/"
-cp -r "$PROJECT_DIR/scripts/lib/messages" "$keyboard_runtime/"
+assert_true "scoped policy installs its trusted message runtime" "cmp '$PROJECT_DIR/scripts/lib/i18n.sh' '$keyboard_runtime/i18n.sh' && cmp '$PROJECT_DIR/scripts/lib/messages/en.msg' '$keyboard_runtime/messages/en.msg'"
 sed -e "s|/usr/local/lib/omaconf|$keyboard_runtime|g" -e 's/\$EUID/0/g' \
     "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/root/usr/local/libexec/omaconf-keyboard-backlight"
 assert_true "device activation restores a level overwritten by native boot restore" "command=\$(sed -n 's/^ExecStart=//p' '$DEVICE_UNIT'); command=\${command/\/usr\/local\/libexec\/omaconf-keyboard-backlight/\$KEYBOARD_SANDBOX\/root\/usr\/local\/libexec\/omaconf-keyboard-backlight}; bash -c \"\$command\" && [[ \"\$(cat '$OMACONF_KEYBOARD_LEDS_ROOT/vendor::kbd_backlight/brightness')\" == 3 ]]"
@@ -111,4 +110,35 @@ cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$KEYBOARD_SANDBOX/"
 cp -r "$PROJECT_DIR/scripts/lib/messages" "$KEYBOARD_SANDBOX/"
 printf 'touch "%s"\nexit 93\n' "$KEYBOARD_SANDBOX/untrusted-ran" > "$KEYBOARD_SANDBOX/untrusted.sh"
 assert_true "root keyboard checks ignore user supplied bootstrap code" "KEYBOARD_TEST_EUID=0 OMACONF_I18N_BOOT='$KEYBOARD_SANDBOX/untrusted.sh' bash '$KEYBOARD_SANDBOX/keyboard-root.sh' --check && [[ ! -e '$KEYBOARD_SANDBOX/untrusted-ran' ]]"
+SETUP_PROJECT="$KEYBOARD_SANDBOX/setup-project"
+mkdir -p "$SETUP_PROJECT/scripts/lib/modules"
+cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$SETUP_PROJECT/scripts/lib/"
+cp -r "$PROJECT_DIR/scripts/lib/messages" "$SETUP_PROJECT/scripts/lib/"
+sed 's/\$EUID/${SETUP_TEST_EUID}/g' "$PROJECT_DIR/scripts/setup.sh" > "$SETUP_PROJECT/scripts/setup.sh"
+cat > "$SETUP_PROJECT/scripts/lib/target-user.sh" <<'MOCK'
+target_user_resolve() {
+    printf 'target\n' >> "$SETUP_TRACE"
+    printf 'tester\n'
+}
+MOCK
+printf '%s\n' 'printf "keyboard\n" >> "$SETUP_TRACE"' > "$SETUP_PROJECT/scripts/lib/keyboard-backlight-policy.sh"
+printf '%s\n' 'printf "packages\n" >> "$SETUP_TRACE"' > "$SETUP_PROJECT/scripts/lib/modules/00-env.sh"
+printf '%s\n' 'source "$PROJECT_ROOT/scripts/lib/keyboard-backlight-policy.sh"' > "$SETUP_PROJECT/scripts/lib/modules/91-suspend-resume.sh"
+SETUP_TRACE="$KEYBOARD_SANDBOX/setup-trace"
+run_setup_scope() {
+    SETUP_TEST_EUID="${SETUP_TEST_EUID:-0}" OMACONF_LOG_STDOUT=1 SETUP_TRACE="$SETUP_TRACE" \
+        OMACONF_I18N_DIR="$SETUP_PROJECT/scripts/lib/messages" bash "$SETUP_PROJECT/scripts/setup.sh" "$@"
+}
+: > "$SETUP_TRACE"
+assert_true "keyboard setup scope runs without resolving an unrelated desktop user" "run_setup_scope --scope keyboard && [[ \"\$(cat '$SETUP_TRACE')\" == keyboard ]]"
+: > "$SETUP_TRACE"
+assert_false "unknown scope cannot fall through to a full system upgrade" "run_setup_scope --scope invalid"
+assert_false "missing setup scope value is rejected" "run_setup_scope --scope"
+assert_false "duplicate setup scopes are rejected" "run_setup_scope --scope keyboard --scope full"
+assert_false "keyboard scope refuses desktop preview regeneration" "run_setup_scope --scope keyboard --rebuild-previews"
+assert_false "keyboard scope rejects inherited preview regeneration" "OMACONF_REBUILD_PREVIEWS=1 run_setup_scope --scope keyboard"
+assert_false "keyboard scope retains the privileged setup requirement" "SETUP_TEST_EUID=1000 run_setup_scope --scope keyboard"
+assert_true "invalid and unprivileged scopes leave all stages untouched" "[[ ! -s '$SETUP_TRACE' ]]"
+assert_true "default setup still runs the full module list" "run_setup_scope && [[ \"\$(cat '$SETUP_TRACE')\" == $'target\npackages\nkeyboard' ]]"
+
 test_summary
