@@ -84,3 +84,5 @@ Zed opens project directories directly with `zed --new /path/to/project` or the 
 
 The `06-os-identity.sh` setup module restores native Arch Linux identity in `/etc/os-release` from the package-owned `/usr/lib/os-release`. The standard identifiers are `NAME="Arch Linux"`, `PRETTY_NAME="Arch Linux"` and `ID=arch`. The original Omarchy `LOGO` and `ANSI_COLOR` values are retained. The original override is preserved under `/var/lib/omaconf/os-identity/`; the root post-update hook reconciles the identity after updates. Desktop icons, themes, configuration and Omarchy packages remain available. Apply through `make setup`.
 Main accepts changes only through squash pull requests with signed commits and current CI, SAST and Main PR provenance checks. No bypass actors or direct pushes are permitted. Enable the local guard with `git config core.hooksPath .githooks`; the server ruleset remains authoritative even when local hooks are disabled.
+
+Desktop package and MIME runtime assertions run on installed Omarchy systems. Bare Arch CI containers still execute source, generated configuration and sandboxed backend checks without requiring a provisioned graphical desktop.
