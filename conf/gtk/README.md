@@ -7,3 +7,5 @@ All application windows use opaque, square surfaces without compositor shadows o
 The desktop uses the dwindle tiling layout with zero gaps and one pixel borders. Main windows tile; modal dialogs and windows tagged by Omarchy as floating retain their dialog behavior. Keybindings are preserved. GTK keeps application controls and file dialogs functional, with flat palette colors and no client window buttons, gradients or rounded widgets.
 
 Run `make setup` after merging the desktop PRs. Reopen libadwaita applications to load updated CSS. The installer preserves unrelated Hyprland configuration.
+
+The Qogir overlay uses scalable outlines of the eza file and folder glyphs from JetBrainsMono Nerd Font 3.5.1. Folders follow the palette accent and MIME icons follow the foreground. Qogir retains application and action icons. Assets ship with setup and theme changes require no font rendering process or Python dependency. The font license is included with the source outlines.

@@ -31,8 +31,13 @@ assert_true "Nautilus native settings install" "bash '$PROJECT_DIR/conf/nautilus
 mkdir -p "$XDG_CONFIG_HOME/hypr" "$XDG_CONFIG_HOME/gtk-4.0"
 printf 'custom_setting = true\n' > "$XDG_CONFIG_HOME/hypr/hyprland.lua"
 printf '.personal { color: red; }\n' > "$XDG_CONFIG_HOME/gtk-4.0/gtk.css"
+mkdir -p "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d" "$XDG_CONFIG_HOME/omaconf"
+printf '%s\n' '#!/bin/bash' 'exec /usr/bin/python "$HOME/.config/omaconf/gtk-unified.py"' > "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons"
+printf '%s\n' 'legacy generator' > "$XDG_CONFIG_HOME/omaconf/gtk-unified.py"
 assert_true "GTK integration installs through the user installer" "bash '$PROJECT_DIR/conf/gtk/install.sh'"
 assert_file_contains_literal "GTK installer preserves personal Hyprland settings" "$XDG_CONFIG_HOME/hypr/hyprland.lua" 'custom_setting = true'
+assert_true "GTK installer retires the competing Python icon hook with a backup" "[[ ! -e '$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons' && ! -e '$XDG_CONFIG_HOME/omaconf/gtk-unified.py' ]] && grep -qx 'legacy generator' '$XDG_CONFIG_HOME/omaconf/migrations/gtk-unified/generator.py'"
+assert_true "GTK installer provisions the canonical terminal icon assets" "cmp '$PROJECT_DIR/conf/gtk/data/nerd-icons/aliases.tsv' '$XDG_CONFIG_HOME/omaconf/nerd-icons/aliases.tsv'"
 assert_true "GTK integration is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/hypr/hyprland.lua' '$XDG_CONFIG_HOME/hypr/omaconf-gtk.lua'); bash '$PROJECT_DIR/conf/gtk/install.sh'; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/hypr/hyprland.lua' '$XDG_CONFIG_HOME/hypr/omaconf-gtk.lua')\" ]]"
 printf 'mode = "dark"\nbackground = "#101010"\nforeground = "#eeeeee"\naccent = "#abcdef"\nselection = "#303030"\nmuted = "#777777"\nred = "#ff0000"\ngreen = "#00ff00"\nblue = "#0000ff"\nyellow = "#ffff00"\ncyan = "#00ffff"\nmagenta = "#ff00ff"\n' > "$SANDBOX/palette.toml"
 export OMACONF_THEME_NAME=test OMACONF_THEME_COLORS="$SANDBOX/palette.toml"

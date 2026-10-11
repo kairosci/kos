@@ -55,6 +55,15 @@ assert_file_contains_literal "folder icons use the exact accent" "$WORKFLOW_SAND
 assert_file_contains_literal "folder overlay inherits the complete dark Qogir set" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/index.theme" 'Inherits=Qogir-Dark,hicolor'
 assert_file_contains_literal "folder variants resolve upstream symlinks" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder-documents.svg" '#88aaff'
 assert_false "folder overlay leaves toolbar actions at their native size" "[[ -e '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/fileopen.svg' ]]"
+for size in 16 22 24 32 48 96 128 scalable; do
+    assert_true "terminal folder outlines match across $size pixel aliases" "cmp '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/$size/places/folder.svg' '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/$size/places/inode-directory.svg' && cmp '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/$size/places/folder.svg' '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder.svg'"
+done
+assert_file_contains_literal "terminal MIME icons use the palette foreground" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/application-pdf.svg" 'fill="#eeeeee"'
+assert_true "terminal MIME aliases share the same outline" "cmp '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/image-png.svg' '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/image-jpeg.svg'"
+sed -i 's/#eeeeee/invalid/' "$WORKFLOW_SANDBOX/colors.toml"
+assert_false "invalid foreground stops icon generation" "run_folder_hook"
+assert_file_contains_literal "invalid foreground preserves existing MIME icons" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/application-pdf.svg" 'fill="#eeeeee"'
+sed -i 's/invalid/#eeeeee/' "$WORKFLOW_SANDBOX/colors.toml"
 assert_true "folder overlay is idempotent" "before=\$(sha256sum '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder.svg'); run_folder_hook; after=\$(sha256sum '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder.svg'); [[ \"\$before\" == \"\$after\" ]]"
 cp -r "$WORKFLOW_SANDBOX/icons/Qogir-Dark" "$WORKFLOW_SANDBOX/icons/Qogir"
 printf 'mode = "light"\n' >> "$WORKFLOW_SANDBOX/colors.toml"
