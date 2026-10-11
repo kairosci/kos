@@ -1269,8 +1269,14 @@ Item {
     WlrLayershell.layer: WlrLayer.Top
 
     Loader {
+      id: barContent
       anchors.fill: parent
       sourceComponent: root.vertical ? verticalBar : horizontalBar
+      opacity: root.barHidden ? 0.0 : 1.0
+
+      Behavior on opacity {
+        NumberAnimation { duration: 180; easing.type: Easing.InOutCubic }
+      }
 
       // A child of the loader, not a sibling of the sections: an ancestor stays
       // hovered while the pointer is over a widget, where a sibling would lose
