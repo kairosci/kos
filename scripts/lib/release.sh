@@ -30,6 +30,7 @@ iso_label="KOS_${version//./_}"
 iso_publisher="kos <https://github.com/kairosci/kos>"
 iso_application="kos installation medium"
 iso_version="$version"
+pacman_args+=(--overwrite='etc/skel/.bashrc')
 PROFILE
     printf 'kos\n' > "$profile/airootfs/etc/hostname" || return 1
     cp "$project/conf/kos/data/iso-motd" "$profile/airootfs/etc/motd" || return 1
