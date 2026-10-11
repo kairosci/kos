@@ -31,6 +31,9 @@ jobs:
       - name: Run Syntax & Integrity Test Suite
         run: bash tests/test_syntax_integrity.sh
 
+      - name: Validate Test Harness Failure Detection
+        run: bash tests/test_test_harness.sh
+
   shellcheck-analysis:
     name: ShellCheck Static Analysis
     runs-on: ubuntu-latest

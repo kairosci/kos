@@ -50,10 +50,14 @@ assert_no_offenders() {
     local desc="$1"
     local scan="$2"
     shift 2
-    local offenders
-    offenders=$("$scan" "$@" | sed "s|${PROJECT_DIR:-.}/||g")
+    local offenders scan_status=0
+    offenders=$("$scan" "$@" | sed "s|${PROJECT_DIR:-.}/||g") || scan_status=$?
     TESTS_RUN=$((TESTS_RUN + 1))
-    if [[ -z "$offenders" ]]; then
+    if [[ $scan_status -ne 0 ]]; then
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        printf '%s\n' "  fail $desc (scanner exited with status $scan_status)"
+        [[ -z "$offenders" ]] || printf '%s\n' "$offenders"
+    elif [[ -z "$offenders" ]]; then
         TESTS_PASSED=$((TESTS_PASSED + 1))
         printf '%s\n' "  pass $desc"
     else
