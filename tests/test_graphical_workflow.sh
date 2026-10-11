@@ -32,6 +32,12 @@ assert_file_contains "GTK selects a generated palette theme" "$WORKFLOW_SANDBOX/
 assert_true "generated GTK theme uses Materia dark as its base" \
     "grep -q 'Materia-dark/gtk-3.0/gtk.css' '$WORKFLOW_SANDBOX/home/.local/share/themes/'*/gtk-3.0/gtk.css"
 assert_true "GTK hook is idempotent" "before=\$(sha256sum '$WORKFLOW_SANDBOX/home/.config/gtk-3.0/'*.css); run_gtk_hook; after=\$(sha256sum '$WORKFLOW_SANDBOX/home/.config/gtk-3.0/'*.css); [[ \"\$before\" == \"\$after\" ]]"
+for version in 3 4; do
+    generated="$WORKFLOW_SANDBOX/home/.config/gtk-$version.0/omaconf.css"
+    assert_file_contains_literal "GTK $version preserves selected rows while hovered" "$generated" 'row:selected, row:selected:hover, .sidebar row:selected, .navigation-sidebar row:selected { background-color: #334455; color: #eeeeee; }'
+    assert_file_contains_literal "GTK $version uses the exact accent for suggested actions" "$generated" 'button.suggested-action { background-color: #88aaff; color: #112233; border-color: #88aaff; }'
+    assert_file_contains_literal "GTK $version clears inherited negative scrollbar margins" "$generated" 'min-width: 8px; min-height: 8px; margin: 0; padding: 0;'
+done
 mkdir -p "$WORKFLOW_SANDBOX/icons/Qogir-Dark/scalable/places"
 printf '[Icon Theme]\nName=Qogir Dark\n' > "$WORKFLOW_SANDBOX/icons/Qogir-Dark/index.theme"
 printf '<svg xmlns="http://www.w3.org/2000/svg"><path fill="#6ba4e7" stroke="#003579"/></svg>\n' > "$WORKFLOW_SANDBOX/icons/Qogir-Dark/scalable/places/folder.svg"
