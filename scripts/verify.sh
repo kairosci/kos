@@ -239,6 +239,12 @@ tcheck "check.kitty_terminal" "pacman -Q kitty &>/dev/null && ! pacman -Q foot &
 tcheck "check.webapps_removed" "! grep -rlE 'omarchy-(launch-webapp|webapp-handler)' /usr/share/omarchy/applications 2>/dev/null"
 
 section verify.sec_power
+if compgen -G '/sys/class/leds/*kbd_backlight*' >/dev/null; then
+    tcheck "check.keyboard_policy" "[[ -x /usr/local/libexec/omaconf-keyboard-backlight && -f /etc/systemd/system/omaconf-keyboard-backlight@.service && -f /etc/udev/rules.d/99-omaconf-keyboard-backlight.rules ]] && systemctl is-enabled --quiet omaconf-keyboard-backlight.service && systemctl is-enabled --quiet omaconf-keyboard-backlight.timer && systemctl is-active --quiet omaconf-keyboard-backlight.timer"
+    tcheck "check.keyboard_maximum" "bash '$SCRIPT_DIR/lib/keyboard-backlight.sh' --check"
+else
+    skip "$(t power.keyboard_unsupported)"
+fi
 tcheck "check.power_conf" "[[ -f /etc/omaconf/power.conf ]]"
 tcheck "check.battery_udev" "[[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]"
 tcheck "check.battery_tmpfiles" "[[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]"
