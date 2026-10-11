@@ -42,7 +42,7 @@ SURFACE=$BACKGROUND
 HOVER=$(mix_color 10)
 BORDER=$(mix_color 18)
 MUTED=$(mix_color 55)
-THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v7" | sha256sum)
+THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v8" | sha256sum)
 GTK_THEME_NAME="Omaconf-${THEME_HASH:0:16}"
 GTK_THEME_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/themes/$GTK_THEME_NAME"
 mkdir -p "$GTK_THEME_DIR/gtk-3.0" "$GTK_THEME_DIR/gtk-4.0"
@@ -113,6 +113,14 @@ scale trough, progressbar trough { background-color: $HOVER; }
 scrollbar trough { background-color: transparent; }
 scrollbar slider { min-width: 8px; min-height: 8px; margin: 0; padding: 0; background-color: $MUTED; border: none; }
 scrollbar slider:hover { background-color: $ACCENT; }
+button, entry, spinbutton, searchentry, combobox, dropdown, row, menuitem, modelbutton, notebook tab, tabs tab, check, radio, switch, switch slider, scale slider, scrollbar slider, expander, link, .link {
+  transition: background-color 120ms ease-out, color 120ms ease-out, border-color 120ms ease-out, outline-color 120ms ease-out;
+}
+scale highlight, progressbar progress, levelbar block {
+  transition: background-color 140ms ease-out, border-color 140ms ease-out;
+}
+button:active, row:active, menuitem:active { transition-duration: 60ms; }
+button:disabled, entry:disabled, spinbutton:disabled, check:disabled, radio:disabled, switch:disabled { transition: none; }
 .link, link { color: $ACCENT; }
 
 EOF_CSS

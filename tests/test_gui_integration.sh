@@ -13,6 +13,7 @@ export PATH="$SANDBOX/bin:$PATH" GUI_TEST_ARGS="$SANDBOX/arguments"
 cat > "$SANDBOX/bin/gsettings" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
+printf '%s\n' "$*" >> "$GUI_TEST_ARGS"
 [[ "$1" != get ]] || printf "'Sans 11'\n"
 MOCK
 cat > "$SANDBOX/bin/update-desktop-database" <<'MOCK'
@@ -35,6 +36,7 @@ mkdir -p "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d" "$XDG_CONFIG_HOME/omaconf"
 printf '%s\n' '#!/bin/bash' 'exec /usr/bin/python "$HOME/.config/omaconf/gtk-unified.py"' > "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons"
 printf '%s\n' 'legacy generator' > "$XDG_CONFIG_HOME/omaconf/gtk-unified.py"
 assert_true "GTK integration installs through the user installer" "bash '$PROJECT_DIR/conf/gtk/install.sh'"
+assert_file_contains_literal "GTK installer enables native toolkit animations" "$GUI_TEST_ARGS" 'set org.gnome.desktop.interface enable-animations true'
 assert_file_contains_literal "GTK installer preserves personal Hyprland settings" "$XDG_CONFIG_HOME/hypr/hyprland.lua" 'custom_setting = true'
 assert_true "GTK installer retires the competing Python icon hook with a backup" "[[ ! -e '$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons' && ! -e '$XDG_CONFIG_HOME/omaconf/gtk-unified.py' ]] && grep -qx 'legacy generator' '$XDG_CONFIG_HOME/omaconf/migrations/gtk-unified/generator.py'"
 assert_true "GTK installer provisions the canonical terminal icon assets" "cmp '$PROJECT_DIR/conf/gtk/data/nerd-icons/aliases.tsv' '$XDG_CONFIG_HOME/omaconf/nerd-icons/aliases.tsv'"

@@ -22,6 +22,28 @@ run_gtk_hook() {
         OMACONF_THEME_COLORS="$WORKFLOW_SANDBOX/colors.toml" bash "$PROJECT_DIR/hooks/theme-set.d/gtk-theme"
 }
 
+component_transition_policy() {
+    awk '
+        /transition:[[:space:]]/ {
+            value=$0
+            sub(/^.*transition:[[:space:]]*/, "", value)
+            sub(/;.*/, "", value)
+            if (value == "none") next
+            count++
+            size=split(value, transitions, ",")
+            for (i=1; i<=size; i++) {
+                sub(/^[[:space:]]*/, "", transitions[i])
+                split(transitions[i], parts, /[[:space:]]+/)
+                if (parts[1] !~ /^(background-color|color|border-color|outline-color)$/) exit 1
+                if (parts[2] !~ /^[0-9]+ms$/) exit 1
+                duration=parts[2]+0
+                if (duration < 60 || duration > 160) exit 1
+            }
+        }
+        END { if (count < 2) exit 1 }
+    ' "$1"
+}
+
 test_section "Graphical Desktop Workflow"
 assert_true "GTK palette hook succeeds with valid colors" "run_gtk_hook"
 assert_file_contains_literal "GTK hook preserves existing user CSS" "$WORKFLOW_SANDBOX/home/.config/gtk-3.0/gtk.css" 'label { font-weight: bold; }'
@@ -38,6 +60,11 @@ for version in 3 4; do
     assert_file_contains_literal "GTK $version uses the exact accent for suggested actions" "$generated" 'button.suggested-action { background-color: #88aaff; color: #112233; border-color: #88aaff; }'
     assert_file_contains_literal "GTK $version clears inherited negative scrollbar margins" "$generated" 'min-width: 8px; min-height: 8px; margin: 0; padding: 0;'
 done
+for version in 3 4; do
+    assert_true "GTK $version component transitions preserve geometry and avoid double fades" "component_transition_policy '$WORKFLOW_SANDBOX/home/.config/gtk-$version.0/omaconf.css'"
+done
+printf '%s\n' 'button { transition: color 120ms ease-out; }' 'entry { transition: border-color 120ms ease-out; }' 'row { transition: transform 120ms ease-out; }' > "$WORKFLOW_SANDBOX/unsafe-motion.css"
+assert_false "animation policy rejects geometry transitions" "component_transition_policy '$WORKFLOW_SANDBOX/unsafe-motion.css'"
 mkdir -p "$WORKFLOW_SANDBOX/icons/Qogir-Dark/scalable/places"
 printf '[Icon Theme]\nName=Qogir Dark\n' > "$WORKFLOW_SANDBOX/icons/Qogir-Dark/index.theme"
 printf '<svg xmlns="http://www.w3.org/2000/svg"><path fill="#6ba4e7" stroke="#003579"/></svg>\n' > "$WORKFLOW_SANDBOX/icons/Qogir-Dark/scalable/places/folder.svg"
