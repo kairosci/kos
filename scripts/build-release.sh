@@ -16,5 +16,5 @@ else
     epoch=$(git -C "$PROJECT_ROOT" log -1 --format=%ct)
     podman run --rm --privileged --network host --volume "$PROJECT_ROOT:/var/tmp/kos-source:ro" \
         --volume "$PROJECT_ROOT/dist:/var/tmp/kos-artifacts" --env "SOURCE_DATE_EPOCH=$epoch" "$image" \
-        bash -c 'set -euo pipefail; pacman -Syu --noconfirm --needed archiso qemu-system-x86 edk2-ovmf git zstd sudo base-devel </dev/null; source /var/tmp/kos-source/scripts/lib/i18n.sh; source /var/tmp/kos-source/scripts/lib/distribution.sh; source /var/tmp/kos-source/scripts/lib/release.sh; i18n_init; kos_release_build /var/tmp/kos-source /var/tmp/kos-artifacts; bash /var/tmp/kos-source/scripts/test-release-boot.sh /var/tmp/kos-artifacts'
+        bash -c 'set -euo pipefail; pacman -Syu --noconfirm --needed archiso qemu-system-x86 edk2-ovmf git zstd sudo base-devel jq </dev/null; source /var/tmp/kos-source/scripts/lib/i18n.sh; source /var/tmp/kos-source/scripts/lib/distribution.sh; source /var/tmp/kos-source/scripts/lib/release.sh; i18n_init; kos_release_build /var/tmp/kos-source /var/tmp/kos-artifacts; bash /var/tmp/kos-source/scripts/test-release-boot.sh /var/tmp/kos-artifacts'
 fi
