@@ -84,8 +84,10 @@ kos_package_build() {
     fi
     install -m 644 "$work/root.MTREE" "$work/root/.MTREE" || { rm -rf "$work"; return 1; }
     package="$output/kos-$version-1-x86_64.pkg.tar.zst"
-    if ! tar --sort=name --mtime="@$timestamp" --owner=0 --group=0 --numeric-owner \
-        -C "$work/root" -cf - . | zstd -T0 -19 -o "$work/package.pkg.tar.zst"; then
+    local -a root_entries=()
+    mapfile -t root_entries < <(find "$work/root" -mindepth 1 -maxdepth 1 ! -name '.PKGINFO' ! -name '.MTREE' -printf '%P\n' | LC_ALL=C sort)
+    if ! bsdtar --format=gnutar --uid 0 --gid 0 --numeric-owner --mtime="@$timestamp" \
+        -C "$work/root" -cf - .PKGINFO .MTREE "${root_entries[@]}" | zstd -T0 -19 -o "$work/package.pkg.tar.zst"; then
         rm -rf "$work"
         return 1
     fi
