@@ -3,6 +3,13 @@
 set -euo pipefail
 
 DEBLOAT=(
+    btop
+    gdu
+    imv
+    micro
+    mupdf
+    mpv-mpris
+    libreoffice-still
     geany
     geany-plugins
     keepassxc
@@ -70,25 +77,8 @@ if [[ -w "$BASE_MANIFEST" ]]; then
 fi
 
 log "debloat.pin"
-mkdir -p /etc/pacman.d/omaconf
-chmod 755 /etc/pacman.d/omaconf 2>/dev/null || warn "debloat.omaconf_chmod_skipped"
-printf '%s\n' "${DEBLOAT[@]}" > /etc/pacman.d/omaconf/ignore-pkgs.list
-chmod 644 /etc/pacman.d/omaconf/ignore-pkgs.list 2>/dev/null || warn "debloat.ignore_chmod_skipped"
-EXISTING_PINS=""
-if grep -q '^IgnorePkg' /etc/pacman.conf 2>/dev/null; then
-    EXISTING_PINS=$(grep '^IgnorePkg' /etc/pacman.conf | head -1 | sed 's/^IgnorePkg[[:space:]]*=[[:space:]]*//')
-fi
-EXISTING_PINS=$(awk '{ for (i = 1; i <= NF; i++) if ($i != "brave-origin-bin" && $i != "nautilus") printf "%s ", $i }' <<< "$EXISTING_PINS")
-MERGED_PINS="$EXISTING_PINS"
-for pkg in "${DEBLOAT[@]}"; do
-    grep -qw "$pkg" <<< " $MERGED_PINS " 2>/dev/null || MERGED_PINS="$MERGED_PINS $pkg"
-done
-MERGED_PINS=$(echo "$MERGED_PINS" | xargs)
-if grep -q '^IgnorePkg' /etc/pacman.conf; then
-    sed -i "s|^IgnorePkg.*|IgnorePkg = $MERGED_PINS|" /etc/pacman.conf
-else
-    sed -i "/^\[options\]/a IgnorePkg = $MERGED_PINS" /etc/pacman.conf
-fi
+sed -i -E "/^[[:space:]]*IgnorePkg[[:space:]]*=/d" /etc/pacman.conf
+rm -f /etc/pacman.d/omaconf/ignore-pkgs.list
 
 log "debloat.foot_cleanup"
 if ! pacman -Q foot &>/dev/null && ! command -v foot &>/dev/null; then

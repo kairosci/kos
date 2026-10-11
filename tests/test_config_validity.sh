@@ -14,17 +14,13 @@ test_section "Config Validity & Placement Regression"
 assert_file_contains "shell plugins module keeps omamp on the right" "$SHELL_PLUGINS_MODULE" "section right"
 
 
-assert_true "Micro settings JSON valid" "jq empty '$PROJECT_DIR/conf/micro/data/settings.json'"
-assert_true "Micro bindings JSON valid" "jq empty '$PROJECT_DIR/conf/micro/data/bindings.json'"
-assert_file_contains_literal "Micro shares common editor bindings" "$PROJECT_DIR/conf/micro/data/bindings.json" '"Ctrl-s": "Save"'
-assert_file_contains_literal "Micro shares search and history bindings" "$PROJECT_DIR/conf/micro/data/bindings.json" '"Ctrl-z": "Undo"'
 
 assert_true "cliconf helpers bash syntax valid" "bash -n '$CLICONF_DATA/helpers.sh'"
 assert_true "cliconf installer bash syntax valid" "bash -n '$PROJECT_DIR/conf/cli/install.sh'"
 assert_true "herdr menu bash syntax valid" "bash -n '$PROJECT_DIR/conf/herdr/data/herdr-keybindings-menu'"
 assert_true "herdr installer bash syntax valid" "bash -n '$PROJECT_DIR/conf/herdr/install.sh'"
 
-for tool in mpv mupdf imv fzf rg fd bat eza zoxide git lazygit gum ai gdu; do
+for tool in fzf rg fd bat eza zoxide git lazygit gum ai; do
     assert_file_contains "cliconf covers $tool" "$CLICONF_DATA/helpers.sh" "$tool)"
 done
 

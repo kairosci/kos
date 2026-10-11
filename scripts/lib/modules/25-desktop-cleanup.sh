@@ -3,6 +3,7 @@
 set -euo pipefail
 
 log "desktop.hook_install"
+install -Dm644 -o root -g root "$PROJECT_ROOT/scripts/lib/userconf.sh" /usr/local/lib/omaconf/userconf.sh
 install -Dm755 "$PROJECT_ROOT/scripts/lib/desktop-cleanup.sh" /usr/local/libexec/omaconf-desktop-cleanup
 mkdir -p /etc/pacman.d/hooks
 cat > /etc/pacman.d/hooks/99-omaconf-desktop-cleanup.hook << 'HOOK'

@@ -42,7 +42,10 @@ chmod 644 /etc/group
 chmod 750 /etc/ssh
 for _ssh_conf in /etc/ssh/ssh_config /etc/ssh/sshd_config /etc/ssh/sshd_config.d/*.conf /etc/ssh/ssh_config.d/*.conf; do
     [[ -f "$_ssh_conf" ]] || continue
-    chmod 644 "$_ssh_conf" 2>/dev/null || warn "power.ssh_chmod"
+    case "$_ssh_conf" in
+        /etc/ssh/sshd_config|/etc/ssh/sshd_config.d/*) chmod 600 "$_ssh_conf" ;;
+        *) chmod 644 "$_ssh_conf" ;;
+    esac
 done
 for u_home in /home/*; do
     [[ -d "$u_home" ]] || continue

@@ -3,38 +3,13 @@ function helper() {
 	"" | list | ls)
 		cat << 'HELP'
 helper - one helper per tool. Usage: helper <name>
-  Micro has built-in help: Ctrl-g
-  yh/mh are terminal quick cards
-  mpv ................ video and audio   mupdf .... pdf
-  imv ................ images            fzf .... fuzzy search
+  fzf ................ fuzzy search
   rg ................. search in files   fd ..... find files
   bat ................ cat with colors   eza .... modern ls
   zoxide ............. jump to frequent directories
-  gdu ................ disk usage analyzer
   git ................ git essentials   lazygit  visual git
   gum ................ menus and prompts for scripts
   ai ................. AI CLI: default TUI only
-HELP
-		;;
-	mpv)
-		cat << 'HELP'
-mpv - q quit, SPACE pause, f fullscreen, m mute
-  arrows +-5s/+-60s, [/] speed, 9/0 volume
-  s screenshot, i stats, T screenshot without subtitles
-  j/J subtitle delay, # audio track, _ video
-HELP
-		;;
-		mupdf)
-		cat << 'HELP'
-MuPDF - arrows scroll, +/- zoom, f fit width, / search
-  n/N next/previous match, w wrap to page width, q quit
-HELP
-		;;
-	imv)
-		cat << 'HELP'
-imv - arrows/wheel prev/next image, +/- zoom, 0 actual size
-  x checkerboard, d overlay, f fullscreen, q quit
-  . rotate clockwise, u pin on top, p pause gif
 HELP
 		;;
 	fzf)
@@ -92,27 +67,10 @@ gum - gum choose a b c (menu), gum confirm "ok?" && ...
   gum input --placeholder "name", gum spin -- long command
 HELP
 		;;
-	gdu)
-		cat << 'HELP'
-gdu - j/k move, g/G top/bottom, h/l parent/enter (vim-style)
-  enter open, d/e delete/empty, D trash, space mark, s sort, q quit
-  gdu (interactive here), gdu ~/Downloads (scan path), ? full help
-HELP
-		;;
-	dua | disk)
-		helper gdu
-		;;
 	ai)
 		cat << 'HELP'
 AI CLI - no exceptions: default TUI only, no omaconf themes.
   Open the built-in help inside the app you are using.
-HELP
-		;;
-	micro)
-		cat << 'HELP'
-These have built-in help, always up to date:
-
-  micro .. press Ctrl-g inside micro (or mh from terminal)
 HELP
 		;;
 	*)
