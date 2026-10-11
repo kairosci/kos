@@ -118,7 +118,7 @@ sed 's/\$EUID/${SETUP_TEST_EUID}/g' "$PROJECT_DIR/scripts/setup.sh" > "$SETUP_PR
 cat > "$SETUP_PROJECT/scripts/lib/target-user.sh" <<'MOCK'
 target_user_resolve() {
     printf 'target\n' >> "$SETUP_TRACE"
-    id -un
+    getent passwd | awk -F: '$3 >= 1000 && $3 < 65534 { print $1; exit }'
 }
 MOCK
 printf '%s\n' 'printf "keyboard\n" >> "$SETUP_TRACE"' > "$SETUP_PROJECT/scripts/lib/keyboard-backlight-policy.sh"
