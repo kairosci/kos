@@ -25,10 +25,11 @@ kos_kernel_build() {
     cp -a "$project/conf/kos/data/packages/linux-kos/." "$work/"
     chown -R "$user:$user" "$work"
     install -d -m 700 -o "$user" -g "$user" "$work/gpg"
+    pacman -S --needed --noconfirm base-devel sudo
     sudo -u "$user" env "GNUPGHOME=$work/gpg" gpg --import "$work"/keys/pgp/*.asc
     dependency=$(sudo -u "$user" bash -c 'cd "$1" && makepkg --printsrcinfo' bash "$work")
     mapfile -t dependencies < <(awk '$1 == "makedepends" || $1 == "makedepends_x86_64" { print $3 }' <<< "$dependency")
-    pacman -S --needed --noconfirm base-devel sudo "${dependencies[@]}"
+    pacman -S --needed --noconfirm "${dependencies[@]}"
     cp /etc/makepkg.conf "$work/makepkg.conf"
     printf '\nMAKEFLAGS="-j2"\nPKGDEST=%q\nSRCDEST=%q\nSRCPKGDEST=%q\nCOMPRESSZST=(zstd -c -T2 -10)\n' "$output" "$work" "$output" >> "$work/makepkg.conf"
     chown "$user:$user" "$work/makepkg.conf"
