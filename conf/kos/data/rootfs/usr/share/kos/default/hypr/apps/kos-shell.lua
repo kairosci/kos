@@ -1,13 +1,12 @@
 -- Window and layer rules for the Kos Quickshell surfaces. The
 -- shell-wide bar / menu / popouts are layer-shell.
 
--- Keep the bar instant: no layer-shell fade/slide animation.
-hl.layer_rule({ match = { namespace = "kos-bar" }, no_anim = true, animation = "none" })
+-- Bar uses smooth compositor layer fade animation.
+hl.layer_rule({ match = { namespace = "kos-bar" }, animation = "fade" })
 
 -- Launcher, image selector, emojis, clipboard overlays, and keyboard-driven
--- panels should pop without compositor layer fades. Panels keep their own
--- QML opacity transition for normal open/close, and skip it for panel handoff.
-hl.layer_rule({ match = { namespace = "^(kos-menu|kos-image-selector|kos-emojis|kos-clipboard|kos-keyboard-panel)$" }, no_anim = true, animation = "none" })
+-- panels use smooth compositor layer fade animation.
+hl.layer_rule({ match = { namespace = "^(kos-menu|kos-image-selector|kos-emojis|kos-clipboard|kos-keyboard-panel)$" }, animation = "fade" })
 
 -- Dev gallery is the main shell workbench; open it maximized like
 -- SUPER+ALT+F so component previews have the whole workspace.
