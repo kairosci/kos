@@ -22,6 +22,28 @@ run_gtk_hook() {
         OMACONF_THEME_COLORS="$WORKFLOW_SANDBOX/colors.toml" bash "$PROJECT_DIR/hooks/theme-set.d/gtk-theme"
 }
 
+component_transition_policy() {
+    awk '
+        /transition:[[:space:]]/ {
+            value=$0
+            sub(/^.*transition:[[:space:]]*/, "", value)
+            sub(/;.*/, "", value)
+            if (value == "none") next
+            count++
+            size=split(value, transitions, ",")
+            for (i=1; i<=size; i++) {
+                sub(/^[[:space:]]*/, "", transitions[i])
+                split(transitions[i], parts, /[[:space:]]+/)
+                if (parts[1] !~ /^(background-color|color|border-color|outline-color)$/) exit 1
+                if (parts[2] !~ /^[0-9]+ms$/) exit 1
+                duration=parts[2]+0
+                if (duration < 60 || duration > 160) exit 1
+            }
+        }
+        END { if (count < 2) exit 1 }
+    ' "$1"
+}
+
 test_section "Graphical Desktop Workflow"
 assert_true "GTK palette hook succeeds with valid colors" "run_gtk_hook"
 assert_file_contains_literal "GTK hook preserves existing user CSS" "$WORKFLOW_SANDBOX/home/.config/gtk-3.0/gtk.css" 'label { font-weight: bold; }'
@@ -32,6 +54,17 @@ assert_file_contains "GTK selects a generated palette theme" "$WORKFLOW_SANDBOX/
 assert_true "generated GTK theme uses Materia dark as its base" \
     "grep -q 'Materia-dark/gtk-3.0/gtk.css' '$WORKFLOW_SANDBOX/home/.local/share/themes/'*/gtk-3.0/gtk.css"
 assert_true "GTK hook is idempotent" "before=\$(sha256sum '$WORKFLOW_SANDBOX/home/.config/gtk-3.0/'*.css); run_gtk_hook; after=\$(sha256sum '$WORKFLOW_SANDBOX/home/.config/gtk-3.0/'*.css); [[ \"\$before\" == \"\$after\" ]]"
+for version in 3 4; do
+    generated="$WORKFLOW_SANDBOX/home/.config/gtk-$version.0/omaconf.css"
+    assert_file_contains_literal "GTK $version preserves selected rows while hovered" "$generated" 'row:selected, row:selected:hover, .sidebar row:selected, .navigation-sidebar row:selected { background-color: #334455; color: #eeeeee; }'
+    assert_file_contains_literal "GTK $version uses the exact accent for suggested actions" "$generated" 'button.suggested-action { background-color: #88aaff; color: #112233; border-color: #88aaff; }'
+    assert_file_contains_literal "GTK $version clears inherited negative scrollbar margins" "$generated" 'min-width: 8px; min-height: 8px; margin: 0; padding: 0;'
+done
+for version in 3 4; do
+    assert_true "GTK $version component transitions preserve geometry and avoid double fades" "component_transition_policy '$WORKFLOW_SANDBOX/home/.config/gtk-$version.0/omaconf.css'"
+done
+printf '%s\n' 'button { transition: color 120ms ease-out; }' 'entry { transition: border-color 120ms ease-out; }' 'row { transition: transform 120ms ease-out; }' > "$WORKFLOW_SANDBOX/unsafe-motion.css"
+assert_false "animation policy rejects geometry transitions" "component_transition_policy '$WORKFLOW_SANDBOX/unsafe-motion.css'"
 mkdir -p "$WORKFLOW_SANDBOX/icons/Qogir-Dark/scalable/places"
 printf '[Icon Theme]\nName=Qogir Dark\n' > "$WORKFLOW_SANDBOX/icons/Qogir-Dark/index.theme"
 printf '<svg xmlns="http://www.w3.org/2000/svg"><path fill="#6ba4e7" stroke="#003579"/></svg>\n' > "$WORKFLOW_SANDBOX/icons/Qogir-Dark/scalable/places/folder.svg"
@@ -49,6 +82,15 @@ assert_file_contains_literal "folder icons use the exact accent" "$WORKFLOW_SAND
 assert_file_contains_literal "folder overlay inherits the complete dark Qogir set" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/index.theme" 'Inherits=Qogir-Dark,hicolor'
 assert_file_contains_literal "folder variants resolve upstream symlinks" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder-documents.svg" '#88aaff'
 assert_false "folder overlay leaves toolbar actions at their native size" "[[ -e '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/fileopen.svg' ]]"
+for size in 16 22 24 32 48 96 128 scalable; do
+    assert_true "terminal folder outlines match across $size pixel aliases" "cmp '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/$size/places/folder.svg' '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/$size/places/inode-directory.svg' && cmp '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/$size/places/folder.svg' '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder.svg'"
+done
+assert_file_contains_literal "terminal MIME icons use the palette foreground" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/application-pdf.svg" 'fill="#eeeeee"'
+assert_true "terminal MIME aliases share the same outline" "cmp '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/image-png.svg' '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/image-jpeg.svg'"
+sed -i 's/#eeeeee/invalid/' "$WORKFLOW_SANDBOX/colors.toml"
+assert_false "invalid foreground stops icon generation" "run_folder_hook"
+assert_file_contains_literal "invalid foreground preserves existing MIME icons" "$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/mimetypes/application-pdf.svg" 'fill="#eeeeee"'
+sed -i 's/invalid/#eeeeee/' "$WORKFLOW_SANDBOX/colors.toml"
 assert_true "folder overlay is idempotent" "before=\$(sha256sum '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder.svg'); run_folder_hook; after=\$(sha256sum '$WORKFLOW_SANDBOX/home/.local/share/icons/Omaconf-Qogir/scalable/places/folder.svg'); [[ \"\$before\" == \"\$after\" ]]"
 cp -r "$WORKFLOW_SANDBOX/icons/Qogir-Dark" "$WORKFLOW_SANDBOX/icons/Qogir"
 printf 'mode = "light"\n' >> "$WORKFLOW_SANDBOX/colors.toml"
@@ -75,6 +117,8 @@ assert_file_contains_literal "desktop defaults keep Brave for HTTPS" "$WORKFLOW_
 assert_file_contains_literal "text defaults use Zed" "$WORKFLOW_SANDBOX/commands" 'xdg-mime default dev.zed.Zed.desktop text/plain'
 assert_file_contains_literal "Omarchy editor state records Zed" "$WORKFLOW_SANDBOX/home/.local/state/omarchy/defaults/editor" 'zed'
 assert_file_contains_literal "PDF defaults use Papers" "$WORKFLOW_SANDBOX/commands" 'xdg-mime default org.gnome.Papers.desktop application/pdf'
+assert_file_contains_literal "office documents use OnlyOffice" "$WORKFLOW_SANDBOX/commands" 'xdg-mime default onlyoffice-desktopeditors.desktop application/msword'
+assert_file_contains_literal "backend launcher is hidden" "$WORKFLOW_SANDBOX/home/.local/share/applications/mpv.desktop" 'Hidden=true'
 assert_file_contains_literal "image defaults use Loupe" "$WORKFLOW_SANDBOX/commands" 'xdg-mime default org.gnome.Loupe.desktop image/png'
 assert_file_contains_literal "media defaults use Celluloid" "$WORKFLOW_SANDBOX/commands" 'xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mp4'
 assert_file_contains "Omarchy file manager state records Nautilus" "$WORKFLOW_SANDBOX/home/.local/state/omarchy/defaults/file-manager" '^nautilus$'

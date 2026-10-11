@@ -20,7 +20,7 @@ assert_true "desktop cleanup library has no failure suppression" "! grep -qE '[|
 assert_true "desktop cleanup library never exits the sourcing shell" "! grep -qE '^[[:space:]]*exit' '$LIB'"
 assert_file_contains "library resolves wrapped executables" "$LIB" "desktop_cleanup_resolve_target"
 assert_file_contains "library detects missing executables" "$LIB" "desktop_cleanup_exec_missing"
-assert_file_contains "library repoints disk usage to gdu" "$LIB" "gdu"
+assert_file_contains "library detects duplicate application entries" "$LIB" "desktop_cleanup_duplicate"
 assert_file_contains "library drops foot without its binary" "$LIB" "foot.desktop"
 assert_file_contains "library drops docker without lazydocker" "$LIB" "lazydocker"
 assert_file_contains "library refreshes the desktop database" "$LIB" "update-desktop-database"
@@ -80,13 +80,7 @@ assert_false "user executable paths do not leak into root lookup" "command -v sa
 
 assert_true "foot orphan removed from the system entries" "[[ ! -f '$DC_SYS/foot.desktop' ]]"
 assert_true "docker orphan removed without lazydocker" "[[ ! -f '$DC_SYS/Docker.desktop' ]]"
-assert_true "disk usage entry kept through the repoint" "[[ -f '$DC_SYS/Disk Usage.desktop' ]]"
-if command -v baobab >/dev/null; then
-    assert_file_contains "disk usage uses the installed graphical analyzer" "$DC_SYS/Disk Usage.desktop" '^Exec=baobab$'
-else
-    assert_true "disk usage falls back to the available gdu" "grep -q 'gdu /' '$DC_SYS/Disk Usage.desktop'"
-fi
-assert_true "disk usage entry no longer references dua" "! grep -q 'dua' '$DC_SYS/Disk Usage.desktop'"
+assert_false "legacy disk alias is removed" "[[ -f '$DC_SYS/Disk Usage.desktop' ]]"
 assert_true "valid entry kept" "[[ -f '$DC_SYS/keep.desktop' ]]"
 assert_true "user orphan removed" "[[ ! -f '$DC_HOMES/tester/.local/share/applications/gone.desktop' ]]"
 assert_true "mimeapps reference cleaned" "! grep -q 'foot.desktop' '$DC_HOMES/tester/.config/mimeapps.list'"
@@ -123,11 +117,42 @@ assert_true "standalone helper removes tryexec orphans" "[[ ! -f '$DC_HOMES/test
 
 printf '#!/bin/bash\nexit 0\n' > "$DC_BIN/baobab"
 chmod +x "$DC_BIN/baobab"
-printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Exec=xdg-terminal-exec gdu /' 'Terminal=true' 'Icon=utilities-terminal' > "$DC_SYS/graphical-disk.desktop"
-assert_true "disk launcher migrates to the graphical analyzer" "_desktop_cleanup_patch_disk_usage '$DC_SYS/graphical-disk.desktop'"
-assert_file_contains "graphical disk launcher runs Baobab" "$DC_SYS/graphical-disk.desktop" '^Exec=baobab$'
-assert_file_contains "graphical disk launcher does not open a terminal" "$DC_SYS/graphical-disk.desktop" '^Terminal=false$'
-assert_file_contains "graphical disk launcher uses its application icon" "$DC_SYS/graphical-disk.desktop" '^Icon=org.gnome.baobab$'
+export OMACONF_SYSTEM_APPS_DIRS="$DC_SANDBOX/sysapps"
+printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Disk analyzer' 'Exec=baobab' > "$DC_SANDBOX/sysapps/org.gnome.baobab.desktop"
+printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Duplicate' 'Exec=env GTK_USE_PORTAL=1 /usr/bin/baobab %U' > "$DC_SYS/graphical-disk.desktop"
+assert_true "wrapped alias of the canonical analyzer is removed" "desktop_cleanup_file '$DC_SYS/graphical-disk.desktop'"
+assert_false "duplicate analyzer entry no longer exists" "[[ -e '$DC_SYS/graphical-disk.desktop' ]]"
+assert_false "canonical analyzer entry is preserved" "desktop_cleanup_file '$DC_SANDBOX/sysapps/org.gnome.baobab.desktop'"
+printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Duplicate with spaces' 'Exec=baobab' > "$DC_SYS/Another Disk.desktop"
+printf '[Default Applications]\napplication/x-test=Another Disk.desktop;keep.desktop;\n[Added Associations]\napplication/x-test=Another Disk.desktop;keep.desktop;\n' > "$DC_HOMES/tester/.config/mimeapps.list"
+desktop_cleanup_sweep
+assert_file_not_contains "duplicate IDs containing spaces are cleaned exactly" "$DC_HOMES/tester/.config/mimeapps.list" 'Another Disk.desktop'
+assert_file_contains_literal "duplicate cleanup preserves unrelated associations" "$DC_HOMES/tester/.config/mimeapps.list" 'application/x-test=keep.desktop;'
+rm -f "$DC_SANDBOX/sysapps/org.gnome.baobab.desktop"
+printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Only analyzer' 'Exec=baobab' > "$DC_SYS/sole-analyzer.desktop"
+assert_false "aliases remain when no canonical entry is available" "desktop_cleanup_file '$DC_SYS/sole-analyzer.desktop'"
+printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Disk Usage' 'Hidden=true' > "$DC_HOMES/tester/.local/share/applications/Disk Usage.desktop"
+assert_false "hidden legacy aliases survive subsequent cleanup" "desktop_cleanup_file '$DC_HOMES/tester/.local/share/applications/Disk Usage.desktop'"
+
+printf '#!/bin/bash\nexit 0\n' > "$DC_BIN/papers"
+chmod +x "$DC_BIN/papers"
+printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Papers' 'Exec=papers' > "$DC_SANDBOX/sysapps/org.gnome.Papers.desktop"
+printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Protected viewer' 'Exec=papers' > "$DC_SANDBOX/sysapps/protected.desktop"
+export PATH="$DC_FAKEBIN:$DC_BIN:/usr/bin:/bin"
+assert_true "package-owned duplicate gets a persistent user override" "desktop_cleanup_sweep"
+assert_file_exists "package-owned duplicate is not modified" "$DC_SANDBOX/sysapps/protected.desktop"
+assert_file_contains_literal "package-owned duplicate is hidden for the user" "$DC_HOMES/tester/.local/share/applications/protected.desktop" 'Hidden=true'
+before=$(sha256sum "$DC_HOMES/tester/.local/share/applications/protected.desktop")
+assert_true "duplicate overrides survive repeated sweeps" "desktop_cleanup_sweep; [[ \"\$(sha256sum '$DC_HOMES/tester/.local/share/applications/protected.desktop')\" == '$before' ]]"
+assert_true "unique launcher verification honors user overrides" "desktop_cleanup_unique '$DC_HOMES/tester'"
+rm -f "$DC_HOMES/tester/.local/share/applications/protected.desktop"
+assert_false "unique launcher verification catches visible package aliases" "desktop_cleanup_unique '$DC_HOMES/tester'"
+mkdir -p "$DC_SANDBOX/cache"
+# shellcheck disable=SC2329
+update-desktop-database() { printf '[MIME Cache]\n' > "$1/mimeinfo.cache"; chmod 600 "$1/mimeinfo.cache"; }
+assert_true "desktop cache refresh succeeds" "_desktop_cleanup_refresh_dir '$DC_SANDBOX/cache'"
+assert_true "shared desktop cache remains readable" "[[ \$(stat -c %a '$DC_SANDBOX/cache/mimeinfo.cache') == 644 ]]"
+unset -f update-desktop-database
 
 rm -rf "$DC_SANDBOX"
 

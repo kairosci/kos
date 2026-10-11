@@ -20,10 +20,15 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_config_validity.sh" \
     "$SCRIPT_DIR/test_desktop_defaults.sh" \
     "$SCRIPT_DIR/test_herdr_menu.sh" \
-    "$SCRIPT_DIR/test_diskconf.sh" \
+    "$SCRIPT_DIR/test_application_policy.sh" \
     "$SCRIPT_DIR/test_desktop_cleanup.sh" \
     "$SCRIPT_DIR/test_graphical_workflow.sh" \
     "$SCRIPT_DIR/test_gui_integration.sh" \
     "$SCRIPT_DIR/test_preview_layout.sh" \
     "$SCRIPT_DIR/test_os_identity.sh" \
-    "$SCRIPT_DIR/test_bluetooth_state.sh"
+    "$SCRIPT_DIR/test_bluetooth_state.sh" \
+    "$SCRIPT_DIR/test_power_state.sh" \
+    "$SCRIPT_DIR/test_responsiveness.sh" \
+    "$SCRIPT_DIR/test_test_harness.sh" \
+    "$SCRIPT_DIR/test_update_hooks.sh" \
+    "$SCRIPT_DIR/test_keyboard_backlight.sh"

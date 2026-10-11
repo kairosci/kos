@@ -2,6 +2,27 @@
 
 set -euo pipefail
 
+install -d -m 755 -o root -g root /usr/local/lib/omaconf/messages /etc/pacman.d/hooks
+install -m 644 -o root -g root "$PROJECT_DIR/scripts/lib/i18n.sh" \
+    "$PROJECT_DIR/scripts/lib/theme-preview.sh" \
+    "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" /usr/local/lib/omaconf/
+install -m 644 -o root -g root "$PROJECT_DIR/conf/xdg-desktop-portal/data/portals.conf" \
+    "$PROJECT_DIR/conf/desktop/data/mpv.desktop" /usr/local/lib/omaconf/
+install -m 644 -o root -g root "$PROJECT_DIR"/scripts/lib/messages/*.msg /usr/local/lib/omaconf/messages/
+install -Dm755 -o root -g root "$PROJECT_DIR/scripts/lib/update-previews.sh" /usr/local/libexec/omaconf-update-previews
+cat > /etc/pacman.d/hooks/99-omaconf-theme-previews.hook << 'HOOK'
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Path
+Target = usr/share/omarchy/themes/*
+
+[Action]
+When = PostTransaction
+Exec = /usr/local/libexec/omaconf-update-previews
+HOOK
+chmod 644 /etc/pacman.d/hooks/99-omaconf-theme-previews.hook
+
 if [[ -f "$PROJECT_DIR/scripts/lib/theme-preview.sh" ]]; then
     # shellcheck source=../theme-preview.sh
     source "$PROJECT_DIR/scripts/lib/theme-preview.sh"
@@ -86,19 +107,21 @@ for user_home in /home/*; do
     _lib_dir="$user_home/.config/omarchy/hooks/lib"
     mkdir -p "$_hook_dir" "$_i18n_dir/messages" "$_lib_dir"
     rm -f "$_hook_dir/yazi-theme" "$user_home/.local/share/applications/yazi-terminal.desktop"
+    cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/i18n-boot.sh" "$_i18n_dir/"
+    cp "$PROJECT_DIR"/scripts/lib/messages/*.msg "$_i18n_dir/messages/"
+    cp "$PROJECT_DIR/scripts/lib/theme-preview.sh" "$_lib_dir/"
+    cp "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "$_lib_dir/"
+    cp "$PROJECT_DIR/conf/xdg-desktop-portal/data/portals.conf" "$_lib_dir/"
+    cp "$PROJECT_DIR/conf/desktop/data/mpv.desktop" "$_lib_dir/"
+    chmod 644 "$_i18n_dir/i18n.sh" "$_i18n_dir"/messages/*.msg "$_lib_dir/theme-preview.sh"
+    chown "$_user":"$_user" "$user_home/.config/omarchy" "$user_home/.config/omarchy/hooks"
+    chown -R "$_user":"$_user" "$_hook_dir" "$_i18n_dir" "$_lib_dir"
     for hook_file in "$PROJECT_DIR"/hooks/theme-set.d/*; do
         [[ -f "$hook_file" ]] || continue
         hook_name=$(basename "$hook_file")
         install -m 755 -o "$_user" -g "$_user" "$hook_file" "$_hook_dir/$hook_name"
         user_as "$_user" bash "$_hook_dir/$hook_name" || warn "theming.hook_failed" "$hook_name" "$_user"
     done
-    cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/i18n-boot.sh" "$_i18n_dir/"
-    cp "$PROJECT_DIR"/scripts/lib/messages/*.msg "$_i18n_dir/messages/"
-    cp "$PROJECT_DIR/scripts/lib/theme-preview.sh" "$_lib_dir/"
-    cp "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "$_lib_dir/"
-    cp "$PROJECT_DIR/conf/xdg-desktop-portal/data/portals.conf" "$_lib_dir/"
-    chmod 644 "$_i18n_dir/i18n.sh" "$_i18n_dir"/messages/*.msg "$_lib_dir/theme-preview.sh"
-    chown -R "$_user":"$_user" "$_hook_dir" "$_i18n_dir" "$_lib_dir"
 done
 
 if [[ "${OMACONF_REBUILD_PREVIEWS:-0}" == 1 ]]; then
