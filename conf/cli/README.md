@@ -16,4 +16,4 @@ bash conf/cli/install.sh
 
 ## Architecture
 
-Installer copies data helpers into shared omaconf path and registers marked source block in bashrc with markers refreshed idempotently on each run. Helper list prints tool index and helper with name prints section for mpv and MuPDF and imv and fzf and rg and fd and bat and eza and zoxide and git and lazygit and gum and built in pointers for Micro. Terminal helpers for Micro arrive with sibling configs.
+Installer copies data helpers into the shared omaconf path and registers a marked source block in bashrc idempotently. Helpers cover the retained command line tools. Retired application helpers are removed during setup; graphical applications use their native help.

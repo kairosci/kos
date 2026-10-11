@@ -52,10 +52,6 @@ HOOK_FILE="$PROJECT_DIR/hooks/theme-set.d/folder-color"
 check "folder-color hook exists" "[[ -f '$HOOK_FILE' ]]"
 check "folder-color hook is executable" "[[ -x '$HOOK_FILE' ]]"
 
-MICRO_HOOK="$PROJECT_DIR/hooks/theme-set.d/micro-theme"
-check "micro-theme hook exists" "[[ -f '$MICRO_HOOK' ]]"
-check "micro-theme hook is executable" "[[ -x '$MICRO_HOOK' ]]"
-
 test_icon_mapping() {
     local theme="$1" expected="$2"
     local mapped
@@ -99,21 +95,21 @@ check "Thunar removed" "! pacman -Q thunar &>/dev/null"
 check "herdr installed" "pacman -Q herdr &>/dev/null"
 check "gum installed" "pacman -Q gum &>/dev/null"
 check "Nautilus installed" "pacman -Q nautilus &>/dev/null"
-check "micro installed" "pacman -Q micro &>/dev/null"
-check "Micro symbol navigation dependencies installed" "pacman -Q fzf universal-ctags &>/dev/null"
+check "Zed installed" "pacman -Q zed &>/dev/null"
+check "OnlyOffice installed" "pacman -Q onlyoffice-bin &>/dev/null"
 check "7zip installed" "pacman -Q 7zip &>/dev/null"
-check "imv installed" "pacman -Q imv &>/dev/null"
+check "Loupe installed" "pacman -Q loupe &>/dev/null"
 check "trash-cli installed" "pacman -Q trash-cli &>/dev/null"
-check "mpv installed" "pacman -Q mpv &>/dev/null"
-check "mupdf installed" "pacman -Q mupdf &>/dev/null"
+check "Celluloid installed" "pacman -Q celluloid &>/dev/null"
+check "Papers installed" "pacman -Q papers &>/dev/null"
 
-for debloated in chromium thunar yaru-icon-theme kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra; do
+for debloated in chromium thunar yaru-icon-theme kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
     check "debloat verified: $debloated removed" "! pacman -Q '$debloated' &>/dev/null"
 done
 check "docker daemon absent" "! command -v dockerd &>/dev/null"
 
 section "Pacman Configuration & Pinning"
-check "IgnorePkg defined in /etc/pacman.conf" "grep -q '^IgnorePkg' /etc/pacman.conf"
+check "No IgnorePkg in /etc/pacman.conf" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 check "No syntax error in /etc/pacman.conf" "pacman -Q &>/dev/null"
 
 section "Security Daemon Non-Lockout Checks"

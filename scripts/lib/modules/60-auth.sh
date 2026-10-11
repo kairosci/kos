@@ -20,6 +20,11 @@ minclass = 4
 PWQ
 chmod 644 /etc/security/pwquality.conf
 
+pacman -S --noconfirm --needed libpwquality
+# shellcheck source=scripts/lib/pam-policy.sh
+source "$PROJECT_ROOT/scripts/lib/pam-policy.sh"
+pam_policy_reconcile /etc/pam.d/system-auth || err "auth.pam_failed"
+
 log "auth.access"
 cat > /etc/security/access.conf << 'ACCESS'
 +:root:LOCAL

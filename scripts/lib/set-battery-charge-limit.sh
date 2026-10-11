@@ -28,7 +28,7 @@ threshold_read() {
     local node="$1" value=""
     [[ -r "$node" ]] || return 1
     value=$(cat "$node" 2>/dev/null) || return 1
-    [[ "$value" =~ ^[0-9]+$ ]] || return 1
+    [[ "$value" =~ ^[0-9]+$ ]] || return 2
     printf '%s\n' "$value"
 }
 
@@ -47,8 +47,13 @@ threshold_apply() {
 
 battery_candidates() {
     local battery attribute
-    for battery in "$POWER_SUPPLY_ROOT"/BAT* "$POWER_SUPPLY_ROOT"/BATT*; do
+    for battery in "$POWER_SUPPLY_ROOT"/*; do
         [[ -d "$battery" ]] || continue
+        if [[ -r "$battery/type" ]]; then
+            [[ $(cat "$battery/type") == Battery ]] || continue
+        else
+            [[ ${battery##*/} == BAT* ]] || continue
+        fi
         for attribute in "${ATTRIBUTES[@]}"; do
             [[ -e "$battery/$attribute" ]] && printf '%s\n' "$battery/$attribute"
         done
@@ -62,7 +67,7 @@ write_state() {
     local tmp=""
 
     install -d -m 0755 "$STATE_DIR"
-    tmp="$STATE_FILE.tmp.$$"
+    tmp=$(mktemp "$STATE_FILE.XXXXXX")
     {
         printf 'limit=%s\n' "$limit"
         printf 'reason=%s\n' "$reason"
@@ -77,14 +82,30 @@ write_state() {
 
 apply_limit() {
     local limit="$1"
-    local node mechanism=none reason=firmware_unsupported
+    local node value status mechanism=none reason=firmware_unsupported
     local functional_nodes=0 applied_nodes=0 rejected_nodes=0
 
+    local battery_lock
+    exec {battery_lock}>"$STATE_DIR/battery-charge-limit.lock"
+    flock -w 20 -x "$battery_lock"
     while read -r node; do
         [[ -n "$node" ]] || continue
-        threshold_functional "$node" || continue
+        if value=$(threshold_read "$node"); then
+            if ! threshold_functional "$node"; then
+                functional_nodes=$((functional_nodes + 1))
+                rejected_nodes=$((rejected_nodes + 1))
+                continue
+            fi
+        else
+            status=$?
+            if ((status == 1)); then
+                functional_nodes=$((functional_nodes + 1))
+                rejected_nodes=$((rejected_nodes + 1))
+            fi
+            continue
+        fi
         functional_nodes=$((functional_nodes + 1))
-        if threshold_apply "$node" "$limit"; then
+        if [[ "$value" == "$limit" ]] || threshold_apply "$node" "$limit"; then
             applied_nodes=$((applied_nodes + 1))
             if [[ "$mechanism" == none ]]; then
                 mechanism="sysfs:${node}"
@@ -121,12 +142,20 @@ state_get() {
 
 live_probe() {
     local want="$1"
-    local node value
+    local node value status
     local functional_nodes=0 drift=no
 
     while read -r node; do
         [[ -n "$node" ]] || continue
-        value=$(threshold_read "$node") || continue
+        if value=$(threshold_read "$node"); then
+            :
+        else
+            status=$?
+            if ((status == 1)); then
+                drift=yes
+            fi
+            continue
+        fi
         functional_nodes=$((functional_nodes + 1))
         if [[ "$value" != "$want" ]]; then
             drift=yes
@@ -178,6 +207,7 @@ query_key() {
 mode="${1:---apply}"
 case "$mode" in
     --apply|apply)
+        install -d -m 0755 "$STATE_DIR"
         apply_limit "$(resolve_limit)"
         ;;
     --query|query)

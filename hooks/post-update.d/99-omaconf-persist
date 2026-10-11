@@ -3,7 +3,12 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 OMACONF_I18N_BOOT="${OMACONF_I18N_BOOT:-$SCRIPT_DIR/../i18n/i18n-boot.sh}"
 [[ -f "$OMACONF_I18N_BOOT" ]] || OMACONF_I18N_BOOT="$SCRIPT_DIR/../../scripts/lib/i18n-boot.sh"
-if [[ -f "$OMACONF_I18N_BOOT" ]]; then
+if [[ $EUID -eq 0 ]]; then
+    export OMACONF_I18N_DIR=/usr/local/lib/omaconf/messages
+    OMACONF_I18N_BOOT=/usr/local/lib/omaconf/i18n.sh
+    source "$OMACONF_I18N_BOOT"
+    i18n_init
+elif [[ -f "$OMACONF_I18N_BOOT" ]]; then
     . "$OMACONF_I18N_BOOT"
 else
     warn() { printf '%s: %s\n' "Warning" "$1" >&2; }
@@ -24,9 +29,16 @@ run_as_user() {
 }
 OMACONF_DESKTOP_WORKFLOW="${OMACONF_DESKTOP_WORKFLOW:-$SCRIPT_DIR/../lib/desktop-workflow.sh}"
 [[ -f "$OMACONF_DESKTOP_WORKFLOW" ]] || OMACONF_DESKTOP_WORKFLOW="$SCRIPT_DIR/../../scripts/lib/desktop-workflow.sh"
+if [[ $EUID -eq 0 ]]; then
+    OMACONF_DESKTOP_WORKFLOW=/usr/local/lib/omaconf/desktop-workflow.sh
+    export DESKTOP_WORKFLOW_MPV_ENTRY=/usr/local/lib/omaconf/mpv.desktop
+fi
 source "$OMACONF_DESKTOP_WORKFLOW"
 DESKTOP_WORKFLOW_PORTALS="$SCRIPT_DIR/../lib/portals.conf"
 [[ -f "$DESKTOP_WORKFLOW_PORTALS" ]] || DESKTOP_WORKFLOW_PORTALS="$SCRIPT_DIR/../../conf/xdg-desktop-portal/data/portals.conf"
+if [[ $EUID -eq 0 ]]; then
+    DESKTOP_WORKFLOW_PORTALS=/usr/local/lib/omaconf/portals.conf
+fi
 user_as() {
     local user="$1" uid home
     shift
@@ -37,23 +49,33 @@ user_as() {
 }
 OMACONF_THEME_PREVIEW="${OMACONF_THEME_PREVIEW:-$SCRIPT_DIR/../lib/theme-preview.sh}"
 [[ -f "$OMACONF_THEME_PREVIEW" ]] || OMACONF_THEME_PREVIEW="$SCRIPT_DIR/../../scripts/lib/theme-preview.sh"
+if [[ $EUID -eq 0 ]]; then
+    OMACONF_THEME_PREVIEW=/usr/local/lib/omaconf/theme-preview.sh
+fi
 if [[ -f "$OMACONF_THEME_PREVIEW" ]]; then
   source "$OMACONF_THEME_PREVIEW"
 fi
 if [[ $EUID -eq 0 ]] && declare -F theme_preview_normalize >/dev/null; then
   theme_preview_normalize
 fi
-if [[ -x /usr/local/libexec/omaconf-desktop-cleanup ]]; then
+if [[ $EUID -eq 0 && -x /usr/local/libexec/omaconf-desktop-cleanup ]]; then
   /usr/local/libexec/omaconf-desktop-cleanup 2>/dev/null || warn "hooks.desktop_reapply_skipped" "all"
-elif [[ -x "$SCRIPT_DIR/../../scripts/lib/desktop-cleanup.sh" ]]; then
-  "$SCRIPT_DIR/../../scripts/lib/desktop-cleanup.sh" 2>/dev/null || warn "hooks.desktop_reapply_skipped" "all"
 fi
-for user_home in /home/*; do
+if [[ $EUID -eq 0 ]]; then
+    user_homes=(/home/*)
+else
+    user_homes=("$HOME")
+fi
+for user_home in "${user_homes[@]}"; do
   [[ -d "$user_home" ]] || continue
-  _user=$(basename "$user_home")
+  if [[ $EUID -eq 0 ]]; then
+    _user=$(basename "$user_home")
+  else
+    _user=$(id -un)
+  fi
   _uid=$(id -u "$_user" 2>/dev/null) || continue
   if [[ -e "/run/user/$_uid/bus" ]]; then
-    run_as_user "$_user" env XDG_RUNTIME_DIR="/run/user/$_uid" gsettings set org.gnome.desktop.interface cursor-theme "capitaine-cursors" 2>/dev/null || warn "hooks.cursor_reapply_skipped" "$_user"
+    user_as "$_user" gsettings set org.gnome.desktop.interface cursor-theme "capitaine-cursors" || warn "hooks.cursor_reapply_skipped" "$_user"
   fi
   if [[ -n "$_uid" && -d "/run/user/$_uid" ]]; then
     _user_env=(env "XDG_RUNTIME_DIR=/run/user/$_uid" "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$_uid/bus")
