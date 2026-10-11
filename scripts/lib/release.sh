@@ -11,11 +11,15 @@ kos_release_profile() {
     strip_tmp=$(mktemp -d) || return 1
     stripped_pkg="$repository/$(basename "$package")"
     bsdtar -C "$strip_tmp" -xf "$package" || { rm -rf "$strip_tmp"; return 1; }
-    install -d -m 755 "$profile/airootfs/etc/skel"
-    install -m 644 "$strip_tmp/etc/skel/.bashrc" "$profile/airootfs/etc/skel/.bashrc" || { rm -rf "$strip_tmp"; return 1; }
-    rm -f "$strip_tmp/etc/skel/.bashrc"
+    if [[ -f "$strip_tmp/etc/skel/.bashrc" ]]; then
+        install -Dm644 "$strip_tmp/etc/skel/.bashrc" "$profile/airootfs/etc/skel/.bashrc" || { rm -rf "$strip_tmp"; return 1; }
+        rm -f "$strip_tmp/etc/skel/.bashrc"
+    fi
     mapfile -d '' _iso_entries < <(cd "$strip_tmp" && find . \! \( -name .PKGINFO -o -name .MTREE \) -mindepth 1 -print0 | sort -z)
-    bsdtar --format=gnutar -C "$strip_tmp" -cf - .PKGINFO .MTREE "${_iso_entries[@]}" | zstd -T0 > "$stripped_pkg" || { rm -rf "$strip_tmp"; return 1; }
+    local _meta=()
+    [[ -f "$strip_tmp/.PKGINFO" ]] && _meta+=(.PKGINFO)
+    [[ -f "$strip_tmp/.MTREE" ]] && _meta+=(.MTREE)
+    bsdtar --format=gnutar -C "$strip_tmp" -cf - "${_meta[@]}" "${_iso_entries[@]}" | zstd -T0 > "$stripped_pkg" || { rm -rf "$strip_tmp"; return 1; }
     rm -rf "$strip_tmp"
     repo-add "$repository/kos.db.tar.gz" "$stripped_pkg" || return 1
     printf '\n[kos]\nSigLevel = Optional TrustAll\nServer = file://%s\n' "$repository" >> "$profile/pacman.conf" || return 1
