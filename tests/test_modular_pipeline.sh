@@ -12,6 +12,8 @@ test_section "Modular Pipeline Architecture & Integrity"
 
 EXPECTED_MODULES=(
     "00-env.sh"
+    "02-kos-runtime.sh"
+    "03-kos-migration.sh"
     "05-locale.sh"
     "06-os-identity.sh"
     "10-debloat.sh"
@@ -44,11 +46,11 @@ for m in "${EXPECTED_MODULES[@]}"; do
 done
 
 assert_file_contains "00-env defines aur_verified_install" "$MODULES_DIR/00-env.sh" "aur_verified_install\(\)"
-assert_file_contains "00-env defines omarchy_as helper" "$MODULES_DIR/00-env.sh" "omarchy_as\(\)"
-assert_file_contains "omarchy_as forwards the user session bus" "$MODULES_DIR/00-env.sh" "DBUS_SESSION_BUS_ADDRESS"
-assert_file_contains "20-defaults routes the browser through omarchy_as" "$MODULES_DIR/20-defaults.sh" "omarchy_as"
-assert_file_contains "35-shell-plugins uses the canonical omamp source" "$MODULES_DIR/35-shell-plugins.sh" "omaconf/omamp.git"
-assert_file_contains "35-shell-plugins routes through omarchy_as" "$MODULES_DIR/35-shell-plugins.sh" "omarchy_as"
+assert_file_contains "00-env defines kos_as helper" "$MODULES_DIR/00-env.sh" "kos_as\(\)"
+assert_file_contains "kos_as forwards the user session bus" "$MODULES_DIR/00-env.sh" "DBUS_SESSION_BUS_ADDRESS"
+assert_file_contains "20-defaults routes the browser through kos_as" "$MODULES_DIR/20-defaults.sh" "kos_as"
+assert_file_contains "35-shell-plugins uses the canonical omamp source" "$MODULES_DIR/35-shell-plugins.sh" "kos/omamp.git"
+assert_file_contains "35-shell-plugins routes through kos_as" "$MODULES_DIR/35-shell-plugins.sh" "kos_as"
 assert_file_contains "32-omaqt tracks the omaqt checkout" "$MODULES_DIR/32-omaqt.sh" "OMAQT_DIR"
 assert_file_contains "10-debloat defines DEBLOAT array" "$MODULES_DIR/10-debloat.sh" "DEBLOAT=\("
 assert_file_contains "85-security-stack defines SECURITY_PKGS array" "$MODULES_DIR/85-security-stack.sh" "SECURITY_PKGS=\("

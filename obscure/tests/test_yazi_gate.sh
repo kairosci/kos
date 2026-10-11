@@ -46,13 +46,13 @@ merge_simulation() {
     mkdir -p "$cfg"
     printf '%s\n' "[mgr]" "show_hidden = false" "" "[opener]" 'edit = [' ']' "" "[open]" 'rules = [' ']' > "$cfg/yazi.toml"
     {
-        printf '%s\n' "# >>> omaconf obscure >>>" "[plugin]" "prepend_previewers = ["
+        printf '%s\n' "# >>> kos obscure >>>" "[plugin]" "prepend_previewers = ["
         local pat=""
         while IFS= read -r pat; do
             [[ "$pat" =~ ^[[:space:]]*(#|$) ]] && continue
             printf '\t{ url = "%s", run = "obscure" },\n' "$pat"
         done < "$PATTERNS"
-        printf '%s\n' "]" "# <<< omaconf obscure <<<"
+        printf '%s\n' "]" "# <<< kos obscure <<<"
     } >> "$cfg/yazi.toml"
     awk '/^\[plugin\]$/{section=1; next} /^\[/{section=0} section && /prepend_previewers = \[/{found=1} END{exit !found}' "$cfg/yazi.toml" || { rm -rf "$work"; return 1; }
     rm -rf "$work"

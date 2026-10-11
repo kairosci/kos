@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+readonly SCRIPT_NAME="limine-update"
+readonly AUTH_HELPER=/usr/lib/limine/auth-helper
+
+if ((EUID != 0)); then
+	if [[ -f "${AUTH_HELPER}" ]]; then
+		# shellcheck disable=SC1090
+		source "${AUTH_HELPER}" || exit
+	else
+		echo -e "\033[91m${SCRIPT_NAME} must be run as root.\033[0m" >&2
+		exit 1
+	fi
+fi
+
+# Check if limine-install exists
+if command -v limine-install &>/dev/null; then
+	limine-install --no-efi-register
+else
+	echo "ERROR: limine-install not found." >&2
+fi
+
+# Check if limine-mkinitcpio exists and is executable
+if command -v limine-mkinitcpio &>/dev/null; then
+	limine-mkinitcpio "$@"
+else
+	echo "ERROR: limine-mkinitcpio not found." >&2
+fi

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# kos:summary=Check whether kos updates are available
+set -euo pipefail
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/i18n.sh"
+i18n_init
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/release-query.sh"
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+status=0
+kos_release_query "$(kos-version-channel)" "$work/release.json" || status=$?
+[[ "$status" != 1 ]] || exit 1
+[[ "$status" == 0 ]] || err release.invalid
+release=$(cat "$work/release.json")
+tag=$(jq -er '.tag_name' <<< "$release")
+[[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || err release.invalid
+current=$(kos-version)
+if [[ $(vercmp "${tag#v}" "$current") -gt 0 ]]; then
+    printf 'kos %s -> %s\n' "$current" "${tag#v}"
+else
+    exit 1
+fi

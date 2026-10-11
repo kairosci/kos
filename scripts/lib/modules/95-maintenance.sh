@@ -18,9 +18,9 @@ set -euo pipefail
 /usr/bin/rkhunter --check --skip-keypress --report-warnings-only >> /var/log/rkhunter-audit.log 2>&1
 AUDITEOF
 chmod 755 /etc/cron.weekly/security-audit.sh
-cat > /etc/systemd/system/omaconf-security-audit.service << 'SERVICE'
+cat > /etc/systemd/system/kos-security-audit.service << 'SERVICE'
 [Unit]
-Description=Omaconf security audit
+Description=Kos security audit
 
 [Service]
 Type=oneshot
@@ -28,9 +28,9 @@ ExecStart=/etc/cron.weekly/security-audit.sh
 Nice=19
 IOSchedulingClass=idle
 SERVICE
-cat > /etc/systemd/system/omaconf-security-audit.timer << 'TIMER'
+cat > /etc/systemd/system/kos-security-audit.timer << 'TIMER'
 [Unit]
-Description=Weekly Omaconf security audit
+Description=Weekly Kos security audit
 
 [Timer]
 OnCalendar=weekly
@@ -40,13 +40,13 @@ RandomizedDelaySec=1h
 [Install]
 WantedBy=timers.target
 TIMER
-chmod 644 /etc/systemd/system/omaconf-security-audit.{service,timer}
+chmod 644 /etc/systemd/system/kos-security-audit.{service,timer}
 systemctl daemon-reload
 if systemctl is-enabled --quiet cronie.service || systemctl is-active --quiet cronie.service; then
     systemctl enable --now cronie.service
-    systemctl disable --now omaconf-security-audit.timer
+    systemctl disable --now kos-security-audit.timer
 else
-    systemctl enable --now omaconf-security-audit.timer
+    systemctl enable --now kos-security-audit.timer
 fi
 
 log "maint.logs"

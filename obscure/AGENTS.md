@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-obscure is the gaze protection microcomponent for Omarchy on Arch Linux. It hides sensitive content with password gated yazi previews and native idle lock. It never touches documents and vaults and installed apps beyond preview and open gate.
+obscure is the gaze protection microcomponent for Kos on Arch Linux. It hides sensitive content with password gated yazi previews and native idle lock. It never touches documents and vaults and installed apps beyond preview and open gate.
 
 ## Repository Architecture
 

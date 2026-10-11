@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+readonly SCRIPT_NAME="limine-remove-entry"
+export HOOK_CALLER="$SCRIPT_NAME"
+export HOOK_CMDLINE="$*"
+
+if ! command -v limine-entry-tool &>/dev/null; then
+	echo "ERROR: limine-entry-tool not found." >&2
+	exit 1
+fi
+exec limine-entry-tool --remove-entry "${@}"

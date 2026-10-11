@@ -3,7 +3,7 @@
 set -euo pipefail
 
 log "env.sync"
-OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm || err "env.sync_skipped"
+KOS_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm || err "env.sync_skipped"
 
 log "env.fixing_broken"
 for pkg_dir in /var/lib/pacman/local/*/; do
@@ -104,12 +104,12 @@ user_as() {
         "XDG_DATA_HOME=$home/.local/share"
         "XDG_STATE_HOME=$home/.local/state"
         "XDG_CACHE_HOME=$home/.cache"
-        "PATH=$home/.local/bin:/usr/share/omarchy/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin"
+        "PATH=$home/.local/bin:/usr/share/kos/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin"
         "XDG_RUNTIME_DIR=$runtime"
         "DBUS_SESSION_BUS_ADDRESS=$bus"
     )
-    if [[ -n "${OMACONF_LANG:-}" ]]; then _env+=("OMACONF_LANG=$OMACONF_LANG"); fi
-    if [[ -n "${OMACONF_FORCE_TZ:-}" ]]; then _env+=("OMACONF_FORCE_TZ=$OMACONF_FORCE_TZ"); fi
+    if [[ -n "${KOS_LANG:-}" ]]; then _env+=("KOS_LANG=$KOS_LANG"); fi
+    if [[ -n "${KOS_FORCE_TZ:-}" ]]; then _env+=("KOS_FORCE_TZ=$KOS_FORCE_TZ"); fi
     local session_env entry
     if [[ -n "$bus" ]] && session_env=$(sudo -u "$user" env "XDG_RUNTIME_DIR=$runtime" "DBUS_SESSION_BUS_ADDRESS=$bus" systemctl --user show-environment); then
         while IFS= read -r entry; do
@@ -122,15 +122,15 @@ user_as() {
         -u SUDO_USER -u SUDO_UID -u SUDO_GID -u PKEXEC_UID "${_env[@]}" "$@"
 }
 
-omarchy_as() {
+kos_as() {
     local user="$1"
     shift
-    [[ -n "$user" ]] || { warn "env.omarchy_as_no_user"; return 1; }
-    if [[ -z "${OMARCHY_PATH:-}" ]]; then
-        if [[ -f /usr/share/omarchy/default/bash/env-bootstrap ]]; then
-            source /usr/share/omarchy/default/bash/env-bootstrap 2>/dev/null || warn "env.omarchy_bootstrap_skipped"
+    [[ -n "$user" ]] || { warn "env.kos_as_no_user"; return 1; }
+    if [[ -z "${KOS_PATH:-}" ]]; then
+        if [[ -f /usr/share/kos/default/bash/env-bootstrap ]]; then
+            source /usr/share/kos/default/bash/env-bootstrap 2>/dev/null || warn "env.kos_bootstrap_skipped"
         fi
-        OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}"
+        KOS_PATH="${KOS_PATH:-/usr/share/kos}"
     fi
-    user_as "$user" env "OMARCHY_PATH=$OMARCHY_PATH" omarchy "$@"
+    user_as "$user" env "KOS_PATH=$KOS_PATH" kos "$@"
 }

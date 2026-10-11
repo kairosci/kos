@@ -1,0 +1,420 @@
+#!/usr/bin/env bash
+
+# Default values
+EFI_REGISTER=yes
+ALLOW_DOWNGRADE=no
+SET_LIMINE_AS_FALLBACK=no
+
+# Parse command-line arguments
+for arg in "$@"; do
+	case "$arg" in
+	--no-efi-register | -n)
+		EFI_REGISTER=no
+		;;
+	--allow-downgrade | -d)
+		ALLOW_DOWNGRADE=yes
+		;;
+	--fallback | -f)
+		SET_LIMINE_AS_FALLBACK=yes
+		;;
+	--skip-uefi | -s)
+		SKIP_UEFI=yes
+		;;
+	--help | -h | *)
+		echo "Usage: $0 [options]"
+		echo "  --no-efi-register | -n    Skip registering Limine in NVRAM."
+		echo "  --allow-downgrade | -d    Allow installing older Limine versions."
+		echo "  --fallback        | -f    Make Limine the default fallback bootloader."
+		echo "  --skip-uefi       | -s    Skip UEFI check and registration for non-compliant UEFI boards."
+		exit 0
+		;;
+	esac
+done
+
+readonly SCRIPT_NAME="limine-install"
+readonly AUTH_HELPER=/usr/lib/limine/auth-helper
+export HOOK_CALLER="$SCRIPT_NAME"
+export HOOK_CMDLINE="$*"
+
+if ((EUID != 0)); then
+	if [[ -f "${AUTH_HELPER}" ]]; then
+		# shellcheck disable=SC1090
+		source "${AUTH_HELPER}" || exit
+	else
+		echo -e "\033[91m${SCRIPT_NAME} must be run as root.\033[0m" >&2
+		exit 1
+	fi
+fi
+
+# Import functions and environment variables
+readonly LIMINE_FUNCTIONS_PATH=/usr/lib/limine/limine-common-functions
+# shellcheck disable=SC1090
+source "${LIMINE_FUNCTIONS_PATH}" || {
+	echo "ERROR: Failed to source '${LIMINE_FUNCTIONS_PATH}'."
+	exit 1
+}
+
+initialize_header || exit 1
+
+# Skip UEFI check on some MSI UEFI boards with broken EFI implementation.
+if [[ "${SKIP_UEFI:-no}" == "yes" ]]; then
+	SET_LIMINE_AS_FALLBACK=yes
+else
+	is_uefi || {
+		info_msg "The system is not using UEFI."
+		SET_LIMINE_AS_FALLBACK=yes
+		SKIP_UEFI=yes
+	}
+fi
+
+is_supported_arch || {
+	info_msg "No Limine EFI binary for $(uname -m)."
+	exit 0
+}
+
+# Function that registers Limine in the UEFI boot manager
+register_uefi_entry() {
+	local esp_path="$1"
+	local boot_label="$2"
+	local efi_file_path="$3"
+
+	# Check if efibootmgr exists
+	if ! command -v efibootmgr &>/dev/null; then
+		error_msg "efibootmgr command not found."
+		return 1
+	fi
+
+	# Get the disk and partition information
+	local source
+	if ! read -r source < <(findmnt -n -o SOURCE "$esp_path"); then
+		error_msg "Unable to determine the source device for '$esp_path'."
+		return 1
+	fi
+
+	local part_uuid
+	if ! read -r part_uuid < <(findmnt -n -o PARTUUID "$esp_path"); then
+		error_msg "Unable to determine GPT UUID for '$esp_path'."
+		return 1
+	fi
+
+	# Validate partition UUID
+	if [[ -z "$part_uuid" ]]; then
+		error_msg "Empty partition UUID detected for '$esp_path'."
+		return 1
+	fi
+
+	# GPT UUID = 36 chars (8-4-4-4-12); Legacy MBR disk ID = 8 hex chars with "-NN" partition suffix
+	if [[ ${#part_uuid} -ne 36 ]]; then
+		# Check for MBR-like ID with "-NN" suffix
+		if [[ "$part_uuid" =~ ^([0-9A-Fa-f]{8})(-[0-9A-Fa-f]{2})?$ ]]; then
+			# Remove "-NN" suffix
+			part_uuid="${BASH_REMATCH[1]}"
+		else
+			error_msg "Invalid partition UUID format: '$part_uuid' for '$esp_path'"
+			return 1
+		fi
+	fi
+
+	# Check if the Limine EFI entry already exists
+	if efibootmgr | grep -Fi "${part_uuid}" | grep -Fqi "/${efi_file_path}"; then
+		return 0
+	fi
+
+	# Extract disk and partition
+	local disk part
+	if [[ "$source" =~ ^(/dev/nvme[0-9]+n[0-9]+)p([0-9]+)$ ]]; then
+		# NVMe: /dev/nvmeXnYpZ -> disk=/dev/nvmeXnY, part=Z
+		disk="${BASH_REMATCH[1]}"
+		part="${BASH_REMATCH[2]}"
+	elif [[ "$source" =~ ^(/dev/mmcblk[0-9]+)p([0-9]+)$ ]]; then
+		# MMC/SD: /dev/mmcblkXpY -> disk=/dev/mmcblkX, part=Y
+		disk="${BASH_REMATCH[1]}"
+		part="${BASH_REMATCH[2]}"
+	elif [[ "$source" =~ ^(/dev/[a-z]+)([0-9]+)$ ]]; then
+		# /dev/sdaX, /dev/vdaX, /dev/xvdaX -> disk=/dev/[sda|vda|xvda], part=X
+		disk="${BASH_REMATCH[1]}"
+		part="${BASH_REMATCH[2]}"
+	else
+		error_msg "Failed to parse disk and partition from source ${source}."
+		return 1
+	fi
+
+	# Add the EFI entry using efibootmgr
+	if efibootmgr --create \
+		--disk "${disk}" \
+		--part "${part}" \
+		--label "${boot_label}" \
+		--loader "${efi_file_path}" \
+		--unicode; then
+		info_msg "EFI boot entry '${boot_label}' for '${efi_file_path}' added successfully."
+	else
+		warning_msg "UEFI NVRAM may already be full."
+		error_msg "Failed to add EFI boot entry: disk=${disk}, part=${part}, label=${boot_label}, loader=${efi_file_path}"
+		return 1
+	fi
+}
+
+# Check for downgrade when an older Limine version is detected
+# Returns:
+#   0 -> OK (no downgrade or downgrade allowed)
+#   1 -> Downgrade detected but not allowed
+#   2 -> Invalid version or comparison error
+check_limine_downgrade() {
+	local src_file="$1"
+	local tgt_file="$2"
+	local name="${3:-Limine}"
+
+	compare_limine_versions "$src_file" "$tgt_file"
+	local cmp_result=$?
+
+	case "$cmp_result" in
+	0 | 1)
+		# Source is equal or newer
+		return 0
+		;;
+	2)
+		# Downgrade detected
+		local src_ver tgt_ver
+		src_ver=$(get_limine_version "$src_file") || return 2
+		tgt_ver=$(get_limine_version "$tgt_file") || return 0
+
+		info_msg "Info: Downgrade detected for $name from version $tgt_ver to $src_ver."
+
+		if [[ "$ALLOW_DOWNGRADE" != "yes" ]]; then
+			info_msg "Info: Downgrade skipped; '--allow-downgrade' not set for limine-install."
+			return 1
+		fi
+
+		return 0
+		;;
+	*)
+		# Invalid version or comparison error
+		return 2
+		;;
+	esac
+}
+
+# Check if a Limine binary is within the supported major version range.
+# Args: <limine binary file> <min major version> <max major version> <name>
+# Returns:
+#   0 -> Supported version
+#   1 -> Version newer than $max_version (unsupported future major version)
+#   2 -> Version older than $min_version (too old / unsupported)
+#   3 -> Failed to retrieve version (get_limine_version failed)
+check_limine_upgrade() {
+	local src_file="$1"
+	local min_major_version="$2"
+	local max_major_version="$3"
+	local name="${4:-Limine}"
+	local src_version major_version
+
+	src_version=$(get_limine_version "$src_file") || return 3
+
+	# Extract the major version number
+	major_version=$(cut -d. -f1 <<<"$src_version")
+
+	if ((major_version > max_major_version)); then
+		info_msg "Info: $name version $major_version exceeds the supported maximum version ${max_major_version} for limine-entry-tool; skipping upgrade."
+		return 1
+	fi
+
+	if ((major_version < min_major_version)); then
+		warning_msg "$name version $major_version is below the supported minimum version ${min_major_version} for limine-entry-tool; skipping installation."
+		return 2
+	fi
+}
+
+# Check for conflicting Limine config files in common ESP locations.
+# Warn if any are found, since Limine v10.3.0+ will ignore the default ${ESP_PATH}/limine.conf
+check_limine_config_conflicts() {
+	local paths=(
+		"${ESP_PATH}/EFI/limine/limine.conf"
+		"${ESP_PATH}/EFI/BOOT/limine.conf"
+		"${ESP_PATH}/boot/limine/limine.conf"
+		"${ESP_PATH}/boot/limine.conf"
+		"${ESP_PATH}/limine/limine.conf"
+	)
+	local found=0
+
+	for config_path in "${paths[@]}"; do
+		if [[ -f "$config_path" ]]; then
+			warning_msg "Detected conflicting config:" "$config_path"
+			found=1
+		fi
+	done
+
+	if ((found)); then
+		warning_msg "One or more conflicting Limine config files were detected.
+      \t Limine will load one of these files based on its search order, ignoring the default ${ESP_PATH}/limine.conf.
+      \t To avoid unexpected boot behavior, please remove the conflicting files manually."
+	fi
+	return 0
+}
+
+# Function to update a specific EFI file if needed
+update_limine_efi() {
+	local source_file="${BINARY_SOURCE_PATH}"
+	local backup_file="${LIMINE_DIR_PATH}${LIMINE_BACKUP_FILE}"
+	local target_file="${LIMINE_DIR_PATH}${LIMINE_EFI_FILE}"
+
+	# Verify the original Limine binary file exists
+	if [[ ! -f "$source_file" ]]; then
+		error_msg "Limine EFI file '$source_file' is not available!"
+		return 1
+	fi
+
+	# If b2sum and backup archive exist, compare hashes
+	if command -v b2sum &>/dev/null && [[ -f "$backup_file" ]]; then
+		local source_hash backup_hash
+		source_hash=$(b2sum "$source_file" | awk '{print $1}')
+		backup_hash=$(tar --to-command="b2sum" -xf "$backup_file" 2>/dev/null | awk '{print $1}')
+
+		if [[ "$source_hash" == "$backup_hash" ]]; then
+			# No update needed
+			return 0
+		fi
+	fi
+
+	# Check Limine version only if a target file already exists
+	if [[ -f "$target_file" && "${SKIP_LIMINE_VERSION_CHECK:-}" != "yes" ]]; then
+		if ! check_limine_downgrade "$source_file" "$target_file" "Limine EFI"; then
+			return 0
+		fi
+		if ! check_limine_upgrade "$source_file" 8 12 "Limine EFI"; then
+			return 0
+		fi
+	fi
+
+	info_msg "Updating $target_file..."
+	cp "$source_file" "$target_file" || return 1
+
+	info_msg "Creating a backup $backup_file..."
+	tar -cf "$backup_file" --directory="${LIMINE_DIR_PATH}" "${LIMINE_EFI_FILE}" || {
+		error_msg "Failed to create backup at $backup_file."
+		return 1
+	}
+}
+
+# Function to update the Limine fallback EFI binary if needed
+update_limine_fallback() {
+	local source_file="${BINARY_SOURCE_PATH}"
+	local target_file="${BINARY_FALLBACK_PATH}"
+
+	# Verify the original Limine binary exists
+	if [[ ! -f "$source_file" ]]; then
+		error_msg "Limine EFI file '$source_file' is not available!"
+		return 1
+	fi
+
+	# If b2sum exists, compare hashes
+	if command -v b2sum &>/dev/null && [[ -f "$target_file" ]]; then
+		local source_hash target_hash
+		source_hash=$(b2sum "$source_file" | awk '{print $1}')
+		target_hash=$(b2sum "$target_file" | awk '{print $1}')
+
+		if [[ "$source_hash" == "$target_hash" ]]; then
+			# No update needed
+			return 0
+		fi
+	fi
+
+	# Check for downgrade and upgrade, only if fallback exists
+	if [[ -f "$target_file" && "${SKIP_LIMINE_VERSION_CHECK:-}" != "yes" ]]; then
+		if ! check_limine_downgrade "$source_file" "$target_file" "Limine (fallback)"; then
+			return 0
+		fi
+		if ! check_limine_upgrade "$source_file" 8 12 "Limine (fallback)"; then
+			return 0
+		fi
+	fi
+
+	info_msg "Updating Limine fallback EFI..."
+	cp -f "$source_file" "$target_file" || {
+		error_msg "Failed to copy fallback Limine EFI."
+		return 1
+	}
+}
+
+exit_handler() {
+	local exit_code=$?
+	run_boot_hooks post || exit_code=$?
+	mutex_unlock
+	exit "$exit_code"
+}
+
+# Main logic
+mutex_lock "limine-install"
+rc=0
+run_boot_hooks pre || rc=$?
+if ((rc >= 100)); then
+	exit "$rc"
+fi
+
+# Validate ESP_PATH
+if [[ ! -d "${ESP_PATH}" ]]; then
+	error_msg "'${ESP_PATH}' is invalid. Please set ESP_PATH correctly."
+	mutex_unlock
+	exit 1
+fi
+
+# Create necessary Limine boot directory
+if ! install -dm 700 "${LIMINE_DIR_PATH}"; then
+	error_msg "Failed to create directory '${LIMINE_DIR_PATH}'."
+	mutex_unlock
+	exit 1
+fi
+
+trap exit_handler EXIT
+
+# Check for any Limine config conflicts on the same boot partition and warn users if found.
+check_limine_config_conflicts
+
+# Optionally add some bootloaders if they are present on the same ESP
+if [[ "${FIND_BOOTLOADERS:-no}" == "yes" && "${SKIP_UEFI:-no}" == "no" ]]; then
+	bootloader_path="${ESP_PATH}/EFI/systemd/systemd-boot$(limine_efi_arch | tr "[:upper:]" "[:lower:]").efi"
+	if [[ -f "${bootloader_path}" ]]; then
+		limine-entry-tool --add-efi "Systemd-boot" "${bootloader_path}" --comment "Systemd bootloader" --priority 20 --quiet --no-mutex --no-hooks
+	fi
+
+	bootloader_path="${ESP_PATH}/EFI/refind/refind_x64.efi"
+	if [[ -f "${bootloader_path}" ]]; then
+		limine-entry-tool --add-efi "rEFInd" "${bootloader_path}" --comment "rEFInd bootloader" --priority 20 --quiet --no-mutex --no-hooks
+	fi
+
+	bootloader_path="${ESP_PATH}/EFI/BOOT/BOOT$(limine_efi_arch).EFI"
+	if [[ -f "${bootloader_path}" ]]; then
+		limine-entry-tool --add-efi "EFI fallback" "${bootloader_path}" --comment "Default EFI loader" --priority 10 --quiet --no-mutex --no-hooks
+	fi
+fi
+
+# Optionally set Limine as fallback bootloader
+if [[ "${ENABLE_LIMINE_FALLBACK:-}" == "yes" ]] ||
+	[[ "${SET_LIMINE_AS_FALLBACK:-}" == "yes" ]] ||
+	[[ ! -f "${BINARY_FALLBACK_PATH}" && -z "${ENABLE_LIMINE_FALLBACK:-}" ]]; then
+
+	# Ensure the fallback boot directory exists
+	if ! install -dm 700 "${ESP_PATH}/EFI/BOOT/"; then
+		error_msg "Failed to create directory '${ESP_PATH}/EFI/BOOT/'."
+	else
+		update_limine_fallback
+	fi
+fi
+
+# Update Limine EFI file
+if ! update_limine_efi; then
+	exit 1
+fi
+
+# Skip UEFI registration on some MSI UEFI boards with broken EFI implementation.
+if [[ "${SKIP_UEFI:-no}" == "yes" ]]; then
+	info_msg "Skipping UEFI registration."
+elif [[ "${EFI_REGISTER}" == "yes" ]]; then
+	if register_uefi_entry "${ESP_PATH}" "Limine" "${LIMINE_EFI_PATH}"; then
+		info_msg "Limine EFI install completed successfully."
+	else
+		error_msg "Limine EFI install failed."
+		exit 1
+	fi
+else
+	info_msg "Limine EFI update completed successfully."
+fi

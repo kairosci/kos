@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# kos:summary=Print the installed kos version
+set -euo pipefail
+cat "${KOS_PATH:-/usr/share/kos}/version"

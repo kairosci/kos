@@ -1,0 +1,13 @@
+[Unit]
+Description=Setup OverlayFS on Root Filesystem
+DefaultDependencies=no
+After=initrd-fs.target
+Before=initrd.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/limine/overlayfs-setup
+RemainAfterExit=yes
+
+[Install]
+WantedBy=initrd.target

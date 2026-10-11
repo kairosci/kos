@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kos:summary=Overwrite the user tmux config with the Kos default and reload tmux.
+
+kos-refresh-config tmux/tmux.conf
+kos-restart-tmux

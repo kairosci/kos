@@ -1,45 +1,29 @@
 #!/usr/bin/env bash
 
-arch_identity_valid() {
-    local root="${1:-}" vendor destination
-    vendor="$root/usr/lib/os-release"
-    destination="$root/etc/os-release"
-    [[ -r "$vendor" && -r "$destination" ]] || return 1
-    grep -qE '^ID=(arch|"arch")$' "$vendor" || return 1
-    cmp -s <(sed '/^\(LOGO\|ANSI_COLOR\)=/d' "$vendor") <(sed '/^\(LOGO\|ANSI_COLOR\)=/d' "$destination")
+kos_identity_valid() {
+    local root="${1:-}"
+    [[ -r "$root/usr/lib/os-release" && -r "$root/etc/os-release" ]] || return 1
+    grep -qE '^ID=(arch|"arch")$' "$root/usr/lib/os-release" || return 1
+    grep -qx 'ID=kos' "$root/etc/os-release" || return 1
+    grep -qx 'ID_LIKE=arch' "$root/etc/os-release" || return 1
+    grep -qx 'NAME="kos"' "$root/etc/os-release" || return 1
 }
 
-arch_identity_apply() {
-    local root="${1:-}" vendor destination backup branding staged
-    vendor="$root/usr/lib/os-release"
+kos_identity_apply() {
+    local root="${1:-}" version="${2:-}" destination backup staged
+    [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || return 1
+    [[ -r "$root/usr/lib/os-release" ]] || return 1
+    grep -qE '^ID=(arch|"arch")$' "$root/usr/lib/os-release" || return 1
     destination="$root/etc/os-release"
-    backup="$root/var/lib/omaconf/os-identity"
-    [[ -r "$vendor" ]] || return 1
-    grep -qE '^ID=(arch|"arch")$' "$vendor" || return 1
+    backup="$root/var/lib/kos/os-identity"
     [[ ! -d "$destination" ]] || return 1
     if [[ -e "$destination" && ! -e "$backup/os-release" ]]; then
         install -d -m 700 "$backup" || return 1
         cp -L --preserve=mode,timestamps "$destination" "$backup/os-release" || return 1
         chmod 600 "$backup/os-release" || return 1
     fi
-    branding="$destination"
-    [[ -r "$backup/os-release" ]] && branding="$backup/os-release"
-    [[ -r "$branding" ]] || branding=/dev/null
     staged=$(mktemp "$root/etc/.os-release.XXXXXX") || return 1
-    if ! awk '
-        FILENAME == ARGV[1] {
-            if (/^(LOGO|ANSI_COLOR)=/) {
-                key=$0; sub(/=.*/, "", key); visual[key]=$0
-            }
-            next
-        }
-        /^(LOGO|ANSI_COLOR)=/ {
-            key=$0; sub(/=.*/, "", key)
-            if (key in visual) { print visual[key]; delete visual[key]; next }
-        }
-        { print }
-        END { for (key in visual) print visual[key] }
-    ' "$branding" "$vendor" > "$staged"; then
+    if ! printf 'NAME="kos"\nPRETTY_NAME="kos %s"\nID=kos\nID_LIKE=arch\nVERSION_ID="%s"\nBUILD_ID=rolling\nHOME_URL="https://github.com/kairosci/kos"\nSUPPORT_URL="https://github.com/kairosci/kos/issues"\nLOGO=kos\n' "$version" "$version" > "$staged"; then
         rm -f "$staged"
         return 1
     fi

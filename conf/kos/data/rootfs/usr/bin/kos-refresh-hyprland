@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# kos:summary=Overwrite all the user Hyprland Lua configs in ~/.config/hypr with the Kos defaults.
+
+kos-refresh-config hypr/.luarc.json
+kos-refresh-config hypr/autostart.lua
+kos-refresh-config hypr/bindings.lua
+kos-refresh-config hypr/input.lua
+kos-refresh-config hypr/looknfeel.lua
+kos-refresh-config hypr/hyprland.lua
+kos-refresh-config hypr/monitors.lua
+
+mkdir -p ~/.local/state/kos/toggles/hypr
+cp "$KOS_PATH/default/hypr/toggles/flags.lua" ~/.local/state/kos/toggles/hypr/

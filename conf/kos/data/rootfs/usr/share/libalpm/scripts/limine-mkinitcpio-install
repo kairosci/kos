@@ -1,0 +1,302 @@
+#!/usr/bin/env bash
+
+readonly SCRIPT_NAME="limine-mkinitcpio-install"
+# Import functions and environment variables
+readonly LIMINE_FUNCTIONS_PATH=/usr/lib/limine/limine-common-functions
+# shellcheck disable=SC1090
+source "${LIMINE_FUNCTIONS_PATH}" || {
+	echo "ERROR: Failed to source '${LIMINE_FUNCTIONS_PATH}'" >&2
+	exit 1
+}
+
+export HOOK_CALLER="$SCRIPT_NAME"
+export HOOK_CMDLINE="$*"
+
+initialize_header || exit 1
+
+# Initialize global variables
+declare -a KERNEL_DIRS=()
+KERNEL_NAME=""
+KERNEL_VERSION=""
+KERNEL_DIR=""
+BOOT_KERNEL_DIR=""
+INITRAMFS_FALLBACK_PATH=""
+UKI_PATH=""
+UKI_FALLBACK_PATH=""
+CMDLINE_FILE=""
+BOOT_PATH="$ESP_PATH"
+UKI_PREFIX="$MACHINE_ID"
+read -ra UKI_OPTIONS <<<"${MKINITCPIO_UKI_OPTIONS:-}"
+TMP_DIR=$(mktemp -d /tmp/limine-mkinitcpio.XXXXXX) || {
+	error_msg "Failed to create temporary directory"
+	exit 1
+}
+readonly TMP_DIR
+cleanup_tmp_dir() {
+	[[ -d "$TMP_DIR" && "$TMP_DIR" == /tmp/limine-mkinitcpio.* ]] && rm -r "$TMP_DIR"
+	return 0
+}
+trap cleanup_tmp_dir EXIT
+
+resolve_uki_prefix() {
+	UKI_PREFIX="$MACHINE_ID"
+	[[ -z ${CUSTOM_UKI_NAME:-} ]] && return
+
+	if [[ $CUSTOM_UKI_NAME =~ ^[a-z0-9]+$ ]]; then
+		UKI_PREFIX=$CUSTOM_UKI_NAME
+	else
+		warning_msg "CUSTOM_UKI_NAME is invalid. Only lowercase letters (a-z) and digits (0-9) are allowed."
+	fi
+}
+
+resolve_uki_prefix
+
+# Add kernel directories owned by a package.
+add_kernel_package() {
+	local package="$1" path
+	local found=false
+	while IFS= read -r path; do
+		KERNEL_DIRS+=("$path")
+		found=true
+	done < <(
+		pacman -Ql "$package" 2>/dev/null |
+			awk '$2 ~ "^/usr/lib/modules/[^/]+/$" { print $2 }'
+	)
+	$found
+}
+
+# Collect kernel directories from pacman hook stdin or package names.
+collect_kernels() {
+	local line path
+	local rebuild_all=false
+
+	while IFS= read -r line; do
+		if [[ "$line" == usr/lib/modules/*/modules.builtin ]]; then
+			# Convert the modules.builtin path to the kernel directory.
+			path="/${line%/modules.builtin}"
+			KERNEL_DIRS+=("$path")
+		elif [[ "$line" == usr/lib/modules/*/extramodules/* ]]; then
+			# Convert the extramodules path to the kernel directory.
+			path="/${line%%/extramodules/*}"
+			KERNEL_DIRS+=("$path")
+		elif add_kernel_package "$line"; then
+			continue
+		elif [[ "$line" != usr/lib/modules/* ]]; then
+			rebuild_all=true
+			# Do not change "continue" to "break", as it causes:
+			# "unable to write to pipe (Broken pipe)" if reading stops early.
+			continue
+		fi
+	done
+
+	if $rebuild_all; then
+		# Find all kernel module directories.
+		KERNEL_DIRS=(/usr/lib/modules/*/)
+	fi
+}
+
+# Set the global kernel context for the current kernel.
+set_kernel_context() {
+	local kernel_dir="$1" kernel_name="${2:-}"
+	# Remove all spaces that are invalid in FAT32 names to create kernel file or directory
+	KERNEL_NAME="${kernel_name// /}"
+	if [[ -z "${KERNEL_NAME}" ]]; then
+		error_msg "kernel name of '${kernel_dir}' is empty, skipping."
+		return 1
+	fi
+	# Get kernel version from the kernel directory
+	KERNEL_DIR="${kernel_dir%/}"
+	KERNEL_VERSION="${KERNEL_DIR##*/}"
+	# kernel locations
+	BOOT_KERNEL_DIR="${BOOT_PATH}/${MACHINE_ID}/${KERNEL_NAME}"
+	INITRAMFS_FALLBACK_PATH="${BOOT_KERNEL_DIR}/initramfs-fallback"
+
+	local uki_install_dir="${BOOT_PATH}/EFI/Linux"
+	UKI_PATH="${uki_install_dir}/${UKI_PREFIX}_${KERNEL_NAME}.efi"
+	UKI_FALLBACK_PATH="${uki_install_dir}/${UKI_PREFIX}_${KERNEL_NAME}-fallback.efi"
+	return 0
+}
+
+# Sets CMDLINE_FILE, or leaves it empty if no cmdline should be embedded.
+resolve_cmdline_file() {
+	local kernel_name="$1"
+	CMDLINE_FILE=""
+	if is_sb_installed && is_snapper_installed; then
+		# Signed UKIs with embedded cmdlines cannot boot Btrfs snapshots.
+		# Omit the embedded cmdline when Secure Boot and Snapper are used.
+		return 0
+	fi
+	local cmdline_file="$TMP_DIR/cmdline-${kernel_name}"
+	if ! limine-entry-tool --get-cmdline "$kernel_name" --no-mutex --no-hooks | tail -n 1 >"$cmdline_file"; then
+		error_msg "failed to get kernel cmdline for '${kernel_name}'."
+		return 1
+	fi
+	CMDLINE_FILE="$cmdline_file"
+	return 0
+}
+
+# build_uki OUTPUT IS_FALLBACK CMDLINE_FILE
+build_uki() {
+	local output="$1" is_fallback="$2" cmdline_file="$3"
+	local args=(--kernel "$KERNEL_VERSION")
+	if [[ -n "$cmdline_file" ]]; then
+		args+=(--cmdline "$cmdline_file")
+	else
+		args+=(--no-cmdline)
+	fi
+	args+=(--uki "$output")
+	if [[ "$is_fallback" == true ]]; then
+		args+=(-S autodetect)
+	fi
+	args+=("${UKI_OPTIONS[@]}")
+	/usr/bin/mkinitcpio "${args[@]}"
+}
+
+# build_initramfs OUTPUT IS_FALLBACK
+build_initramfs() {
+	local output="$1" is_fallback="$2"
+	local args=(--kernel "$KERNEL_VERSION" --no-cmdline --generate "$output")
+	if [[ "$is_fallback" == true ]]; then
+		args+=(-S autodetect)
+	fi
+	/usr/bin/mkinitcpio "${args[@]}"
+}
+
+# install_uki KERNEL_NAME UKI_FILE COMMENT
+install_uki() {
+	local name="$1" file="$2" comment="$3"
+	limine-entry-tool --add-uki "$name" "$file" \
+		--comment "$comment" --no-mutex --no-hooks
+}
+
+# install_kernel KERNEL_NAME INITRAMFS VMLINUZ COMMENT [-fallback]
+install_kernel() {
+	local name="$1" initramfs="$2" vmlinuz="$3" comment="$4" suffix="${5:-}"
+	limine-entry-tool --add-kernel "$name" "$initramfs" "$vmlinuz" ${suffix:+"$suffix"} \
+		--comment "$comment" --no-mutex --no-hooks
+}
+
+remove_uki_if_present() {
+	local name="$1" path="$2"
+	[[ -f $path ]] || return 0
+	limine-entry-tool --remove-uki "$name" --no-mutex --no-hooks --quiet
+	return 0
+}
+
+cleanup_legacy_uki_entries() {
+	remove_uki_if_present "$KERNEL_NAME" "$UKI_PATH"
+	remove_uki_if_present "${KERNEL_NAME}-fallback" "$UKI_FALLBACK_PATH"
+}
+
+cleanup_legacy_regular_entry() {
+	[[ -d "$BOOT_KERNEL_DIR" ]] && limine-entry-tool --remove-kernel "$KERNEL_NAME" --no-mutex --no-hooks --quiet
+}
+
+# build_install_uki KERNEL_NAME TMP_PATH IS_FALLBACK COMMENT
+build_install_uki() {
+	local kernel_name="$1" tmp_uki="$2" is_fallback="$3" comment="$4"
+
+	resolve_cmdline_file "$kernel_name" || return 1
+
+	if ! build_uki "$tmp_uki" "$is_fallback" "$CMDLINE_FILE"; then
+		error_msg "mkinitcpio failed for kernel ${KERNEL_VERSION}, skipping."
+		return 1
+	fi
+	#sb_sign "$tmp_uki" # Not needed, as it is already handled by mkinitcpio's sbctl hook
+	install_uki "$kernel_name" "$tmp_uki" "$comment"
+	return 0
+}
+
+process_uki_kernel() {
+	info_msg "Building UKI for ${KERNEL_NAME} (${KERNEL_VERSION})"
+	local tmp_uki="$TMP_DIR/${KERNEL_NAME}.efi"
+	build_install_uki "$KERNEL_NAME" "$tmp_uki" false "Kernel version: ${KERNEL_VERSION}" || return 1
+
+	if [[ "${MKINITCPIO_FALLBACK:-}" == "yes" || "${MKINITCPIO_FALLBACK:-}" == "$KERNEL_NAME" ]]; then
+		info_msg "Building UKI fallback for ${KERNEL_NAME} (${KERNEL_VERSION})"
+		local tmp_uki_fb="$TMP_DIR/${KERNEL_NAME}-fallback.efi"
+		build_install_uki "${KERNEL_NAME}-fallback" "$tmp_uki_fb" true "Kernel version: ${KERNEL_VERSION} fallback" || return 1
+	else
+		remove_uki_if_present "${KERNEL_NAME}-fallback" "$UKI_FALLBACK_PATH"
+	fi
+
+	cleanup_legacy_regular_entry
+	return 0
+}
+
+process_regular_kernel() {
+	info_msg "Building initramfs for ${KERNEL_NAME} (${KERNEL_VERSION})"
+	local tmp_initramfs="$TMP_DIR/initramfs"
+	if ! build_initramfs "$tmp_initramfs" false; then
+		error_msg "mkinitcpio failed for kernel ${KERNEL_VERSION}, skipping."
+		return 1
+	fi
+	# Cleanup the legacy kernel directory after confirming it contains legacy files.
+	if [[ -f "$BOOT_KERNEL_DIR/initramfs-${KERNEL_NAME}" ]]; then
+		rm -r "$BOOT_KERNEL_DIR"
+	fi
+	install_kernel "$KERNEL_NAME" "$tmp_initramfs" "${KERNEL_DIR}/vmlinuz" "Kernel version: ${KERNEL_VERSION}"
+
+	if [[ "${MKINITCPIO_FALLBACK:-}" == "yes" || "${MKINITCPIO_FALLBACK:-}" == "$KERNEL_NAME" ]]; then
+		info_msg "Building fallback initramfs for ${KERNEL_NAME} (${KERNEL_VERSION})"
+		local tmp_initramfs_fb="$TMP_DIR/initramfs-fallback"
+		if ! build_initramfs "$tmp_initramfs_fb" true; then
+			error_msg "mkinitcpio failed for kernel ${KERNEL_VERSION}, skipping."
+			return 1
+		fi
+		install_kernel "$KERNEL_NAME" "$tmp_initramfs_fb" "${KERNEL_DIR}/vmlinuz" "Kernel version: ${KERNEL_VERSION} fallback" "-fallback"
+	elif [[ -f "$INITRAMFS_FALLBACK_PATH" ]]; then
+		limine-entry-tool --remove-kernel "${KERNEL_NAME}-fallback" --keep-files --no-mutex --no-hooks --quiet
+		rm -f "$INITRAMFS_FALLBACK_PATH"
+	fi
+
+	cleanup_legacy_uki_entries
+	return 0
+}
+
+# Process a kernel
+process_kernel() {
+	local kernel_dir="$1" kernel_name=""
+
+	[[ -d "$kernel_dir" ]] || return 0
+	[[ -f "${kernel_dir}/modules.builtin" ]] || return 0
+	kernel_name="$(pacman -Qqo "${kernel_dir}/modules.builtin" 2>/dev/null)" || return 0
+	[[ -n "$kernel_name" ]] || return 0
+
+	set_kernel_context "$kernel_dir" "$kernel_name" || return 0
+
+	if [[ "${ENABLE_UKI:-}" == "yes" ]] && is_uefi; then
+		process_uki_kernel || return 0
+	else
+		process_regular_kernel || return 0
+	fi
+}
+
+# Main logic
+main() {
+	collect_kernels
+
+	mutex_lock "$SCRIPT_NAME"
+	if ! run_boot_hooks pre; then
+		mutex_unlock
+		exit 2
+	fi
+
+	local kernel_dir
+	for kernel_dir in "${KERNEL_DIRS[@]}"; do
+		process_kernel "$kernel_dir" || true
+	done
+
+	if ! run_boot_hooks post; then
+		mutex_unlock
+		exit 3
+	fi
+	mutex_unlock
+
+	if [[ -f "/var/lib/limine/removed_kernels.list" ]]; then
+		info_msg "Clean up kernel entries if they are unused."
+		/usr/share/libalpm/scripts/limine-mkinitcpio-remove post
+	fi
+}
+
+main

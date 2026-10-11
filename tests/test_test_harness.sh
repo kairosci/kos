@@ -45,10 +45,10 @@ assert_true "runner accepts a consistent successful suite" "bash '$SCRIPT_DIR/ru
 assert_false "runner rejects missing suites" "bash '$SCRIPT_DIR/run-suite-list.sh' '$HARNESS_SANDBOX/missing.sh'"
 printf '%s\n' 'exit 7' >> "$HARNESS_SANDBOX/suite.sh"
 assert_false "runner propagates nonzero exits after successful assertions" "bash '$SCRIPT_DIR/run-suite-list.sh' '$HARNESS_SANDBOX/suite.sh'"
-mkdir -p "$HARNESS_SANDBOX/bin" "$HARNESS_SANDBOX/omarchy" "$HARNESS_SANDBOX/empty"
+mkdir -p "$HARNESS_SANDBOX/bin" "$HARNESS_SANDBOX/kos" "$HARNESS_SANDBOX/empty"
 printf '%s\n' '#!/bin/bash' 'exit 0' > "$HARNESS_SANDBOX/bin/pacman"
 chmod 755 "$HARNESS_SANDBOX/bin/pacman"
 assert_false "bare Arch container does not require installed desktop packages" "PATH='$HARNESS_SANDBOX/bin' desktop_runtime_available '$HARNESS_SANDBOX/missing'"
-assert_true "installed Omarchy retains strict desktop runtime checks" "PATH='$HARNESS_SANDBOX/bin' desktop_runtime_available '$HARNESS_SANDBOX/omarchy'"
-assert_false "desktop runtime requires the native package manager" "PATH='$HARNESS_SANDBOX/empty' desktop_runtime_available '$HARNESS_SANDBOX/omarchy'"
+assert_true "installed Kos retains strict desktop runtime checks" "PATH='$HARNESS_SANDBOX/bin' desktop_runtime_available '$HARNESS_SANDBOX/kos'"
+assert_false "desktop runtime requires the native package manager" "PATH='$HARNESS_SANDBOX/empty' desktop_runtime_available '$HARNESS_SANDBOX/kos'"
 test_summary

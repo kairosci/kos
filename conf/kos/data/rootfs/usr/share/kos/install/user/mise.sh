@@ -1,0 +1,28 @@
+# Upgrades must not delete the version a running process is executing from:
+# mise up would prune the old install dir out from under a live session.
+mise settings set upgrade.auto_prune false
+
+kos-mise-install codex
+kos-mise-install claude
+kos-mise-install crush
+kos-mise-install gemini
+kos-mise-install gh
+kos-mise-install copilot
+kos-mise-install opencode
+kos-mise-install npm:playwright playwright
+kos-mise-install pi
+kos-mise-install github:can1357/oh-my-pi omp
+kos-mise-install npm:@xai-official/grok grok
+# Cursor's own installer links the same path, so a re-provision keeps it.
+kos-cmd-missing cursor-agent && kos-mise-install cursor-agent
+kos-mise-install npm:@kitlangton/ghui ghui
+kos-mise-install aqua:modem-dev/hunk hunk
+# Every line above writes a stub and cannot fail. This one can: it exits
+# non-zero when Hermes Desktop owns Hermes but has not finished setting it up,
+# and this leaf is sourced under `bash -eE`, so that would abort the rest of
+# kos-provision-user -- the default browser, the mailto handler and the
+# finalize-user marker all come after it.
+kos-install-hermes-cli || true
+if kos-cmd-missing muse; then
+  kos-mise-install "http:muse[url=https://api.meta.ai/muse-launcher.sh,bin=muse,version_list_url=https://api.meta.ai/muse-code/channels/muse-stable,version_json_path=.version]" muse
+fi

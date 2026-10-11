@@ -1,0 +1,50 @@
+#!/bin/bash
+
+function mount_snapshot_overlay() {
+	local root_mnt="/sysroot"
+	local fstype source_path ro_state tmp_dir
+
+	# Check: Is $root_mnt mounted on Btrfs?
+	fstype=$(findmnt --mountpoint "${root_mnt}" -no FSTYPE) || return 0
+	[[ "${fstype}" != "btrfs" ]] && return 0
+
+	# Check: Does $root_mnt source path contain '/snapshot'?
+	source_path=$(findmnt --mountpoint "${root_mnt}" -no SOURCE) || return 0
+	[[ "${source_path}" != *"/snapshot"* ]] && return 0
+
+	# Check: Is the subvolume read-only?
+	ro_state=$(btrfs property get -t subvol "${root_mnt}" ro 2>/dev/null)
+	[[ "${ro_state}" != "ro=true" ]] && return 0
+
+	echo "[OverlayFS setup] ${root_mnt} is a read-only Btrfs snapshot. Setting up OverlayFS..."
+
+	# Prepare overlay structure, create tmpfs for overlay
+	tmp_dir=$(mktemp -d -p / cowspace_XXX) || {
+		echo "[OverlayFS setup] Failed to create tmp_dir for overlay"
+		logger -t "overlayfs-setup" -p err "Failed to create tmp_dir for overlay"
+		return 0
+	}
+	mount -t tmpfs cowspace "${tmp_dir}" || {
+		echo "[OverlayFS setup] Failed to mount tmpfs"
+		logger -t "overlayfs-setup" -p err "Failed to mount tmpfs"
+		return 0
+	}
+	mkdir -p "${tmp_dir}"/{upper,work} || {
+		echo "[OverlayFS setup] Failed to mkdir upperdir and workdir"
+		logger -t "overlayfs-setup" -p err "Failed to mkdir upperdir and workdir"
+		return 0
+	}
+
+	# Mount overlayfs
+	if mount -t overlay overlay \
+		-o "lowerdir=${root_mnt},upperdir=${tmp_dir}/upper,workdir=${tmp_dir}/work" \
+		"${root_mnt}"; then
+		echo "[OverlayFS setup] OverlayFS mounted on ${root_mnt}"
+	else
+		echo "[OverlayFS setup] Overlay mount failed"
+		logger -t "overlayfs-setup" -p err "Overlay mount failed"
+		return 0
+	fi
+}
+
+mount_snapshot_overlay

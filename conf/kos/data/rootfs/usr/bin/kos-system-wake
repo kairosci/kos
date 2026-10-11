@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# kos:summary=Wake displays and restore brightness after idle
+# kos:group=system
+# kos:name=wake
+# kos:examples=kos system wake
+
+kos-brightness-display on
+kos-brightness-keyboard restore
+kos-hyprland-monitor-clamshell >/dev/null 2>&1 || true

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-ai is the opt in AI debloat microcomponent for Omarchy on Arch Linux. Nothing here ever runs by default. Dedicated entry with request option is the only entry point, and module refuses to run with zero explicit flag set by entry.
+ai is the opt in AI debloat microcomponent for Kos on Arch Linux. Nothing here ever runs by default. Dedicated entry with request option is the only entry point, and module refuses to run with zero explicit flag set by entry.
 
 ## Ownership
 

@@ -2,7 +2,7 @@
 
 battery_driver_needs_recovery() {
     local battery
-    for battery in "${OMACONF_POWER_SUPPLY_ROOT:-/sys/class/power_supply}"/*; do
+    for battery in "${KOS_POWER_SUPPLY_ROOT:-/sys/class/power_supply}"/*; do
         [[ -d "$battery/extensions/samsung-galaxybook" ]] || continue
         if [[ -r "$battery/present" ]] && [[ $(cat "$battery/present") == 1 ]] &&
             cat "$battery/capacity" >/dev/null &&

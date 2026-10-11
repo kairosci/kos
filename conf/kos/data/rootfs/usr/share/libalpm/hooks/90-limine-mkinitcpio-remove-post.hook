@@ -1,0 +1,9 @@
+[Trigger]
+Type = Path
+Operation = Remove
+Target = usr/lib/modules/*/modules.builtin
+
+[Action]
+Description = Clean Limine boot entries of removed kernels
+When = PostTransaction
+Exec = /usr/share/libalpm/scripts/limine-mkinitcpio-remove post

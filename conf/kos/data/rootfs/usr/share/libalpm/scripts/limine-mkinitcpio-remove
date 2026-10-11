@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Handles cleanup of Limine boot entries when kernels are removed or upgraded
+
+# Import functions and environment variables
+readonly LIMINE_FUNCTIONS_PATH=/usr/lib/limine/limine-common-functions
+# File for recording kernels marked for later Limine boot entry removal,
+# this file persists in case of an kernel upgrade failure or power outage
+readonly REMOVE_LIST="/var/lib/limine/removed_kernels.list"
+readonly SCRIPT_NAME="limine-mkinitcpio-remove"
+export HOOK_CALLER="$SCRIPT_NAME"
+export HOOK_CMDLINE="$*"
+
+# Record kernels marked for removal before pacman upgrade,
+# ensuring boot entries are preserved if the upgrade fails.
+pre_remove() {
+	# Ensure directory exists
+	install -d -m 755 /var/lib/limine
+
+	# Read stdin from the libalpm hook
+	while read -r targetLine; do
+		[[ "$targetLine" == */modules.builtin ]] || continue
+
+		local kernel_dir="/${targetLine%/modules.builtin}"
+		local kernel_name=""
+
+		[[ -f "${kernel_dir}/modules.builtin" ]] || continue
+		kernel_name="$(pacman -Qqo "${kernel_dir}/modules.builtin" 2>/dev/null)" || continue
+		[[ -n "$kernel_name" ]] || continue
+
+		# Append to remove list
+		echo "$kernel_name" >>"$REMOVE_LIST"
+	done
+}
+
+# After pacman upgrade, remove boot entries of kernels that no longer exist in /usr/lib/modules.
+post_remove() {
+	# No record file -> nothing to do
+	[[ -f "$REMOVE_LIST" ]] || return 0
+
+	# Load common Limine functions
+	# shellcheck disable=SC1090
+	source "$LIMINE_FUNCTIONS_PATH" || {
+		echo "ERROR: Failed to source $LIMINE_FUNCTIONS_PATH" >&2
+		return 1
+	}
+
+	initialize_header || return 1
+	mutex_lock "${SCRIPT_NAME}"
+	rc=0
+	run_boot_hooks pre || rc=$?
+	if ((rc >= 100)); then
+		mutex_unlock
+		return "$rc"
+	fi
+
+	valid_kernels=$(pacman -Qqo /usr/lib/modules/*/modules.builtin 2>/dev/null || true)
+	while read -r kernelName; do
+		# Remove spaces (invalid for kernel file/directory name in FAT32)
+		kernelNameClean="${kernelName// /}"
+
+		# Skip empty lines
+		[[ -z "${kernelNameClean}" ]] && continue
+
+		# If kernel no longer exists in pacman-owned /usr/lib/modules/*/modules.builtin
+		if ! grep -qx "$kernelName" <<<"$valid_kernels"; then
+			info_msg "Removed unused Limine boot entry: ${kernelName}"
+			# Safely remove boot entries of the kernel
+			limine-entry-tool --remove-all "${kernelNameClean}" "${kernelNameClean}-fallback" --quiet --no-mutex --no-hooks
+		fi
+	done <"$REMOVE_LIST"
+
+	# Cleanup
+	rm -f "$REMOVE_LIST"
+
+	run_boot_hooks post || true
+	mutex_unlock
+}
+
+case "$1" in
+pre) pre_remove ;;
+post) post_remove ;;
+*)
+	echo "Usage: $0 {pre|post}" >&2
+	exit 1
+	;;
+esac

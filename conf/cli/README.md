@@ -1,6 +1,6 @@
 # cliconf
 
-Native CLI helper installer for omaconf terminal stack.
+Native CLI helper installer for kos terminal stack.
 
 ## Overview
 
@@ -16,4 +16,4 @@ bash conf/cli/install.sh
 
 ## Architecture
 
-Installer copies data helpers into the shared omaconf path and registers a marked source block in bashrc idempotently. Helpers cover the retained command line tools. Retired application helpers are removed during setup; graphical applications use their native help.
+Installer copies data helpers into the shared kos path and registers a marked source block in bashrc idempotently. Helpers cover the retained command line tools. Retired application helpers are removed during setup; graphical applications use their native help.

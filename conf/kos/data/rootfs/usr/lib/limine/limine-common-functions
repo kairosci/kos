@@ -1,0 +1,420 @@
+# Initialize color variables early
+_color_reset=""
+_color_green=""
+_color_red=""
+_color_yellow=""
+
+colors="$(tput colors 2>/dev/null || echo 0)"
+if ((colors >= 8)); then
+	_color_reset="\033[0m"
+	_color_green="\033[1;32m"
+	_color_yellow="\033[1;33m"
+	_color_red="\033[1;31m"
+fi
+
+readonly BOOT_PARTITION_LOCK="/run/lock/boot-partition.lock"
+
+info_msg() {
+	echo "$1"
+}
+
+success_msg() {
+	echo -e "${_color_green}SUCCESS: $1${_color_reset} ${2:-}"
+}
+
+warning_msg() {
+	echo -e "${_color_yellow}WARNING: $1${_color_reset} ${2:-}" >&2
+}
+
+error_msg() {
+	echo -e "${_color_red}ERROR: $1${_color_reset} ${2:-}" >&2
+}
+
+mutex_lock() {
+	local name=$1
+	mkdir -p /run/lock
+	exec 200>${BOOT_PARTITION_LOCK} || {
+		rm -f ${BOOT_PARTITION_LOCK}
+		exec 200>${BOOT_PARTITION_LOCK}
+	}
+	flock --timeout=10 200 || {
+		warning_msg "Mutex lock timeout on ${name}."
+		return 1
+	}
+}
+
+mutex_unlock() {
+	# Release the lock
+	flock --unlock 200
+}
+
+is_uefi() {
+	[[ -d /sys/firmware/efi ]]
+}
+
+is_x64() {
+	[[ "$(uname -m)" == "x86_64" ]]
+}
+
+# Limine ships BOOTX64/BOOTIA32/BOOTAA64/BOOTRISCV64/BOOTLOONGARCH64; this tool
+# only ever used the x64 one. Map the machine to the binary it actually has.
+limine_efi_arch() {
+	case "$(uname -m)" in
+		x86_64)      echo "X64"        ;;
+		i?86)        echo "IA32"       ;;
+		aarch64)     echo "AA64"       ;;
+		riscv64)     echo "RISCV64"    ;;
+		loongarch64) echo "LOONGARCH64";;
+		*)           return 1          ;;
+	esac
+}
+
+is_supported_arch() {
+	limine_efi_arch >/dev/null 2>&1
+}
+
+### Load key=value config
+load_key_value_config() {
+	local file="$1"
+	while IFS= read -r line || [[ -n "$line" ]]; do
+		# Skip blank lines and comments
+		[[ "$line" =~ ^[[:space:]]*(#.*)?$ ]] && continue
+
+		# Match VAR = value
+		if [[ "$line" =~ ^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=[[:space:]]*(.*)$ ]]; then
+			local var="${BASH_REMATCH[1]}"
+			local val="${BASH_REMATCH[2]}"
+			val="${val%\"}"
+			val="${val#\"}"
+			export "$var"="$val"
+		fi
+	done <"$file"
+}
+
+find_boot_partition() {
+	local boot_paths=(
+		"/efi"
+		"/boot"
+		"/boot/efi"
+		"/limine"
+	)
+	for path in "${boot_paths[@]}"; do
+		[[ -d "$path" ]] || continue
+		local fs_type
+		fs_type=$(findmnt -no FSTYPE "$path" 2>/dev/null)
+		if [[ "$fs_type" == "vfat" ]]; then
+			ESP_PATH="$path"
+			return 0
+		fi
+	done
+	error_msg "FAT32 boot partition not found. Make sure it is mounted or configure ESP_PATH in /etc/default/limine."
+	return 1
+}
+
+### Load configuration
+load_config() {
+	local usr_d_dir="/usr/share/limine-entry-tool.d"
+	local etc_conf="/etc/limine-entry-tool.conf"
+	local etc_d_dir="/etc/limine-entry-tool.d"
+	# /etc/default/limine is the central config read by all Limine-based packages
+	local default_conf="/etc/default/limine"
+
+	# 1. Load all /usr/share/limine-entry-tool.d/*.conf (lowest priority)
+	if [[ -d "$usr_d_dir" ]]; then
+		for file in "$usr_d_dir"/*.conf; do
+			[[ -f "$file" ]] || continue
+			load_key_value_config "$file"
+		done
+	fi
+
+	# 2. Load /etc/limine-entry-tool.conf
+	if [[ -f "$etc_conf" ]]; then
+		load_key_value_config "$etc_conf"
+	fi
+
+	# 3. Load all /etc/limine-entry-tool.d/*.conf
+	if [[ -d "$etc_d_dir" ]]; then
+		for file in "$etc_d_dir"/*.conf; do
+			[[ -f "$file" ]] || continue
+			load_key_value_config "$file"
+		done
+	fi
+
+	# Do not use ENABLE_ENROLL_LIMINE_CONFIG in any random configs
+	ENABLE_ENROLL_LIMINE_CONFIG=""
+
+	# 4. Load /etc/default/limine (highest priority)
+	if [[ -f "$default_conf" ]]; then
+		load_key_value_config "$default_conf"
+	fi
+
+	# Detect ESP_PATH if not set
+	if [[ -z "${ESP_PATH:-}" || -z "${ESP_PATH// /}" ]]; then
+		find_boot_partition || return 1
+	fi
+	return 0
+}
+
+### Check if a given path is a valid FAT32 boot partition
+check_boot_partition() {
+	local path="$1"
+	if [[ ! -d "$path" ]]; then
+		error_msg "Boot path '$path' does not exist or is not a directory."
+		return 1
+	fi
+	if ! mountpoint -q "$path"; then
+		error_msg "Boot path '$path' is not a mounted FAT32 boot partition."
+		return 1
+	fi
+	local fsType
+	read -r fsType < <(findmnt -n -o FSTYPE "$path")
+	if [[ "$fsType" != "vfat" ]]; then
+		error_msg "Boot path '$path' is not a FAT32 filesystem."
+		return 1
+	fi
+	return 0
+}
+
+### Get machine-id
+get_machine_id() {
+	local machine_id_path="/etc/machine-id"
+
+	# Generate if missing or empty
+	if [[ ! -s "$machine_id_path" ]]; then
+		info_msg "Generating machine-id at $machine_id_path..."
+		uuidgen | tr -d '-' | head -c 32 >"$machine_id_path" || return 1
+		# Set ownership and permissions
+		chmod 444 "$machine_id_path"
+		chown root:root "$machine_id_path"
+	fi
+
+	# Read and export
+	# shellcheck disable=SC2034
+	MACHINE_ID=$(<"$machine_id_path")
+	return 0
+}
+
+### Get a version of Limine binary
+get_limine_version() {
+	local file=$1
+
+	# Helper function:
+	# Runs the given command with the file as argument,
+	# checks if output contains "limine",
+	# and extracts the version number if present.
+	try_cmd() {
+		local output version
+		output=$("$@" 2>/dev/null) || return 1
+		# Check if output contains 'limine'
+		[[ $output == *limine* ]] || return 1
+		# Extract version (like 11.3.0)
+		[[ $output =~ ([0-9]+\.[0-9]+\.[0-9]+) ]] || return 1
+		version="${BASH_REMATCH[1]}"
+		echo "$version"
+	}
+
+	if command -v strings &>/dev/null && try_cmd strings "$file"; then
+		return 0
+	fi
+
+	# fallback: use strings-like behavior via grep -a
+	if try_cmd grep -a -o '[[:print:]]\{4,\}' "$file"; then
+		return 0
+	fi
+
+	return 1
+}
+
+get_limine_version_as_int() {
+	local file=$1
+	local version major minor patch
+
+	version=$(get_limine_version "$file") || return 1
+
+	# Split into major, minor, patch
+	IFS='.' read -r major minor patch <<<"$version"
+
+	# Default fallback if parts are missing
+	major=${major:-0}
+	minor=${minor:-0}
+	patch=${patch:-0}
+
+	printf "%03d%03d%03d\n" "$major" "$minor" "$patch"
+}
+
+### Compare two files based on their embedded Limine version
+### Returns:
+###   0 -> source == target
+###   1 -> source > target
+###   2 -> source < target
+###   3 -> source invalid
+compare_limine_versions() {
+	local src="$1"
+	local tgt="$2"
+
+	local src_ver tgt_ver
+
+	src_ver=$(get_limine_version_as_int "$src") || return 3
+	tgt_ver=$(get_limine_version_as_int "$tgt") || tgt_ver=0
+
+	# Strip leading zeros
+	src_ver=$((10#$src_ver))
+	tgt_ver=$((10#$tgt_ver))
+
+	if ((src_ver == tgt_ver)); then
+		return 0
+	elif ((src_ver > tgt_ver)); then
+		return 1
+	else
+		return 2
+	fi
+}
+
+### Check if snapper is installed and btrfs is used
+is_snapper_installed() {
+	command -v snapper &>/dev/null || return 1
+	local fsType
+	read -r fsType < <(findmnt -n -o FSTYPE "/")
+	[[ "$fsType" == "btrfs" || "$fsType" == "overlay" ]]
+}
+
+### Check if sbctl is installed
+is_sb_installed() {
+	command -v sbctl &>/dev/null || return 1
+	[[ $(sbctl setup --print-state --json 2>/dev/null) == *'"installed": true'* ]]
+}
+
+### Check if secure boot is enabled
+check_secure_boot() {
+	# Check if Secure Boot is enabled via EFI variable
+	local sb_var="/sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c"
+	[[ -r "$sb_var" ]] || return 1
+	# Last byte: 01 = enabled, 00 = disabled
+	local sb_byte
+	sb_byte=$(od -An -t u1 -j4 -N1 "$sb_var" 2>/dev/null | tr -d ' ')
+	[[ "$sb_byte" == "1" ]]
+}
+
+### Secure boot sign
+sb_sign() {
+	local file_path=$1
+	is_sb_installed || return 0
+	if [[ ! -f "$file_path" ]]; then
+		error_msg "File '$file_path' does not exist."
+		return 1
+	fi
+	if ! sbctl sign "$file_path"; then
+		error_msg "Failed to sign the file '$file_path'."
+		return 1
+	fi
+	return 0
+}
+
+### Sync cached writes to FAT32 to prevent data loss in case of power failure or forced shutdown.
+sync_file() {
+	if [[ -f "${BINARY_TARGET_PATH}" ]]; then
+		# Do not use the -d option, as it applies to Linux file systems but not to FAT32. Use -f instead.
+		sync -f "${BINARY_TARGET_PATH}"
+	fi
+}
+
+restore_limine_binary() {
+	# Restore the binary file from backup
+	if [[ ! -f "$BINARY_BACKUP_PATH" ]]; then
+		#warning_msg "No backup of the Limine binary."
+		return 1
+	fi
+
+	local backup_hash=""
+	local target_hash=""
+
+	# Check if b2sum is present
+	if command -v b2sum &>/dev/null; then
+		backup_hash=$(tar --to-command="b2sum" -xf "$BINARY_BACKUP_PATH" 2>/dev/null | awk '{print $1}')
+		if [[ -f "$BINARY_TARGET_PATH" ]]; then
+			target_hash=$(b2sum "$BINARY_TARGET_PATH" | awk '{print $1}')
+		fi
+	fi
+
+	if [[ -z "$backup_hash" || "$backup_hash" != "$target_hash" ]]; then
+		if ! tar -xf "$BINARY_BACKUP_PATH" --directory="${LIMINE_DIR_PATH}" "${LIMINE_EFI_FILE}"; then
+			error_msg "Failed to restore '$BINARY_BACKUP_PATH' to '$BINARY_TARGET_PATH'."
+		fi
+	fi
+}
+
+reset_enroll_config() {
+	is_supported_arch || return 0
+	is_uefi || return 0
+	if restore_limine_binary; then
+		return 0
+	fi
+	if [[ -f "$BINARY_TARGET_PATH" ]]; then
+		if ! limine enroll-config --reset "$BINARY_TARGET_PATH" --quiet; then
+			error_msg "Failed to reset the enrolled config for '$BINARY_TARGET_PATH'."
+			return 1
+		fi
+	fi
+}
+
+### Enroll Limine config into Limine binary file, then sign the binary.
+enroll_config() {
+	is_supported_arch || return 0
+	is_uefi || return 0
+	restore_limine_binary
+	if [[ -f "$LIMINE_CONFIG_PATH" && "$ENABLE_ENROLL_LIMINE_CONFIG" == "yes" ]]; then
+		# Attempt to enroll the config file
+		if ! limine enroll-config "$BINARY_TARGET_PATH" "$(b2sum "$LIMINE_CONFIG_PATH" | awk '{print $1}')"; then
+			error_msg "Failed to enroll the config '$LIMINE_CONFIG_PATH' into '$BINARY_TARGET_PATH'."
+			restore_limine_binary
+		fi
+	fi
+	sb_sign "${BINARY_TARGET_PATH}"
+	sync_file
+}
+
+### Run hooks
+run_boot_hooks() {
+	local dir="$1"
+	local hook rc=0
+	for hook in /etc/boot/hooks/"$dir".d/*; do
+		[[ -f $hook && -x $hook && $hook != *.disabled ]] || continue
+		rc=0
+		"$hook" || rc=$?
+		((rc == 0)) && continue
+		if ((rc >= 100)); then
+			error_msg "$dir hook failed (exit code $rc): $hook"
+			return "$rc"
+		else
+			warning_msg "$dir hook failed (exit code $rc): $hook"
+		fi
+	done
+	return "$rc"
+}
+
+### Main Header Logic
+initialize_header() {
+	load_config || return 1
+	check_boot_partition "$ESP_PATH" || return 1
+	get_machine_id || return 1
+
+	# Source and target file paths
+	if [[ -n "${LIMINE_BINARY_PATH:-}" ]]; then
+		export BINARY_SOURCE_PATH="$LIMINE_BINARY_PATH"
+	else
+		export BINARY_SOURCE_PATH="/usr/share/limine/BOOT$(limine_efi_arch).EFI"
+	fi
+
+	export LIMINE_DIR_PATH="${ESP_PATH}/EFI/limine/"
+	_limine_arch_lc="$(limine_efi_arch | tr '[:upper:]' '[:lower:]')"
+	export LIMINE_EFI_FILE="limine_${_limine_arch_lc}.efi"
+	export LIMINE_BACKUP_FILE="limine_${_limine_arch_lc}.bak"
+
+	export BINARY_TARGET_PATH="${LIMINE_DIR_PATH}${LIMINE_EFI_FILE}"
+	export BINARY_BACKUP_PATH="${LIMINE_DIR_PATH}${LIMINE_BACKUP_FILE}"
+	export BINARY_FALLBACK_PATH="${ESP_PATH}/EFI/BOOT/BOOT$(limine_efi_arch).EFI"
+
+	export LIMINE_EFI_PATH="\\EFI\\limine\\${LIMINE_EFI_FILE}"
+	export LIMINE_CONFIG_PATH="${ESP_PATH}/limine.conf"
+	return 0
+}

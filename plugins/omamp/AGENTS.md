@@ -12,4 +12,4 @@ The widget must collapse completely when there is no media loaded, which means d
 Keeping paused and idle visually distinct is the part that gets broken most often. A paused player still has a title and an artist, so it belongs to the visible state, and collapsing it would hide the resume control.
 
 ## Applying Changes
-After any code change, reload the Omarchy desktop shell so the widget picks up the new sources instead of testing stale state.
+After any code change, reload the Kos desktop shell so the widget picks up the new sources instead of testing stale state.

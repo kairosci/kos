@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "kos.battery",
+  "name": "Battery",
+  "version": "1.0.0",
+  "author": "Kos",
+  "description": "Low battery warning service",
+  "kinds": [
+    "service"
+  ],
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}

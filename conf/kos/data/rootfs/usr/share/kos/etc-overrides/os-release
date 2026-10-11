@@ -1,0 +1,6 @@
+NAME="kos"
+ID=kos
+ID_LIKE=arch
+HOME_URL="https://github.com/kairosci/kos"
+SUPPORT_URL="https://github.com/kairosci/kos/issues"
+LOGO=kos

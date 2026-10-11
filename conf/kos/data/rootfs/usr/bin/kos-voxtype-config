@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# kos:summary=Open Voxtype configuration
+
+set -e
+
+kos-launch-floating-terminal-with-presentation "voxtype configure"
+kos-restart-shell

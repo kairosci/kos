@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+### Example post-hook: Remount the ESP read-only to prevent accidental writes.
+### Disabled by default (.disabled suffix).
+###
+### Environment variables:
+###   HOOK_CALLER:   tool that triggered this hook
+###   HOOK_CMDLINE:  full command line passed to the tool
+###
+### IMPORTANT:
+###   Never call limine-entry-tool or limine-snapper-sync inside hooks.
+###   This would cause infinite hook recursion.
+###
+### Exit codes:
+###   0      -> success, continue normally
+###   1-99   -> non-fatal error, next hook continues
+###   >=100  -> fatal error, execution stops immediately
+
+### Optional debug
+#echo "caller: $HOOK_CALLER"
+
+esp_path=""
+
+### Detect boot partition
+if [[ -z $esp_path ]]; then
+	for p in /efi /boot /boot/efi /limine; do
+		mountpoint -q "$p" 2>/dev/null && {
+			esp_path="$p"
+			break
+		}
+	done
+fi
+
+[[ -n $esp_path ]] || exit 101
+
+### Remount as read-only, this prevents accidental deletion (e.g. recursive rm)
+if ! mount -o remount,ro "$esp_path" 2>/dev/null; then
+	echo "ERROR: Failed to remount ESP as read-only: $esp_path" >&2
+	exit 102
+fi
+
+exit 0

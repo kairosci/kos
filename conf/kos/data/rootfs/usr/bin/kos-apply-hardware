@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# kos:summary=Apply Kos hardware-specific packages and system configuration
+# kos:group=apply
+# kos:requires-sudo=true
+# kos:examples=kos apply hardware --install-user dhh
+# kos:hidden=true
+
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage: kos apply hardware --install-user USER
+       kos apply hardware --defer-provisioning
+
+Runs idempotent hardware detection/setup for the installed machine. This is
+called by kos-apply-system during ISO finalization and can be rerun later
+for diagnostics or after hardware/package updates.
+
+--defer-provisioning runs without an install user (deferred-provisioning installs create the user at
+first boot); group grants are recorded in /var/lib/kos/provisioning/groups.
+USAGE
+}
+
+install_user="${KOS_INSTALL_USER:-}"
+defer_provisioning=0
+while (($#)); do
+  case "$1" in
+    --install-user)
+      install_user="${2:-}"
+      shift 2
+      ;;
+    --defer-provisioning)
+      defer_provisioning=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+if (( EUID != 0 )); then
+  echo "Error: kos-apply-hardware must run as root" >&2
+  exit 1
+fi
+
+if (( defer_provisioning )); then
+  install_user=""
+else
+  if [[ -z $install_user || $install_user == "root" ]]; then
+    echo "Error: --install-user must name the target non-root user" >&2
+    exit 1
+  fi
+
+  if ! getent passwd "$install_user" >/dev/null; then
+    echo "Error: user '$install_user' does not exist" >&2
+    exit 1
+  fi
+fi
+
+export KOS_INSTALL_USER="$install_user"
+export KOS_PATH="${KOS_PATH:-/usr/share/kos}"
+export KOS_INSTALL="${KOS_INSTALL:-$KOS_PATH/install}"
+export KOS_INSTALL_LOG_FILE="${KOS_INSTALL_LOG_FILE:-/var/log/kos-install.log}"
+export PATH="$KOS_PATH/bin:$PATH"
+
+source "$KOS_INSTALL/helpers/logging.sh"
+source "$KOS_INSTALL/hardware/all.sh"

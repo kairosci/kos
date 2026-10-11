@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# kos:summary=Open a config file in the user's editor and surface a toast
+# kos:args=<path>
+# kos:examples=kos launch config-editor ~/.config/hypr/hyprland.lua
+
+path="${1-}"
+
+if [[ -z $path ]]; then
+  echo "Usage: kos-launch-config-editor <path>" >&2
+  exit 1
+fi
+
+kos-notification-send -u low "Editing config file" "$path"
+exec kos-launch-editor "$path"

@@ -2,18 +2,18 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-OMACONF_I18N_BOOT="${OMACONF_I18N_BOOT:-/usr/local/lib/omaconf/i18n.sh}"
+KOS_I18N_BOOT="${KOS_I18N_BOOT:-/usr/local/lib/kos/i18n.sh}"
 if [[ $EUID -eq 0 ]]; then
-    OMACONF_I18N_BOOT=/usr/local/lib/omaconf/i18n.sh
-    if [[ -f "$OMACONF_I18N_BOOT" ]]; then
-        export OMACONF_I18N_DIR=/usr/local/lib/omaconf/messages
+    KOS_I18N_BOOT=/usr/local/lib/kos/i18n.sh
+    if [[ -f "$KOS_I18N_BOOT" ]]; then
+        export KOS_I18N_DIR=/usr/local/lib/kos/messages
     else
-        export OMACONF_I18N_DIR="$SCRIPT_DIR/messages"
+        export KOS_I18N_DIR="$SCRIPT_DIR/messages"
     fi
 fi
-if [[ -f "$OMACONF_I18N_BOOT" ]]; then
+if [[ -f "$KOS_I18N_BOOT" ]]; then
     # shellcheck source=i18n.sh
-    source "$OMACONF_I18N_BOOT"
+    source "$KOS_I18N_BOOT"
     i18n_init
 else
     source "$SCRIPT_DIR/i18n.sh"
@@ -36,7 +36,7 @@ case "$mode" in
 esac
 
 found=0
-for led in "${OMACONF_KEYBOARD_LEDS_ROOT:-/sys/class/leds}"/*kbd_backlight*; do
+for led in "${KOS_KEYBOARD_LEDS_ROOT:-/sys/class/leds}"/*kbd_backlight*; do
     [[ -e "$led" ]] || continue
     found=1
     maximum=$(cat "$led/max_brightness") || err "power.keyboard_failed" "$led"

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# kos:summary=Toggle screensaver availability
+
+kos-toggle screensaver-off
+
+if kos-toggle-enabled screensaver-off; then
+  kos-notification-send -g 󱄄 "Screensaver disabled"
+else
+  kos-notification-send -g 󱄄 "Screensaver enabled"
+fi

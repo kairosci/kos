@@ -3,9 +3,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
-SHARE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/omaconf"
-MARK_BEGIN="# >>> omaconf helpers >>>"
-MARK_END="# <<< omaconf helpers <<<"
+SHARE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/kos"
+MARK_BEGIN="# >>> kos helpers >>>"
+MARK_END="# <<< kos helpers <<<"
 
 I18N_LIB="$PROJECT_DIR/scripts/lib"
 # shellcheck source=/dev/null
@@ -22,8 +22,8 @@ if [[ -f "$PROJECT_DIR/hooks/theme-set.d/cli-theme" ]]; then
 fi
 
 install_shell_block "$HOME/.bashrc" "$MARK_BEGIN" "$MARK_END" << 'SHELLBLOCK'
-[[ -r "$HOME/.local/share/omaconf/helpers.sh" ]] && source "$HOME/.local/share/omaconf/helpers.sh"
-[[ -r "$HOME/.config/omaconf/cli-theme.sh" ]] && source "$HOME/.config/omaconf/cli-theme.sh"
+[[ -r "$HOME/.local/share/kos/helpers.sh" ]] && source "$HOME/.local/share/kos/helpers.sh"
+[[ -r "$HOME/.config/kos/cli-theme.sh" ]] && source "$HOME/.config/kos/cli-theme.sh"
 SHELLBLOCK
 
 log "install.cli_done"

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kos:summary=Check whether a webcam is available
+
+[[ -n $(kos-capture-webcam-list) ]]

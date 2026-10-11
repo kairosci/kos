@@ -1,7 +1,7 @@
 ---
 name: system-cleanup
 description: >-
-  Procedures for safe general system cleanup and post-debloat home hygiene on Omarchy.
+  Procedures for safe general system cleanup and post-debloat home hygiene on Kos.
 ---
 
 # System Cleanup
@@ -16,7 +16,7 @@ Trim the pacman cache to two kept versions with `paccache -rk2`, falling back to
 
 ## Home Hygiene Standards
 
-Iterate `/home/*` with directory guards and never hardcode usernames. For each debloated application, remove its `.config`, `.local/share`, and `.cache` paths only when both `pacman -Q <pkg>` and `command -v <bin>` fail, so present applications are untouched. Sweep `.local/share/applications` for `.desktop` files referencing missing binaries and for `omarchy-launch-webapp` leftovers. Prune `.cache/thumbnails` and `.thumbnails` entries older than 30 days. Prune `Trash/files` and `Trash/info` entries older than 30 days. Never touch vaults, documents, or editor configs.
+Iterate `/home/*` with directory guards and never hardcode usernames. For each debloated application, remove its `.config`, `.local/share`, and `.cache` paths only when both `pacman -Q <pkg>` and `command -v <bin>` fail, so present applications are untouched. Sweep `.local/share/applications` for `.desktop` files referencing missing binaries and for `kos-launch-webapp` leftovers. Prune `.cache/thumbnails` and `.thumbnails` entries older than 30 days. Prune `Trash/files` and `Trash/info` entries older than 30 days. Never touch vaults, documents, or editor configs.
 
 ## Agent Workflow
 

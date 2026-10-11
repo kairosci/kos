@@ -74,7 +74,7 @@ for u_home in /home/*; do
     done
 done
 
-log "Removing leftover omarchy webapp launchers"
+log "Removing leftover kos webapp launchers"
 for u_home in /home/*; do
     [[ -d "$u_home" ]] || continue
     for webapp in Basecamp "Google Contacts" "Google Maps" "Google Messages" "Google Photos" Discord HEY WhatsApp X YouTube Zoom; do
@@ -85,7 +85,7 @@ for u_home in /home/*; do
             [[ -f "$app_file" ]] || continue
             rm -f "$app_file" 2>/dev/null || warn "webapp sweep skipped: $app_file"
         done < <(find "$u_home/.local/share/applications" -maxdepth 1 -type f -name '*.desktop' \
-                -exec grep -lE 'omarchy-(launch-webapp|webapp-handler)' {} + 2>/dev/null)
+                -exec grep -lE 'kos-(launch-webapp|webapp-handler)' {} + 2>/dev/null)
     fi
 done
 

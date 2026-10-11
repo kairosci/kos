@@ -45,11 +45,11 @@ test:
 	bash tests/run-all.sh
 
 hook:
-	@mkdir -p ~/.config/omarchy/hooks/theme-set.d ~/.config/omarchy/hooks/i18n/messages
-	cp hooks/theme-set.d/* ~/.config/omarchy/hooks/theme-set.d/
-	chmod +x ~/.config/omarchy/hooks/theme-set.d/*
-	cp scripts/lib/i18n.sh scripts/lib/i18n-boot.sh ~/.config/omarchy/hooks/i18n/
-	cp scripts/lib/messages/*.msg ~/.config/omarchy/hooks/i18n/messages/
+	@mkdir -p ~/.config/kos/hooks/theme-set.d ~/.config/kos/hooks/i18n/messages
+	cp hooks/theme-set.d/* ~/.config/kos/hooks/theme-set.d/
+	chmod +x ~/.config/kos/hooks/theme-set.d/*
+	cp scripts/lib/i18n.sh scripts/lib/i18n-boot.sh ~/.config/kos/hooks/i18n/
+	cp scripts/lib/messages/*.msg ~/.config/kos/hooks/i18n/messages/
 
 icons:
 	@bash hooks/theme-set.d/folder-color

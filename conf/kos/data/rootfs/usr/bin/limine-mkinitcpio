@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+readonly SCRIPT_NAME="limine-mkinitcpio"
+readonly AUTH_HELPER=/usr/lib/limine/auth-helper
+
+if ((EUID != 0)); then
+	if [[ -f "${AUTH_HELPER}" ]]; then
+		# shellcheck disable=SC1090
+		source "${AUTH_HELPER}" || exit
+	else
+		echo -e "\033[91m${SCRIPT_NAME} must be run as root.\033[0m" >&2
+		exit 1
+	fi
+fi
+
+validate_kernel_packages() {
+	local kernel_package
+	for kernel_package in "$@"; do
+		if ! pacman -Q "$kernel_package" &>/dev/null; then
+			echo -e "\033[91mERROR: kernel package '$kernel_package' is not installed.\033[0m" >&2
+			return 1
+		fi
+	done
+}
+
+if [[ $# -eq 0 ]]; then
+	echo rebuild | /usr/share/libalpm/scripts/limine-mkinitcpio-install
+else
+	if ! validate_kernel_packages "$@"; then
+		exit 1
+	fi
+	printf '%s\n' "$@" | /usr/share/libalpm/scripts/limine-mkinitcpio-install
+fi

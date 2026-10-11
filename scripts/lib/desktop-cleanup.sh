@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-OMACONF_OMARCHY_APPS_DIR="${OMACONF_OMARCHY_APPS_DIR:-/usr/share/omarchy/applications}"
-OMACONF_HOMES_ROOT="${OMACONF_HOMES_ROOT:-/home}"
-OMACONF_SYSTEM_APPS_DIRS="${OMACONF_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
+KOS_KOS_APPS_DIR="${KOS_KOS_APPS_DIR:-/usr/share/kos/applications}"
+KOS_HOMES_ROOT="${KOS_HOMES_ROOT:-/home}"
+KOS_SYSTEM_APPS_DIRS="${KOS_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
 DESKTOP_CLEANUP_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [[ -f "$DESKTOP_CLEANUP_LIB_DIR/userconf.sh" ]]; then
     DESKTOP_CLEANUP_USERCONF="$DESKTOP_CLEANUP_LIB_DIR/userconf.sh"
 else
-    DESKTOP_CLEANUP_USERCONF=/usr/local/lib/omaconf/userconf.sh
+    DESKTOP_CLEANUP_USERCONF=/usr/local/lib/kos/userconf.sh
 fi
 # shellcheck source=userconf.sh
 source "$DESKTOP_CLEANUP_USERCONF"
@@ -54,7 +54,7 @@ _desktop_cleanup_unwrap_once() {
     local line="$1" head rest tok
     head="$(_desktop_cleanup_first_token "$line")" || return 1
     case "$(basename "$head")" in
-        xdg-terminal-exec|uwsm-app|omarchy-launch-or-focus-tui|omarchy-launch-tui|omarchy-launch-or-focus|env|sudo|pkexec)
+        xdg-terminal-exec|uwsm-app|kos-launch-or-focus-tui|kos-launch-tui|kos-launch-or-focus|env|sudo|pkexec)
             rest="${line#*"${head}"}"
             rest="$(printf '%s' "$rest" | sed -E 's/^[[:space:]]+//; s/^--app-id=[^[:space:]]+[[:space:]]*//; s/^--app-id[[:space:]]+[^[:space:]]+[[:space:]]*//; s/^--title[[:space:]]+[^[:space:]]+[[:space:]]*//; s/^--title=[^[:space:]]+[[:space:]]*//; s/^--dir=[^[:space:]]+[[:space:]]*//; s/^--dir[[:space:]]+[^[:space:]]+[[:space:]]*//; s/^[A-Za-z_][A-Za-z0-9_]*=[^[:space:]]+[[:space:]]*//; s/^-e[[:space:]]+//; s/^--[[:space:]]*//')"
             printf '%s' "$rest"
@@ -159,7 +159,7 @@ desktop_cleanup_duplicate() {
         *) return 1 ;;
     esac
     [[ "${file##*/}" != "$canonical" ]] || return 1
-    IFS=':' read -ra directories <<< "$OMACONF_SYSTEM_APPS_DIRS"
+    IFS=':' read -ra directories <<< "$KOS_SYSTEM_APPS_DIRS"
     for directory in "${directories[@]}"; do
         [[ ! -f "$directory/$canonical" ]] || return 0
     done
@@ -305,8 +305,8 @@ _desktop_cleanup_hide_user_entry() {
 desktop_cleanup_unique() {
     local home="$1" directory file effective
     local -a directories=()
-    IFS=':' read -ra directories <<< "$OMACONF_SYSTEM_APPS_DIRS"
-    directories+=("$OMACONF_OMARCHY_APPS_DIR" "$home/.local/share/applications")
+    IFS=':' read -ra directories <<< "$KOS_SYSTEM_APPS_DIRS"
+    directories+=("$KOS_KOS_APPS_DIR" "$home/.local/share/applications")
     for directory in "${directories[@]}"; do
         for file in "$directory"/*.desktop; do
             [[ -f "$file" ]] || continue
@@ -322,9 +322,9 @@ desktop_cleanup_unique() {
 }
 
 desktop_cleanup_sweep() {
-    local omarchy_dir="${OMACONF_OMARCHY_APPS_DIR:-/usr/share/omarchy/applications}"
-    local homes_root="${OMACONF_HOMES_ROOT:-/home}"
-    local sys_dirs="${OMACONF_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
+    local kos_dir="${KOS_KOS_APPS_DIR:-/usr/share/kos/applications}"
+    local homes_root="${KOS_HOMES_ROOT:-/home}"
+    local sys_dirs="${KOS_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
     local outcome rc entry _u
     local -a removed_entries=() duplicate_entries=()
     local file user_home mimeapps sys_dir
@@ -348,7 +348,7 @@ desktop_cleanup_sweep() {
             unset outcome
         done
     done
-    for file in "$omarchy_dir"/*.desktop; do
+    for file in "$kos_dir"/*.desktop; do
         [[ -f "$file" ]] || continue
         if [[ "${file##*/}" == "Disk Usage.desktop" ]] || desktop_cleanup_duplicate "$file"; then
             duplicate_entries+=("${file##*/}")
@@ -400,10 +400,10 @@ desktop_cleanup_sweep() {
             fi
         done
     fi
-    if [[ "${OMACONF_DESKTOP_SKIP_REFRESH:-0}" == "1" ]]; then
+    if [[ "${KOS_DESKTOP_SKIP_REFRESH:-0}" == "1" ]]; then
         return 0
     fi
-    _desktop_cleanup_refresh_dir "$omarchy_dir"
+    _desktop_cleanup_refresh_dir "$kos_dir"
     for sys_dir in "${_sys_dirs[@]}"; do
         _desktop_cleanup_refresh_dir "$sys_dir"
     done
@@ -418,15 +418,15 @@ desktop_cleanup_sweep() {
             update-mime-database "$user_home/.local/share/mime" 2>/dev/null || warn "desktop.refresh_skipped"
         done
     fi
-    if command -v omarchy >/dev/null 2>&1; then
-        if declare -F omarchy_as >/dev/null; then
+    if command -v kos >/dev/null 2>&1; then
+        if declare -F kos_as >/dev/null; then
             for user_home in "$homes_root"/*; do
                 [[ -d "$user_home" ]] || continue
                 _u="$(basename "$user_home")"
-                omarchy_as "$_u" menu refresh || warn "desktop.refresh_skipped"
+                kos_as "$_u" menu refresh || warn "desktop.refresh_skipped"
             done
         elif [[ $EUID -ne 0 ]]; then
-            omarchy menu refresh || warn "desktop.refresh_skipped"
+            kos menu refresh || warn "desktop.refresh_skipped"
         fi
     fi
     return 0

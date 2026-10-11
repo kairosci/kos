@@ -1,6 +1,6 @@
 # obscure
 
-Gaze protection for Omarchy on Arch Linux. Yazi previews locked under password plus native idle lock.
+Gaze protection for Kos on Arch Linux. Yazi previews locked under password plus native idle lock.
 
 ## Index
 
@@ -50,8 +50,8 @@ Real file for idle module holds per home removal of stay awake indicator and scr
 Inspection code without comments:
 
 ```bash
-ls ~/.local/state/omarchy/indicators/stay-awake
-ls ~/.local/state/omarchy/toggles/screensaver-off
+ls ~/.local/state/kos/indicators/stay-awake
+ls ~/.local/state/kos/toggles/screensaver-off
 ```
 
 Idempotence holds removal of absent files as null.
@@ -116,4 +116,4 @@ bash tests/test_auth_helpers.sh
 bash tests/test_idle.sh
 ```
 
-Operating rules in `AGENTS.md` and runbook in `.skills/privacy-shield`. Family contract in profile repo `omaconf/.github` inside `docs`. Operating note holds that after yazi config reinstall from debloat repo this setup needs rerun.
+Operating rules in `AGENTS.md` and runbook in `.skills/privacy-shield`. Family contract in profile repo `kos/.github` inside `docs`. Operating note holds that after yazi config reinstall from debloat repo this setup needs rerun.

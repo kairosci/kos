@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# kos:summary=Remove the Xbox Cloud Gaming web app.
+
+set -e
+
+kos-webapp-remove "Xbox Cloud Gaming"
