@@ -31,6 +31,7 @@ EXPECTED_MODULES=(
     "89-battery-charge.sh"
     "90-hardware-power.sh"
     "91-suspend-resume.sh"
+    "92-responsiveness.sh"
     "95-maintenance.sh"
 )
 

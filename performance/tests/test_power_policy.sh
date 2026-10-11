@@ -28,12 +28,12 @@ fi
 
 if [[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]; then
     assert_file_contains "udev rule matches power_supply subsystem" "/etc/udev/rules.d/98-battery-charge-threshold.rules" "SUBSYSTEM==\"power_supply\""
-    assert_file_contains "udev rule targets battery kernel devices" "/etc/udev/rules.d/98-battery-charge-threshold.rules" "KERNEL==\"BAT\*\|BATT\*\""
-    assert_file_contains "udev rule configures charge limit" "/etc/udev/rules.d/98-battery-charge-threshold.rules" "ATTR\{charge_control_end_threshold\}="
+    assert_file_contains "udev rule targets battery devices by type" "/etc/udev/rules.d/98-battery-charge-threshold.rules" 'ATTR\{type\}=="Battery"'
+    assert_file_contains "udev rule delegates to the verified helper" "/etc/udev/rules.d/98-battery-charge-threshold.rules" 'RUN\+="/usr/local/libexec/omaconf-set-battery-charge-limit"'
 fi
 
 if [[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]; then
-    assert_file_contains "tmpfiles uses safe write prefix" "/etc/tmpfiles.d/battery-charge-threshold.conf" "^w- /sys/class/power_supply/\*/charge_control_end_threshold"
+    assert_file_contains "tmpfiles prepares the state directory" "/etc/tmpfiles.d/battery-charge-threshold.conf" '^d /run/omaconf 0755 root root -'
 fi
 
 if [[ -f /etc/systemd/system/battery-charge-threshold.service ]]; then

@@ -42,13 +42,10 @@ can_inspect_system() {
 }
 
 disk_entry_valid() {
-    local disk_entry="/usr/share/omarchy/applications/Disk Usage.desktop"
-    [[ -f "$disk_entry" ]] || return 0
-    if grep -q 'dua' "$disk_entry" 2>/dev/null; then
-        command -v dua &>/dev/null
-    else
-        command -v gdu &>/dev/null
-    fi
+    local disk_entry
+    for disk_entry in "/usr/share/omarchy/applications/Disk Usage.desktop" "$HOME/.local/share/applications/Disk Usage.desktop"; do
+        [[ ! -f "$disk_entry" ]] || grep -qx Hidden=true "$disk_entry" || return 1
+    done
 }
 
 RED='\033[0;31m'
@@ -88,7 +85,7 @@ for pkg in geany geany-plugins; do
     tcheck "check.pkg_removed" "! pacman -Q $pkg &>/dev/null" "$pkg"
 done
 tcheck "check.pkg_installed" "pacman -Q brave-origin-bin &>/dev/null" brave-origin-bin
-for pkg in zed nautilus gvfs papers loupe celluloid baobab resources; do
+for pkg in zed nautilus gvfs papers loupe celluloid baobab resources onlyoffice-bin; do
     tcheck "check.pkg_installed" "pacman -Q $pkg &>/dev/null" "$pkg"
 done
 tcheck "check.pkg_installed" "pacman -Q slack-desktop &>/dev/null" slack-desktop
@@ -96,7 +93,9 @@ tcheck "check.pkg_installed" "pacman -Q discord &>/dev/null" discord
 tcheck "check.pkg_removed" "! pacman -Q chromium &>/dev/null" chromium
 tcheck "check.pkg_removed" "! pacman -Q neovim &>/dev/null" neovim
 tcheck "check.pkg_removed" "! pacman -Q omarchy-nvim &>/dev/null" omarchy-nvim
-tcheck "check.pkg_installed" "pacman -Q micro &>/dev/null" micro
+for pkg in micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
+    tcheck "check.pkg_removed" "! pacman -Q $pkg &>/dev/null" "$pkg"
+done
 tcheck "check.pkg_installed" "pacman -Q fzf &>/dev/null" fzf
 tcheck "check.pkg_installed" "pacman -Q universal-ctags &>/dev/null" universal-ctags
 tcheck "check.pkg_installed" "pacman -Q shellcheck &>/dev/null" shellcheck
@@ -105,9 +104,7 @@ tcheck "check.pkg_installed" "pacman -Q ruff &>/dev/null" ruff
 tcheck "check.pkg_installed" "pacman -Q yamllint &>/dev/null" yamllint
 tcheck "check.pkg_installed" "pacman -Q mpv &>/dev/null" mpv
 tcheck "check.pkg_installed" "pacman -Q 7zip &>/dev/null" 7zip
-tcheck "check.pkg_installed" "pacman -Q imv &>/dev/null" imv
 tcheck "check.pkg_installed" "pacman -Q trash-cli &>/dev/null" trash-cli
-tcheck "check.pkg_installed" "pacman -Q mupdf &>/dev/null" mupdf
 tcheck "check.pkg_removed" "! pacman -Q zathura &>/dev/null" zathura
 tcheck "check.pkg_removed" "! pacman -Q zathura-pdf-mupdf &>/dev/null" zathura-pdf-mupdf
 tcheck "check.pkg_removed" "! pacman -Q thunar &>/dev/null" thunar
@@ -125,8 +122,6 @@ tcheck "check.runtime_present" "pacman -Q podman &>/dev/null" podman
 tcheck "check.pkg_removed" "! pacman -Q obs-studio &>/dev/null" obs-studio
 tcheck "check.pkg_removed" "! pacman -Q libreoffice-fresh &>/dev/null" libreoffice-fresh
 tcheck "check.pkg_removed" "! pacman -Q obsidian &>/dev/null" obsidian
-tcheck "check.pkg_installed" "pacman -Q btop &>/dev/null" btop
-tcheck "check.pkg_installed" "pacman -Q gdu &>/dev/null" gdu
 tcheck "check.pkg_installed" "pacman -Q capitaine-cursors &>/dev/null" capitaine-cursors
 tcheck "check.pkg_installed" "pacman -Q qogir-icon-theme &>/dev/null" qogir-icon-theme
 tcheck "check.pkg_removed" "! pacman -Q gnome-disk-utility &>/dev/null" gnome-disk-utility
@@ -189,8 +184,8 @@ tcheck "check.sysctl_persisted"         "[[ -f /etc/sysctl.d/99-security.conf ]]
 tcheck "check.coredump_disabled"             "[[ -f /etc/security/limits.d/99-no-core.conf ]]"
 
 section verify.sec_pam
-tcheck "check.faillock"    "[[ -f /etc/security/faillock.conf ]]"
-tcheck "check.pwquality"   "[[ -f /etc/security/pwquality.conf ]]"
+tcheck "check.faillock"    "[[ -f /etc/security/faillock.conf ]] && grep -q '^[^#].*pam_faillock.so' /etc/pam.d/system-auth && ! grep -Eq '^[^#].*pam_faillock.so.*(deny|unlock_time|conf)=' /etc/pam.d/system-auth"
+tcheck "check.pwquality"   "[[ -f /etc/security/pwquality.conf ]] && grep -Eq '^password[[:space:]]+requisite[[:space:]]+pam_pwquality.so' /etc/pam.d/system-auth && grep -Eq '^password.*pam_unix.so.*use_authtok' /etc/pam.d/system-auth"
 tcheck "check.access_conf" "[[ -f /etc/security/access.conf ]] && grep -q 'ALL:ALL' /etc/security/access.conf"
 
 section verify.sec_ssh
@@ -244,10 +239,17 @@ tcheck "check.kitty_terminal" "pacman -Q kitty &>/dev/null && ! pacman -Q foot &
 tcheck "check.webapps_removed" "! grep -rlE 'omarchy-(launch-webapp|webapp-handler)' /usr/share/omarchy/applications 2>/dev/null"
 
 section verify.sec_power
+if compgen -G '/sys/class/leds/*kbd_backlight*' >/dev/null; then
+    tcheck "check.keyboard_policy" "[[ -x /usr/local/libexec/omaconf-keyboard-backlight && -f /etc/systemd/system/omaconf-keyboard-backlight@.service && -f /etc/udev/rules.d/99-omaconf-keyboard-backlight.rules ]] && systemctl is-enabled --quiet omaconf-keyboard-backlight.service && systemctl is-enabled --quiet omaconf-keyboard-backlight.timer && systemctl is-active --quiet omaconf-keyboard-backlight.timer"
+    tcheck "check.keyboard_maximum" "bash '$SCRIPT_DIR/lib/keyboard-backlight.sh' --check"
+else
+    skip "$(t power.keyboard_unsupported)"
+fi
 tcheck "check.power_conf" "[[ -f /etc/omaconf/power.conf ]]"
 tcheck "check.battery_udev" "[[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]"
 tcheck "check.battery_tmpfiles" "[[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]"
 tcheck "check.battery_service" "systemctl is-enabled battery-charge-threshold.service &>/dev/null || [[ -L /etc/systemd/system/multi-user.target.wants/battery-charge-threshold.service ]]"
+tcheck "check.battery_service" "systemctl is-enabled --quiet battery-charge-threshold.timer && systemctl is-active --quiet battery-charge-threshold.timer"
 BATTERY_HELPER=/usr/local/libexec/omaconf-set-battery-charge-limit
 BATTERY_STATE_LIMIT=""
 BATTERY_FUNCTIONAL=""
@@ -262,7 +264,7 @@ BATTERY_POLICY=${BATTERY_POLICY:-75}
 
 if [[ -n "$BATTERY_STATE_LIMIT" && -n "$BATTERY_FUNCTIONAL" && -n "$BATTERY_DRIFT" ]]; then
     tcheck "check.battery_policy_applied" "[[ '$BATTERY_STATE_LIMIT' == '$BATTERY_POLICY' ]]"
-    if [[ "$BATTERY_FUNCTIONAL" == "0" ]]; then
+    if [[ "$BATTERY_FUNCTIONAL" == "0" && "$BATTERY_DRIFT" == "no" ]]; then
         skip "$(t verify.skip_charge_unsupported)"
     elif [[ "$BATTERY_DRIFT" == "no" ]]; then
         check "$(t check.battery_limit)" true
@@ -270,7 +272,7 @@ if [[ -n "$BATTERY_STATE_LIMIT" && -n "$BATTERY_FUNCTIONAL" && -n "$BATTERY_DRIF
         check "$(t check.battery_limit)" false
     fi
 else
-    skip "$(t verify.skip_charge_state)"
+    check "$(t verify.skip_charge_state)" false
 fi
 if [[ -r /sys/power/mem_sleep ]]; then
     if grep -q '\[deep\]' /sys/power/mem_sleep; then
@@ -302,25 +304,32 @@ tcheck "check.keyring_backend" "grep -qx gnome-keyring /etc/omaconf/keyring-back
 tcheck "check.keyring_provider" "pacman -Q gnome-keyring seahorse &>/dev/null && ! pacman -Q keepassxc &>/dev/null"
 tcheck "check.desktop_graphical" "pacman -Q nautilus gvfs xdg-desktop-portal-gtk &>/dev/null && [[ \"\$(xdg-mime query default inode/directory)\" == org.gnome.Nautilus.desktop ]]"
 tcheck "check.cli_secrets"      "command -v secret-tool &>/dev/null && command -v pass &>/dev/null"
-tcheck "check.disk_config"      "[[ -f \$HOME/.config/gdu/gdu.yaml ]]"
+tcheck "check.onlyoffice_config" "[[ -f \$HOME/.config/onlyoffice/DesktopEditors.conf ]]"
+tcheck "check.onlyoffice_default" "[[ \$(xdg-mime query default application/vnd.openxmlformats-officedocument.wordprocessingml.document) == onlyoffice-desktopeditors.desktop ]]"
+tcheck "check.mpv_hidden" "grep -qx Hidden=true \"\$HOME/.local/share/applications/mpv.desktop\""
+source "$SCRIPT_DIR/lib/desktop-cleanup.sh"
+tcheck "check.desktop_unique" "desktop_cleanup_unique \"\$HOME\""
 
 section verify.sec_debloat
 source "$SCRIPT_DIR/lib/package-pins.sh"
 tcheck "check.retained_updateable" "package_pins_retained_updateable"
-tcheck "check.ignorepkg" "grep -q '^IgnorePkg' /etc/pacman.conf"
+tcheck "check.ignorepkg" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 tcheck "check.icon_theme"      "gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | grep -q 'Qogir'"
 tcheck "check.cursor_theme"  "gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | grep -q 'capitaine-cursors'"
 tcheck "check.no_tela"         "! grep -rq 'Tela' $HOME/.config/omarchy/themes/ 2>/dev/null"
 tcheck "check.folder_color_hook"        "[[ -x $HOME/.config/omarchy/hooks/theme-set.d/folder-color ]]"
-tcheck "check.micro_theme_hook"         "[[ -x $HOME/.config/omarchy/hooks/theme-set.d/micro-theme ]]"
-tcheck "check.disk_theme_hook"          "[[ -x \$HOME/.config/omarchy/hooks/theme-set.d/disk-theme ]]"
-tcheck "check.micro_colorscheme" "[[ -f $HOME/.config/micro/colorschemes/omarchy.micro ]]"
 
 section verify.sec_desktop
 tcheck "check.desktop_no_foot" "pacman -Q foot &>/dev/null || [[ ! -f \"/usr/share/omarchy/applications/foot.desktop\" ]]"
 tcheck "check.desktop_disk_valid" "disk_entry_valid"
 tcheck "check.desktop_no_docker" "command -v lazydocker &>/dev/null || [[ ! -f \"/usr/share/omarchy/applications/Docker.desktop\" ]]"
 tcheck "check.desktop_hook" "[[ -f /etc/pacman.d/hooks/99-omaconf-desktop-cleanup.hook ]] && [[ -x /usr/local/libexec/omaconf-desktop-cleanup ]]"
+
+section verify.sec_performance
+# shellcheck source=scripts/lib/responsiveness.sh
+source "$SCRIPT_DIR/lib/responsiveness.sh"
+tcheck "check.performance_files" "responsiveness_files_match \"$(dirname "$SCRIPT_DIR")\""
+tcheck "check.performance_runtime" "responsiveness_runtime \"$(dirname "$SCRIPT_DIR")\""
 
 section verify.sec_aur
 tcheck "check.no_unverified_aur" "! grep -q 'aur_install ' '$SCRIPT_DIR/setup.sh'"

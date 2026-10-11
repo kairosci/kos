@@ -9,13 +9,18 @@ COLORS="${OMACONF_THEME_COLORS:-$HOME/.local/state/omarchy/current/theme/colors.
 [[ -r "$COLORS" ]] || exit 0
 ACCENT=$(awk -F '"' '/^accent[[:space:]]*=/ { print $2; exit }' "$COLORS")
 [[ "$ACCENT" =~ ^#[0-9a-fA-F]{6}$ ]] || { warn "hooks.gtk_palette_failed" "$COLORS"; exit 1; }
+FOREGROUND=$(awk -F '"' '/^foreground[[:space:]]*=/ { print $2; exit }' "$COLORS")
+[[ "$FOREGROUND" =~ ^#[0-9a-fA-F]{6}$ ]] || { warn "hooks.gtk_palette_failed" "$COLORS"; exit 1; }
+NERD_ASSETS="${XDG_CONFIG_HOME:-$HOME/.config}/omaconf/nerd-icons"
+[[ -r "$NERD_ASSETS/aliases.tsv" ]] || NERD_ASSETS="$SCRIPT_DIR/../../conf/gtk/data/nerd-icons"
+[[ -r "$NERD_ASSETS/aliases.tsv" ]] || { warn "defaults.icons_failed"; exit 1; }
 MODE=$(awk -F '"' '/^mode[[:space:]]*=/ { print $2; exit }' "$COLORS")
 if [[ "$MODE" == light ]]; then BASE=Qogir; else BASE=Qogir-Dark; fi
 BASE_DIR="${OMACONF_ICON_ROOT:-/usr/share/icons}/$BASE"
 [[ -r "$BASE_DIR/index.theme" ]] || { warn "defaults.icons_failed"; exit 1; }
 ICON_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/icons/Omaconf-Qogir"
 mkdir -p "$ICON_DIR"
-printf '[Icon Theme]\nName=Omaconf Qogir\nInherits=%s,hicolor\nDirectories=16/places,22/places,24/places,32/places,48/places,96/places,128/places,scalable/places\n' "$BASE" > "$ICON_DIR/index.theme"
+printf '[Icon Theme]\nName=Omaconf Qogir\nInherits=%s,hicolor\nDirectories=16/places,22/places,24/places,32/places,48/places,96/places,128/places,scalable/places,scalable/mimetypes\n' "$BASE" > "$ICON_DIR/index.theme"
 for size in 16 22 24 32 48 96 128 scalable; do
     directory="$ICON_DIR/$size/places"
     mkdir -p "$directory"
@@ -35,4 +40,22 @@ for size in 16 22 24 32 48 96 128 scalable; do
     done
     if [[ -f "$directory/folder.svg" ]]; then ln -sfn folder.svg "$directory/inode-directory.svg"; fi
 done
+printf '\n[scalable/mimetypes]\nSize=64\nMinSize=8\nMaxSize=512\nContext=MimeTypes\nType=Scalable\n' >> "$ICON_DIR/index.theme"
+while IFS=$'\t' read -r context template aliases; do
+    [[ "$context" == places || "$context" == mimetypes ]] || { warn "defaults.icons_failed"; exit 1; }
+    IFS=',' read -r -a names <<< "$aliases"
+    sizes=(scalable)
+    color="$FOREGROUND"
+    if [[ "$context" == places ]]; then
+        sizes=(16 22 24 32 48 96 128 scalable)
+        color="$ACCENT"
+    fi
+    for size in "${sizes[@]}"; do
+        directory="$ICON_DIR/$size/$context"
+        mkdir -p "$directory"
+        for name in "${names[@]}"; do
+            sed "s/@COLOR@/$color/g" "$NERD_ASSETS/$template" > "$directory/$name.svg"
+        done
+    done
+done < "$NERD_ASSETS/aliases.tsv"
 if command -v gtk-update-icon-cache >/dev/null; then gtk-update-icon-cache -q -f -t "$ICON_DIR"; fi

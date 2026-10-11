@@ -31,6 +31,9 @@ jobs:
       - name: Run Syntax & Integrity Test Suite
         run: bash tests/test_syntax_integrity.sh
 
+      - name: Validate Test Harness Failure Detection
+        run: bash tests/test_test_harness.sh
+
   shellcheck-analysis:
     name: ShellCheck Static Analysis
     runs-on: ubuntu-latest
@@ -90,7 +93,7 @@ jobs:
         run: bash tests/test_hardware_power.sh
 
   theming-and-hook-engine:
-    name: Desktop Theming & Micro Engine
+    name: Desktop Theming & Application Policy
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -102,6 +105,12 @@ jobs:
 
       - name: Run Debloat & Theming Tests
         run: bash tests/test_debloat_theming.sh
+
+      - name: Run Application Policy Tests
+        run: bash tests/test_application_policy.sh
+
+      - name: Run Update Hook Security Tests
+        run: bash tests/test_update_hooks.sh
 
   arch-container-validation:
     name: Arch Linux Container Full Run

@@ -15,7 +15,7 @@ else
 $(error BACKEND must be gnome-keyring)
 endif
 
-.PHONY: help setup keyring verify test hook icons theme zed micro cli herdr disk editors clean lang i18n-status lint
+.PHONY: help setup keyring verify test hook icons theme zed cli herdr editors clean lang i18n-status lint
 
 lint:
 	@if ! command -v shellcheck &> /dev/null; then \
@@ -55,13 +55,10 @@ icons:
 
 theme:
 	@bash hooks/theme-set.d/folder-color
-	@bash hooks/theme-set.d/micro-theme
+	@bash hooks/theme-set.d/zed-theme
 
 zed:
 	bash conf/zed/install.sh
-
-micro:
-	bash conf/micro/install.sh
 
 cli:
 	bash conf/cli/install.sh
@@ -69,10 +66,7 @@ cli:
 herdr:
 	bash conf/herdr/install.sh
 
-disk:
-	bash conf/disk/install.sh
-
-editors: zed micro cli
+editors: zed cli
 
 lang:
 	@bash scripts/lib/i18n.sh --list

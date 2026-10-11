@@ -6,10 +6,11 @@ install_user_file() {
     mkdir -p "$(dirname "$dest")" || return 1
     if [[ -f "$dest" ]]; then
         if cmp -s "$src" "$dest"; then
-            chmod "$mode" "$dest"
+            chmod "$mode" "$dest" || return 1
             return 0
         fi
-        cp "$dest" "$dest.bak"
+        [[ ! -L "$dest.bak" ]] || return 1
+        cp -T "$dest" "$dest.bak" || return 1
     fi
     install -m "$mode" "$src" "$dest"
 }
@@ -18,21 +19,34 @@ install_user_content() {
     local dest="$1" mode="${2:-644}" tmp
     mkdir -p "$(dirname "$dest")" || return 1
     tmp="$(mktemp "$dest.tmp.XXXXXX")" || return 1
-    cat > "$tmp"
+    if ! cat > "$tmp"; then
+        rm -f "$tmp"
+        return 1
+    fi
     if [[ -f "$dest" ]]; then
         if cmp -s "$tmp" "$dest"; then
             rm -f "$tmp"
-            chmod "$mode" "$dest"
+            chmod "$mode" "$dest" || return 1
+            if [[ "$mode" == 600 && -e "$dest.bak" ]]; then
+                [[ -f "$dest.bak" && ! -L "$dest.bak" ]] || return 1
+                chmod "$mode" "$dest.bak" || return 1
+            fi
             return 0
         fi
-        cp "$dest" "$dest.bak"
+        if [[ -L "$dest.bak" ]] || ! cp -T "$dest" "$dest.bak" || ! chmod "$mode" "$dest.bak"; then
+            rm -f "$tmp"
+            return 1
+        fi
     fi
-    chmod "$mode" "$tmp"
+    if ! chmod "$mode" "$tmp"; then
+        rm -f "$tmp"
+        return 1
+    fi
     mv "$tmp" "$dest"
 }
 
 merge_user_ini() {
-    local src="$1" dest="$2" staged current=/dev/null
+    local src="$1" dest="$2" mode="${3:-644}" staged current=/dev/null
     [[ -r "$src" ]] || return 1
     [[ ! -f "$dest" ]] || current="$dest"
     staged=$(mktemp) || return 1
@@ -70,7 +84,7 @@ merge_user_ini() {
         rm -f "$staged"
         return 1
     fi
-    if install_user_content "$dest" < "$staged"; then
+    if install_user_content "$dest" "$mode" < "$staged"; then
         rm -f "$staged"
     else
         rm -f "$staged"
@@ -100,6 +114,27 @@ install_user_electron_launcher() {
         return 1
     fi
     if install_user_content "$dest" < "$staged"; then
+        rm -f "$staged"
+    else
+        rm -f "$staged"
+        return 1
+    fi
+}
+
+remove_shell_block() {
+    local rc="$1" begin="$2" end="$3" staged
+    [[ -f "$rc" ]] || return 0
+    staged=$(mktemp) || return 1
+    if ! awk -v begin="$begin" -v end="$end" '
+        $0 == begin { if (skip) exit 1; skip=1; next }
+        $0 == end { if (!skip) exit 1; skip=0; next }
+        !skip { print }
+        END { if (skip) exit 1 }
+    ' "$rc" > "$staged"; then
+        rm -f "$staged"
+        return 1
+    fi
+    if install_user_content "$rc" "$(stat -c %a "$rc")" < "$staged"; then
         rm -f "$staged"
     else
         rm -f "$staged"
