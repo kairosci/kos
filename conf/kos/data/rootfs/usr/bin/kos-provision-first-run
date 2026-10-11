@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# kos:summary=Initialize the kos user session
+# kos:hidden=true
+set -euo pipefail
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/i18n.sh"
+i18n_init
+[[ $# == 0 || ( $# == 1 && $1 == --force ) ]] || err release.invalid
+if [[ ${1:-} != --force ]] && kos-done check first-run-user; then
+    exit 0
+fi
+kos-provision-user
+kos-done mark first-run-user

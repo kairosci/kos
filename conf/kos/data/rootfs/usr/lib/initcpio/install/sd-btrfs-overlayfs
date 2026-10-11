@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+build() {
+	add_module btrfs
+	add_module overlay
+	map add_binary bash btrfs findmnt logger mount mktemp mkdir echo
+	add_file '/usr/lib/limine/overlayfs-setup' '/usr/lib/limine/overlayfs-setup' 755
+	if ! add_systemd_unit overlayfs-setup.service; then
+		error "sd-btrfs-overlayfs requires systemd hook, not busybox hooks."
+		exit 1
+	fi
+	add_symlink '/usr/lib/systemd/system/initrd.target.wants/overlayfs-setup.service' '/usr/lib/systemd/system/overlayfs-setup.service'
+}
+
+help() {
+	cat <<HELPEOF
+This hook uses overlayfs to boot on a read only snapshot.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

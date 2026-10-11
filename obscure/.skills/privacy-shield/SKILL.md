@@ -1,14 +1,14 @@
 ---
 name: privacy-shield
 description: >-
-  Procedures for shoulder-surfing protection on Omarchy - gated yazi previews and enforced idle lock.
+  Procedures for shoulder-surfing protection on Kos - gated yazi previews and enforced idle lock.
 ---
 
 # Privacy Shield
 
 ## Overview
 
-This skill defines how the obscure microcomponent protects sensitive content from prying eyes. The yazi gate replaces previews of 2FA backup codes, recovery keys, passwords, and secrets with a lock screen and routes opening through a password check. The idle stage enforces the native Omarchy blank and lock chain. Everything is idempotent and degrades to warnings.
+This skill defines how the obscure microcomponent protects sensitive content from prying eyes. The yazi gate replaces previews of 2FA backup codes, recovery keys, passwords, and secrets with a lock screen and routes opening through a password check. The idle stage enforces the native Kos blank and lock chain. Everything is idempotent and degrades to warnings.
 
 ## Yazi Gate Standards
 
@@ -16,7 +16,7 @@ Keep the sensitive filename globs in `data/patterns`: 2FA and authenticator name
 
 ## Idle Obscure Standards
 
-Remove the stay-awake indicator and the screensaver-off toggle per user so the Omarchy defaults apply: screensaver after 150 seconds, lock after 300 seconds. Never ship a custom locker or idle daemon: the canonical Omarchy lockscreen is the only session lock.
+Remove the stay-awake indicator and the screensaver-off toggle per user so the Kos defaults apply: screensaver after 150 seconds, lock after 300 seconds. Never ship a custom locker or idle daemon: the canonical Kos lockscreen is the only session lock.
 
 ## Agent Workflow
 

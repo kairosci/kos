@@ -1,14 +1,16 @@
-# omaconf
+# kos
 
-Arch Linux security hardening, debloat and theming automation for Omarchy.
+An autonomous Arch based desktop operating system with native provisioning and release tooling.
+
+See [distribution builds and installation](conf/kos/README.md).
 
 ## Overview
 
-omaconf provisions and maintains a hardened Omarchy desktop through native Bash automation and standard system utilities. The pipeline applies kernel and authentication hardening, firewall policy, intrusion prevention tooling, package debloating with persistent defaults, per theme desktop integration and battery health enforcement. Every operation is idempotent and verifiable, and no stage depends on anything Python based.
+kos provisions and maintains a hardened Kos desktop through native Bash automation and standard system utilities. The pipeline applies kernel and authentication hardening, firewall policy, intrusion prevention tooling, package debloating with persistent defaults, per theme desktop integration and battery health enforcement. Every operation is idempotent and verifiable, and no stage depends on anything Python based.
 
 ## Repository Architecture
 
-The repository is organized into functional components under dedicated paths, and each rule has exactly one home. The `scripts/` directory holds the root provisioning pipeline in `scripts/lib/modules/`, shared libraries in `scripts/lib/`, the verifier, the compatibility suite and interactive launchers. The `tests/` directory holds modular suites orchestrated by `tests/run-all.sh`. The `hooks/` directory holds Omarchy desktop integration, split by lifecycle event. All per-application configuration modules live under `conf/<app>/`; each app folder owns its data files and user-scope installer. The `theme-previews/` directory holds preview generation and installation. The `ai/`, `clean/`, `obscure/` and `performance/` directories hold focused sub-projects, and `plugins/` holds the desktop plugin catalog. Operational runbooks live in `.skills/`, workflows are exposed through the `Makefile`, and continuous integration under `.github/workflows/ci.yml` runs syntax checks and the modular suites on every change.
+The repository is organized into functional components under dedicated paths, and each rule has exactly one home. The `scripts/` directory holds the root provisioning pipeline in `scripts/lib/modules/`, shared libraries in `scripts/lib/`, the verifier, the compatibility suite and interactive launchers. The `tests/` directory holds modular suites orchestrated by `tests/run-all.sh`. The `hooks/` directory holds Kos desktop integration, split by lifecycle event. All per-application configuration modules live under `conf/<app>/`; each app folder owns its data files and user-scope installer. The `theme-previews/` directory holds preview generation and installation. The `ai/`, `clean/`, `obscure/` and `performance/` directories hold focused sub-projects, and `plugins/` holds the desktop plugin catalog. Operational runbooks live in `.skills/`, workflows are exposed through the `Makefile`, and continuous integration under `.github/workflows/ci.yml` runs syntax checks and the modular suites on every change.
 
 ## Execution Workflows
 
@@ -22,7 +24,7 @@ System operations run through the standard Makefile targets. Running `make setup
 
 ## Provisioning Modules
 
-`scripts/setup.sh` runs as root, opens a log in append mode, resolves the primary user and sources every stage module in a fixed order. Because each module is sourced rather than executed, a module signals that it has nothing to do by returning instead of exiting, and every module degrades gracefully. The environment and package database stage repairs broken pacman entries and defines the helpers used to reach a real user session. The locale stage derives the locale, the console keymap and the XKB layout from the system timezone through the offline resolver, and never assumes an English default. The debloat stage removes stock packages with a normal then forced fallback, writes the dedicated pin list, merges it into `pacman.conf` without duplicates and installs the per user persistence hooks. The defaults stage installs the retained applications, sets the browser, editor, media player and file manager defaults, patches `mimeapps.list` and registers the Hypr bindings. The theming stage creates the per home hook folder, clears leftover color state, copies the hooks with their executable bits and repairs ownership. The opt in desktop stack stage logs a clean skip and returns unless `OMAQT_URL` is set, so no upstream URL is hardcoded anywhere. The shell plugin stage provisions the desktop plugin layer; Neovim and its Omarchy package are removed by debloat. The remaining stages own the firewall, kernel, authentication, SSH, service isolation, security tooling, hardware power and maintenance concerns.
+`scripts/setup.sh` runs as root, opens a log in append mode, resolves the primary user and sources every stage module in a fixed order. Because each module is sourced rather than executed, a module signals that it has nothing to do by returning instead of exiting, and every module degrades gracefully. The environment and package database stage repairs broken pacman entries and defines the helpers used to reach a real user session. The locale stage derives the locale, the console keymap and the XKB layout from the system timezone through the offline resolver, and never assumes an English default. The debloat stage removes stock packages with a normal then forced fallback, writes the dedicated pin list, merges it into `pacman.conf` without duplicates and installs the per user persistence hooks. The defaults stage installs the retained applications, sets the browser, editor, media player and file manager defaults, patches `mimeapps.list` and registers the Hypr bindings. The theming stage creates the per home hook folder, clears leftover color state, copies the hooks with their executable bits and repairs ownership. The opt in desktop stack stage logs a clean skip and returns unless `OMAQT_URL` is set, so no upstream URL is hardcoded anywhere. The shell plugin stage provisions the desktop plugin layer; Neovim and its Kos package are removed by debloat. The remaining stages own the firewall, kernel, authentication, SSH, service isolation, security tooling, hardware power and maintenance concerns.
 
 ## Shared Libraries
 
@@ -36,7 +38,7 @@ Because every installer routes through the user config library, replacing a mana
 
 ## Application Keybindings
 
-Omarchy's Super shortcuts remain owned by Hyprland. In the apps, Ctrl+S saves, Ctrl+F searches the current document, Ctrl+C/X/V copy, cut and paste in each app's context, and Ctrl+Q closes the editor or browser. Zed uses the VS Code keymap; Micro receives matching bindings. The private browser shortcut remains on Omarchy's Super+Shift+Alt+B chord and starts Brave Origin in incognito mode.
+Kos's Super shortcuts remain owned by Hyprland. In the apps, Ctrl+S saves, Ctrl+F searches the current document, Ctrl+C/X/V copy, cut and paste in each app's context, and Ctrl+Q closes the editor or browser. Zed uses the VS Code keymap; Micro receives matching bindings. The private browser shortcut remains on Kos's Super+Shift+Alt+B chord and starts Brave Origin in incognito mode.
 
 ## Theme Previews
 
@@ -44,7 +46,7 @@ Preview images must all share the same geometry, color depth and density, otherw
 
 ## Theme and Persistence Hooks
 
-The `hooks/theme-set.d/` directory holds the hooks that react to a theme change: folder colors, shell icon family, Micro colorschemes generated from the shared palette theme, CLI colors and the system monitor restart. Each hook resolves the current theme name from the Omarchy state directory and picks the light or dark family accordingly. The `hooks/pre-refresh-pacman.d/` and `hooks/post-update.d/` directories each hold a single `99-omaconf-persist` hook that re-merges the pins, re-applies the removals, resets the MIME defaults, restores the shared GTK file chooser and Hyprland capture routing, masks the crash watcher and re-normalizes the previews. The update hook runs as root because the package manager requires it, and it sources the shared libraries it needs instead of carrying its own copy.
+The `hooks/theme-set.d/` directory holds the hooks that react to a theme change: folder colors, shell icon family, Micro colorschemes generated from the shared palette theme, CLI colors and the system monitor restart. Each hook resolves the current theme name from the Kos state directory and picks the light or dark family accordingly. The `hooks/pre-refresh-pacman.d/` and `hooks/post-update.d/` directories each hold a single `99-kos-persist` hook that re-merges the pins, re-applies the removals, resets the MIME defaults, restores the shared GTK file chooser and Hyprland capture routing, masks the crash watcher and re-normalizes the previews. The update hook runs as root because the package manager requires it, and it sources the shared libraries it needs instead of carrying its own copy.
 
 ## Security Posture and Kernel Protections
 
@@ -56,7 +58,7 @@ Authentication locks accounts after a configured number of consecutive failed at
 
 ## Desktop Parity and Debloat Strategy
 
-Theming keeps the system monitor, folder colors, the icon theme and the cursor in sync with the active palette, and generates Micro colorschemes dynamically from the current theme. Nautilus is the default graphical file manager; GTK provides desktop open and save dialogs. The pipeline removes unneeded stock packages and uses Brave Origin as the default browser, Zed as the editor for files and projects, Nautilus as the graphical file manager, a lightweight image viewer, a media player, a document viewer and a console system monitor. No `IgnorePkg` entries are kept in `/etc/pacman.conf` so system and Omarchy updates flow without held packages, and obsolete web application shortcuts are cleaned from the application directories. MIME defaults are registered per user for the retained document, image and video types, and the shell bar gains the media plugin in the right section.
+Theming keeps the system monitor, folder colors, the icon theme and the cursor in sync with the active palette, and generates Micro colorschemes dynamically from the current theme. Nautilus is the default graphical file manager; GTK provides desktop open and save dialogs. The pipeline removes unneeded stock packages and uses Brave Origin as the default browser, Zed as the editor for files and projects, Nautilus as the graphical file manager, a lightweight image viewer, a media player, a document viewer and a console system monitor. No `IgnorePkg` entries are kept in `/etc/pacman.conf` so system and Kos updates flow without held packages, and obsolete web application shortcuts are cleaned from the application directories. MIME defaults are registered per user for the retained document, image and video types, and the shell bar gains the media plugin in the right section.
 
 ## Regression Prevention
 
@@ -64,7 +66,7 @@ Hardening must never break the desktop. The session bus, the authorization servi
 
 ## Internationalization
 
-Every human-readable string in the scripts, hooks and installers is referenced by a symbolic key resolved through the i18n engine, with catalogs for English, Italian, French, German, Spanish and Portuguese. The active language is resolved from `OMACONF_LANG` first, then the standard `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG` variables, and finally the system locale configuration. English is always loaded first and acts as the fallback, and all catalogs must declare exactly the same key set with the same placeholder count so no message can disappear in translation.
+Every human-readable string in the scripts, hooks and installers is referenced by a symbolic key resolved through the i18n engine, with catalogs for English, Italian, French, German, Spanish and Portuguese. The active language is resolved from `KOS_LANG` first, then the standard `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG` variables, and finally the system locale configuration. English is always loaded first and acts as the fallback, and all catalogs must declare exactly the same key set with the same placeholder count so no message can disappear in translation.
 
 ## Battery Health and Power Management
 
@@ -76,13 +78,13 @@ Follow the project conventions. Commit messages use the Conventional Commits for
 
 Report security issues through the [private vulnerability reporting policy](SECURITY.md).
 
-The setup pipeline discovers all `conf/*/install.sh` automatically, including Brave Origin, and applies them in the correct user environment. New app configs need their native installer; browser profiles and personal data remain in their native directories. GTK uses Materia and exact Omarchy palette overrides, including libadwaita CSS variables. Folder icons use a generated Qogir accent overlay. First setup defaults to dark mode; subsequent user theme selections are preserved. Yazi and its managed integration are retired.
+The setup pipeline discovers all `conf/*/install.sh` automatically, including Brave Origin, and applies them in the correct user environment. New app configs need their native installer; browser profiles and personal data remain in their native directories. GTK uses Materia and exact Kos palette overrides, including libadwaita CSS variables. Folder icons use a generated Qogir accent overlay. First setup defaults to dark mode; subsequent user theme selections are preserved. Yazi and its managed integration are retired.
 
 `make setup REBUILD_PREVIEWS=1` applies every theme to the actual desktop and captures the entire monitor, including wallpaper, bar and sample application windows, before restoring the original theme, background and workspace.
 
 Zed opens project directories directly with `zed --new /path/to/project` or the terminal. Micro remains the terminal alternative. GUI application modules configure native dialogs, media integration and Wayland launchers. GNOME Keyring and Seahorse replace KeePassXC; existing `.kdbx` databases remain untouched.
 
-The `06-os-identity.sh` setup module restores native Arch Linux identity in `/etc/os-release` from the package-owned `/usr/lib/os-release`. The standard identifiers are `NAME="Arch Linux"`, `PRETTY_NAME="Arch Linux"` and `ID=arch`. The original Omarchy `LOGO` and `ANSI_COLOR` values are retained. The original override is preserved under `/var/lib/omaconf/os-identity/`; the root post-update hook reconciles the identity after updates. Desktop icons, themes, configuration and Omarchy packages remain available. Apply through `make setup`.
+The `06-os-identity.sh` module publishes `NAME="kos"`, `ID=kos`, `ID_LIKE=arch` and the distribution version in `/etc/os-release`. It preserves the original override privately under `/var/lib/kos/os-identity/` and leaves the package owned `/usr/lib/os-release` unchanged. The post update hook restores the kos identity after package updates. Apply an existing installation through the canonical migration scope with `make setup SCOPE=migrate`; build installation media with `make setup SCOPE=release`.
 Main accepts changes only through squash pull requests with signed commits and current CI, SAST and Main PR provenance checks. No bypass actors or direct pushes are permitted. Enable the local guard with `git config core.hooksPath .githooks`; the server ruleset remains authoritative even when local hooks are disabled.
 
-Desktop package and MIME runtime assertions run on installed Omarchy systems. Bare Arch CI containers still execute source, generated configuration and sandboxed backend checks without requiring a provisioned graphical desktop.
+Desktop package and MIME runtime assertions run on installed Kos systems. Bare Arch CI containers still execute source, generated configuration and sandboxed backend checks without requiring a provisioned graphical desktop.

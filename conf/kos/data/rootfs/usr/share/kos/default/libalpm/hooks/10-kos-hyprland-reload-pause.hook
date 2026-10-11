@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = kos-settings
+Target = kos-settings-dev
+
+[Action]
+Description = Pausing Hyprland config auto-reload for Kos settings update...
+When = PreTransaction
+Depends = kos
+Exec = /usr/bin/kos-hyprland-reload-guard pause

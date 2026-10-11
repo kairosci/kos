@@ -13,15 +13,15 @@ responsiveness_user_systemctl() {
 
 responsiveness_files_match() {
     local root="$1" slice
-    cmp -s "$root/conf/performance/data/oomd.conf" /etc/systemd/oomd.conf.d/90-omaconf.conf || return 1
+    cmp -s "$root/conf/performance/data/oomd.conf" /etc/systemd/oomd.conf.d/90-kos.conf || return 1
     for slice in app background session; do
-        cmp -s "$root/conf/performance/data/$slice.slice.conf" "/etc/systemd/user/$slice.slice.d/90-omaconf.conf" || return 1
+        cmp -s "$root/conf/performance/data/$slice.slice.conf" "/etc/systemd/user/$slice.slice.d/90-kos.conf" || return 1
     done
     for slice in user user-; do
-        cmp -s "$root/conf/performance/data/memory.slice.conf" "/etc/systemd/system/$slice.slice.d/90-omaconf-memory.conf" || return 1
+        cmp -s "$root/conf/performance/data/memory.slice.conf" "/etc/systemd/system/$slice.slice.d/90-kos-memory.conf" || return 1
     done
-    cmp -s "$root/conf/performance/data/memory.slice.conf" /etc/systemd/user/session.slice.d/90-omaconf-memory.conf || return 1
-    cmp -s <(sed 's/^\[Slice\]$/[Service]/' "$root/conf/performance/data/memory.slice.conf") /etc/systemd/system/user@.service.d/90-omaconf-memory.conf || return 1
+    cmp -s "$root/conf/performance/data/memory.slice.conf" /etc/systemd/user/session.slice.d/90-kos-memory.conf || return 1
+    cmp -s <(sed 's/^\[Slice\]$/[Service]/' "$root/conf/performance/data/memory.slice.conf") /etc/systemd/system/user@.service.d/90-kos-memory.conf || return 1
 }
 
 responsiveness_runtime() {

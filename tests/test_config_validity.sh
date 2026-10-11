@@ -82,12 +82,12 @@ if ((UID != 0)); then
     assert_true "user config library never accumulates backups across runs" \
         "[[ \$(ls -1 '$USERCONF_SANDBOX/dst/' | grep -c 'payload') -eq 2 ]]"
 
-    printf '# rc\n\n# >>> omaconf sandbox >>>\nold() { :; }\n# <<< omaconf sandbox <<<\n' > "$USERCONF_SANDBOX/rc"
+    printf '# rc\n\n# >>> kos sandbox >>>\nold() { :; }\n# <<< kos sandbox <<<\n' > "$USERCONF_SANDBOX/rc"
     (
         set -euo pipefail
         # shellcheck source=../scripts/lib/userconf.sh
         source "$USERCONF_LIB"
-        install_shell_block "$USERCONF_SANDBOX/rc" "# >>> omaconf sandbox >>>" "# <<< omaconf sandbox <<<" << 'BLOCK'
+        install_shell_block "$USERCONF_SANDBOX/rc" "# >>> kos sandbox >>>" "# <<< kos sandbox <<<" << 'BLOCK'
 new() { :; }
 BLOCK
     ) 2>/dev/null
@@ -96,14 +96,14 @@ BLOCK
     assert_true "shell block writes the new body" \
         "grep -q 'new()' '$USERCONF_SANDBOX/rc'"
     assert_true "shell block writes exactly one marked range" \
-        "[[ \$(grep -c '>>> omaconf sandbox >>>' '$USERCONF_SANDBOX/rc') -eq 1 ]]"
+        "[[ \$(grep -c '>>> kos sandbox >>>' '$USERCONF_SANDBOX/rc') -eq 1 ]]"
 
-    printf '# rc\n\n# >>> omaconf sandbox >>>\nnew() { :; }\n# <<< omaconf sandbox <<<\n' > "$USERCONF_SANDBOX/rc-idem"
+    printf '# rc\n\n# >>> kos sandbox >>>\nnew() { :; }\n# <<< kos sandbox <<<\n' > "$USERCONF_SANDBOX/rc-idem"
     (
         set -euo pipefail
         # shellcheck source=../scripts/lib/userconf.sh
         source "$USERCONF_LIB"
-        install_shell_block "$USERCONF_SANDBOX/rc-idem" "# >>> omaconf sandbox >>>" "# <<< omaconf sandbox <<<" << 'BLOCK'
+        install_shell_block "$USERCONF_SANDBOX/rc-idem" "# >>> kos sandbox >>>" "# <<< kos sandbox <<<" << 'BLOCK'
 new() { :; }
 BLOCK
     ) 2>/dev/null

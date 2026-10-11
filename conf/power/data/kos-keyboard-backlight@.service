@@ -1,0 +1,14 @@
+[Unit]
+Description=Maximum keyboard backlight
+Wants=systemd-backlight@leds:%i.service
+After=systemd-backlight@leds:%i.service
+ConditionPathExistsGlob=/sys/class/leds/*kbd_backlight*
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/kos-keyboard-backlight --awake
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/sys/devices
+

@@ -1,0 +1,40 @@
+readonly BASE_CONFIG="/etc/limine-entry-tool.conf"
+readonly DEFAULT_CONFIG="/etc/default/limine"
+
+load_auth_method() {
+	local file="$1"
+	while IFS= read -r line || [[ -n "$line" ]]; do
+		# Skip blank lines and comments
+		[[ "$line" =~ ^[[:space:]]*(#.*)?$ ]] && continue
+		# Match AUTH_METHOD = value only
+		if [[ "$line" =~ ^[[:space:]]*AUTH_METHOD[[:space:]]*=[[:space:]]*(.*)$ ]]; then
+			local val="${BASH_REMATCH[1]}"
+			# remove inline comments
+			val="${val%%#*}"
+			# strip quotes
+			val="${val%\"}"
+			val="${val#\"}"
+			# trim leading space
+			val="${val#"${val%%[![:space:]]*}"}"
+			local cmd="${val%% *}"
+			if command -v "$cmd" &>/dev/null; then
+				export AUTH_METHOD="$val"
+				return 0
+			fi
+		fi
+	done <"$file"
+}
+
+if ((EUID != 0)); then
+	[[ -f "${DEFAULT_CONFIG}" ]] && load_auth_method "${DEFAULT_CONFIG}"
+	[[ -z "$AUTH_METHOD" ]] && [[ -f "${BASE_CONFIG}" ]] && load_auth_method "${BASE_CONFIG}"
+	[[ -z "$AUTH_METHOD" ]] && command -v sudo &>/dev/null && AUTH_METHOD="sudo"
+	if [[ -z "$AUTH_METHOD" ]]; then
+		echo -e "\033[91mThis must be run as root.\033[0m" >&2
+		exit 1
+	fi
+	read -r -a auth_cmd <<<"$AUTH_METHOD"
+	exec "${auth_cmd[@]}" "$0" "$@"
+	echo "Failed to exec AUTH_METHOD: $AUTH_METHOD" >&2
+	exit 127
+fi

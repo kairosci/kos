@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kos:summary=Detect ASUS ExpertBook B9406 series laptops on Intel Panther Lake.
+
+kos-hw-match "B9406" && kos-hw-intel-ptl

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# kos:summary=Apply the kos system configuration
+# kos:requires-sudo=true
+set -euo pipefail
+exec make -C /usr/share/kos/provision setup

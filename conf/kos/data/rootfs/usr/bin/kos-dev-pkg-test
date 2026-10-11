@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# kos:summary=Build and install kos from its canonical source checkout
+# kos:group=dev
+# kos:args=<path-to-checkout>
+set -euo pipefail
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/i18n.sh"
+i18n_init
+[[ $# == 1 ]] || err release.invalid
+checkout=$(realpath -e "$1")
+[[ -f "$checkout/scripts/lib/distribution.sh" && -f "$checkout/Makefile" ]] || err release.invalid
+make -C "$checkout" setup SCOPE=migrate

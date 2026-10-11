@@ -16,7 +16,7 @@ failed_upgrade_stops_setup() {
         log() { :; }
         err() { exit 1; }
         pacman() {
-            [[ "${OMARCHY_ALLOW_DIRECT_PACMAN:-}" == 1 ]] || exit 2
+            [[ "${KOS_ALLOW_DIRECT_PACMAN:-}" == 1 ]] || exit 2
             printf "upgrade failure\n" >&2
             return 42
         }

@@ -29,11 +29,11 @@ source "$SANDBOX/module.sh"
 SH
 test_section "Desktop responsiveness"
 assert_true "module installs configuration successfully" 'bash "$SANDBOX/run.sh"'
-assert_true "all installed templates match the repository" 'cmp -s "$PROJECT_ROOT/conf/performance/data/oomd.conf" "$SANDBOX/etc/systemd/oomd.conf.d/90-omaconf.conf" && for slice in app background session; do cmp -s "$PROJECT_ROOT/conf/performance/data/$slice.slice.conf" "$SANDBOX/etc/systemd/user/$slice.slice.d/90-omaconf.conf" || exit 1; done'
+assert_true "all installed templates match the repository" 'cmp -s "$PROJECT_ROOT/conf/performance/data/oomd.conf" "$SANDBOX/etc/systemd/oomd.conf.d/90-kos.conf" && for slice in app background session; do cmp -s "$PROJECT_ROOT/conf/performance/data/$slice.slice.conf" "$SANDBOX/etc/systemd/user/$slice.slice.d/90-kos.conf" || exit 1; done'
 assert_file_contains_literal "daemon is enabled and started" "$SANDBOX/calls" 'enable --now systemd-oomd.socket systemd-oomd.service'
 assert_file_contains_literal "new daemon configuration is applied" "$SANDBOX/calls" 'restart systemd-oomd.service'
 assert_file_contains_literal "inactive session is explicitly deferred" "$SANDBOX/log" 'performance.session_deferred tester'
-assert_true "memory protection extends through the session ancestors" 'for slice in user user-; do cmp -s "$PROJECT_ROOT/conf/performance/data/memory.slice.conf" "$SANDBOX/etc/systemd/system/$slice.slice.d/90-omaconf-memory.conf" || exit 1; done; cmp -s "$PROJECT_ROOT/conf/performance/data/memory.slice.conf" "$SANDBOX/etc/systemd/user/session.slice.d/90-omaconf-memory.conf" && grep -qxF '\''[Service]'\'' "$SANDBOX/etc/systemd/system/user@.service.d/90-omaconf-memory.conf" && grep -qxF '\''MemoryLow=512M'\'' "$SANDBOX/etc/systemd/system/user@.service.d/90-omaconf-memory.conf"'
+assert_true "memory protection extends through the session ancestors" 'for slice in user user-; do cmp -s "$PROJECT_ROOT/conf/performance/data/memory.slice.conf" "$SANDBOX/etc/systemd/system/$slice.slice.d/90-kos-memory.conf" || exit 1; done; cmp -s "$PROJECT_ROOT/conf/performance/data/memory.slice.conf" "$SANDBOX/etc/systemd/user/session.slice.d/90-kos-memory.conf" && grep -qxF '\''[Service]'\'' "$SANDBOX/etc/systemd/system/user@.service.d/90-kos-memory.conf" && grep -qxF '\''MemoryLow=512M'\'' "$SANDBOX/etc/systemd/system/user@.service.d/90-kos-memory.conf"'
 first_hash=$(find "$SANDBOX/etc" -type f -exec sha256sum {} + | sort)
 first_restarts=$(grep -c '^restart ' "$SANDBOX/calls")
 assert_true "repeat setup preserves files and avoids restarting an unchanged daemon" 'bash "$SANDBOX/run.sh" && [[ "$first_hash" == "$(find "$SANDBOX/etc" -type f -exec sha256sum {} + | sort)" && "$first_restarts" == "$(grep -c '\''^restart '\'' "$SANDBOX/calls")" ]]'

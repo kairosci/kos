@@ -1,0 +1,75 @@
+name: kos release
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kos-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      id-token: write
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Build and verify installation media
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          image=$(cat conf/kos/data/build-image)
+          epoch=$(git log -1 --format=%ct)
+          docker run --rm --privileged --volume "$PWD:/source:ro" \
+            --volume "$PWD/dist:/source/dist" --env "SOURCE_DATE_EPOCH=$epoch" "$image" \
+            bash -c 'set -euo pipefail; pacman -Syu --noconfirm --needed archiso qemu-system-x86 edk2-ovmf git zstd; KOS_LOG_STDOUT=1 bash /source/scripts/setup.sh --scope release; bash /source/scripts/test-release-boot.sh /source/dist'
+      - uses: sigstore/cosign-installer@af595e623eec1ede52d6322f53b635d5def0a95a
+        with:
+          cosign-release: v3.1.0
+      - name: Sign and verify artifacts
+        run: |
+          set -euo pipefail
+          identity="https://github.com/$GITHUB_REPOSITORY/.github/workflows/release.yml@refs/heads/main"
+          for artifact in dist/kos-*.pkg.tar.zst dist/linux-kos-*.pkg.tar.zst dist/*.src.tar.* dist/kos-*.iso dist/PACKAGES.json; do
+            cosign sign-blob --yes --bundle "$artifact.sigstore.json" "$artifact"
+            cosign verify-blob "$artifact" --bundle "$artifact.sigstore.json" \
+              --certificate-identity "$identity" \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: kos-release
+          path: |
+            dist/kos-*.pkg.tar.zst
+            dist/linux-kos-*.pkg.tar.zst
+            dist/*.src.tar.*
+            dist/kos-*.iso
+            dist/*.sigstore.json
+            dist/PACKAGES.json
+            dist/SHA256SUMS
+            dist/boot-*.log
+          compression-level: 0
+      - name: Publish verified release
+        if: inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version=$(cat conf/kos/data/version)
+          gh release create "v$version" dist/kos-*.pkg.tar.zst dist/linux-kos-*.pkg.tar.zst dist/*.src.tar.* dist/kos-*.iso dist/PACKAGES.json \
+            dist/*.sigstore.json dist/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "kos $version" --notes '' --prerelease

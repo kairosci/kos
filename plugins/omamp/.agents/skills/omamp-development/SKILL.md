@@ -2,19 +2,19 @@
 name: omamp-development
 description: >-
   Expert guide and procedures for developing, maintaining, and testing the omamp
-  media player plugin for the Omarchy desktop shell and Quickshell environment.
-  Use when modifying, debugging, or enhancing omamp or other Omarchy bar widgets.
+  media player plugin for the Kos desktop shell and Quickshell environment.
+  Use when modifying, debugging, or enhancing omamp or other Kos bar widgets.
 ---
 
 # omamp Development and Maintenance
 
-This skill documents the design patterns, the MPRIS integration rules and the reload workflow for the `omamp` media player plugin in the Omarchy shell.
+This skill documents the design patterns, the MPRIS integration rules and the reload workflow for the `omamp` media player plugin in the Kos shell.
 
 ## Local Workflow
 
 The plugin is installed from this repository through the project plugin catalog, which declares the identifier, the upstream source and the bar section it belongs to. During development it is convenient to link the checkout into the user plugin directory instead of reinstalling, pointing the plugin entry at the local path. The identifier must stay identical to the one declared in the catalog entry, because the desktop shell keys its installed plugins by that string.
 
-After any code change, reload the Omarchy desktop shell so the widget is rebuilt from the new sources. Pushing goes to the plugin upstream declared in the catalog, on its default branch.
+After any code change, reload the Kos desktop shell so the widget is rebuilt from the new sources. Pushing goes to the plugin upstream declared in the catalog, on its default branch.
 
 ## Design Principles
 

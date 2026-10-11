@@ -9,9 +9,9 @@ source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
 i18n_init
 
-SOURCE_DIR="${OMARCHY_PATH:-/usr/share/omarchy}/shell/plugins/panels/bluetooth"
-DEST_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/plugins/omaconf.bluetooth"
-SHELL_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/shell.json"
+SOURCE_DIR="${KOS_PATH:-/usr/share/kos}/shell/plugins/panels/bluetooth"
+DEST_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/kos/plugins/kos.bluetooth"
+SHELL_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/kos/shell.json"
 
 [[ -r "$SOURCE_DIR/Panel.qml" && -r "$SOURCE_DIR/manifest.json" && -r "$SOURCE_DIR/Model.js" ]] || err "defaults.app_failed" bluetooth
 [[ -f "$SHELL_CONFIG" ]] || err "defaults.app_failed" bluetooth
@@ -25,8 +25,8 @@ panel=$(awk -v snippet="$SCRIPT_DIR/data/state.qml" '
         close(snippet)
     }
 ' "$SOURCE_DIR/Panel.qml")
-manifest=$(jq '.id = "omaconf.bluetooth" | .omarchy.clonedFrom = "omarchy.bluetooth"' "$SOURCE_DIR/manifest.json")
-config=$(jq 'walk(if type == "object" and .id? == "omarchy.bluetooth" then .id = "omaconf.bluetooth" else . end)' "$SHELL_CONFIG")
+manifest=$(jq '.id = "kos.bluetooth" | .kos.clonedFrom = "kos.bluetooth"' "$SOURCE_DIR/manifest.json")
+config=$(jq 'walk(if type == "object" and .id? == "kos.bluetooth" then .id = "kos.bluetooth" else . end)' "$SHELL_CONFIG")
 install_user_content "$DEST_DIR/Panel.qml" <<< "$panel"
 install_user_file "$SOURCE_DIR/Model.js" "$DEST_DIR/Model.js"
 install_user_content "$DEST_DIR/manifest.json" <<< "$manifest"

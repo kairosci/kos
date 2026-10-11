@@ -39,14 +39,14 @@ watchdogs, change kernel hardening or install a second OOM daemon.
 
 Generated configuration:
 
-- `/etc/systemd/oomd.conf.d/90-omaconf.conf`
-- `/etc/systemd/user/app.slice.d/90-omaconf.conf`
-- `/etc/systemd/user/background.slice.d/90-omaconf.conf`
-- `/etc/systemd/user/session.slice.d/90-omaconf.conf`
-- `/etc/systemd/user/session.slice.d/90-omaconf-memory.conf`
-- `/etc/systemd/system/user.slice.d/90-omaconf-memory.conf`
-- `/etc/systemd/system/user-.slice.d/90-omaconf-memory.conf`
-- `/etc/systemd/system/user@.service.d/90-omaconf-memory.conf`
+- `/etc/systemd/oomd.conf.d/90-kos.conf`
+- `/etc/systemd/user/app.slice.d/90-kos.conf`
+- `/etc/systemd/user/background.slice.d/90-kos.conf`
+- `/etc/systemd/user/session.slice.d/90-kos.conf`
+- `/etc/systemd/user/session.slice.d/90-kos-memory.conf`
+- `/etc/systemd/system/user.slice.d/90-kos-memory.conf`
+- `/etc/systemd/system/user-.slice.d/90-kos-memory.conf`
+- `/etc/systemd/system/user@.service.d/90-kos-memory.conf`
 
 `data/memory.slice.conf` is the single source of the memory protection value.
 The service drop-in changes only the section header. The 512 MiB allowance

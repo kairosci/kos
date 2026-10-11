@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# kos:summary=Install the latest verified kos release package
+# kos:requires-sudo=true
+set -euo pipefail
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/i18n.sh"
+i18n_init
+repository=kairosci/kos
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/release-query.sh"
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/release-manifest.sh"
+status=0
+kos_release_query "$(kos-version-channel)" "$work/release.json" || status=$?
+[[ "$status" != 1 ]] || exit 0
+[[ "$status" == 0 ]] || err release.invalid
+release=$(cat "$work/release.json")
+tag=$(jq -er '.tag_name' <<< "$release")
+[[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || err release.invalid
+version="${tag#v}"
+[[ $(vercmp "$version" "$(kos-version)") -gt 0 ]] || exit 0
+base="https://github.com/$repository/releases/download/$tag"
+fetch_asset() {
+    local asset="$1" url
+    url=$(jq -er --arg name "$asset" '.assets[] | select(.name == $name) | .browser_download_url' <<< "$release")
+    [[ "$url" == "$base/$asset" ]] || err release.invalid
+    curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' "$url" -o "$work/$asset"
+}
+verify_asset() {
+    cosign verify-blob "$work/$1" --bundle "$work/$1.sigstore.json" \
+        --certificate-identity "https://github.com/$repository/.github/workflows/release.yml@refs/heads/main" \
+        --certificate-oidc-issuer https://token.actions.githubusercontent.com
+}
+fetch_asset PACKAGES.json
+fetch_asset PACKAGES.json.sigstore.json
+verify_asset PACKAGES.json
+kos_manifest_valid "$work/PACKAGES.json" "$version" || err release.invalid
+packages=()
+while IFS=$'\t' read -r name package_version package checksum; do
+    fetch_asset "$package"
+    fetch_asset "$package.sigstore.json"
+    verify_asset "$package"
+    [[ "$(sha256sum "$work/$package" | cut -d' ' -f1)" == "$checksum" ]] || err release.invalid
+    [[ "$(pacman -Qp "$work/$package")" == "$name $package_version" ]] || err release.invalid
+    packages+=("$work/$package")
+done < <(jq -r '.packages[] | [.name, .version, .file, .sha256] | @tsv' "$work/PACKAGES.json")
+sudo pacman -U "${packages[@]}"

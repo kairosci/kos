@@ -47,12 +47,12 @@ desktop_workflow_defaults() {
     user_as "$user" xdg-mime default org.gnome.FileRoller.desktop application/zip application/x-7z-compressed \
         application/x-tar application/gzip application/x-bzip2 application/x-xz application/zstd \
         application/vnd.rar application/x-rar application/x-rar-compressed application/x-compressed-tar || return 1
-    install -d -m 700 -o "$user" -g "$user" "$home/.local/state/omarchy/defaults" || return 1
-    printf 'nautilus\n' > "$home/.local/state/omarchy/defaults/file-manager" || return 1
-    chown "$user:$user" "$home/.local/state/omarchy/defaults/file-manager" || return 1
-    printf 'zed\n' > "$home/.local/state/omarchy/defaults/editor" || return 1
-    printf 'celluloid\n' > "$home/.local/state/omarchy/defaults/media-player" || return 1
-    chown "$user:$user" "$home/.local/state/omarchy/defaults/editor" "$home/.local/state/omarchy/defaults/media-player" || return 1
+    install -d -m 700 -o "$user" -g "$user" "$home/.local/state/kos/defaults" || return 1
+    printf 'nautilus\n' > "$home/.local/state/kos/defaults/file-manager" || return 1
+    chown "$user:$user" "$home/.local/state/kos/defaults/file-manager" || return 1
+    printf 'zed\n' > "$home/.local/state/kos/defaults/editor" || return 1
+    printf 'celluloid\n' > "$home/.local/state/kos/defaults/media-player" || return 1
+    chown "$user:$user" "$home/.local/state/kos/defaults/editor" "$home/.local/state/kos/defaults/media-player" || return 1
 }
 
 desktop_workflow_portals() {

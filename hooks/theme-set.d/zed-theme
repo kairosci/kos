@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-exec bash "${XDG_CONFIG_HOME:-$HOME/.config}/omaconf/zed-theme.sh"
+exec bash "${XDG_CONFIG_HOME:-$HOME/.config}/kos/zed-theme.sh"

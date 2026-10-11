@@ -3,8 +3,8 @@ set -euo pipefail
 
 command -v yazi >/dev/null || return 0
 
-MARK_BEGIN="# >>> omaconf obscure >>>"
-MARK_END="# <<< omaconf obscure <<<"
+MARK_BEGIN="# >>> kos obscure >>>"
+MARK_END="# <<< kos obscure <<<"
 PATTERNS_FILE="$PROJECT_DIR/data/patterns"
 PLUGIN_SRC="$PROJECT_DIR/data/obscure.yazi"
 

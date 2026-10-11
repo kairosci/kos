@@ -1,0 +1,4 @@
+kos
+
+archinstall
+kos-install-system /mnt USER

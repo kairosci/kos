@@ -1,0 +1,10 @@
+[Trigger]
+Type = Path
+Operation = Remove
+Target = usr/lib/modules/*/modules.builtin
+
+[Action]
+Description = Record kernels marked for removal in Limine
+When = PreTransaction
+Exec = /usr/share/libalpm/scripts/limine-mkinitcpio-remove pre
+NeedsTargets

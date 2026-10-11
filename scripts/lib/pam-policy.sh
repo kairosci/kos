@@ -39,7 +39,7 @@ pam_policy_reconcile() {
         rm -f "$staged"
         return 0
     fi
-    if { [[ -e "${target}.omaconf-backup" ]] || cp -p "$target" "${target}.omaconf-backup"; } &&
+    if { [[ -e "${target}.kos-backup" ]] || cp -p "$target" "${target}.kos-backup"; } &&
         chmod --reference="$target" "$staged" &&
         chown --reference="$target" "$staged" &&
         mv -f "$staged" "$target"; then

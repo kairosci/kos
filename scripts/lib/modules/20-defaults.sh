@@ -42,8 +42,8 @@ log "defaults.editor"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    mkdir -p "$user_home/.local/state/omarchy/defaults"
-    printf 'zed\n' > "$user_home/.local/state/omarchy/defaults/editor"
+    mkdir -p "$user_home/.local/state/kos/defaults"
+    printf 'zed\n' > "$user_home/.local/state/kos/defaults/editor"
     chown -R "$_user":"$_user" "$user_home/.local/state" 2>/dev/null || warn "defaults.editor_state_failed" "$_user"
 done
 
@@ -59,7 +59,7 @@ fi
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    omarchy_as "$_user" default terminal kitty 2>/dev/null || warn "defaults.terminal_skipped" "$_user"
+    kos_as "$_user" default terminal kitty 2>/dev/null || warn "defaults.terminal_skipped" "$_user"
 done
 
 log "defaults.trash_install"
@@ -89,24 +89,24 @@ for user_home in /home/*; do
     if [[ -f "$_bindings" ]] && grep -qE '^-- om(ablot|aconf)-yazi-fm:' "$_bindings"; then
         sed -i \
             -e '/^-- omablot-yazi-fm:/,/^o\.bind("SUPER + ALT + SHIFT + F"/d' \
-            -e '/^-- omaconf-yazi-fm:/,/^o\.bind("SUPER + ALT + SHIFT + F"/d' \
+            -e '/^-- kos-yazi-fm:/,/^o\.bind("SUPER + ALT + SHIFT + F"/d' \
             "$_bindings" || warn "defaults.bindings_migration_skipped" "$_user"
         chown "$_user":"$_user" "$_bindings" 2>/dev/null || warn "defaults.bindings_chown" "$_user"
     fi
     if [[ -f "$_bindings" ]]; then
-        sed -i -e 's/omaconf-thunar-fm/omaconf-nautilus-fm/g' \
+        sed -i -e 's/kos-thunar-fm/kos-nautilus-fm/g' \
             -e 's/"thunar/"nautilus/g' \
             -e 's/thunar|Thunar/org.gnome.Nautilus/g' "$_bindings"
         chown "$_user:$_user" "$_bindings"
     fi
-    if [[ -f "$_bindings" ]] && ! grep -q 'omaconf-nautilus-fm' "$_bindings" 2>/dev/null; then
+    if [[ -f "$_bindings" ]] && ! grep -q 'kos-nautilus-fm' "$_bindings" 2>/dev/null; then
         cat >> "$_bindings" << 'LUAEOF'
 
--- omaconf-nautilus-fm
+-- kos-nautilus-fm
 hl.unbind("SUPER + SHIFT + F")
 o.bind("SUPER + SHIFT + F", "File manager", "nautilus")
 hl.unbind("SUPER + ALT + SHIFT + F")
-o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", "nautilus \"$(omarchy-cmd-terminal-cwd)\"")
+o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", "nautilus \"$(kos-cmd-terminal-cwd)\"")
 LUAEOF
         chown "$_user":"$_user" "$_bindings" 2>/dev/null || warn "defaults.bindings_chown" "$_user"
     fi
@@ -114,10 +114,10 @@ LUAEOF
         sed -i -e 's/"Editor", "geany"/"Editor", "zed"/g' -e '/^o\.window("^(geany|Geany|/d' "$_bindings"
         chown "$_user:$_user" "$_bindings"
     fi
-    if [[ -f "$_bindings" ]] && ! grep -q 'omaconf-graphical-apps' "$_bindings"; then
+    if [[ -f "$_bindings" ]] && ! grep -q 'kos-graphical-apps' "$_bindings"; then
         cat >> "$_bindings" << 'LUAEOF'
 
--- omaconf-graphical-apps
+-- kos-graphical-apps
 hl.unbind("SUPER + SHIFT + N")
 o.bind("SUPER + SHIFT + N", "Editor", "zed")
 hl.unbind("SUPER + CTRL + T")

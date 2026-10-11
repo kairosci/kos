@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kos:summary=Set the correct power profile on boot based on current AC/battery state.
+
+exec kos-powerprofiles-set autodetect

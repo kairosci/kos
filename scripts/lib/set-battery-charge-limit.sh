@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-STATE_DIR="${OMACONF_BATTERY_STATE_DIR:-/run/omaconf}"
+STATE_DIR="${KOS_BATTERY_STATE_DIR:-/run/kos}"
 STATE_FILE="$STATE_DIR/battery-charge-limit.state"
-CONFIG="${OMACONF_POWER_CONF:-/etc/omaconf/power.conf}"
-POWER_SUPPLY_ROOT="${OMACONF_POWER_SUPPLY_ROOT:-/sys/class/power_supply}"
+CONFIG="${KOS_POWER_CONF:-/etc/kos/power.conf}"
+POWER_SUPPLY_ROOT="${KOS_POWER_SUPPLY_ROOT:-/sys/class/power_supply}"
 DEFAULT_LIMIT=75
 ATTRIBUTES=(charge_control_end_threshold charge_stop_threshold charge_end_threshold)
 

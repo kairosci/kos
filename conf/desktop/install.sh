@@ -8,10 +8,10 @@ source "$PROJECT_DIR/scripts/lib/userconf.sh"
 i18n_init
 
 for tool in micro disk; do
-    remove_shell_block "$HOME/.bashrc" "# >>> omaconf $tool >>>" "# <<< omaconf $tool <<<"
+    remove_shell_block "$HOME/.bashrc" "# >>> kos $tool >>>" "# <<< kos $tool <<<"
 done
 for hook in micro-theme disk-theme btop-theme; do
-    rm -f "${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/hooks/theme-set.d/$hook"
+    rm -f "${XDG_CONFIG_HOME:-$HOME/.config}/kos/hooks/theme-set.d/$hook"
 done
 install_user_file "$SCRIPT_DIR/data/mpv.desktop" "${XDG_DATA_HOME:-$HOME/.local/share}/applications/mpv.desktop"
 log "gui.install_done" "desktop"

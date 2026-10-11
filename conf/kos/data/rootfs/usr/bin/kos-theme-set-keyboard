@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# kos:summary=Apply the current theme keyboard color to supported keyboards
+# kos:hidden=true
+
+kos-theme-set-keyboard-asus-rog
+kos-theme-set-keyboard-f16

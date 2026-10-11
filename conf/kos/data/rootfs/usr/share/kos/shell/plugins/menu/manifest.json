@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "kos.menu",
+  "name": "Kos menu",
+  "version": "1.0.0",
+  "author": "Kos",
+  "description": "Quickshell-powered Kos command menu",
+  "kinds": [
+    "menu",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "menu": "Menu.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Kos menu",
+    "description": "Launches the Kos menu",
+    "category": "Compositor",
+    "allowMultiple": false
+  }
+}

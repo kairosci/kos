@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# kos:summary=Remove the GeForce NOW Flatpak app and its data.
+# kos:group=remove
+# kos:name=gaming geforce-now
+
+set -e
+
+if kos-cmd-present flatpak && flatpak info com.nvidia.geforcenow &>/dev/null; then
+  flatpak uninstall -y --delete-data com.nvidia.geforcenow
+fi
+
+echo ""
+echo "GeForce NOW removed."

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Name=Discord
+Exec=kos-launch-webapp https://discord.com/channels/@me
+Terminal=false
+Type=Application
+Icon=kos-discord
+StartupNotify=true

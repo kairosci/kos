@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kos:summary=Check if a Hyprland toggle is currently enabled.
+# kos:args=<flag-name>
+
+[[ -f "$HOME/.local/state/kos/toggles/hypr/$1.lua" ]]

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kos:summary=Toggle the current weather panel
+
+kos-shell shell toggle kos.weather

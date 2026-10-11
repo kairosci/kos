@@ -4,8 +4,8 @@ set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/../locale-map.sh"
 
-LOCALE_PROFILE="/etc/profile.d/omaconf-locale.sh"
-HOMES_ROOT="${OMACONF_HOMES_ROOT:-/home}"
+LOCALE_PROFILE="/etc/profile.d/kos-locale.sh"
+HOMES_ROOT="${KOS_HOMES_ROOT:-/home}"
 
 locale_enable_gen() {
     local target="$1"
@@ -71,13 +71,13 @@ locale_apply_hyprland() {
         fi
 
         _lu_tmp=$(mktemp) || { warn "locale.hyprland_skipped" "$_lu_user"; continue; }
-        sed '/^-- omaconf locale .*(managed)$/,/^-- end omaconf locale .*(managed)$/d' "$_lu_input" 2>/dev/null \
+        sed '/^-- kos locale .*(managed)$/,/^-- end kos locale .*(managed)$/d' "$_lu_input" 2>/dev/null \
             | sed -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}' > "$_lu_tmp" 2>/dev/null \
             || warn "locale.hyprland_skipped" "$_lu_user"
 
         cat >> "$_lu_tmp" <<EOF
 
--- omaconf locale (managed)
+-- kos locale (managed)
 hl.config({
   input = {
     kb_layout = "$layout",
@@ -85,7 +85,7 @@ hl.config({
 })
 hl.env("LANG", "$target")
 hl.env("LANGUAGE", "${target%%_*}")
--- end omaconf locale (managed)
+-- end kos locale (managed)
 EOF
 
         if cat "$_lu_tmp" > "$_lu_input" 2>/dev/null; then
@@ -140,6 +140,6 @@ locale_main() {
 
 }
 
-if [[ "${OMACONF_LOCALE_LIB_ONLY:-0}" != "1" ]]; then
+if [[ "${KOS_LOCALE_LIB_ONLY:-0}" != "1" ]]; then
     locale_main
 fi

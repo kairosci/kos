@@ -8,7 +8,7 @@ TESTS_FAILED=0
 TESTS_WARNED=0
 
 desktop_runtime_available() {
-    command -v pacman >/dev/null && [[ -d "${1:-/usr/share/omarchy}" ]]
+    command -v pacman >/dev/null && [[ -d "${1:-/usr/share/kos}" ]]
 }
 
 assert_true() {

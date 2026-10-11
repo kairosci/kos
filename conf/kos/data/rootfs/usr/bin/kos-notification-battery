@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# kos:summary=Show the current battery status notification
+
+kos-notification-send -g 󰁹 -u low "$(kos-battery-status)"

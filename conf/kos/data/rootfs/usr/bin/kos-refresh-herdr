@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# kos:summary=Overwrite the user herdr config with the Kos default and reload herdr.
+
+kos-refresh-config herdr/config.toml
+kos-restart-herdr

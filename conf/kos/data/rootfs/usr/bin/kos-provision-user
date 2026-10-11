@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# kos:summary=Apply the kos user palette and desktop defaults
+# kos:group=finalize
+# kos:name=user
+set -euo pipefail
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/i18n.sh"
+i18n_init
+[[ $EUID != 0 ]] || err release.invalid
+for argument in "$@"; do
+    case $argument in --force|--first-install) ;; *) err release.invalid ;; esac
+done
+xdg-user-dirs-update
+source "${KOS_PATH:-/usr/share/kos}/provision/scripts/lib/desktop-workflow.sh"
+desktop_workflow_defaults "$HOME" "$USER"
+kos-hook theme-set "$(kos-theme-current)"
+kos-done mark finalize-user

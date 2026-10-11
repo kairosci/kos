@@ -1,6 +1,6 @@
 # MediaPlayer
 
-MediaPlayer is a native MPRIS bar widget and popup panel plugin for the Omarchy desktop shell. It provides a clean, transparent topbar icon matching system typography and colors, alongside an interactive media panel with album artwork, clean track metadata (automatically stripped of parenthetical/bracketed noise), live time progress seeking, and playback controls.
+MediaPlayer is a native MPRIS bar widget and popup panel plugin for the Kos desktop shell. It provides a clean, transparent topbar icon matching system typography and colors, alongside an interactive media panel with album artwork, clean track metadata (automatically stripped of parenthetical/bracketed noise), live time progress seeking, and playback controls.
 
 The plugin communicates directly with MPRIS services via Quickshell, automatically tracking active audio or video sessions across browsers, Spotify, VLC, and other media players without requiring background daemons.
 
@@ -8,24 +8,24 @@ The plugin communicates directly with MPRIS services via Quickshell, automatical
 
 ### Local Development Installation
 
-Link the repository to the Omarchy plugins directory, enable the plugin identifier, add the widget to the desired bar section, and reload the shell.
+Link the repository to the Kos plugins directory, enable the plugin identifier, add the widget to the desired bar section, and reload the shell.
 
 ```bash
-mkdir -p ~/.config/omarchy/plugins
-ln -sfn "$(pwd)" ~/.config/omarchy/plugins/krosci.omamp
-omarchy plugin enable krosci.omamp
-omarchy bar add krosci.omamp --section right
-omarchy restart shell
+mkdir -p ~/.config/kos/plugins
+ln -sfn "$(pwd)" ~/.config/kos/plugins/krosci.omamp
+kos plugin enable krosci.omamp
+kos bar add krosci.omamp --section right
+kos restart shell
 ```
 
 ### Git Repository Installation
 
-Install the plugin directly from the remote Git repository into the Omarchy configuration. The source below is the one declared in the project plugin catalog.
+Install the plugin directly from the remote Git repository into the Kos configuration. The source below is the one declared in the project plugin catalog.
 
 ```bash
-omarchy plugin add https://github.com/omaconf/omamp.git --enable --yes
-omarchy bar move krosci.omamp --after omarchy.clock
-omarchy restart shell
+kos plugin add https://github.com/kos/omamp.git --enable --yes
+kos bar move krosci.omamp --after kos.clock
+kos restart shell
 ```
 
 ### Uninstallation
@@ -33,13 +33,13 @@ omarchy restart shell
 Remove the plugin and reload the shell.
 
 ```bash
-omarchy plugin remove krosci.omamp --yes
-omarchy restart shell
+kos plugin remove krosci.omamp --yes
+kos restart shell
 ```
 
 ## Bar Widget Behavior
 
-The topbar widget displays a clean icon using standard Omarchy typography without background boxes or colored highlights. When audio is actively playing, the icon displays the pause symbol (`󰏤`), switching to the play symbol (`󰐊`) when playback is paused. When no media track is active or loaded, the widget automatically collapses and hides from the bar.
+The topbar widget displays a clean icon using standard Kos typography without background boxes or colored highlights. When audio is actively playing, the icon displays the pause symbol (`󰏤`), switching to the play symbol (`󰐊`) when playback is paused. When no media track is active or loaded, the widget automatically collapses and hides from the bar.
 
 Left clicking the bar icon toggles the popup card. Right clicking toggles playback state directly. Middle clicking advances to the next track. Scrolling the mouse wheel over the icon navigates between previous and next tracks. Hovering reveals track title and artist in the system tooltip.
 

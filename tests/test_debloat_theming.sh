@@ -17,9 +17,9 @@ assert_file_contains "debloat module defines package removal" "$DEBLOAT_MODULE" 
 assert_file_contains "debloat module removes IgnorePkg entries" "$DEBLOAT_MODULE" "IgnorePkg"
 assert_file_not_contains "debloat module keeps no merged pin list" "$DEBLOAT_MODULE" "MERGED_PINS"
 assert_file_not_contains "debloat module preserves no existing pins" "$DEBLOAT_MODULE" "EXISTING_PINS"
-assert_file_contains "debloat module installs persistence hooks" "$DEBLOAT_MODULE" "99-omaconf-persist"
+assert_file_contains "debloat module installs persistence hooks" "$DEBLOAT_MODULE" "99-kos-persist"
 assert_file_contains "debloat removes Neovim" "$DEBLOAT_MODULE" "neovim"
-assert_file_contains "debloat removes the Omarchy Neovim package" "$DEBLOAT_MODULE" "omarchy-nvim"
+assert_file_contains "debloat removes the Kos Neovim package" "$DEBLOAT_MODULE" "kos-nvim"
 assert_file_contains "debloat module removes the sushi previewer orphan" "$DEBLOAT_MODULE" "sushi"
 assert_file_contains "debloat module removes the sushi sourceview dependency" "$DEBLOAT_MODULE" "gtksourceview4"
 assert_file_contains "debloat module removes the sushi gtk plugin dependency" "$DEBLOAT_MODULE" "gst-plugin-gtk"
@@ -64,12 +64,12 @@ assert_file_contains "theme preview library restores stored overlays" "$PREVIEW_
 assert_file_contains "theming module sources the preview library" "$THEMING_MODULE" "lib/theme-preview.sh"
 assert_file_contains "theming module normalizes preview size" "$THEMING_MODULE" "theme_preview_normalize"
 assert_file_contains "theming module deploys the preview library to hooks lib" "$THEMING_MODULE" 'hooks/lib'
-assert_file_contains "post-update hook resolves the deployed preview library" "$PROJECT_DIR/hooks/post-update.d/99-omaconf-persist" "lib/theme-preview.sh"
-assert_file_contains "post-update hook reapplies preview normalization" "$PROJECT_DIR/hooks/post-update.d/99-omaconf-persist" "theme_preview_normalize"
-assert_file_contains "setup deploys privileged preview transaction hook" "$THEMING_MODULE" '99-omaconf-theme-previews.hook'
-assert_file_contains "preview hook targets packaged themes" "$THEMING_MODULE" 'Target = usr/share/omarchy/themes/'
-assert_file_contains "preview transaction uses only privileged libraries" "$PROJECT_DIR/scripts/lib/update-previews.sh" 'source /usr/local/lib/omaconf/theme-preview.sh'
-assert_false "user hook no longer warns about privileged previews" "grep -q 'hooks.preview_size_reapply_root_skipped' '$PROJECT_DIR/hooks/post-update.d/99-omaconf-persist'"
+assert_file_contains "post-update hook resolves the deployed preview library" "$PROJECT_DIR/hooks/post-update.d/99-kos-persist" "lib/theme-preview.sh"
+assert_file_contains "post-update hook reapplies preview normalization" "$PROJECT_DIR/hooks/post-update.d/99-kos-persist" "theme_preview_normalize"
+assert_file_contains "setup deploys privileged preview transaction hook" "$THEMING_MODULE" '99-kos-theme-previews.hook'
+assert_file_contains "preview hook targets packaged themes" "$THEMING_MODULE" 'Target = usr/share/kos/themes/'
+assert_file_contains "preview transaction uses only privileged libraries" "$PROJECT_DIR/scripts/lib/update-previews.sh" 'source /usr/local/lib/kos/theme-preview.sh'
+assert_false "user hook no longer warns about privileged previews" "grep -q 'hooks.preview_size_reapply_root_skipped' '$PROJECT_DIR/hooks/post-update.d/99-kos-persist'"
 
 REBUILD_GEOMETRY="$PROJECT_DIR/theme-previews/rebuild-previews.sh"
 assert_file_contains "rebuild script captures Zed" "$REBUILD_GEOMETRY" 'capture_app zed'
@@ -137,7 +137,7 @@ if desktop_runtime_available; then
 
     assert_true "kitty terminal installed" "pacman -Q kitty &>/dev/null"
     assert_false "foot terminal removed" "pacman -Q foot &>/dev/null"
-    for debloated in chromium zathura zathura-pdf-mupdf thunar thunar-archive-plugin tumbler yaru-icon-theme system-config-printer totem evince eog dolphin okular gwenview xdg-desktop-portal-kde breeze breeze-gtk haruna kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra sushi gtksourceview4 gst-plugin-gtk foot neovim omarchy-nvim micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
+    for debloated in chromium zathura zathura-pdf-mupdf thunar thunar-archive-plugin tumbler yaru-icon-theme system-config-printer totem evince eog dolphin okular gwenview xdg-desktop-portal-kde breeze breeze-gtk haruna kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra sushi gtksourceview4 gst-plugin-gtk foot neovim kos-nvim micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
         assert_false "debloat verified: $debloated removed" "pacman -Q '$debloated' &>/dev/null"
     done
     assert_false "docker daemon absent" "command -v dockerd &>/dev/null"
@@ -145,7 +145,7 @@ if desktop_runtime_available; then
 fi
 
 if command -v pacman &>/dev/null && [[ -f /etc/arch-release ]]; then
-    assert_false "stale ignore-pkgs.list is gone" "[[ -f /etc/pacman.d/omaconf/ignore-pkgs.list ]]"
+    assert_false "stale ignore-pkgs.list is gone" "[[ -f /etc/pacman.d/kos/ignore-pkgs.list ]]"
     assert_false "pacman.conf carries no IgnorePkg" "grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 fi
 
@@ -154,12 +154,12 @@ assert_file_exists "folder-color hook exists in repo" "$HOOK_FILE"
 assert_file_executable "folder-color hook executable" "$HOOK_FILE"
 
 
-PERSIST_PRE="$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-omaconf-persist"
+PERSIST_PRE="$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-kos-persist"
 assert_file_exists "pre-refresh persist hook exists in repo" "$PERSIST_PRE"
 assert_file_executable "pre-refresh persist hook executable" "$PERSIST_PRE"
 assert_file_not_contains "pre-refresh hook keeps no IgnorePkg" "$PERSIST_PRE" "IgnorePkg"
 
-PERSIST_POST="$PROJECT_DIR/hooks/post-update.d/99-omaconf-persist"
+PERSIST_POST="$PROJECT_DIR/hooks/post-update.d/99-kos-persist"
 assert_file_exists "post-update persist hook exists in repo" "$PERSIST_POST"
 assert_file_executable "post-update persist hook executable" "$PERSIST_POST"
 assert_file_contains "post-update hook delegates shared desktop defaults" "$PERSIST_POST" "desktop_workflow_defaults"
@@ -175,7 +175,7 @@ assert_file_exists "zedconf install script exists" "$PROJECT_DIR/conf/zed/instal
 assert_file_contains "defaults module enforces gio file manager default" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "gio mime inode/directory"
 assert_file_contains "defaults module delegates shared desktop defaults" "$DEFAULTS_MODULE" "desktop_workflow_defaults"
 assert_file_contains "defaults module records file-manager state" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "defaults/file-manager"
-assert_file_contains "defaults module rebinding hypr file manager keys" "$DEFAULTS_MODULE" "omaconf-nautilus-fm"
+assert_file_contains "defaults module rebinding hypr file manager keys" "$DEFAULTS_MODULE" "kos-nautilus-fm"
 PORTALS_MODULE="$PROJECT_DIR/scripts/lib/modules/22-portals.sh"
 assert_file_contains "portals module installs the GTK backend" "$PORTALS_MODULE" "xdg-desktop-portal-gtk"
 assert_file_contains "portals module routes FileChooser to GTK" "$PROJECT_DIR/conf/xdg-desktop-portal/data/portals.conf" "FileChooser=gtk"

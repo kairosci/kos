@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-performance is the energy and runtime microcomponent for Omarchy on Arch Linux. It owns low-battery hibernate and prudent runtime tuning. It consumes the canonical charge threshold module from the repository root and never defines a second battery policy. It never touches hardening or debloat or themes.
+performance is the energy and runtime microcomponent for Kos on Arch Linux. It owns low-battery hibernate and prudent runtime tuning. It consumes the canonical charge threshold module from the repository root and never defines a second battery policy. It never touches hardening or debloat or themes.
 
 ## Repository Architecture
 

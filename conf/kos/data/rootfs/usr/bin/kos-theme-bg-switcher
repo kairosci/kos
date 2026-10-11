@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# kos:summary=Open the Kos background switcher
+# kos:group=theme
+# kos:name=bg-switcher
+# kos:aliases=kos background
+
+theme_name=$(cat "$HOME/.local/state/kos/current/theme.name" 2>/dev/null)
+current_background=$(readlink -f "$HOME/.local/state/kos/current/background" 2>/dev/null)
+
+kos-menu-images \
+  --selected "$current_background" \
+  "$HOME/.local/state/kos/current/theme/backgrounds" \
+  "$HOME/.config/kos/backgrounds/$theme_name"

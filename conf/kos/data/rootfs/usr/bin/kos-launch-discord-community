@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# kos:summary=Open the Kos Discord community in the Discord app or a browser.
+
+invite="https://discord.gg/tXFUdasqhY"
+
+if kos-cmd-present discord; then
+  exec setsid uwsm-app -- discord --url -- "discord://-/invite/${invite##*/}"
+else
+  exec kos-launch-webapp "$invite"
+fi

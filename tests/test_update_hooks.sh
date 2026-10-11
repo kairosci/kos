@@ -12,11 +12,11 @@ cp -r "$PROJECT_DIR/scripts/lib/messages" "$UPDATE_SANDBOX/trusted/"
 cp "$PROJECT_DIR/scripts/lib/i18n-boot.sh" "$PROJECT_DIR/scripts/lib/i18n.sh" "$UPDATE_SANDBOX/hooks/i18n/"
 cp -r "$PROJECT_DIR/scripts/lib/messages" "$UPDATE_SANDBOX/hooks/i18n/"
 sed -e 's/\$EUID/${HOOK_TEST_EUID}/g' \
-    -e "s|/usr/local/lib/omaconf|$UPDATE_SANDBOX/trusted|g" \
-    -e "s|/usr/local/libexec/omaconf-desktop-cleanup|$UPDATE_SANDBOX/bin/cleanup|g" \
+    -e "s|/usr/local/lib/kos|$UPDATE_SANDBOX/trusted|g" \
+    -e "s|/usr/local/libexec/kos-desktop-cleanup|$UPDATE_SANDBOX/bin/cleanup|g" \
     -e "s|/home/\*|$UPDATE_SANDBOX/homes/*|g" \
     -e "s|/run/user/|$UPDATE_SANDBOX/run/user/|g" \
-    "$PROJECT_DIR/hooks/post-update.d/99-omaconf-persist" > "$UPDATE_SANDBOX/hooks/post-update.d/99-omaconf-persist"
+    "$PROJECT_DIR/hooks/post-update.d/99-kos-persist" > "$UPDATE_SANDBOX/hooks/post-update.d/99-kos-persist"
 cat > "$UPDATE_SANDBOX/bin/id" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -71,15 +71,15 @@ theme_preview_normalize() {
 MOCK
 cp "$UPDATE_SANDBOX/hooks/lib/theme-preview.sh" "$UPDATE_SANDBOX/trusted/"
 cat > "$UPDATE_SANDBOX/trusted/os-identity.sh" <<'MOCK'
-arch_identity_apply() {
+kos_identity_apply() {
     printf 'identity\n' >> "$UPDATE_COMMANDS"
 }
 MOCK
 printf 'printf "untrusted\\n" >> "$UPDATE_COMMANDS"\nexit 97\n' > "$UPDATE_SANDBOX/untrusted.sh"
 for update_home in "$UPDATE_SANDBOX/own home" "$UPDATE_SANDBOX/homes/otheruser"; do
-    mkdir -p "$update_home/.config/omarchy/hooks/theme-set.d"
+    mkdir -p "$update_home/.config/kos/hooks/theme-set.d"
     for update_hook in folder-color gtk-theme shell-icons; do
-        cat > "$update_home/.config/omarchy/hooks/theme-set.d/$update_hook" <<'MOCK'
+        cat > "$update_home/.config/kos/hooks/theme-set.d/$update_hook" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
 printf 'theme %s %s %s\n' "$HOME" "$XDG_RUNTIME_DIR" "$DBUS_SESSION_BUS_ADDRESS" >> "$UPDATE_COMMANDS"
@@ -92,14 +92,14 @@ export UPDATE_COMMANDS="$UPDATE_SANDBOX/commands"
 
 run_update_hook() {
     env PATH="$UPDATE_SANDBOX/bin:$PATH" HOME="$UPDATE_SANDBOX/own home" \
-        HOOK_TEST_EUID="$1" OMACONF_LANG=en \
-        bash "$UPDATE_SANDBOX/hooks/post-update.d/99-omaconf-persist" \
+        HOOK_TEST_EUID="$1" KOS_LANG=en KOS_RELEASE_VERSION=0.1.0 \
+        bash "$UPDATE_SANDBOX/hooks/post-update.d/99-kos-persist" \
         > "$UPDATE_SANDBOX/stdout" 2> "$UPDATE_SANDBOX/stderr"
 }
 
 test_section "Update Hook Privilege Boundaries"
 assert_true "pre-refresh succeeds without loading arbitrary bootstrap code" \
-    "OMACONF_I18N_BOOT='$UPDATE_SANDBOX/untrusted.sh' bash '$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-omaconf-persist'"
+    "KOS_I18N_BOOT='$UPDATE_SANDBOX/untrusted.sh' bash '$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-kos-persist'"
 assert_true "user update hook completes with an isolated home" "run_update_hook 1000"
 assert_file_contains_literal "user hook uses the account name rather than the home basename" "$UPDATE_COMMANDS" "defaults testuser $UPDATE_SANDBOX/own home"
 assert_file_not_contains "user update does not touch other homes" "$UPDATE_COMMANDS" 'otheruser'
@@ -117,10 +117,10 @@ assert_file_contains "optional desktop failure emits a diagnostic" "$UPDATE_SAND
 unset UPDATE_DEFAULTS_FAIL
 
 : > "$UPDATE_COMMANDS"
-export OMACONF_I18N_BOOT="$UPDATE_SANDBOX/untrusted.sh" \
-    OMACONF_DESKTOP_WORKFLOW="$UPDATE_SANDBOX/untrusted.sh" \
-    OMACONF_THEME_PREVIEW="$UPDATE_SANDBOX/untrusted.sh" \
-    OMACONF_I18N_DIR="$UPDATE_SANDBOX/untrusted"
+export KOS_I18N_BOOT="$UPDATE_SANDBOX/untrusted.sh" \
+    KOS_DESKTOP_WORKFLOW="$UPDATE_SANDBOX/untrusted.sh" \
+    KOS_THEME_PREVIEW="$UPDATE_SANDBOX/untrusted.sh" \
+    KOS_I18N_DIR="$UPDATE_SANDBOX/untrusted"
 assert_true "root update ignores user supplied library overrides" "run_update_hook 0"
 assert_file_not_contains "root never executes overridden user libraries" "$UPDATE_COMMANDS" '^untrusted$'
 assert_file_contains "root uses the privileged preview library" "$UPDATE_COMMANDS" '^previews$'
@@ -133,7 +133,7 @@ assert_false "missing privileged library fails rather than sourcing a user libra
 assert_file_not_contains "missing privileged library does not execute user override" "$UPDATE_COMMANDS" '^untrusted$'
 
 mkdir -p "$UPDATE_SANDBOX/install-homes/$(id -un)"
-awk '/^if .*OMACONF_REBUILD_PREVIEWS/ { exit } /^log "theming.hooks"$/ { found=1 } found { print }' \
+awk '/^if .*KOS_REBUILD_PREVIEWS/ { exit } /^log "theming.hooks"$/ { found=1 } found { print }' \
     "$PROJECT_DIR/scripts/lib/modules/30-theming.sh" | \
     sed "s|/home/\\*|$UPDATE_SANDBOX/install-homes/*|g" > "$UPDATE_SANDBOX/install-hooks.sh"
 install_hooks_with_dependencies() (

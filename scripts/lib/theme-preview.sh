@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 THEME_PREVIEW_CANVAS="${THEME_PREVIEW_CANVAS:-1800x1012}"
-THEME_PREVIEW_BACKUP_DIR="${THEME_PREVIEW_BACKUP_DIR:-/var/cache/omaconf/theme-preview-stock}"
-THEME_PREVIEW_OVERLAY_STORE="${THEME_PREVIEW_OVERLAY_STORE:-/var/lib/omaconf/theme-preview-overlay}"
+THEME_PREVIEW_BACKUP_DIR="${THEME_PREVIEW_BACKUP_DIR:-/var/cache/kos/theme-preview-stock}"
+THEME_PREVIEW_OVERLAY_STORE="${THEME_PREVIEW_OVERLAY_STORE:-/var/lib/kos/theme-preview-overlay}"
 THEME_PREVIEW_DENSITY="${THEME_PREVIEW_DENSITY:-72}"
 THEME_PREVIEW_DEPTH="${THEME_PREVIEW_DEPTH:-8}"
 
@@ -81,7 +81,7 @@ theme_preview_restore_overlays() {
 theme_preview_normalize() {
     command -v magick >/dev/null || return 0
     command -v identify >/dev/null || return 0
-    local themes_root="${THEME_PREVIEW_THEMES_ROOT:-/usr/share/omarchy/themes}"
+    local themes_root="${THEME_PREVIEW_THEMES_ROOT:-/usr/share/kos/themes}"
     [[ -d "$themes_root" ]] || return 0
     local backup_dir preview size original
     backup_dir="$THEME_PREVIEW_BACKUP_DIR"

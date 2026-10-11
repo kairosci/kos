@@ -1,0 +1,14 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = limine
+Target = limine-git
+Target = limine-dev
+Target = limine-mkinitcpio-hook
+Target = limine-mkinitcpio-hook-git
+
+[Action]
+Description = Deploying Limine after upgrade...
+When = PostTransaction
+Exec = /usr/bin/limine-install

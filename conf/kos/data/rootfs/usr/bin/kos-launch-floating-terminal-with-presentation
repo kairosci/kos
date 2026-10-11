@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# kos:summary=Launch a floating terminal with the Kos presentation wrapper
+# kos:args=<command>
+
+# Export the current theme's gum styling so gum widgets match the active theme
+# even after a theme switch (the inherited environment is captured at login).
+source kos-restart-gum
+
+cmd="$*"
+presentation_script="kos-show-logo; $cmd; if (( \$? != 130 )); then kos-show-done; fi"
+
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.kos.terminal --title=Kos -e bash -c "$presentation_script"

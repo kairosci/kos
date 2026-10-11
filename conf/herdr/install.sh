@@ -2,10 +2,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-SHARE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/omaconf"
+SHARE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/kos"
 BINDINGS="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/bindings.lua"
-MARK_BEGIN="-- omaconf-herdr-keys (managed)"
-MARK_END="-- end omaconf-herdr-keys (managed)"
+MARK_BEGIN="-- kos-herdr-keys (managed)"
+MARK_END="-- end kos-herdr-keys (managed)"
 MENU_SRC="$SCRIPT_DIR/data/herdr-keybindings-menu"
 MENU_PATH="$SHARE_DIR/herdr-keybindings-menu"
 

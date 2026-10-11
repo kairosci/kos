@@ -1,0 +1,57 @@
+#!/usr/bin/ash
+
+run_latehook() {
+	root_mnt="/new_root"
+
+	# Check: Is $root_mnt mounted on Btrfs?
+	fstype=$(findmnt --mountpoint "$root_mnt" -no FSTYPE 2>/dev/null) || return 0
+	[ "$fstype" = "btrfs" ] || return 0
+
+	# Check: Does $root_mnt source path contain '/snapshot'?
+	subvol_path=$(findmnt --mountpoint "$root_mnt" -no SOURCE 2>/dev/null) || return 0
+	case "$subvol_path" in
+	*/snapshot*) : ;; # ok
+	*) return 0 ;;    # not a snapshot subvolume
+	esac
+
+	# Check: Is the subvolume read-only?
+	ro_state=$(btrfs property get -t subvol "$root_mnt" ro 2>/dev/null) || return 0
+	[ "$ro_state" = "ro=true" ] || return 0
+
+	echo "[OverlayFS setup] ${root_mnt} is a read-only Btrfs subvolume. Setting up OverlayFS..."
+
+	# Prepare overlay mount
+	lower_dir=$(mktemp -d -p / lowdir_XXX) || {
+		echo "[OverlayFS setup] mktemp failed for lower_dir"
+		return 0
+	}
+
+	ram_dir=$(mktemp -d -p / ramdir_XXX) || {
+		echo "[OverlayFS setup] mktemp failed for ram_dir"
+		return 0
+	}
+
+	mount -t tmpfs cowspace "$ram_dir" || {
+		echo "[OverlayFS setup] tmpfs mount failed"
+		return 0
+	}
+
+	mkdir -p "$ram_dir/upper" "$ram_dir/work" || {
+		echo "[OverlayFS setup] mkdir failed"
+		return 0
+	}
+
+	mount --move "$root_mnt" "$lower_dir" || {
+		echo "[OverlayFS setup] mount move failed"
+		return 0
+	}
+
+	mount -t overlay overlay \
+		-o "lowerdir=$lower_dir,upperdir=$ram_dir/upper,workdir=$ram_dir/work" \
+		"$root_mnt" || {
+		echo "[OverlayFS setup] mount overlay failed"
+		return 0
+	}
+
+	echo "[OverlayFS setup] OverlayFS mounted on ${root_mnt}"
+}

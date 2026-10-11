@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "kos.dev-gallery",
+  "name": "Dev gallery",
+  "version": "1.0.0",
+  "author": "Kos",
+  "description": "Visual reference for kos-shell common UI components. Summon with: kos-shell shell summon kos.dev-gallery '{}' (or run: kos dev ui-preview).",
+  "kinds": [
+    "panel"
+  ],
+  "entryPoints": {
+    "panel": "GalleryPanel.qml"
+  }
+}

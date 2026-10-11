@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# kos:summary=Save diagnostic logs locally
+# kos:args=<install|current|previous|installed>
+set -euo pipefail
+source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/i18n.sh"
+i18n_init
+umask 077
+directory="${XDG_STATE_HOME:-$HOME/.local/state}/kos/logs"
+mkdir -p "$directory"
+logfile=$(mktemp "$directory/diagnostic.XXXXXX.log")
+case ${1:-current} in
+    install) cat "${XDG_STATE_HOME:-$HOME/.local/state}/kos/first-run.log" > "$logfile" ;;
+    current) journalctl -b --no-pager > "$logfile" ;;
+    previous) journalctl -b -1 --no-pager > "$logfile" ;;
+    installed) pacman -Q > "$logfile" ;;
+    *) err release.invalid ;;
+esac
+log debug.saved "$logfile"
