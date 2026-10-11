@@ -20,7 +20,8 @@ kos_kernel_build() {
         fi
     fi
     [[ $(id -u "$user") == "$uid" ]] || err release.invalid
-    install -d -m 755 "$output"
+    install -d -m 777 "$output"
+    chown "$user:$user" "$output" 2>/dev/null || chmod 777 "$output"
     work=$(mktemp -d "$output/.kernel.XXXXXX") || err release.invalid
     cp -a "$project/conf/kos/data/packages/linux-kos/." "$work/"
     chown -R "$user:$user" "$work"
