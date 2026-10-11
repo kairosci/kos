@@ -10,8 +10,8 @@ mountpoint -q "$target" || err release.invalid
 [[ -r "$target/usr/lib/os-release" && -d "$target/home/$user" ]] || err release.invalid
 grep -qE '^ID=(arch|"arch")$' "$target/usr/lib/os-release" || err release.invalid
 arch-chroot "$target" id "$user" >/dev/null || err release.invalid
-packages=(/opt/kos/kos-*.pkg.tar.zst /opt/kos/linux-kos-*.pkg.tar.zst)
-[[ ${#packages[@]} == 3 ]] || err release.invalid
+packages=(/opt/kos/kos-*.pkg.tar.zst)
+[[ ${#packages[@]} == 1 ]] || err release.invalid
 for package in "${packages[@]}"; do
     [[ -f "$package" ]] || err release.invalid
 done

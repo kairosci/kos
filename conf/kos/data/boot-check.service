@@ -5,7 +5,7 @@ ConditionVirtualization=qemu
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'test $(uname -r | grep -c -- -kos) = 1 && pacman -Q kos linux-kos >/dev/null && test -f /usr/share/kos/shell/shell.qml && /usr/bin/kos version && /usr/bin/kos commands --json >/dev/null && printf "KOS_BOOT_OK\n" >/dev/ttyS0'
+ExecStart=/bin/bash -c 'pacman -Q kos linux >/dev/null && test -f /usr/share/kos/shell/shell.qml && /usr/bin/kos version && /usr/bin/kos commands --json >/dev/null && printf "KOS_BOOT_OK\n" >/dev/ttyS0'
 RemainAfterExit=yes
 
 [Install]
