@@ -49,12 +49,12 @@ fi
 
 if [[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]; then
     assert_file_contains "udev rule matches power_supply subsystem" "/etc/udev/rules.d/98-battery-charge-threshold.rules" "SUBSYSTEM==\"power_supply\""
-    assert_file_contains "udev rule targets battery kernel devices" "/etc/udev/rules.d/98-battery-charge-threshold.rules" "KERNEL==\"BAT\*\|BATT\*\""
-    assert_file_contains "udev rule configures charge limit" "/etc/udev/rules.d/98-battery-charge-threshold.rules" "ATTR\{charge_control_end_threshold\}="
+    assert_file_contains "udev rule targets battery devices by type" "$POWER_MODULE" 'ATTR\{type\}=="Battery"'
+    assert_file_contains "udev delegates to the verified helper" "$POWER_MODULE" 'RUN\+="/usr/local/libexec/omaconf-set-battery-charge-limit"'
 fi
 
 if [[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]; then
-    assert_file_contains "tmpfiles uses safe write prefix" "/etc/tmpfiles.d/battery-charge-threshold.conf" "^w- /sys/class/power_supply/\*/charge_control_end_threshold"
+    assert_file_contains "tmpfiles prepares the state directory" "$POWER_MODULE" '^d /run/omaconf 0755 root root -'
 fi
 
 if [[ -f /etc/systemd/system/battery-charge-threshold.service ]]; then
@@ -147,5 +147,45 @@ assert_true "an unsupported interface is never reported as drifted" "battery_hel
 printf '80\n' > "$SANDBOX_THRESHOLD"
 battery_helper_apply
 assert_true "a missing policy falls back to the default limit" "battery_helper_query 75 limit"
+
+mkdir -p "$SANDBOX_POWER/BATT0" "$SANDBOX_POWER/vendor-battery" "$SANDBOX_POWER/adapter"
+printf 'Battery\n' > "$SANDBOX_POWER/vendor-battery/type"
+printf 'Mains\n' > "$SANDBOX_POWER/adapter/type"
+printf '80\n' > "$SANDBOX_POWER/BATT0/charge_stop_threshold"
+printf '80\n' > "$SANDBOX_POWER/vendor-battery/charge_end_threshold"
+printf '80\n' > "$SANDBOX_POWER/adapter/charge_end_threshold"
+battery_helper_apply
+assert_true "battery enumeration counts each interface once regardless of name" "battery_helper_query 3 nodes_seen && battery_helper_query 3 nodes_written"
+assert_equal "non battery supplies are preserved" "$(cat "$SANDBOX_POWER/adapter/charge_end_threshold")" "80"
+rm "$SANDBOX_POWER/vendor-battery/charge_end_threshold"
+ln -s /proc/self/mem "$SANDBOX_POWER/vendor-battery/charge_end_threshold"
+assert_true "read errors are drift rather than unsupported firmware" "battery_helper_query yes drift && battery_helper_query no enforced"
+assert_false "unreadable interfaces fail application" "battery_helper_apply"
+assert_true "unreadable interfaces are recorded as rejected" "battery_helper_query partial reason && battery_helper_query 1 nodes_refused"
+
+check_samsung_recovery() (
+    local recovery_root="$SANDBOX/recovery" actions="$SANDBOX/recovery-actions"
+    mkdir -p "$recovery_root/BAT1/extensions/samsung-galaxybook"
+    printf '1\n' > "$recovery_root/BAT1/present"
+    printf '34\n' > "$recovery_root/BAT1/capacity"
+    ln -s /proc/self/mem "$recovery_root/BAT1/charge_control_end_threshold"
+    ln -s /proc/self/mem "$recovery_root/BAT1/uevent"
+    : > "$actions"
+    # shellcheck disable=SC2329
+    modprobe() {
+        printf '%s\n' "$*" >> "$actions"
+        if [[ "$1" == -r ]]; then
+            rm "$recovery_root/BAT1/charge_control_end_threshold" "$recovery_root/BAT1/uevent"
+            printf 'POWER_SUPPLY_TYPE=Battery\n' > "$recovery_root/BAT1/uevent"
+        fi
+    }
+    export OMACONF_POWER_SUPPLY_ROOT="$recovery_root"
+    source "$PROJECT_DIR/scripts/lib/battery-driver.sh"
+    battery_driver_needs_recovery && battery_driver_recover
+    [[ $(cat "$actions") == $'-r samsung_galaxybook\nsamsung_galaxybook' ]] || return 1
+    : > "$actions"
+    ! battery_driver_needs_recovery && [[ ! -s "$actions" ]]
+)
+assert_true "Samsung recovery restores events and leaves a recovered driver alone" "check_samsung_recovery"
 
 test_summary

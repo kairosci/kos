@@ -58,8 +58,9 @@ check_audit_scheduler() (
     done
 )
 assert_true "audit scheduler starts stopped Cronie and avoids duplicate schedulers" "check_audit_scheduler"
-assert_file_contains "auditd reload is guarded by a change check" "$SECURITY_STACK_MODULE" "augenrules --check"
+assert_file_not_contains "auditd reload does not mistake a successful change check for unchanged rules" "$SECURITY_STACK_MODULE" "augenrules --check"
 assert_file_contains "auditd rules are reloaded idempotently with augenrules" "$SECURITY_STACK_MODULE" "augenrules --load"
+assert_file_contains "merged audit rules clear the prior rules before reload" "$SECURITY_STACK_MODULE" '^-D$'
 assert_file_contains "service disabling is guarded on unit existence" "$SERVICES_MODULE" "unit_installed()"
 assert_file_contains "clamav update is deferred when freshclam already runs" "$SECURITY_STACK_MODULE" "pgrep -x freshclam"
 assert_file_not_contains "auditd is not restarted via the missing initscripts service wrapper" "$SECURITY_STACK_MODULE" "service auditd restart"

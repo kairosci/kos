@@ -14,7 +14,7 @@ The active Omarchy `colors.toml` is the single palette authority. Never map prod
 
 `folder-color` generates Qogir folder icons in a user overlay using the exact palette accent; inherit the installed Qogir light or dark family for other icons. `shell-icons` persists this overlay in the Omarchy theme. Keep cursor integration and the Qt xdgdesktop platform theme. Browser machine policies are applied by the packaged privileged helper through setup, never by editing running browser profile databases.
 
-Theme hooks are staged in the repository and installed through setup. Setup and post-update share the same hooks and libraries. App configuration installers run automatically before theming; Micro synchronization remains available for its optional terminal workflow.
+Theme hooks are staged in the repository and installed through setup. Setup and post-update share the same hooks and libraries. App configuration installers run automatically before theming; retired Micro, disk and btop hooks are removed during migration.
 
 Preview regeneration applies each real system theme, captures the complete active monitor with wallpaper, shell and sample graphical applications, and restores the original theme, background and workspace on success, failure or interruption. Run it only through `make setup REBUILD_PREVIEWS=1`. Isolate sample application state, select capture windows by their owned process groups and never publish personal windows or browser profiles.
 

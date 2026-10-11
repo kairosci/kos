@@ -15,7 +15,7 @@ aur_package_artifact() {
     local directory="$1" package="$2" artifact name
     for artifact in "$directory/$package-"*.pkg.tar.*; do
         [[ -f "$artifact" && "$artifact" != *.sig ]] || continue
-        name=$(pacman -Qp --print-format '%n' "$artifact") || return 1
+        name=$(pacman -Qpq "$artifact") || return 1
         if [[ "$name" == "$package" ]]; then
             printf '%s\n' "$artifact"
             return 0
@@ -24,8 +24,13 @@ aur_package_artifact() {
     return 1
 }
 
+aur_source_dependencies() {
+    awk -v arch="$2" '$1 == "depends" || $1 == "makedepends" || $1 == "depends_" arch || $1 == "makedepends_" arch { print $3 }' "$1"
+}
+
 aur_verified_install() {
-    local pkg="$1" tmp f
+    local pkg="$1" tmp f srcinfo dependency dependency_metadata missing status=0
+    local -a dependencies=() missing_dependencies=()
     [[ -n "$pkg" ]] || err "env.aur_empty"
     [[ "$pkg" =~ ^[a-zA-Z0-9._-]+$ ]] || err "env.aur_invalid" "$pkg"
     pacman -S --noconfirm --needed base-devel git wget
@@ -36,8 +41,39 @@ aur_verified_install() {
         "cd '$tmp' && git clone --quiet --depth 1 https://aur.archlinux.org/$pkg.git src && cd src && \
          { grep -q '^validpgpkeys=' PKGBUILD || \
            { grep -qE '^(sha256sums|sha512sums|b2sums|sha256sums_x86_64)=' PKGBUILD && ! grep -q 'SKIP' PKGBUILD && \
-             grep -qE '^# Maintainer: [^<]+ <([^ ]+@[^ ]+|contact: https://[^ >]+)>' PKGBUILD; }; }" || \
+             grep -qE '^#[[:space:]]*Maintainer[[:space:]]*: [^<]+ <([^ ]+@[^ ]+|contact: https://[^ >]+)>' PKGBUILD; }; }" || \
         err "env.aur_no_integrity" "$pkg"
+    srcinfo="$tmp/srcinfo"
+    sudo -u "$PRIMARY_USER" bash -c 'cd "$1" && makepkg --printsrcinfo > "$2"' bash "$tmp/src" "$srcinfo" || {
+        rm -rf "$tmp"
+        err "env.aur_verify_failed" "$pkg"
+    }
+    dependency_metadata=$(aur_source_dependencies "$srcinfo" "$(uname -m)") || {
+        rm -rf "$tmp"
+        err "env.aur_verify_failed" "$pkg"
+    }
+    while IFS= read -r dependency; do
+        [[ -n "$dependency" ]] || continue
+        [[ "$dependency" =~ ^[a-zA-Z0-9@._+-]+([\<\>\=]+[a-zA-Z0-9:._+~-]+)?$ ]] || {
+            rm -rf "$tmp"
+            err "env.aur_invalid" "$dependency"
+        }
+        dependencies+=("$dependency")
+    done <<< "$dependency_metadata"
+    if ((${#dependencies[@]})); then
+        missing=$(pacman -T "${dependencies[@]}") || status=$?
+        if [[ $status -ne 0 && $status -ne 127 ]]; then
+            rm -rf "$tmp"
+            err "env.aur_verify_failed" "$pkg"
+        fi
+        if [[ -n "$missing" ]]; then
+            mapfile -t missing_dependencies <<< "$missing"
+            pacman -S --noconfirm --needed --asdeps "${missing_dependencies[@]}" || {
+                rm -rf "$tmp"
+                err "env.aur_verify_failed" "$pkg"
+            }
+        fi
+    fi
     sudo -u "$PRIMARY_USER" bash -c \
         "cd '$tmp/src' && makepkg --noconfirm" || {
         rm -rf "$tmp"

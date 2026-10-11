@@ -4,6 +4,9 @@ set -euo pipefail
 
 log "power.suspend_resume"
 
+# shellcheck source=../keyboard-backlight-policy.sh
+source "$PROJECT_ROOT/scripts/lib/keyboard-backlight-policy.sh"
+
 rm -f /etc/systemd/sleep.conf.d/99-omaconf-deep-sleep.conf
 
 target_sleep_mode=""

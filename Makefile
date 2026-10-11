@@ -4,6 +4,7 @@ PROJECT_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 .DEFAULT_GOAL := help
 BACKEND ?= gnome-keyring
 REBUILD_PREVIEWS ?= 0
+SCOPE ?= full
 
 ifeq ($(filter $(REBUILD_PREVIEWS),0 1),)
 $(error REBUILD_PREVIEWS must be 0 or 1)
@@ -15,7 +16,7 @@ else
 $(error BACKEND must be gnome-keyring)
 endif
 
-.PHONY: help setup keyring verify test hook icons theme zed micro cli herdr disk editors clean lang i18n-status lint
+.PHONY: help setup keyring verify test hook icons theme zed cli herdr editors clean lang i18n-status lint
 
 lint:
 	@if ! command -v shellcheck &> /dev/null; then \
@@ -32,7 +33,7 @@ help:
 	@bash scripts/lib/help.sh
 
 setup:
-	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh $(if $(filter 1,$(REBUILD_PREVIEWS)),--rebuild-previews)
+	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh --scope "$(SCOPE)" $(if $(filter 1,$(REBUILD_PREVIEWS)),--rebuild-previews)
 
 keyring:
 	bash $(PROJECT_ROOT)/scripts/keyring-switch.sh "$(KEYRING_BACKEND)"
@@ -55,13 +56,10 @@ icons:
 
 theme:
 	@bash hooks/theme-set.d/folder-color
-	@bash hooks/theme-set.d/micro-theme
+	@bash hooks/theme-set.d/zed-theme
 
 zed:
 	bash conf/zed/install.sh
-
-micro:
-	bash conf/micro/install.sh
 
 cli:
 	bash conf/cli/install.sh
@@ -69,10 +67,7 @@ cli:
 herdr:
 	bash conf/herdr/install.sh
 
-disk:
-	bash conf/disk/install.sh
-
-editors: zed micro cli
+editors: zed cli
 
 lang:
 	@bash scripts/lib/i18n.sh --list
