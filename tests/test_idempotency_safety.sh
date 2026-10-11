@@ -38,7 +38,7 @@ check_aur_artifacts() (
     # shellcheck source=/dev/null
     source <(awk '/^aur_package_artifact\(\)/ { found=1 } found { print } found && /^}/ { exit }' "$PROJECT_DIR/scripts/lib/modules/00-env.sh")
     # shellcheck disable=SC2329
-    pacman() { [[ "$1" == -Qp ]] && cat "${@: -1}"; }
+    pacman() { [[ "$1" == -Qpq && $# == 2 ]] && cat "$2"; }
     mkdir -p "$fixture/nested"
     printf '%s\n' example-debug > "$fixture/example-debug-1.pkg.tar.zst"
     printf '%s\n' example > "$fixture/example-1.pkg.tar.zst"

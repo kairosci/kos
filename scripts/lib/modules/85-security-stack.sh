@@ -25,12 +25,15 @@ done
 log "security.audit"
 mkdir -p /etc/audit/rules.d
 cat > /etc/audit/rules.d/hardened.rules << 'AUDIT'
+-D
 -w /etc/passwd -p wa -k identity
 -w /etc/group -p wa -k identity
 -w /etc/shadow -p wa -k identity
 -w /etc/gshadow -p wa -k identity
 -w /etc/sudoers -p wa -k sudoers
+-w /etc/sudoers.d -p wa -k sudoers
 -w /etc/ssh/sshd_config -p wa -k sshd
+-w /etc/ssh/sshd_config.d -p wa -k sshd
 -w /etc/ufw -p wa -k firewall
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k privilege_escalation
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k privilege_escalation
@@ -39,6 +42,7 @@ cat > /etc/audit/rules.d/hardened.rules << 'AUDIT'
 -w /etc/hosts -p wa -k system-locale
 -w /etc/hostname -p wa -k system-locale
 -w /etc/sysctl.conf -p wa -k sysctl
+-w /etc/sysctl.d -p wa -k sysctl
 -w /etc/modprobe.d -p wa -k modules
 -a always,exit -F arch=b64 -S mount -k mount
 -a always,exit -F arch=b32 -S mount -k mount
@@ -48,9 +52,7 @@ if systemctl list-unit-files auditd.service &>/dev/null; then
 fi
 if systemctl is-active --quiet auditd.service; then
     if command -v augenrules &>/dev/null; then
-        if ! augenrules --check &>/dev/null; then
-            augenrules --load &>/dev/null || warn "security.audit_load_skipped"
-        fi
+        augenrules --load || warn "security.audit_load_skipped"
     else
         auditctl -R /etc/audit/rules.d/hardened.rules 2>/dev/null || warn "security.audit_load_skipped"
     fi

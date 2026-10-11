@@ -2,6 +2,13 @@
 
 Prudent energy and runtime for Omarchy on Arch Linux. Fixed charge threshold, hibernate on low battery, conservative tuning.
 
+Desktop responsiveness is now installed by the repository's **root** `make setup`
+pipeline through the canonical `scripts/lib/modules/92-responsiveness.sh` stage.
+Its policy, diagnostics and limitations are documented in
+[conf/performance/README.md](../conf/performance/README.md). The legacy standalone
+performance setup does not install this stage; use root `make setup` to reconcile
+the full system and `make verify` to inspect its live protections.
+
 ## Index
 
 This guide covers purpose and boundaries and central setup and energy module and runtime module and central verification and interactive launch and logs and tests and suite.

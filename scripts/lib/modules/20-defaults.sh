@@ -21,12 +21,15 @@ done
 log "defaults.graphical_apps"
 pacman -S --noconfirm --needed zed papers loupe celluloid baobab resources materia-gtk-theme || err "defaults.app_failed" "graphical desktop"
 
-log "defaults.micro_install"
-for pkg in micro fzf universal-ctags shellcheck shfmt ruff yamllint; do
+for pkg in fzf universal-ctags shellcheck shfmt ruff yamllint; do
     if ! pacman -Q "$pkg" &>/dev/null; then
-        pacman -S --noconfirm --needed "$pkg" || err "defaults.micro_dependency_failed" "$pkg"
+        pacman -S --noconfirm --needed "$pkg" || err "defaults.app_failed" "$pkg"
     fi
 done
+
+if ! pacman -Q onlyoffice-bin &>/dev/null; then
+    aur_verified_install onlyoffice-bin || err "defaults.app_failed" "OnlyOffice"
+fi
 
 log "defaults.collaboration_apps"
 for pkg in slack-desktop discord; do
@@ -59,29 +62,9 @@ for user_home in /home/*; do
     omarchy_as "$_user" default terminal kitty 2>/dev/null || warn "defaults.terminal_skipped" "$_user"
 done
 
-log "defaults.disk_install"
-if ! pacman -Q gdu &>/dev/null; then
-    pacman -S --noconfirm --needed gdu || warn "defaults.disk_failed" "gdu"
-fi
-
 log "defaults.trash_install"
 if ! pacman -Q trash-cli &>/dev/null; then
     pacman -S --noconfirm --needed trash-cli
-fi
-
-log "defaults.imv_install"
-if ! pacman -Q imv &>/dev/null; then
-    pacman -S --noconfirm --needed imv
-fi
-
-log "defaults.mpv_install"
-if ! pacman -Q mpv &>/dev/null; then
-    pacman -S --noconfirm --needed mpv
-fi
-
-log "defaults.pdf_install"
-if ! pacman -Q mupdf &>/dev/null; then
-    pacman -S --noconfirm --needed mupdf
 fi
 
 log "defaults.filemanager"
@@ -170,11 +153,6 @@ for pkg in podman podman-compose podman-docker slirp4netns; do
 done
 systemctl enable podman.socket 2>/dev/null || warn "defaults.podman_socket_skipped"
 
-log "defaults.btop_install"
-if ! pacman -Q btop &>/dev/null; then
-    pacman -S --noconfirm --needed btop || warn "defaults.btop_failed"
-fi
-
 log "defaults.cursors_install"
 if ! pacman -Q capitaine-cursors &>/dev/null; then
     pacman -S --noconfirm --needed capitaine-cursors || warn "defaults.cursors_failed"
@@ -184,17 +162,6 @@ log "defaults.icons_install"
 if ! pacman -Q qogir-icon-theme &>/dev/null; then
     aur_verified_install qogir-icon-theme || err "defaults.icons_failed"
 fi
-
-log "defaults.btop_theme"
-for user_home in /home/*; do
-    [[ -d "$user_home" ]] || continue
-    _user=$(basename "$user_home")
-    _btop_conf="$user_home/.config/btop/btop.conf"
-    if [[ -f "$_btop_conf" ]] && ! grep -q '^color_theme *= *"current"' "$_btop_conf" 2>/dev/null; then
-        sed -i 's|^color_theme *= *".*"|color_theme = "current"|' "$_btop_conf" 2>/dev/null || warn "defaults.btop_theme_skipped" "$_user"
-        chown "$_user":"$_user" "$_btop_conf" 2>/dev/null || warn "defaults.btop_conf_chown" "$_user"
-    fi
-done
 
 log "desktop.sweep"
 if [[ -f "$PROJECT_DIR/scripts/lib/desktop-cleanup.sh" ]]; then

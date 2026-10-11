@@ -8,7 +8,7 @@ description: >-
 
 Nautilus is the graphical file manager. Provision GVFS for trash and mounts, gvfs-mtp for phones, native thumbnails and archive support, with File Roller for advanced archive operations. Thunar is retired; preserve its personal configuration. Remove Yazi and its provisioned integrations while preserving personal data.
 
-Zed edits text and projects, Papers opens PDFs, Loupe opens images, Celluloid plays media, Baobab analyzes storage and Resources monitors the system. Register their MIME defaults and Omarchy launch shortcuts through the shared desktop workflow. Retain existing terminal tools as optional alternatives.
+Provision exactly one user-facing application per function. Zed edits text and projects, OnlyOffice edits office documents, Papers opens PDFs, Loupe opens images, Celluloid plays media, Baobab analyzes storage and Resources monitors the system. Register their MIME defaults and Omarchy launch shortcuts through the shared desktop workflow. Retire Micro, MuPDF, imv, gdu and btop while preserving personal configurations. Keep mpv only as Celluloid's required backend and hide its separate launcher. Remove duplicate launchers instead of repointing them to an application that already has a canonical entry.
 
 Brave Origin is the sole provisioned browser. Remove qutebrowser, its adblock dependency and the terminal file chooser backend through the debloat stage and persistent pins. Preserve user data when removing applications.
 

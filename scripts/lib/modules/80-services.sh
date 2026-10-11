@@ -35,8 +35,3 @@ for svc in avahi-daemon cups cups-browsed; do
         systemctl disable --now "$svc.socket" 2>/dev/null || warn "services.socket_missing" "$svc"
     fi
 done
-
-log "services.oomd"
-systemctl enable systemd-oomd.service || warn "services.oomd_enable_failed"
-systemctl enable systemd-oomd.socket || warn "services.oomd_socket_enable_failed"
-systemctl start systemd-oomd.socket 2>/dev/null || warn "services.oomd_socket_start_skipped"

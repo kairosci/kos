@@ -3,6 +3,14 @@
 OMACONF_OMARCHY_APPS_DIR="${OMACONF_OMARCHY_APPS_DIR:-/usr/share/omarchy/applications}"
 OMACONF_HOMES_ROOT="${OMACONF_HOMES_ROOT:-/home}"
 OMACONF_SYSTEM_APPS_DIRS="${OMACONF_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
+DESKTOP_CLEANUP_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "$DESKTOP_CLEANUP_LIB_DIR/userconf.sh" ]]; then
+    DESKTOP_CLEANUP_USERCONF="$DESKTOP_CLEANUP_LIB_DIR/userconf.sh"
+else
+    DESKTOP_CLEANUP_USERCONF=/usr/local/lib/omaconf/userconf.sh
+fi
+# shellcheck source=userconf.sh
+source "$DESKTOP_CLEANUP_USERCONF"
 
 _desktop_cleanup_has_cmd() {
     local cmd="$1"
@@ -126,29 +134,43 @@ desktop_cleanup_exec_missing() {
     return 1
 }
 
-_desktop_cleanup_patch_disk_usage() {
-    local file="$1"
-    [[ -f "$file" ]] || return 1
-    if _desktop_cleanup_has_cmd baobab && grep -qE '^Exec=.*(dua|gdu)' "$file"; then
-        sed -i -e 's|^Exec=.*|Exec=baobab|' -e 's|^Terminal=.*|Terminal=false|' \
-            -e 's|^Icon=.*|Icon=org.gnome.baobab|' "$file" || return 1
-        return 0
-    fi
-    grep -q 'dua' "$file" 2>/dev/null || return 1
-    if _desktop_cleanup_has_cmd dua; then
-        return 1
-    fi
-    sed -i 's/dua *i *\//gdu \//g' "$file" 2>/dev/null || return 1
-    if grep -q 'dua' "$file" 2>/dev/null; then
-        return 1
-    fi
-    return 0
+desktop_cleanup_duplicate() {
+    local file="$1" exec_line target canonical directory
+    local -a directories=()
+    exec_line=$(sed -n '/^Exec=/{s/^Exec=//;p;q;}' "$file") || return 1
+    [[ -n "$exec_line" ]] || return 1
+    target=$(desktop_cleanup_resolve_target "$exec_line") || return 1
+    case "${target##*/}" in
+        baobab) canonical=org.gnome.baobab.desktop ;;
+        resources) canonical=net.nokyan.Resources.desktop ;;
+        loupe) canonical=org.gnome.Loupe.desktop ;;
+        papers) canonical=org.gnome.Papers.desktop ;;
+        celluloid|mpv) canonical=io.github.celluloid_player.Celluloid.desktop ;;
+        nautilus) canonical=org.gnome.Nautilus.desktop ;;
+        zed) canonical=dev.zed.Zed.desktop ;;
+        brave-origin) canonical=brave-origin.desktop ;;
+        file-roller) canonical=org.gnome.FileRoller.desktop ;;
+        onlyoffice-desktopeditors) canonical=onlyoffice-desktopeditors.desktop ;;
+        spotify) canonical=spotify.desktop ;;
+        slack) canonical=slack.desktop ;;
+        discord) canonical=discord.desktop ;;
+        seahorse) canonical=org.gnome.seahorse.Application.desktop ;;
+        kitty) canonical=kitty.desktop ;;
+        *) return 1 ;;
+    esac
+    [[ "${file##*/}" != "$canonical" ]] || return 1
+    IFS=':' read -ra directories <<< "$OMACONF_SYSTEM_APPS_DIRS"
+    for directory in "${directories[@]}"; do
+        [[ ! -f "$directory/$canonical" ]] || return 0
+    done
+    return 1
 }
 
 _desktop_cleanup_own() {
     local user="$1" file="$2"
     [[ -n "$user" ]] || return 0
     [[ -e "$file" ]] || return 0
+    [[ ! -L "$file" ]] || return 0
     id -u "$user" >/dev/null 2>&1 || return 0
     chown "$user:$user" "$file" 2>/dev/null || warn "desktop.chown_skipped" "$file"
 }
@@ -156,6 +178,7 @@ _desktop_cleanup_own() {
 _desktop_cleanup_refresh_dir() {
     local dir="$1" user="${2:-}"
     [[ -d "$dir" ]] || return 0
+    [[ -w "$dir" ]] || return 0
     command -v update-desktop-database >/dev/null 2>&1 || return 0
     if [[ -n "$user" ]] && command -v sudo >/dev/null 2>&1; then
         if sudo -n -u "$user" update-desktop-database "$dir" 2>/dev/null; then
@@ -163,13 +186,22 @@ _desktop_cleanup_refresh_dir() {
         fi
     fi
     update-desktop-database "$dir" 2>/dev/null || warn "desktop.refresh_skipped"
+    if [[ -f "$dir/mimeinfo.cache" && ! -L "$dir/mimeinfo.cache" ]]; then
+        chmod 644 "$dir/mimeinfo.cache" || return 1
+    fi
     _desktop_cleanup_own "$user" "$dir/mimeinfo.cache"
 }
 
 desktop_cleanup_file() {
     local file="$1" base
     [[ -f "$file" ]] || return 1
+    grep -qx 'Hidden=true' "$file" && return 1
     base="$(basename "$file")"
+    if desktop_cleanup_duplicate "$file"; then
+        rm -f "$file" || return 1
+        printf '%s' "$base"
+        return 0
+    fi
     case "$base" in
         foot.desktop|footclient.desktop|foot-server.desktop)
             if _desktop_cleanup_has_cmd foot; then
@@ -180,16 +212,9 @@ desktop_cleanup_file() {
             return 0
             ;;
         "Disk Usage.desktop")
-            if _desktop_cleanup_patch_disk_usage "$file"; then
-                printf 'patched:%s' "$base"
-                return 2
-            fi
-            if desktop_cleanup_exec_missing "$file"; then
-                rm -f "$file" 2>/dev/null || return 1
-                printf '%s' "$base"
-                return 0
-            fi
-            return 1
+            rm -f "$file" || return 1
+            printf '%s' "$base"
+            return 0
             ;;
         Docker.desktop)
             if _desktop_cleanup_has_cmd lazydocker; then
@@ -226,33 +251,82 @@ desktop_cleanup_system_file() {
 }
 
 _desktop_cleanup_mimeapps() {
-    local mimeapps="$1"
+    local mimeapps="$1" staged removed
     shift
-    local removed="$1"
     [[ -f "$mimeapps" ]] || return 1
-    [[ -n "$removed" ]] || return 1
-    local entry touched=1
-    for entry in $removed; do
-        [[ -n "$entry" ]] || continue
-        if grep -qF "$entry" "$mimeapps" 2>/dev/null; then
-            sed -i "s/${entry//\//\\/};//g" "$mimeapps" 2>/dev/null || return 1
-            sed -i "s/;${entry//\//\\/}/;/g" "$mimeapps" 2>/dev/null || return 1
-            sed -i "s=${entry//\//\\/}==g" "$mimeapps" 2>/dev/null || return 1
-            touched=0
-        fi
-    done
-    if [[ $touched -eq 0 ]]; then
-        sed -i 's/;;/;/g; s/;$/\n/; s/=$//' "$mimeapps" 2>/dev/null || return 1
-        return 0
+    [[ ! -L "$mimeapps" ]] || return 1
+    (($#)) || return 1
+    removed=$(printf '%s\n' "$@")
+    staged=$(mktemp) || return 1
+    if ! awk -v removed="$removed" '
+        BEGIN { count=split(removed, ids, "\n"); for (i=1; i<=count; i++) retired[ids[i]]=1 }
+        index($0, "=") > 0 && $0 !~ /^[#;\[]/ {
+            equals=index($0, "=")
+            key=substr($0, 1, equals)
+            count=split(substr($0, equals+1), ids, ";")
+            value=""
+            for (i=1; i<=count; i++) if (ids[i] != "" && !(ids[i] in retired)) value=value ids[i] ";"
+            if (value != "") print key value
+            next
+        }
+        { print }
+    ' "$mimeapps" > "$staged"; then
+        rm -f "$staged"
+        return 1
     fi
-    return 1
+    if cmp -s "$staged" "$mimeapps"; then
+        rm -f "$staged"
+        return 1
+    fi
+    if cat "$staged" > "$mimeapps"; then
+        rm -f "$staged"
+    else
+        rm -f "$staged"
+        return 1
+    fi
+}
+
+_desktop_cleanup_hide_user_entry() {
+    local user="$1" home="$2" entry="$3" content
+    content=$(printf '[Desktop Entry]\nType=Application\nName=%s\nHidden=true\n' "${entry%.desktop}")
+    if [[ $EUID -eq 0 ]] && id -u "$user" >/dev/null 2>&1; then
+        if declare -F user_as >/dev/null; then
+            user_as "$user" bash -c 'source "$1"; install_user_content "$2" <<< "$3"' \
+                bash "$DESKTOP_CLEANUP_USERCONF" "$home/.local/share/applications/$entry" "$content" || return 1
+        else
+            runuser -u "$user" -- bash -c 'source "$1"; install_user_content "$2" <<< "$3"' \
+                bash "$DESKTOP_CLEANUP_USERCONF" "$home/.local/share/applications/$entry" "$content" || return 1
+        fi
+    else
+        install_user_content "$home/.local/share/applications/$entry" <<< "$content" || return 1
+    fi
+}
+
+desktop_cleanup_unique() {
+    local home="$1" directory file effective
+    local -a directories=()
+    IFS=':' read -ra directories <<< "$OMACONF_SYSTEM_APPS_DIRS"
+    directories+=("$OMACONF_OMARCHY_APPS_DIR" "$home/.local/share/applications")
+    for directory in "${directories[@]}"; do
+        for file in "$directory"/*.desktop; do
+            [[ -f "$file" ]] || continue
+            effective="$file"
+            [[ ! -f "$home/.local/share/applications/${file##*/}" ]] || effective="$home/.local/share/applications/${file##*/}"
+            if grep -qEx '(Hidden|NoDisplay)=true' "$effective"; then
+                continue
+            fi
+            desktop_cleanup_duplicate "$effective" && return 1
+        done
+    done
+    return 0
 }
 
 desktop_cleanup_sweep() {
     local omarchy_dir="${OMACONF_OMARCHY_APPS_DIR:-/usr/share/omarchy/applications}"
     local homes_root="${OMACONF_HOMES_ROOT:-/home}"
     local sys_dirs="${OMACONF_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
-    local removed_list="" outcome rc entry _u
+    local outcome rc entry _u
+    local -a removed_entries=() duplicate_entries=()
     local file user_home mimeapps sys_dir
     local -a _sys_dirs=()
     IFS=':' read -ra _sys_dirs <<< "$sys_dirs"
@@ -260,28 +334,32 @@ desktop_cleanup_sweep() {
         [[ -d "$sys_dir" ]] || continue
         for file in "$sys_dir"/*.desktop; do
             [[ -f "$file" ]] || continue
+            if desktop_cleanup_duplicate "$file"; then
+                duplicate_entries+=("${file##*/}")
+            fi
+            [[ $EUID -eq 0 || -w "$sys_dir" ]] || continue
             outcome=""
             rc=0
             outcome="$(desktop_cleanup_system_file "$file")" || rc=$?
             if [[ $rc -eq 0 ]]; then
-                removed_list="$removed_list ${outcome}"
+                removed_entries+=("$outcome")
                 log "desktop.removed" "$file" 2>/dev/null || printf 'Removed orphan entry: %s\n' "$file"
-            elif [[ $rc -eq 2 ]]; then
-                log "desktop.patched" "$file" 2>/dev/null || printf 'Repointed entry to replacement: %s\n' "$file"
             fi
             unset outcome
         done
     done
     for file in "$omarchy_dir"/*.desktop; do
         [[ -f "$file" ]] || continue
+        if [[ "${file##*/}" == "Disk Usage.desktop" ]] || desktop_cleanup_duplicate "$file"; then
+            duplicate_entries+=("${file##*/}")
+        fi
+        [[ $EUID -eq 0 || -w "${file%/*}" ]] || continue
         outcome=""
         rc=0
         outcome="$(desktop_cleanup_file "$file")" || rc=$?
         if [[ $rc -eq 0 ]]; then
-            removed_list="$removed_list ${outcome}"
+            removed_entries+=("$outcome")
             log "desktop.removed" "$file" 2>/dev/null || printf 'Removed orphan entry: %s\n' "$file"
-        elif [[ $rc -eq 2 ]]; then
-            log "desktop.patched" "$file" 2>/dev/null || printf 'Repointed entry to replacement: %s\n' "$file"
         fi
         unset outcome
     done
@@ -289,39 +367,36 @@ desktop_cleanup_sweep() {
     for u_home in "$homes_root"/*; do
         [[ -d "$u_home" ]] || continue
         _u="$(basename "$u_home")"
+        [[ $EUID -eq 0 || "$_u" == "$(id -un)" || -w "$u_home" ]] || continue
         for file in "$u_home/.local/share/applications"/*.desktop; do
             [[ -f "$file" ]] || continue
             outcome=""
             rc=0
             outcome="$(PATH="$u_home/.local/bin:$PATH" desktop_cleanup_file "$file")" || rc=$?
             if [[ $rc -eq 0 ]]; then
-                removed_list="$removed_list ${outcome}"
+                removed_entries+=("$outcome")
                 log "desktop.removed" "$file" 2>/dev/null || printf 'Removed orphan entry: %s\n' "$file"
-            elif [[ $rc -eq 2 ]]; then
-                _desktop_cleanup_own "$_u" "$file"
-                log "desktop.patched" "$file" 2>/dev/null || printf 'Repointed entry to replacement: %s\n' "$file"
             fi
             unset outcome
         done
+        for entry in "${duplicate_entries[@]}"; do
+            _desktop_cleanup_hide_user_entry "$_u" "$u_home" "$entry" || return 1
+        done
     done
-    removed_list="$(printf '%s' "$removed_list" | xargs 2>/dev/null)"
-    if [[ -n "$removed_list" ]]; then
+    if ((${#removed_entries[@]})); then
         for user_home in "$homes_root"/*; do
             [[ -d "$user_home" ]] || continue
             _u="$(basename "$user_home")"
             for mimeapps in "$user_home/.config/mimeapps.list" "$user_home/.local/share/applications/mimeapps.list"; do
-                if _desktop_cleanup_mimeapps "$mimeapps" "$removed_list"; then
+                if _desktop_cleanup_mimeapps "$mimeapps" "${removed_entries[@]}"; then
                     _desktop_cleanup_own "$_u" "$mimeapps"
                     log "desktop.mime_cleaned" "$_u" 2>/dev/null || printf 'Cleaned stale reference: %s\n' "$_u"
                 fi
             done
             if [[ -f "$user_home/.local/share/applications/mimeinfo.cache" ]]; then
-                for entry in $removed_list; do
-                    [[ "$entry" == patched:* ]] && continue
-                    sed -i "/=${entry//\//\\/};/d" "$user_home/.local/share/applications/mimeinfo.cache" 2>/dev/null || warn "desktop.mime_clean_skipped" "$entry"
-                    sed -i "s/${entry//\//\\/};//g" "$user_home/.local/share/applications/mimeinfo.cache" 2>/dev/null || warn "desktop.mime_clean_skipped" "$entry"
-                done
-                _desktop_cleanup_own "$_u" "$user_home/.local/share/applications/mimeinfo.cache"
+                if _desktop_cleanup_mimeapps "$user_home/.local/share/applications/mimeinfo.cache" "${removed_entries[@]}"; then
+                    _desktop_cleanup_own "$_u" "$user_home/.local/share/applications/mimeinfo.cache"
+                fi
             fi
         done
     fi
