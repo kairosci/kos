@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     container:
-      image: archlinux:latest:3c64b538588416593f69a1aebd2f2ec0f2541b29159f32556fa7def2167147a0
+      image: archlinux:latest@sha256:3c64b538588416593f69a1aebd2f2ec0f2541b29159f32556fa7def2167147a0
       options: >-
         --cap-add=SYS_PTRACE
         --security-opt seccomp=unconfined
