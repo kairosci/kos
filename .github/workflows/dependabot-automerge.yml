@@ -1,0 +1,45 @@
+name: Dependabot patch remediation
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  patch:
+    if: github.repository == 'kairosci/kos'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Queue verified Dependabot patches after required checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          remediation_dir=$(mktemp -d)
+          trap 'rm -rf "$remediation_dir"' EXIT
+          gh api "repos/$GH_REPO/pulls?state=open&base=main&per_page=100" --paginate --slurp > "$remediation_dir/pulls.json"
+          jq -r --arg repo "$GH_REPO" '
+            flatten[] | select(.user.login == "dependabot[bot]" and .head.repo.full_name == $repo and .draft == false) |
+            select(.body | test("Maintainer changes"; "i") | not) | [.number, .head.sha] | @tsv
+          ' "$remediation_dir/pulls.json" > "$remediation_dir/candidates.tsv"
+          while IFS=$'\t' read -r number head_sha; do
+            [[ "$number" =~ ^[0-9]+$ && "$head_sha" =~ ^[0-9a-f]{40}$ ]]
+            gh api "repos/$GH_REPO/pulls/$number/commits?per_page=100" --paginate --slurp > "$remediation_dir/commits.json"
+            if ! jq -e 'flatten | length > 0 and all(.author.login == "dependabot[bot]" and .commit.verification.verified == true)' "$remediation_dir/commits.json" >/dev/null; then
+              printf 'PR %s requires review because commit provenance changed\n' "$number"
+              continue
+            fi
+            jq -r 'flatten[].commit.message' "$remediation_dir/commits.json" > "$remediation_dir/messages.txt"
+            if ! awk '/^[[:space:]]*update-type:/ { if ($2 != "version-update:semver-patch") invalid=1; found++ } END { exit (!found || invalid) }' "$remediation_dir/messages.txt"; then
+              printf 'PR %s requires review because it is not a patch update\n' "$number"
+              continue
+            fi
+            gh pr merge --repo "$GH_REPO" --auto --squash --match-head-commit "$head_sha" "$number"
+          done < "$remediation_dir/candidates.tsv"
