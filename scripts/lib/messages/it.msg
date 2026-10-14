@@ -475,3 +475,4 @@ preview.capture_invalid=Geometria del monitor o proprietà delle finestre di cat
 preview.zed_live_verified=Cambio palette di Zed verificato senza riavvio
 preview.zed_live_failed=Verifica palette live di Zed fallita atteso %s rilevato %s
 shell_plugins.not_configured=Plugin opzionale osmp non configurato
+fontconfig.match_failed=Fontconfig ha selezionato un font web per %s

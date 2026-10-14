@@ -48,7 +48,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|recovery|desktop) ;;
+    full|keyboard|recovery|desktop|fontconfig) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -69,6 +69,23 @@ if [[ "$SETUP_SCOPE" == recovery || "$SETUP_SCOPE" == desktop ]]; then
     exit 0
 fi
 root_setup_persistent || err "setup.snapshot_boot"
+
+if [[ "$SETUP_SCOPE" == fontconfig ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    if [[ "$PRIMARY_USER" == root ]] || ! id "$PRIMARY_USER" >/dev/null; then
+        err "__cannot_determine_user"
+    fi
+    if ! pacman -Q omarchy >/dev/null || [[ ! -d /usr/share/omarchy ]] || ! command -v omarchy >/dev/null; then
+        err "setup.omarchy_required"
+    fi
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    log "__stage" "23-fontconfig.sh"
+    source "$MODULES_DIR/23-fontconfig.sh"
+    omarchy_as "$PRIMARY_USER" restart shell || err "recovery.failed"
+    omarchy_as "$PRIMARY_USER" shell shell ping || err "recovery.failed"
+    log "__complete"
+    exit 0
+fi
 
 if [[ "$SETUP_SCOPE" == keyboard ]]; then
     log "__stage" "keyboard-backlight-policy.sh"
@@ -96,6 +113,7 @@ MODULE_FILES=(
     "$MODULES_DIR/10-debloat.sh"
     "$MODULES_DIR/20-defaults.sh"
     "$MODULES_DIR/22-portals.sh"
+    "$MODULES_DIR/23-fontconfig.sh"
     "$MODULES_DIR/24-user-configurations.sh"
     "$MODULES_DIR/25-desktop-cleanup.sh"
     "$MODULES_DIR/30-theming.sh"

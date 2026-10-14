@@ -2,6 +2,8 @@
 
 Every per-application configuration lives under this directory. Configuration installers use `scripts/lib/userconf.sh`.
 
+`fontconfig` owns the filter that keeps web only WOFF2 files out of desktop font matching.
+
 Each installed application owns its configuration directory. `desktop` owns migration of retired integrations and the hidden mpv backend launcher.
 
 

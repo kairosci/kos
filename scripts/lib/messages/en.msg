@@ -475,3 +475,4 @@ preview.capture_invalid=Captured monitor geometry or window ownership is invalid
 preview.zed_live_verified=Zed live palette change verified without restarting
 preview.zed_live_failed=Zed live palette check failed expected %s actual %s
 shell_plugins.not_configured=Optional osmp plugin is not configured
+fontconfig.match_failed=Fontconfig selected a web font for %s

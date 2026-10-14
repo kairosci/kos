@@ -475,3 +475,4 @@ preview.capture_invalid=Géométrie ou propriété des fenêtres invalide
 preview.zed_live_verified=Changement de palette Zed vérifié sans redémarrage
 preview.zed_live_failed=Palette Zed incorrecte attendu %s obtenu %s
 shell_plugins.not_configured=Plugin osmp facultatif non configuré
+fontconfig.match_failed=Fontconfig a sélectionné une police web pour %s
