@@ -37,4 +37,44 @@ assert_false "missing plugins stop setup" "MOCK_MISSING_PACKAGE=calf bash '$INST
 if command -v desktop-file-validate >/dev/null; then
     assert_true "native autostart entry is valid" "desktop-file-validate '$XDG_CONFIG_HOME/autostart/com.github.wwmm.easyeffects.desktop'"
 fi
+cat > "$SANDBOX/bin/easyeffects" <<'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >> "$MOCK_EASYEFFECTS_COMMANDS"
+case "$1" in
+    --last-loaded-preset)
+        if [[ -f "$MOCK_EASYEFFECTS_LOADED" ]]; then
+            [[ ${MOCK_QUERY_FAIL:-0} == 0 ]] || exit 1
+            printf '%s\n' OS-Subwoofer
+        else
+            printf '%s\n' "${MOCK_PREVIOUS_PRESET:-}"
+        fi
+        ;;
+    --load-preset)
+        [[ ${MOCK_LOAD_FAIL:-0} == 0 ]] || exit 1
+        : > "$MOCK_EASYEFFECTS_LOADED"
+        ;;
+    --bypass) [[ "$2" == 1 ]] ;;
+    *) exit 1 ;;
+esac
+MOCK
+chmod 755 "$SANDBOX/bin/easyeffects"
+export MOCK_EASYEFFECTS_COMMANDS="$SANDBOX/native-commands" MOCK_EASYEFFECTS_LOADED="$SANDBOX/loaded"
+source "$PROJECT_DIR/scripts/lib/i18n.sh"
+source "$PROJECT_DIR/scripts/lib/userconf.sh"
+source "$PROJECT_DIR/conf/easyeffects/apply.sh"
+i18n_init
+PRESET=OS-Subwoofer
+STATE="$SANDBOX/activation"
+assert_false "load failures propagate" "(MOCK_LOAD_FAIL=1 easyeffects_apply_preset)"
+assert_file_contains_literal "failed load activates safe bypass" "$MOCK_EASYEFFECTS_COMMANDS" '--bypass 1'
+assert_false "failed activation does not write its success marker" "[[ -e '$STATE/default-applied' ]]"
+: > "$MOCK_EASYEFFECTS_COMMANDS"
+assert_false "post-load query failures propagate" "(MOCK_QUERY_FAIL=1 easyeffects_apply_preset)"
+assert_file_contains_literal "post-load query failures also activate bypass" "$MOCK_EASYEFFECTS_COMMANDS" '--bypass 1'
+assert_true "native activation records verified success" "easyeffects_apply_preset && [[ -f '$STATE/default-applied' ]]"
+rm "$MOCK_EASYEFFECTS_LOADED"
+: > "$MOCK_EASYEFFECTS_COMMANDS"
+assert_true "subsequent explicit personal preset is retained" "MOCK_PREVIOUS_PRESET=Personal easyeffects_apply_preset"
+assert_file_not_contains "personal preset prevents reloading the managed preset" "$MOCK_EASYEFFECTS_COMMANDS" '--load-preset'
 test_summary

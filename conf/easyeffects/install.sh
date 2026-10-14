@@ -27,17 +27,7 @@ install_user_file "$SCRIPT_DIR/data/$PRESET.json" "$DATA/output/$PRESET.json" 60
 install_user_file "$SCRIPT_DIR/data/autostart.desktop" "$CONFIG/autostart/com.github.wwmm.easyeffects.desktop" 644 || err "defaults.app_failed" "EasyEffects autostart"
 
 if [[ -S "${XDG_RUNTIME_DIR:-/nonexistent}/bus" ]]; then
-    previous=$(timeout 15 easyeffects --last-loaded-preset output) || err "defaults.app_failed" "EasyEffects preset query"
-    if [[ ! -f "$STATE/default-applied" || "$previous" == "$PRESET" ]]; then
-        if ! timeout 15 easyeffects --load-preset "$PRESET"; then
-            err "defaults.app_failed" "$PRESET"
-        fi
-        loaded=$(timeout 15 easyeffects --last-loaded-preset output) || err "defaults.app_failed" "EasyEffects preset query"
-        if [[ "$loaded" != "$PRESET" ]]; then
-            timeout 15 easyeffects --bypass 1 || warn "defaults.app_failed" "EasyEffects bypass"
-            err "defaults.app_failed" "$PRESET"
-        fi
-        install_user_content "$STATE/default-applied" 600 <<< "$PRESET" || err "defaults.app_failed" "$PRESET"
-    fi
+    source "$SCRIPT_DIR/apply.sh"
+    easyeffects_apply_preset
 fi
 log "gui.install_done" "EasyEffects"
