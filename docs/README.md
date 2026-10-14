@@ -1,6 +1,6 @@
 # Security and desktop roadmap
 
-The current OS and desktop state is frozen. Repository changes, read-only audits and offline previews are allowed. Package updates, setup, live configuration edits, service changes, theme switches and reboots remain deferred until the user explicitly lifts the freeze. All application must use `make setup`; no manual deployment is permitted.
+This document records the security and desktop audit baseline from October 13, 2026. The live-state freeze applied during that audit; it is not a current deployment restriction. Later user-authorized changes are applied through `make setup`. The historical observations below do not describe the current package inventory or desktop configuration.
 
 No system can be guaranteed immune to compromise or injection. Each sprint must define its trust boundary, measurable acceptance criteria, compatibility checks and recovery procedure. Free GitHub automation scans published revisions and pull requests; it does not continuously certify installed packages or unpublished local changes.
 
@@ -14,7 +14,7 @@ Desktop manifest fingerprint: `cbe3b671ea633afe222d92bc07ae80ac1afb43f3db96c58c2
 
 Package inventory fingerprint: `33c1ded113f9ab107ae15222a0f7a0ec066d7994683596fa365867e8e42fc2fc`.
 
-Detailed manifests were stored temporarily under `/tmp/os-baseline.8uINio`; they must not be treated as durable recovery artifacts. GitHub PRs 65 and 66 enabled free automation and updated CI Semgrep to 1.180.0. They did not install software on this machine. The local OS checkout and published legacy main must be reconciled before published scans can represent the new configuration.
+Detailed manifests were stored temporarily under `/tmp/os-baseline.8uINio`; they must not be treated as durable recovery artifacts. GitHub PRs 65 and 66 enabled free automation and updated CI Semgrep to 1.180.0. They did not install software on this machine. Published scans cover the revisions checked by GitHub, not the live system.
 
 ## Security sprints
 
@@ -57,6 +57,6 @@ The [offline GTK prototype](../conf/gtk/preview.html) is an exploratory artifact
 
 ## Delivery gates
 
-Complete each sprint in a feature branch with scoped review, meaningful tests and a recovery procedure. Keep work staged while the freeze remains active. After explicit authorization to apply, use the privileged setup pipeline and compare against the baseline. Preserve automatic tiling, the single-lockscreen invariant, audio, networking, authentication, Secret Service and existing swap or hibernation.
+Complete each sprint in a feature branch with scoped review, meaningful tests and a recovery procedure. After user authorization to apply, use the privileged setup pipeline and compare against the relevant baseline. Preserve automatic tiling, the single-lockscreen invariant, audio, networking, authentication, Secret Service and existing swap or hibernation.
 
 The [terminal editor guide](../conf/nvim/README.md) documents the staged LazyVim workflow. Configuration is edited in Lua; mouse support does not create a graphical settings application. Plugin updates and language-tool downloads remain user-level executable supply-chain changes and require review.

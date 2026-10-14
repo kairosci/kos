@@ -1,4 +1,4 @@
-# ai
+# slop
 
 Opt in AI debloat for OS on Arch Linux. Nothing here runs alone. Terminal only, never separate windows.
 
@@ -13,9 +13,9 @@ This repo removes AI noise while leaving real tools intact. On explicit request 
 Real repo structure:
 
 ```bash
-bash scripts/debloat-ai.sh
-sudo bash scripts/debloat-ai.sh --yes
-make debloat-ai
+bash scripts/debloat-slop.sh
+sudo bash scripts/debloat-slop.sh --yes
+make debloat-slop
 bash tests/check.sh
 ```
 
@@ -26,9 +26,9 @@ Real file for entry shows plan with zero option and exits. With request option i
 Usage code without comments:
 
 ```bash
-bash scripts/debloat-ai.sh
-sudo bash scripts/debloat-ai.sh --yes
-make debloat-ai
+bash scripts/debloat-slop.sh
+sudo bash scripts/debloat-slop.sh --yes
+make debloat-slop
 ```
 
 Observed behavior holds plan print and close with zero status with zero option and root check and internal flag set with option and single module sourcing with shared log functions and per user runtime and bus resolve from user id.
@@ -40,7 +40,7 @@ Real file for module runs only when called from entry with active internal flag,
 Inspection code without comments:
 
 ```bash
-printf '%s\n' "$OS_AI_DEBLOAT"
+printf '%s\n' "$OS_SLOP_DEBLOAT"
 ls /home
 systemctl --user status omarchy-crash-watch.service
 omarchy plugin list
@@ -71,8 +71,8 @@ Verification code without comments:
 
 ```bash
 bash tests/check.sh
-bash -n scripts/debloat-ai.sh
-bash -n scripts/lib/modules/40-ai.sh
+bash -n scripts/debloat-slop.sh
+bash -n scripts/lib/modules/40-slop.sh
 ```
 
 ## Shared rules

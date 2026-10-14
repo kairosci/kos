@@ -39,9 +39,9 @@ PLAN
 
 [[ $EUID -eq 0 ]] || err "Root required (run via sudo or pkexec)"
 
-export OS_AI_DEBLOAT=1
+export OS_SLOP_DEBLOAT=1
 
 # shellcheck source=/dev/null
-source "$MODULES_DIR/40-ai.sh"
+source "$MODULES_DIR/40-slop.sh"
 
 log "AI debloat applied on explicit request."

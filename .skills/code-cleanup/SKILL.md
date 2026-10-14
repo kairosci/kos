@@ -7,7 +7,7 @@ description: >-
 # Code Cleanup
 
 ## Overview
-This skill defines what is noise and what stays. Every script, hook, module, and test across os and its subprojects (obscure, clean, ai, performance) must carry zero decoration: no banner output, no emoji, no narrative comments, no dead variables. Anything a machine or a test does not need is removed.
+This skill defines what is noise and what stays. Every script, hook, module, and test across os and its subprojects (obscure, clean, slop, performance) must carry zero decoration: no banner output, no emoji, no narrative comments, no dead variables. Anything a machine or a test does not need is removed.
 
 ## Banned Output Patterns
 Never emit separator or title banners. These exact shapes are forbidden in every file:
@@ -27,7 +27,7 @@ Keep exactly these comment classes and delete everything else:
 - `# shellcheck ...` directives (`source=`, `disable=`); they drive the linter.
 - AppArmor `#include <...>` lines inside profile heredocs; they are profile syntax, not comments.
 - Test fixture data inside heredocs (commented config lines the parser under test must ignore, fake-script shebangs); removing them changes test semantics.
-- Scope contracts asserted by tests (for example the ai module out-of-scope list covering mise and tensaku, which `ai/tests/check.sh` greps for); removing them breaks the suite.
+- Scope contracts asserted by tests (for example the slop module out-of-scope list covering mise and tensaku, which `slop/tests/check.sh` greps for); removing them breaks the suite.
 Delete narrative file headers, usage prose that duplicates `--help` or plan output, numbered section markers (`# 1. ...`), and any comment restating what the next lines already say. Never add comments to the Makefile or hook scripts.
 
 ## Procedure

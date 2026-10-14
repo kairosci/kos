@@ -65,7 +65,7 @@ jobs:
             tests/*.sh \
             clean/scripts/*.sh clean/scripts/lib/modules/*.sh \
             obscure/scripts/*.sh obscure/scripts/lib/modules/*.sh \
-            ai/scripts/*.sh ai/scripts/lib/modules/*.sh \
+            slop/scripts/*.sh slop/scripts/lib/modules/*.sh \
             performance/scripts/*.sh performance/scripts/lib/modules/*.sh
 
   idempotency-and-safety:
