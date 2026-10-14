@@ -9,7 +9,7 @@ permissions: {}
 
 jobs:
   patch:
-    if: github.repository == 'kairosci/kos'
+    if: github.repository == 'kairosci/os'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
