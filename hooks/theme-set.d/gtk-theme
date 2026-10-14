@@ -40,9 +40,10 @@ mix_color() {
 }
 SURFACE=$BACKGROUND
 HOVER=$(mix_color 10)
+PRESSED=$(mix_color 15)
 BORDER=$(mix_color 18)
 MUTED=$(mix_color 55)
-THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v8" | sha256sum)
+THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v9" | sha256sum)
 GTK_THEME_NAME="OS-${THEME_HASH:0:16}"
 GTK_THEME_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/themes/$GTK_THEME_NAME"
 mkdir -p "$GTK_THEME_DIR/gtk-3.0" "$GTK_THEME_DIR/gtk-4.0"
@@ -89,23 +90,45 @@ window, dialog, .background, .navigation-sidebar, .card, .boxed-list, .boxed-lis
 decoration { border-radius: 0; box-shadow: none; margin: 0; }
 headerbar, toolbar { min-height: 30px; padding: 3px 6px; box-shadow: none; border-bottom: 1px solid $BORDER; }
 headerbar windowcontrols { margin: 0; }
-button { border-radius: 0; border-color: $BORDER; background-image: none; box-shadow: none; padding: 4px 8px; }
+button { min-height: 24px; border-radius: 0; border-color: $BORDER; background-color: $BACKGROUND; color: $FOREGROUND; background-image: none; box-shadow: none; padding: 4px 8px; }
 entry { border-radius: 0; min-height: 24px; padding: 3px 6px; }
 .navigation-sidebar row, .sidebar row { border-radius: 0; padding: 4px 8px; }
 .navigation-sidebar { background-color: $SURFACE; color: $FOREGROUND; }
 popover > contents, tooltip { border: 1px solid $BORDER; }
-button:focus-visible, entry:focus-visible, row:focus-visible { outline: 2px solid $ACCENT; outline-offset: -2px; }
+button:focus-visible, entry:focus-visible, row:focus-visible, checkbutton:focus-visible, switch:focus-visible, scale:focus-visible, notebook tab:focus-visible { outline: 2px solid $ACCENT; outline-offset: -2px; }
 button:hover { background-color: $HOVER; border-color: $ACCENT; }
-entry:focus { border-color: $ACCENT; }
+entry:focus, entry:focus-within, spinbutton:focus-within { border-color: $ACCENT; }
 toolbar button { min-height: 20px; min-width: 20px; padding: 3px 5px; }
 separator { background-color: $BORDER; }
-notebook tab:checked { border-bottom: 2px solid $ACCENT; }
-button:checked, switch:checked, check:checked, radio:checked, scale highlight, progressbar progress { background-color: $ACCENT; color: $BACKGROUND; }
-button:disabled, entry:disabled { color: $MUTED; }
+check:checked, radio:checked, scale highlight, progressbar progress { background-color: $ACCENT; color: $BACKGROUND; }
+entry:disabled { color: $MUTED; }
 button.flat, button.image-button, .sidebar row, .navigation-sidebar row { background-color: transparent; border-color: transparent; }
 button.flat:hover, button.image-button:hover, row:hover { background-color: $HOVER; }
 row:selected, row:selected:hover, .sidebar row:selected, .navigation-sidebar row:selected { background-color: $SELECTION; color: $FOREGROUND; }
 button.suggested-action { background-color: $ACCENT; color: $BACKGROUND; border-color: $ACCENT; }
+button.image-button { min-width: 24px; padding: 4px; }
+button:active, button.flat:active, button.image-button:active { background-color: $PRESSED; border-color: $ACCENT; }
+button:checked, button.flat:checked, button.image-button:checked { background-color: $SELECTION; color: $FOREGROUND; border-color: $ACCENT; }
+button:checked:hover, button.flat:checked:hover, button.image-button:checked:hover { background-color: $SELECTION; border-color: $ACCENT; }
+button.suggested-action:hover, button.suggested-action:active, button.suggested-action:checked { background-color: $ACCENT; color: $BACKGROUND; border-color: $FOREGROUND; }
+button:disabled, button.flat:disabled, button.image-button:disabled, button.suggested-action:disabled { background-color: transparent; color: $MUTED; border-color: transparent; }
+entry, spinbutton { border: 1px solid $BORDER; background-color: $BACKGROUND; color: $FOREGROUND; caret-color: $ACCENT; }
+row:active, menuitem:active, modelbutton:active { background-color: $PRESSED; }
+row:selected:active { background-color: $SELECTION; }
+notebook header { padding: 0; border-bottom: 1px solid $BORDER; }
+notebook tab { min-height: 28px; padding: 4px 12px; border-bottom: 2px solid transparent; }
+notebook tab:hover { background-color: $HOVER; }
+notebook tab:checked { background-color: $BACKGROUND; border-bottom-color: $ACCENT; }
+.boxed-list { border: 1px solid $BORDER; }
+.boxed-list row { border-bottom: 1px solid $BORDER; }
+.boxed-list row:last-child { border-bottom: none; }
+check:not(:checked):not(:indeterminate), radio:not(:checked):not(:indeterminate) { background-color: $BACKGROUND; outline: 1px solid $MUTED; outline-offset: -1px; }
+check:indeterminate, radio:indeterminate { background-color: $ACCENT; color: $BACKGROUND; }
+switch { background-color: $HOVER; border: 1px solid $BORDER; }
+switch:checked { background-color: $ACCENT; border-color: $ACCENT; }
+switch slider { background-color: $FOREGROUND; border: none; }
+switch:checked slider { background-color: $BACKGROUND; }
+check:disabled, radio:disabled, switch:disabled, scale:disabled { color: $MUTED; }
 entry selection, textview text selection { background-color: $SELECTION; color: $FOREGROUND; }
 check, radio, check:checked, radio:checked { border: none; outline: none; box-shadow: none; }
 scale trough, progressbar trough { background-color: $HOVER; }
