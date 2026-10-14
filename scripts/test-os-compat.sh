@@ -104,7 +104,7 @@ check "trash-cli installed" "pacman -Q trash-cli &>/dev/null"
 check "Celluloid installed" "pacman -Q celluloid &>/dev/null"
 check "Papers installed" "pacman -Q papers &>/dev/null"
 
-for debloated in chromium thunar yaru-icon-theme kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra imv mupdf btop gdu mpv-mpris libreoffice-still; do
+for debloated in tensaku chromium thunar yaru-icon-theme kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra imv mupdf btop gdu mpv-mpris libreoffice-still; do
     check "debloat verified: $debloated removed" "! pacman -Q '$debloated' &>/dev/null"
 done
 check "docker daemon absent" "! command -v dockerd &>/dev/null"

@@ -139,7 +139,7 @@ if desktop_runtime_available; then
 
     assert_true "kitty terminal installed" "pacman -Q kitty &>/dev/null"
     assert_false "foot terminal removed" "pacman -Q foot &>/dev/null"
-    for debloated in chromium zathura zathura-pdf-mupdf thunar thunar-archive-plugin tumbler yaru-icon-theme system-config-printer totem evince eog dolphin okular gwenview xdg-desktop-portal-kde breeze breeze-gtk haruna kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra sushi gtksourceview4 gst-plugin-gtk foot micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
+    for debloated in tensaku chromium zathura zathura-pdf-mupdf thunar thunar-archive-plugin tumbler yaru-icon-theme system-config-printer totem evince eog dolphin okular gwenview xdg-desktop-portal-kde breeze breeze-gtk haruna kdenlive obs-studio libreoffice-fresh obsidian gnome-disk-utility gnome-themes-extra sushi gtksourceview4 gst-plugin-gtk foot micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
         assert_false "debloat verified: $debloated removed" "pacman -Q '$debloated' &>/dev/null"
     done
     assert_false "docker daemon absent" "command -v dockerd &>/dev/null"
