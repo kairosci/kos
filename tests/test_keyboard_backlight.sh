@@ -111,17 +111,29 @@ cp -r "$PROJECT_DIR/scripts/lib/messages" "$KEYBOARD_SANDBOX/"
 printf 'touch "%s"\nexit 93\n' "$KEYBOARD_SANDBOX/untrusted-ran" > "$KEYBOARD_SANDBOX/untrusted.sh"
 assert_true "root keyboard checks ignore user supplied bootstrap code" "KEYBOARD_TEST_EUID=0 OS_I18N_BOOT='$KEYBOARD_SANDBOX/untrusted.sh' bash '$KEYBOARD_SANDBOX/keyboard-root.sh' --check && [[ ! -e '$KEYBOARD_SANDBOX/untrusted-ran' ]]"
 SETUP_PROJECT="$KEYBOARD_SANDBOX/setup-project"
-mkdir -p "$SETUP_PROJECT/scripts/lib/modules"
+mkdir -p "$SETUP_PROJECT/scripts/lib/modules" "$SETUP_PROJECT/bin" "$SETUP_PROJECT/omarchy"
 cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$SETUP_PROJECT/scripts/lib/"
 printf '%s\n' 'root_setup_persistent() { return 0; }' > "$SETUP_PROJECT/scripts/lib/root-recovery.sh"
 cp -r "$PROJECT_DIR/scripts/lib/messages" "$SETUP_PROJECT/scripts/lib/"
-sed 's/\$EUID/${SETUP_TEST_EUID}/g' "$PROJECT_DIR/scripts/setup.sh" > "$SETUP_PROJECT/scripts/setup.sh"
+sed -e 's/\$EUID/${SETUP_TEST_EUID}/g' -e "s|/usr/share/omarchy|$SETUP_PROJECT/omarchy|g" "$PROJECT_DIR/scripts/setup.sh" > "$SETUP_PROJECT/scripts/setup.sh"
 cat > "$SETUP_PROJECT/scripts/lib/target-user.sh" <<'MOCK'
 target_user_resolve() {
     printf 'target\n' >> "$SETUP_TRACE"
-    getent passwd | awk -F: '$3 >= 1000 && $3 < 65534 { print $1; exit }'
+    printf 'setup-user\n'
 }
 MOCK
+cat > "$SETUP_PROJECT/bin/id" <<'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+[[ "$*" == setup-user ]]
+MOCK
+cat > "$SETUP_PROJECT/bin/pacman" <<'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+[[ "$*" == '-Q omarchy' && ${SETUP_NATIVE_MISSING:-0} == 0 ]]
+MOCK
+printf '%s\n' '#!/usr/bin/env bash' 'set -euo pipefail' 'exit 0' > "$SETUP_PROJECT/bin/omarchy"
+chmod 755 "$SETUP_PROJECT/bin/"*
 printf '%s\n' 'printf "keyboard\n" >> "$SETUP_TRACE"' > "$SETUP_PROJECT/scripts/lib/keyboard-backlight-policy.sh"
 printf '%s\n' 'printf "packages\n" >> "$SETUP_TRACE"' > "$SETUP_PROJECT/scripts/lib/modules/00-env.sh"
 while IFS= read -r module; do
@@ -130,7 +142,7 @@ done < <(sed -n 's|^[[:space:]]*"\$MODULES_DIR/\([^"]*\)".*|\1|p' "$PROJECT_DIR/
 printf '%s\n' 'source "$PROJECT_ROOT/scripts/lib/keyboard-backlight-policy.sh"' > "$SETUP_PROJECT/scripts/lib/modules/91-suspend-resume.sh"
 SETUP_TRACE="$KEYBOARD_SANDBOX/setup-trace"
 run_setup_scope() {
-    SETUP_TEST_EUID="${SETUP_TEST_EUID:-0}" OS_LOG_STDOUT=1 SETUP_TRACE="$SETUP_TRACE" \
+    PATH="$SETUP_PROJECT/bin:$PATH" SETUP_TEST_EUID="${SETUP_TEST_EUID:-0}" OS_LOG_STDOUT=1 SETUP_TRACE="$SETUP_TRACE" \
         OS_I18N_DIR="$SETUP_PROJECT/scripts/lib/messages" bash "$SETUP_PROJECT/scripts/setup.sh" "$@"
 }
 : > "$SETUP_TRACE"
@@ -144,5 +156,8 @@ assert_false "keyboard scope rejects inherited preview regeneration" "OS_REBUILD
 assert_false "keyboard scope retains the privileged setup requirement" "SETUP_TEST_EUID=1000 run_setup_scope --scope keyboard"
 assert_true "invalid and unprivileged scopes leave all stages untouched" "[[ ! -s '$SETUP_TRACE' ]]"
 assert_true "default setup still runs the full module list" "run_setup_scope && [[ \"\$(cat '$SETUP_TRACE')\" == $'target\npackages\nkeyboard' ]]"
+: > "$SETUP_TRACE"
+assert_false "full setup rejects a missing native Omarchy package" "SETUP_NATIVE_MISSING=1 run_setup_scope"
+assert_true "missing native runtime stops before package provisioning" "[[ \"\$(cat '$SETUP_TRACE')\" == target ]]"
 
 test_summary
