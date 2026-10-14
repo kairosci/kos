@@ -4,7 +4,7 @@
 
 Native Bash configuration and hardening for an existing Omarchy installation.
 
-Install Omarchy first, then run `make setup` from this repository. Setup preserves the Omarchy runtime and system identity. The full, keyboard, desktop and recovery scopes are supported; custom distribution migration and ISO generation have been removed.
+Install Omarchy first, then run `make setup` from this repository. Setup preserves the Omarchy runtime and system identity. The full, keyboard, desktop and recovery scopes are supported; custom distribution migration and ISO generation have been removed. Setup retains `neovim` and `omarchy-nvim` for LazyVim and removes Tensaku alongside the retired desktop alternatives while preserving personal configuration.
 
 `sudo make setup SCOPE=desktop` restores the native terminal configs and reconciles the running Omarchy shell and wallpaper without package provisioning. Previous terminal configs are preserved under `~/.local/state/os/desktop-defaults/`. It also works during a snapshot boot.
 

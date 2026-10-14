@@ -3,6 +3,7 @@
 set -euo pipefail
 
 DEBLOAT=(
+    tensaku
     btop
     gdu
     imv

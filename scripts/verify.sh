@@ -89,7 +89,7 @@ done
 tcheck "check.pkg_installed" "pacman -Q slack-desktop &>/dev/null" slack-desktop
 tcheck "check.pkg_installed" "pacman -Q discord &>/dev/null" discord
 tcheck "check.pkg_removed" "! pacman -Q chromium &>/dev/null" chromium
-for pkg in micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
+for pkg in tensaku micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
     tcheck "check.pkg_removed" "! pacman -Q $pkg &>/dev/null" "$pkg"
 done
 tcheck "check.pkg_installed" "pacman -Q fzf &>/dev/null" fzf
