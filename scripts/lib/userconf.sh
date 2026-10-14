@@ -69,6 +69,7 @@ merge_user_ini() {
                 sections[section]=1
             } else if ($0 ~ /^[^#;=]+=/) {
                 key=$0; sub(/=.*/, "", key)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
                 keys[section, ++lengths[section]]=key
                 values[section, key]=$0
             }
@@ -82,6 +83,7 @@ merge_user_ini() {
         /^\[/ { section=$0; print; emit(section); next }
         /^[^#;=]+=/ {
             key=$0; sub(/=.*/, "", key)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
             if ((section, key) in values) next
         }
         { print }
