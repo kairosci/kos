@@ -29,12 +29,12 @@ check() {
 section() { printf '%b\n' "\n${BOLD}$1${NC}"; }
 
 section "Battery Charge Threshold"
-check "power.conf policy exists" "[[ -f /etc/kos/power.conf ]]"
-check "power.conf defines charge limit" "grep -q 'BATTERY_CHARGE_LIMIT=75' /etc/kos/power.conf 2>/dev/null"
+check "power.conf policy exists" "[[ -f /etc/os/power.conf ]]"
+check "power.conf defines charge limit" "grep -q 'BATTERY_CHARGE_LIMIT=75' /etc/os/power.conf 2>/dev/null"
 check "battery charge udev rule exists" "[[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]"
 check "battery charge tmpfiles exists" "[[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]"
 check "battery service enabled" "systemctl is-enabled battery-charge-threshold.service &>/dev/null || [[ -L /etc/systemd/system/multi-user.target.wants/battery-charge-threshold.service ]]"
-BATTERY_HELPER=/usr/local/libexec/kos-set-battery-charge-limit
+BATTERY_HELPER=/usr/local/libexec/os-set-battery-charge-limit
 if [[ -x "$BATTERY_HELPER" ]]; then
     check "$(t check.battery_policy_applied)" "[[ \"\$('$BATTERY_HELPER' --query state_limit)\" == \"\$('$BATTERY_HELPER' --query limit)\" ]]"
     functional_nodes=$("$BATTERY_HELPER" --query functional_nodes) || exit 1
@@ -46,11 +46,11 @@ if [[ -x "$BATTERY_HELPER" ]]; then
 fi
 
 section "Low-Battery Session Protection"
-check "low-battery hibernate policy exists" "[[ -f /etc/UPower/UPower.conf.d/99-kos-low-battery.conf ]]"
-check "low-battery action is hibernate" "grep -q '^CriticalPowerAction=Hibernate' /etc/UPower/UPower.conf.d/99-kos-low-battery.conf 2>/dev/null"
-check "low-battery warning at 20 percent" "grep -q '^PercentageLow=20' /etc/UPower/UPower.conf.d/99-kos-low-battery.conf 2>/dev/null"
-check "low-battery critical at 10 percent" "grep -q '^PercentageCritical=10' /etc/UPower/UPower.conf.d/99-kos-low-battery.conf 2>/dev/null"
-check "hibernate action at 5 percent" "grep -q '^PercentageAction=5' /etc/UPower/UPower.conf.d/99-kos-low-battery.conf 2>/dev/null"
+check "low-battery hibernate policy exists" "[[ -f /etc/UPower/UPower.conf.d/99-os-low-battery.conf ]]"
+check "low-battery action is hibernate" "grep -q '^CriticalPowerAction=Hibernate' /etc/UPower/UPower.conf.d/99-os-low-battery.conf 2>/dev/null"
+check "low-battery warning at 20 percent" "grep -q '^PercentageLow=20' /etc/UPower/UPower.conf.d/99-os-low-battery.conf 2>/dev/null"
+check "low-battery critical at 10 percent" "grep -q '^PercentageCritical=10' /etc/UPower/UPower.conf.d/99-os-low-battery.conf 2>/dev/null"
+check "hibernate action at 5 percent" "grep -q '^PercentageAction=5' /etc/UPower/UPower.conf.d/99-os-low-battery.conf 2>/dev/null"
 
 section "Runtime Performance"
 check "perf sysctl persisted" "[[ -f /etc/sysctl.d/99-perf.conf ]]"

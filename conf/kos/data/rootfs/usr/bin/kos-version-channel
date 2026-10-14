@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# kos:summary=Print the active kos release channel
-set -euo pipefail
-if [[ -f /etc/kos/channel ]]; then
-    cat /etc/kos/channel
-else
-    printf 'stable\n'
-fi

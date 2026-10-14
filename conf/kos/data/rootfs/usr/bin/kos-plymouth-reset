@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Restore the default Kos Plymouth boot theme and SDDM login screen
-# kos:requires-sudo=true
-
-set -euo pipefail
-
-"$KOS_PATH/bin/kos-refresh-plymouth"
-"$KOS_PATH/bin/kos-refresh-sddm"

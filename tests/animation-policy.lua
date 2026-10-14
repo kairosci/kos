@@ -1,5 +1,6 @@
 local animations = {}
 local config = {}
+local windows = {}
 hl = {
   config = function(value) config = value end,
   curve = function(_, value)
@@ -10,12 +11,20 @@ hl = {
   end,
   animation = function(value) animations[value.leaf] = value end,
 }
-o = { window = function() end }
+o = { window = function(match, rules)
+  windows[#windows + 1] = { match = match, rules = rules }
+end }
 for _, leaf in ipairs({ "windowsIn", "windowsOut", "windowsMove", "workspacesIn", "workspacesOut", "specialWorkspaceIn", "specialWorkspaceOut" }) do
   animations[leaf] = { enabled = true, style = "slide" }
 end
 dofile(arg[1])
 assert(config.general.allow_tearing == false)
+assert(config.misc == nil or config.misc.size_limits_tiled ~= true)
+assert(windows[2].match.float == true)
+assert(windows[2].rules.max_size[1] == "monitor_w-2")
+assert(windows[2].rules.max_size[2] == "monitor_h-2")
+assert(windows[3].match == "xdg-desktop-portal-gtk")
+assert(windows[3].rules.center == true)
 for _, leaf in ipairs({ "global", "windows", "windowsIn", "windowsOut", "windowsMove", "workspaces", "workspacesIn", "workspacesOut", "specialWorkspace", "specialWorkspaceIn", "specialWorkspaceOut", "borderangle" }) do
   assert(animations[leaf].enabled == false, leaf)
 end

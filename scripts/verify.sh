@@ -6,7 +6,6 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 source "$SCRIPT_DIR/lib/i18n.sh"
 source "$SCRIPT_DIR/lib/target-user.sh"
-source "$SCRIPT_DIR/lib/os-identity.sh"
 
 i18n_init
 
@@ -43,7 +42,7 @@ can_inspect_system() {
 
 disk_entry_valid() {
     local disk_entry
-    for disk_entry in "/usr/share/kos/applications/Disk Usage.desktop" "$HOME/.local/share/applications/Disk Usage.desktop"; do
+    for disk_entry in "/usr/share/omarchy/applications/Disk Usage.desktop" "$HOME/.local/share/applications/Disk Usage.desktop"; do
         [[ ! -f "$disk_entry" ]] || grep -qx Hidden=true "$disk_entry" || return 1
     done
 }
@@ -77,7 +76,6 @@ tcheck() {
     check "$(t "$key" "$@")" "$condition"
 }
 
-tcheck "identity.check" "kos_identity_valid"
 section verify.sec_packages
 tcheck "check.pkg_removed" "! pacman -Q qutebrowser &>/dev/null" qutebrowser
 tcheck "check.pkg_removed" "! pacman -Q python-adblock &>/dev/null" python-adblock
@@ -85,14 +83,12 @@ for pkg in geany geany-plugins; do
     tcheck "check.pkg_removed" "! pacman -Q $pkg &>/dev/null" "$pkg"
 done
 tcheck "check.pkg_installed" "pacman -Q brave-origin-bin &>/dev/null" brave-origin-bin
-for pkg in zed nautilus gvfs papers loupe celluloid baobab resources onlyoffice-bin; do
+for pkg in zed neovim omarchy-nvim nautilus gvfs papers loupe celluloid baobab resources onlyoffice-bin; do
     tcheck "check.pkg_installed" "pacman -Q $pkg &>/dev/null" "$pkg"
 done
 tcheck "check.pkg_installed" "pacman -Q slack-desktop &>/dev/null" slack-desktop
 tcheck "check.pkg_installed" "pacman -Q discord &>/dev/null" discord
 tcheck "check.pkg_removed" "! pacman -Q chromium &>/dev/null" chromium
-tcheck "check.pkg_removed" "! pacman -Q neovim &>/dev/null" neovim
-tcheck "check.pkg_removed" "! pacman -Q kos-nvim &>/dev/null" kos-nvim
 for pkg in micro imv mupdf btop gdu mpv-mpris libreoffice-still; do
     tcheck "check.pkg_removed" "! pacman -Q $pkg &>/dev/null" "$pkg"
 done
@@ -133,8 +129,8 @@ tcheck "check.tool_present" "pacman -Q herdr &>/dev/null" herdr
 tcheck "check.tool_present" "pacman -Q gum &>/dev/null" gum
 
 section verify.sec_browser
-tcheck "check.default_browser" "[[ \"\$(xdg-settings get default-web-browser 2>/dev/null)\" == brave-origin.desktop ]]"
-tcheck "check.default_editor"  "[[ \"\$(cat \$HOME/.local/state/kos/defaults/editor 2>/dev/null)\" == zed ]]"
+tcheck "check.default_browser" "[[ \"\$(env -u BROWSER xdg-settings get default-web-browser 2>/dev/null)\" == brave-origin.desktop ]]"
+tcheck "check.default_editor"  "[[ \"\$(cat \$HOME/.local/state/omarchy/defaults/editor 2>/dev/null)\" == zed ]]"
 tcheck "check.default_editor" "[[ \"\$(xdg-mime query default text/plain)\" == dev.zed.Zed.desktop ]]"
 section verify.sec_firewall
 if UFW_STATUS=$(priv ufw status 2>/dev/null); then
@@ -236,21 +232,21 @@ section verify.sec_health
 tcheck "check.tpm_verity_removed" "! [[ -f /usr/lib/nvpcr/verity.nvpcr ]]"
 tcheck "check.voxtype_inactive" "! systemctl --user is-active voxtype 2>/dev/null | grep -q '^active$'"
 tcheck "check.kitty_terminal" "pacman -Q kitty &>/dev/null && ! pacman -Q foot &>/dev/null"
-tcheck "check.webapps_removed" "! grep -rlE 'kos-(launch-webapp|webapp-handler)' /usr/share/kos/applications 2>/dev/null"
+tcheck "check.webapps_removed" "! grep -rlE 'omarchy-(launch-webapp|webapp-handler)' /usr/share/omarchy/applications 2>/dev/null"
 
 section verify.sec_power
 if compgen -G '/sys/class/leds/*kbd_backlight*' >/dev/null; then
-    tcheck "check.keyboard_policy" "[[ -x /usr/local/libexec/kos-keyboard-backlight && -f /etc/systemd/system/kos-keyboard-backlight@.service && -f /etc/udev/rules.d/99-kos-keyboard-backlight.rules ]] && systemctl is-enabled --quiet kos-keyboard-backlight.service && systemctl is-enabled --quiet kos-keyboard-backlight.timer && systemctl is-active --quiet kos-keyboard-backlight.timer"
+    tcheck "check.keyboard_policy" "[[ -x /usr/local/libexec/os-keyboard-backlight && -f /etc/systemd/system/os-keyboard-backlight@.service && -f /etc/udev/rules.d/99-os-keyboard-backlight.rules ]] && systemctl is-enabled --quiet os-keyboard-backlight.service && systemctl is-enabled --quiet os-keyboard-backlight.timer && systemctl is-active --quiet os-keyboard-backlight.timer"
     tcheck "check.keyboard_maximum" "bash '$SCRIPT_DIR/lib/keyboard-backlight.sh' --check"
 else
     skip "$(t power.keyboard_unsupported)"
 fi
-tcheck "check.power_conf" "[[ -f /etc/kos/power.conf ]]"
+tcheck "check.power_conf" "[[ -f /etc/os/power.conf ]]"
 tcheck "check.battery_udev" "[[ -f /etc/udev/rules.d/98-battery-charge-threshold.rules ]]"
 tcheck "check.battery_tmpfiles" "[[ -f /etc/tmpfiles.d/battery-charge-threshold.conf ]]"
 tcheck "check.battery_service" "systemctl is-enabled battery-charge-threshold.service &>/dev/null || [[ -L /etc/systemd/system/multi-user.target.wants/battery-charge-threshold.service ]]"
 tcheck "check.battery_service" "systemctl is-enabled --quiet battery-charge-threshold.timer && systemctl is-active --quiet battery-charge-threshold.timer"
-BATTERY_HELPER=/usr/local/libexec/kos-set-battery-charge-limit
+BATTERY_HELPER=/usr/local/libexec/os-set-battery-charge-limit
 BATTERY_STATE_LIMIT=""
 BATTERY_FUNCTIONAL=""
 BATTERY_DRIFT=""
@@ -259,7 +255,7 @@ if [[ -x "$BATTERY_HELPER" ]]; then
     BATTERY_FUNCTIONAL=$("$BATTERY_HELPER" --query functional_nodes 2>/dev/null) || BATTERY_FUNCTIONAL=""
     BATTERY_DRIFT=$("$BATTERY_HELPER" --query drift 2>/dev/null) || BATTERY_DRIFT=""
 fi
-BATTERY_POLICY=$(sed -n 's/^BATTERY_CHARGE_LIMIT=\([0-9][0-9]*\)$/\1/p' /etc/kos/power.conf 2>/dev/null | head -1)
+BATTERY_POLICY=$(sed -n 's/^BATTERY_CHARGE_LIMIT=\([0-9][0-9]*\)$/\1/p' /etc/os/power.conf 2>/dev/null | head -1)
 BATTERY_POLICY=${BATTERY_POLICY:-75}
 
 if [[ -n "$BATTERY_STATE_LIMIT" && -n "$BATTERY_FUNCTIONAL" && -n "$BATTERY_DRIFT" ]]; then
@@ -276,16 +272,16 @@ else
 fi
 if [[ -r /sys/power/mem_sleep ]]; then
     if grep -q '\[deep\]' /sys/power/mem_sleep; then
-        tcheck "check.suspend_conf" "grep -q '^MemorySleepMode=deep$' /etc/systemd/sleep.conf.d/99-kos-suspend.conf"
+        tcheck "check.suspend_conf" "grep -q '^MemorySleepMode=deep$' /etc/systemd/sleep.conf.d/99-os-suspend.conf"
     elif grep -q '\[s2idle\]' /sys/power/mem_sleep; then
-        tcheck "check.suspend_conf" "grep -q '^MemorySleepMode=s2idle$' /etc/systemd/sleep.conf.d/99-kos-suspend.conf"
+        tcheck "check.suspend_conf" "grep -q '^MemorySleepMode=s2idle$' /etc/systemd/sleep.conf.d/99-os-suspend.conf"
     else
-        tcheck "check.suspend_conf" "[[ -f /etc/systemd/sleep.conf.d/99-kos-suspend.conf ]]"
+        tcheck "check.suspend_conf" "[[ -f /etc/systemd/sleep.conf.d/99-os-suspend.conf ]]"
     fi
 fi
 
 section verify.sec_sched
-tcheck "check.weekly_audit" "{ systemctl is-enabled --quiet kos-security-audit.timer && systemctl is-active --quiet kos-security-audit.timer; } || { systemctl is-enabled --quiet cronie.service && systemctl is-active --quiet cronie.service; }"
+tcheck "check.weekly_audit" "{ systemctl is-enabled --quiet os-security-audit.timer && systemctl is-active --quiet os-security-audit.timer; } || { systemctl is-enabled --quiet cronie.service && systemctl is-active --quiet cronie.service; }"
 if [[ -r /etc/cron.weekly/security-audit.sh ]]; then
     tcheck "check.weekly_audit" "[[ -f /etc/cron.weekly/security-audit.sh && -x /etc/cron.weekly/security-audit.sh ]]"
 elif priv test -r /etc/cron.weekly/security-audit.sh 2>/dev/null; then
@@ -300,7 +296,7 @@ tcheck "check.git_config"       "[[ -f \$HOME/.config/git/config ]]"
 tcheck "check.lazygit_config"   "[[ -f \$HOME/.config/lazygit/config.yml ]]"
 tcheck "check.portals_conf"     "[[ -f \$HOME/.config/xdg-desktop-portal/portals.conf ]] && grep -q 'FileChooser=gtk' \$HOME/.config/xdg-desktop-portal/portals.conf"
 tcheck "check.keyring_pam" "grep -Eq '^session[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so.*auto_start' /etc/pam.d/login"
-tcheck "check.keyring_backend" "grep -qx gnome-keyring /etc/kos/keyring-backend"
+tcheck "check.keyring_backend" "grep -qx gnome-keyring /etc/os/keyring-backend"
 tcheck "check.keyring_provider" "pacman -Q gnome-keyring seahorse &>/dev/null && ! pacman -Q keepassxc &>/dev/null"
 tcheck "check.desktop_graphical" "pacman -Q nautilus gvfs xdg-desktop-portal-gtk &>/dev/null && [[ \"\$(xdg-mime query default inode/directory)\" == org.gnome.Nautilus.desktop ]]"
 tcheck "check.cli_secrets"      "command -v secret-tool &>/dev/null && command -v pass &>/dev/null"
@@ -316,14 +312,14 @@ tcheck "check.retained_updateable" "package_pins_retained_updateable"
 tcheck "check.ignorepkg" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 tcheck "check.icon_theme"      "gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | grep -q 'Qogir'"
 tcheck "check.cursor_theme"  "gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | grep -q 'capitaine-cursors'"
-tcheck "check.no_tela"         "! grep -rq 'Tela' $HOME/.config/kos/themes/ 2>/dev/null"
-tcheck "check.folder_color_hook"        "[[ -x $HOME/.config/kos/hooks/theme-set.d/folder-color ]]"
+tcheck "check.no_tela"         "! grep -rq 'Tela' $HOME/.config/omarchy/themes/ 2>/dev/null"
+tcheck "check.folder_color_hook"        "[[ -x $HOME/.config/omarchy/hooks/theme-set.d/folder-color ]]"
 
 section verify.sec_desktop
-tcheck "check.desktop_no_foot" "pacman -Q foot &>/dev/null || [[ ! -f \"/usr/share/kos/applications/foot.desktop\" ]]"
+tcheck "check.desktop_no_foot" "pacman -Q foot &>/dev/null || [[ ! -f \"/usr/share/omarchy/applications/foot.desktop\" ]]"
 tcheck "check.desktop_disk_valid" "disk_entry_valid"
-tcheck "check.desktop_no_docker" "command -v lazydocker &>/dev/null || [[ ! -f \"/usr/share/kos/applications/Docker.desktop\" ]]"
-tcheck "check.desktop_hook" "[[ -f /etc/pacman.d/hooks/99-kos-desktop-cleanup.hook ]] && [[ -x /usr/local/libexec/kos-desktop-cleanup ]]"
+tcheck "check.desktop_no_docker" "command -v lazydocker &>/dev/null || [[ ! -f \"/usr/share/omarchy/applications/Docker.desktop\" ]]"
+tcheck "check.desktop_hook" "[[ -f /etc/pacman.d/hooks/99-os-desktop-cleanup.hook ]] && [[ -x /usr/local/libexec/os-desktop-cleanup ]]"
 
 section verify.sec_performance
 # shellcheck source=scripts/lib/responsiveness.sh
@@ -348,7 +344,7 @@ tcheck "verify.locale_conf"  "[[ -f /etc/locale.conf ]]"
 tcheck "verify.locale_lang"  "[[ -n \"$VERIFY_LANG\" ]]"
 tcheck "verify.locale_keymap" "grep -qE '^KEYMAP=' /etc/vconsole.conf 2>/dev/null"
 tcheck "verify.locale_generated" "locale_generated"
-tcheck "verify.locale_profile" "[[ -f /etc/profile.d/kos-locale.sh ]]"
+tcheck "verify.locale_profile" "[[ -f /etc/profile.d/os-locale.sh ]]"
 tcheck "verify.locale_hyprland" "grep -rq 'kb_layout' /home/*/.config/hypr/input.lua 2>/dev/null"
 catalog_check() {
     local lang
@@ -358,7 +354,7 @@ catalog_check() {
     return 0
 }
 tcheck "verify.locale_catalogs" "catalog_check"
-tcheck "verify.locale_i18n" "[[ -n \"$I18N_LANG\" ]] && (( ${#KOS_I18N[@]} > 0 ))"
+tcheck "verify.locale_i18n" "[[ -n \"$I18N_LANG\" ]] && (( ${#OS_I18N[@]} > 0 ))"
 
 printf '\n'
 printf '%s\n' "$(t verify.tests_executed "$((PASS + FAIL))")"

@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Restart the hyprsunset service (used for blue light filtering/night light).
-
-kos-restart-app hyprsunset

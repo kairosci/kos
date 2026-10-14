@@ -4,9 +4,9 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$PROJECT_DIR"
 MODULES_DIR="$SCRIPT_DIR/lib/modules"
-LOG="${KOS_LOG:-$PROJECT_DIR/setup.log}"
+LOG="${OS_LOG:-$PROJECT_DIR/setup.log}"
 
-if [[ "${KOS_LOG_STDOUT:-0}" -eq 0 ]]; then
+if [[ "${OS_LOG_STDOUT:-0}" -eq 0 ]]; then
     exec > >(tee -a "$LOG") 2>&1
 fi
 umask 077
@@ -23,7 +23,19 @@ scope_specified=0
 while (($#)); do
     case "$1" in
         --rebuild-previews)
-            KOS_REBUILD_PREVIEWS=1
+            OS_REBUILD_PREVIEWS=1
+            shift
+            ;;
+        --restore-omarchy)
+            OS_RESTORE_OMARCHY=1
+            shift
+            ;;
+        --reset-snapshots)
+            OS_RESET_SNAPSHOTS=1
+            shift
+            ;;
+        --run-migrations)
+            OS_RUN_MIGRATIONS=1
             shift
             ;;
         --scope)
@@ -36,26 +48,27 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|release|iso|migrate|kernel) ;;
+    full|keyboard|recovery|desktop) ;;
     *) err "setup.invalid_args" ;;
 esac
-[[ ( "$SETUP_SCOPE" == full || "$SETUP_SCOPE" == migrate ) || "${KOS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
+[[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
+[[ "$SETUP_SCOPE" == full || "${OS_RUN_MIGRATIONS:-0}" != 1 ]] || err "setup.invalid_args"
+[[ "$SETUP_SCOPE" == full || ( "${OS_RESTORE_OMARCHY:-0}" != 1 && "${OS_RESET_SNAPSHOTS:-0}" != 1 ) ]] || err "setup.invalid_args"
 
 [[ $EUID -eq 0 ]] || err "__root_required"
 
-if [[ "$SETUP_SCOPE" == kernel ]]; then
-    source "$SCRIPT_DIR/lib/kernel-build.sh"
-    kos_kernel_build "$PROJECT_ROOT" "$PROJECT_ROOT/dist"
+source "$SCRIPT_DIR/lib/root-recovery.sh"
+if [[ "$SETUP_SCOPE" == recovery || "$SETUP_SCOPE" == desktop ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    if [[ "$SETUP_SCOPE" == recovery ]]; then
+        root_recovery_restore || err "recovery.failed"
+    else
+        root_recovery_shell || err "recovery.failed"
+    fi
     exit 0
 fi
-
-if [[ "$SETUP_SCOPE" == release || "$SETUP_SCOPE" == iso ]]; then
-    log "__stage" "96-release-iso.sh"
-    # shellcheck source=lib/modules/96-release-iso.sh
-    source "$MODULES_DIR/96-release-iso.sh"
-    log setup.release_done
-    exit 0
-fi
+root_setup_persistent || err "setup.snapshot_boot"
 
 if [[ "$SETUP_SCOPE" == keyboard ]]; then
     log "__stage" "keyboard-backlight-policy.sh"
@@ -65,32 +78,21 @@ if [[ "$SETUP_SCOPE" == keyboard ]]; then
     exit 0
 fi
 
-PRIMARY_USER=${KOS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
 if [[ "$PRIMARY_USER" == root ]] || ! id "$PRIMARY_USER" >/dev/null; then
     err "__cannot_determine_user"
 fi
 
-if [[ "$SETUP_SCOPE" == migrate ]]; then
-    source "$SCRIPT_DIR/lib/migration.sh"
-    _legacy_desktop=$(head -n 1 "$PROJECT_ROOT/conf/kos/data/migration-packages.list")
-    _legacy_automation=$(cat "$PROJECT_ROOT/conf/kos/data/legacy-automation")
-    for _home in /home/*; do
-        [[ -d "$_home" && ! -L "$_home" ]] || continue
-        kos_migrate_preflight "$_home" "$_legacy_desktop" "$_legacy_automation" || err release.invalid
-    done
-    source "$SCRIPT_DIR/lib/distribution.sh"
-    _runtime_package=$(kos_package_build "$PROJECT_ROOT" "$PROJECT_ROOT/dist") || err release.invalid
-    mapfile -t _runtime_packages < "$PROJECT_ROOT/conf/kos/data/runtime-packages.list"
-    pacman -Syu --needed --noconfirm "${_runtime_packages[@]}"
-    pacman -U --noconfirm "$_runtime_package"
+if ! pacman -Q omarchy >/dev/null || [[ ! -d /usr/share/omarchy ]] || ! command -v omarchy >/dev/null; then
+    err "setup.omarchy_required"
 fi
 
 MODULE_FILES=(
     "$MODULES_DIR/00-env.sh"
-    "$MODULES_DIR/02-kos-runtime.sh"
-    "$MODULES_DIR/03-kos-migration.sh"
+    "$MODULES_DIR/01-os-namespace.sh"
+    "$MODULES_DIR/04-omarchy-restore.sh"
     "$MODULES_DIR/05-locale.sh"
-    "$MODULES_DIR/06-os-identity.sh"
+    "$MODULES_DIR/06-omarchy-migrations.sh"
     "$MODULES_DIR/10-debloat.sh"
     "$MODULES_DIR/20-defaults.sh"
     "$MODULES_DIR/22-portals.sh"
@@ -111,15 +113,23 @@ MODULE_FILES=(
     "$MODULES_DIR/91-suspend-resume.sh"
     "$MODULES_DIR/92-responsiveness.sh"
     "$MODULES_DIR/95-maintenance.sh"
-    "$MODULES_DIR/96-release-iso.sh"
 )
 
 for mod in "${MODULE_FILES[@]}"; do
-    [[ -f "$mod" ]] || continue
+    [[ -f "$mod" ]] || err "setup.stage_missing" "$mod"
     mod_name=$(basename "$mod")
     log "__stage" "$mod_name"
     # shellcheck disable=SC1090
     source "$mod"
 done
+
+if [[ "${OS_RESTORE_OMARCHY:-0}" == 1 || "${OS_RESET_SNAPSHOTS:-0}" == 1 || "${OS_RUN_MIGRATIONS:-0}" == 1 ]]; then
+    user_as "$PRIMARY_USER" env OMARCHY_PATH=/usr/share/omarchy Hyprland --verify-config --config "$(getent passwd "$PRIMARY_USER" | cut -d: -f6)/.config/hypr/hyprland.lua" || err "restore.failed" "$PRIMARY_USER"
+    root_recovery_shell || err "recovery.failed"
+fi
+if [[ "${OS_RESET_SNAPSHOTS:-0}" == 1 ]]; then
+    source "$SCRIPT_DIR/lib/snapshot-baseline.sh"
+    snapshot_baseline_reset || err "snapshots.failed"
+fi
 
 log "__complete"

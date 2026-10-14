@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Reload hyprland configuration (used by the Kos theme switching).
-
-hyprctl reload >/dev/null

@@ -63,7 +63,7 @@ check "gwenview config absent when gwenview removed" "check_home_absent 'gwenvie
 check "obsidian config absent when obsidian removed" "check_home_absent 'obsidian' obsidian obsidian .config/obsidian"
 
 section "Stale Launchers and Caches"
-check "no kos webapp launchers in homes" "[[ -z \"\$(grep -rlE 'kos-(launch-webapp|webapp-handler)' /home/*/.local/share/applications 2>/dev/null)\" ]]"
+check "no os webapp launchers in homes" "[[ -z \"\$(grep -rlE 'os-(launch-webapp|webapp-handler)' /home/*/.local/share/applications 2>/dev/null)\" ]]"
 check "no thumbnails older than 30 days" "[[ -z \"\$(find /home/*/.cache/thumbnails -mindepth 1 -atime +30 2>/dev/null)\" ]]"
 check "no trash older than 30 days" "[[ -z \"\$(find /home/*/.local/share/Trash/files -mindepth 1 -atime +30 2>/dev/null)\" ]]"
 

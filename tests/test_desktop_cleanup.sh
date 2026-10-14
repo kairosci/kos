@@ -29,11 +29,11 @@ assert_file_contains "library restores user ownership" "$LIB" "desktop.chown_ski
 assert_file_contains "debloat module sweeps orphan entries" "$PROJECT_DIR/scripts/lib/modules/10-debloat.sh" "desktop-cleanup.sh"
 assert_file_contains "debloat module runs the sweep" "$PROJECT_DIR/scripts/lib/modules/10-debloat.sh" "desktop_cleanup_sweep"
 assert_file_contains "defaults module sweeps orphan entries" "$PROJECT_DIR/scripts/lib/modules/20-defaults.sh" "desktop_cleanup_sweep"
-assert_file_contains "desktop module installs the cleanup helper" "$PROJECT_DIR/scripts/lib/modules/25-desktop-cleanup.sh" "kos-desktop-cleanup"
+assert_file_contains "desktop module installs the cleanup helper" "$PROJECT_DIR/scripts/lib/modules/25-desktop-cleanup.sh" "os-desktop-cleanup"
 assert_file_contains "desktop module hooks package removal" "$PROJECT_DIR/scripts/lib/modules/25-desktop-cleanup.sh" "Operation = Remove"
 assert_file_contains "desktop module runs the general sweep" "$PROJECT_DIR/scripts/lib/modules/25-desktop-cleanup.sh" "desktop_cleanup_sweep"
 assert_file_contains "setup pipeline loads the desktop module" "$PROJECT_DIR/scripts/setup.sh" "25-desktop-cleanup.sh"
-assert_file_contains "post-update hook reapplies the entry sweep" "$PROJECT_DIR/hooks/post-update.d/99-kos-persist" "kos-desktop-cleanup"
+assert_file_contains "post-update hook reapplies the entry sweep" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "os-desktop-cleanup"
 assert_file_contains "verify checks foot orphans" "$PROJECT_DIR/scripts/verify.sh" "check.desktop_no_foot"
 assert_file_contains "verify validates the disk entry" "$PROJECT_DIR/scripts/verify.sh" "disk_entry_valid"
 assert_file_contains "verify checks docker orphans" "$PROJECT_DIR/scripts/verify.sh" "check.desktop_no_docker"
@@ -53,15 +53,15 @@ chmod +x "$DC_BIN/gdu"
 
 printf '%s\n' '[Desktop Entry]' 'Type=Application' 'TryExec=foot' 'Exec=foot' 'Name=Foot' > "$DC_SYS/foot.desktop"
 printf '%s\n' '[Desktop Entry]' 'Version=1.0' 'Name=Disk Usage' 'Exec=xdg-terminal-exec --app-id=TUI.float -e bash -c "dua i /"' 'Type=Application' > "$DC_SYS/Disk Usage.desktop"
-printf '%s\n' '[Desktop Entry]' 'Version=1.0' 'Name=Docker' 'Exec=xdg-terminal-exec --app-id=TUI.tile -e kos-launch-docker-tui' 'Type=Application' > "$DC_SYS/Docker.desktop"
+printf '%s\n' '[Desktop Entry]' 'Version=1.0' 'Name=Docker' 'Exec=xdg-terminal-exec --app-id=TUI.tile -e omarchy-launch-docker-tui' 'Type=Application' > "$DC_SYS/Docker.desktop"
 printf '%s\n' '[Desktop Entry]' 'Name=KeepMe' 'Exec=/usr/bin/true' 'Type=Application' > "$DC_SYS/keep.desktop"
-printf '%s\n' '[Desktop Entry]' 'Name=Gone' 'Exec=/nonexistent-kos-app-xyz --foo' 'Type=Application' > "$DC_HOMES/tester/.local/share/applications/gone.desktop"
+printf '%s\n' '[Desktop Entry]' 'Name=Gone' 'Exec=/nonexistent-os-app-xyz --foo' 'Type=Application' > "$DC_HOMES/tester/.local/share/applications/gone.desktop"
 printf '%s\n' '[Default Applications]' 'inode/directory=yazi-terminal.desktop;foot.desktop;' > "$DC_HOMES/tester/.config/mimeapps.list"
 
-export KOS_KOS_APPS_DIR="$DC_SYS"
-export KOS_HOMES_ROOT="$DC_HOMES"
-export KOS_SYSTEM_APPS_DIRS="$DC_SANDBOX/sysapps"
-export KOS_DESKTOP_SKIP_REFRESH=1
+export OS_DESKTOP_APPS_DIR="$DC_SYS"
+export OS_HOMES_ROOT="$DC_HOMES"
+export OS_SYSTEM_APPS_DIRS="$DC_SANDBOX/sysapps"
+export OS_DESKTOP_SKIP_REFRESH=1
 export PATH="$DC_BIN:/usr/bin:/bin"
 mkdir -p "$DC_SANDBOX/sysapps"
 
@@ -91,33 +91,33 @@ desktop_cleanup_sweep
 DC_AFTER="$(md5sum "$DC_SYS"/*.desktop 2>/dev/null)"
 assert_equal "sweep is idempotent" "$DC_BEFORE" "$DC_AFTER"
 
-printf '%s\n' '[Desktop Entry]' 'Name=AlsoGone' 'TryExec=/nonexistent-kos-tryexec' 'Exec=/usr/bin/true' 'Type=Application' > "$DC_HOMES/tester/.local/share/applications/alsogone.desktop"
+printf '%s\n' '[Desktop Entry]' 'Name=AlsoGone' 'TryExec=/nonexistent-os-tryexec' 'Exec=/usr/bin/true' 'Type=Application' > "$DC_HOMES/tester/.local/share/applications/alsogone.desktop"
 
 DC_SYSAPPS="$DC_SANDBOX/sysapps-case"
 DC_FAKEBIN="$DC_SANDBOX/fakebin"
 mkdir -p "$DC_SYSAPPS" "$DC_FAKEBIN"
 printf '%s\n' '[Desktop Entry]' 'Name=ValidUnowned' 'Exec=/usr/bin/true' 'Type=Application' > "$DC_SYSAPPS/valid.desktop"
-printf '%s\n' '[Desktop Entry]' 'Name=OrphanUnowned' 'Exec=/nonexistent-kos-xyz' 'Type=Application' > "$DC_SYSAPPS/orphan.desktop"
-printf '%s\n' '[Desktop Entry]' 'Name=Protected' 'Exec=/nonexistent-kos-xyz' 'Type=Application' > "$DC_SYSAPPS/protected.desktop"
+printf '%s\n' '[Desktop Entry]' 'Name=OrphanUnowned' 'Exec=/nonexistent-os-xyz' 'Type=Application' > "$DC_SYSAPPS/orphan.desktop"
+printf '%s\n' '[Desktop Entry]' 'Name=Protected' 'Exec=/nonexistent-os-xyz' 'Type=Application' > "$DC_SYSAPPS/protected.desktop"
 printf '%s\n' '#!/bin/bash' 'if [[ "$1" == "-Qqo" && "$2" == *protected.desktop ]]; then echo fakepkg; exit 0; fi' 'exit 1' > "$DC_FAKEBIN/pacman"
 chmod +x "$DC_FAKEBIN/pacman"
 export PATH="$DC_FAKEBIN:$DC_BIN:/usr/bin:/bin"
 assert_true "unowned valid system entry is kept" "! desktop_cleanup_system_file '$DC_SYSAPPS/valid.desktop'"
 assert_true "package-owned entry is kept even with missing exec" "! desktop_cleanup_system_file '$DC_SYSAPPS/protected.desktop'"
 
-export KOS_SYSTEM_APPS_DIRS="$DC_SYSAPPS"
+export OS_SYSTEM_APPS_DIRS="$DC_SYSAPPS"
 desktop_cleanup_sweep
 assert_true "unowned system orphan removed" "[[ ! -f '$DC_SYSAPPS/orphan.desktop' ]]"
 assert_true "unowned valid system entry kept by the sweep" "[[ -f '$DC_SYSAPPS/valid.desktop' ]]"
 assert_true "package-owned entry survives the sweep" "[[ -f '$DC_SYSAPPS/protected.desktop' ]]"
 export PATH="$DC_BIN:/usr/bin:/bin"
 
-KOS_KOS_APPS_DIR="$DC_SYS" KOS_HOMES_ROOT="$DC_HOMES" KOS_SYSTEM_APPS_DIRS="$DC_SANDBOX/sysapps" KOS_DESKTOP_SKIP_REFRESH=1 bash "$LIB"
+OS_DESKTOP_APPS_DIR="$DC_SYS" OS_HOMES_ROOT="$DC_HOMES" OS_SYSTEM_APPS_DIRS="$DC_SANDBOX/sysapps" OS_DESKTOP_SKIP_REFRESH=1 bash "$LIB"
 assert_true "standalone helper removes tryexec orphans" "[[ ! -f '$DC_HOMES/tester/.local/share/applications/alsogone.desktop' ]]"
 
 printf '#!/bin/bash\nexit 0\n' > "$DC_BIN/baobab"
 chmod +x "$DC_BIN/baobab"
-export KOS_SYSTEM_APPS_DIRS="$DC_SANDBOX/sysapps"
+export OS_SYSTEM_APPS_DIRS="$DC_SANDBOX/sysapps"
 printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Disk analyzer' 'Exec=baobab' > "$DC_SANDBOX/sysapps/org.gnome.baobab.desktop"
 printf '%s\n' '[Desktop Entry]' 'Type=Application' 'Name=Duplicate' 'Exec=env GTK_USE_PORTAL=1 /usr/bin/baobab %U' > "$DC_SYS/graphical-disk.desktop"
 assert_true "wrapped alias of the canonical analyzer is removed" "desktop_cleanup_file '$DC_SYS/graphical-disk.desktop'"
@@ -153,6 +153,14 @@ update-desktop-database() { printf '[MIME Cache]\n' > "$1/mimeinfo.cache"; chmod
 assert_true "desktop cache refresh succeeds" "_desktop_cleanup_refresh_dir '$DC_SANDBOX/cache'"
 assert_true "shared desktop cache remains readable" "[[ \$(stat -c %a '$DC_SANDBOX/cache/mimeinfo.cache') == 644 ]]"
 unset -f update-desktop-database
+
+mkdir -p "$DC_SANDBOX/resources"
+printf '[Desktop Entry]\nExec=resources\n' > "$DC_SANDBOX/resources/org.gnome.Resources.desktop"
+cp "$DC_SANDBOX/resources/org.gnome.Resources.desktop" "$DC_SANDBOX/resources/net.nokyan.Resources.desktop"
+assert_false "GNOME Resources launcher remains canonical" 'OS_SYSTEM_APPS_DIRS="$DC_SANDBOX/resources" desktop_cleanup_duplicate "$DC_SANDBOX/resources/org.gnome.Resources.desktop"'
+assert_true "legacy Resources launcher is retired when the GNOME launcher exists" 'OS_SYSTEM_APPS_DIRS="$DC_SANDBOX/resources" desktop_cleanup_duplicate "$DC_SANDBOX/resources/net.nokyan.Resources.desktop"'
+rm "$DC_SANDBOX/resources/org.gnome.Resources.desktop"
+assert_false "legacy Resources launcher stays canonical on older versions" 'OS_SYSTEM_APPS_DIRS="$DC_SANDBOX/resources" desktop_cleanup_duplicate "$DC_SANDBOX/resources/net.nokyan.Resources.desktop"'
 
 rm -rf "$DC_SANDBOX"
 

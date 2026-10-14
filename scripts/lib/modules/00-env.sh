@@ -2,15 +2,6 @@
 
 set -euo pipefail
 
-log "env.sync"
-KOS_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm || err "env.sync_skipped"
-
-log "env.fixing_broken"
-for pkg_dir in /var/lib/pacman/local/*/; do
-    [[ -d "$pkg_dir" ]] || continue
-    [[ -f "$pkg_dir/desc" ]] || { warn "env.removing_broken" "$pkg_dir"; rm -rf "$pkg_dir"; }
-done
-
 aur_package_artifact() {
     local directory="$1" package="$2" artifact name
     for artifact in "$directory/$package-"*.pkg.tar.*; do
@@ -104,33 +95,45 @@ user_as() {
         "XDG_DATA_HOME=$home/.local/share"
         "XDG_STATE_HOME=$home/.local/state"
         "XDG_CACHE_HOME=$home/.cache"
-        "PATH=$home/.local/bin:/usr/share/kos/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin"
+        "PATH=$home/.local/bin:/usr/share/omarchy/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin"
         "XDG_RUNTIME_DIR=$runtime"
         "DBUS_SESSION_BUS_ADDRESS=$bus"
     )
-    if [[ -n "${KOS_LANG:-}" ]]; then _env+=("KOS_LANG=$KOS_LANG"); fi
-    if [[ -n "${KOS_FORCE_TZ:-}" ]]; then _env+=("KOS_FORCE_TZ=$KOS_FORCE_TZ"); fi
+    if [[ -n "${OS_LANG:-}" ]]; then _env+=("OS_LANG=$OS_LANG"); fi
+    if [[ -n "${OS_FORCE_TZ:-}" ]]; then _env+=("OS_FORCE_TZ=$OS_FORCE_TZ"); fi
     local session_env entry
-    if [[ -n "$bus" ]] && session_env=$(sudo -u "$user" env "XDG_RUNTIME_DIR=$runtime" "DBUS_SESSION_BUS_ADDRESS=$bus" systemctl --user show-environment); then
+    if [[ -n "$bus" ]] && session_env=$(sudo -u "$user" env "XDG_RUNTIME_DIR=$runtime" "DBUS_SESSION_BUS_ADDRESS=$bus" systemctl --user show-environment </dev/null); then
         while IFS= read -r entry; do
             case "$entry" in
-                WAYLAND_DISPLAY=*|DISPLAY=*|HYPRLAND_INSTANCE_SIGNATURE=*|XDG_CURRENT_DESKTOP=*) _env+=("$entry") ;;
+                WAYLAND_DISPLAY=*|DISPLAY=*|HYPRLAND_INSTANCE_SIGNATURE=*|XDG_CURRENT_DESKTOP=*|XDG_SESSION_TYPE=*) _env+=("$entry") ;;
             esac
         done <<< "$session_env"
     fi
     sudo -u "$user" env -u XDG_SESSION_DESKTOP -u DESKTOP_SESSION \
-        -u SUDO_USER -u SUDO_UID -u SUDO_GID -u PKEXEC_UID "${_env[@]}" "$@"
+        -u SUDO_USER -u SUDO_UID -u SUDO_GID -u PKEXEC_UID "${_env[@]}" \
+        bash -c 'cd "$HOME" && exec "$@"' bash "$@"
 }
 
-kos_as() {
+omarchy_as() {
     local user="$1"
     shift
-    [[ -n "$user" ]] || { warn "env.kos_as_no_user"; return 1; }
-    if [[ -z "${KOS_PATH:-}" ]]; then
-        if [[ -f /usr/share/kos/default/bash/env-bootstrap ]]; then
-            source /usr/share/kos/default/bash/env-bootstrap 2>/dev/null || warn "env.kos_bootstrap_skipped"
+    [[ -n "$user" ]] || { warn "env.omarchy_as_no_user"; return 1; }
+    if [[ -z "${OMARCHY_PATH:-}" ]]; then
+        if [[ -f /usr/share/omarchy/default/bash/env-bootstrap ]]; then
+            source /usr/share/omarchy/default/bash/env-bootstrap 2>/dev/null || warn "env.omarchy_bootstrap_skipped"
         fi
-        KOS_PATH="${KOS_PATH:-/usr/share/kos}"
+        OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}"
     fi
-    user_as "$user" env "KOS_PATH=$KOS_PATH" kos "$@"
+    user_as "$user" env "OMARCHY_PATH=$OMARCHY_PATH" omarchy "$@"
 }
+
+[[ "${1:-}" != --functions-only ]] || return 0
+
+log "env.sync"
+OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm || err "env.sync_skipped"
+
+log "env.fixing_broken"
+for pkg_dir in /var/lib/pacman/local/*/; do
+    [[ -d "$pkg_dir" ]] || continue
+    [[ -f "$pkg_dir/desc" ]] || { warn "env.removing_broken" "$pkg_dir"; rm -rf "$pkg_dir"; }
+done

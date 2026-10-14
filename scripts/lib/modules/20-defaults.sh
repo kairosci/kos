@@ -15,11 +15,15 @@ log "defaults.browser"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    user_as "$_user" xdg-settings set default-web-browser brave-origin.desktop 2>/dev/null || warn "defaults.browser_skipped_user" "$_user"
+    user_as "$_user" env -u BROWSER xdg-settings set default-web-browser brave-origin.desktop || warn "defaults.browser_skipped_user" "$_user"
 done
 
 log "defaults.graphical_apps"
 pacman -S --noconfirm --needed zed papers loupe celluloid baobab resources materia-gtk-theme || err "defaults.app_failed" "graphical desktop"
+
+
+log "gui.install_done" "LazyVim"
+pacman -S --noconfirm --needed neovim omarchy-nvim fd ripgrep lazygit tree-sitter-cli || err "defaults.app_failed" "LazyVim"
 
 for pkg in fzf universal-ctags shellcheck shfmt ruff yamllint; do
     if ! pacman -Q "$pkg" &>/dev/null; then
@@ -42,8 +46,8 @@ log "defaults.editor"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    mkdir -p "$user_home/.local/state/kos/defaults"
-    printf 'zed\n' > "$user_home/.local/state/kos/defaults/editor"
+    mkdir -p "$user_home/.local/state/omarchy/defaults"
+    printf 'zed\n' > "$user_home/.local/state/omarchy/defaults/editor"
     chown -R "$_user":"$_user" "$user_home/.local/state" 2>/dev/null || warn "defaults.editor_state_failed" "$_user"
 done
 
@@ -59,7 +63,7 @@ fi
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    kos_as "$_user" default terminal kitty 2>/dev/null || warn "defaults.terminal_skipped" "$_user"
+    omarchy_as "$_user" default terminal kitty 2>/dev/null || warn "defaults.terminal_skipped" "$_user"
 done
 
 log "defaults.trash_install"
@@ -89,24 +93,24 @@ for user_home in /home/*; do
     if [[ -f "$_bindings" ]] && grep -qE '^-- om(ablot|aconf)-yazi-fm:' "$_bindings"; then
         sed -i \
             -e '/^-- omablot-yazi-fm:/,/^o\.bind("SUPER + ALT + SHIFT + F"/d' \
-            -e '/^-- kos-yazi-fm:/,/^o\.bind("SUPER + ALT + SHIFT + F"/d' \
+            -e '/^-- os-yazi-fm:/,/^o\.bind("SUPER + ALT + SHIFT + F"/d' \
             "$_bindings" || warn "defaults.bindings_migration_skipped" "$_user"
         chown "$_user":"$_user" "$_bindings" 2>/dev/null || warn "defaults.bindings_chown" "$_user"
     fi
     if [[ -f "$_bindings" ]]; then
-        sed -i -e 's/kos-thunar-fm/kos-nautilus-fm/g' \
+        sed -i -e 's/os-thunar-fm/os-nautilus-fm/g' \
             -e 's/"thunar/"nautilus/g' \
             -e 's/thunar|Thunar/org.gnome.Nautilus/g' "$_bindings"
         chown "$_user:$_user" "$_bindings"
     fi
-    if [[ -f "$_bindings" ]] && ! grep -q 'kos-nautilus-fm' "$_bindings" 2>/dev/null; then
+    if [[ -f "$_bindings" ]] && ! grep -q 'os-nautilus-fm' "$_bindings" 2>/dev/null; then
         cat >> "$_bindings" << 'LUAEOF'
 
--- kos-nautilus-fm
+-- os-nautilus-fm
 hl.unbind("SUPER + SHIFT + F")
 o.bind("SUPER + SHIFT + F", "File manager", "nautilus")
 hl.unbind("SUPER + ALT + SHIFT + F")
-o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", "nautilus \"$(kos-cmd-terminal-cwd)\"")
+o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", "nautilus \"$(omarchy-cmd-terminal-cwd)\"")
 LUAEOF
         chown "$_user":"$_user" "$_bindings" 2>/dev/null || warn "defaults.bindings_chown" "$_user"
     fi
@@ -114,10 +118,10 @@ LUAEOF
         sed -i -e 's/"Editor", "geany"/"Editor", "zed"/g' -e '/^o\.window("^(geany|Geany|/d' "$_bindings"
         chown "$_user:$_user" "$_bindings"
     fi
-    if [[ -f "$_bindings" ]] && ! grep -q 'kos-graphical-apps' "$_bindings"; then
+    if [[ -f "$_bindings" ]] && ! grep -q 'os-graphical-apps' "$_bindings"; then
         cat >> "$_bindings" << 'LUAEOF'
 
--- kos-graphical-apps
+-- os-graphical-apps
 hl.unbind("SUPER + SHIFT + N")
 o.bind("SUPER + SHIFT + N", "Editor", "zed")
 hl.unbind("SUPER + CTRL + T")
@@ -127,7 +131,7 @@ LUAEOF
     fi
     if [[ -f "$_bindings" ]] && ! grep -qF 'o.window("^(dev.zed.Zed|' "$_bindings"; then
         cat >> "$_bindings" << 'LUAEOF'
-o.window("^(dev.zed.Zed|org.gnome.Nautilus|org.gnome.Papers|org.gnome.Loupe|io.github.celluloid_player.Celluloid|net.nokyan.Resources|org.gnome.baobab|xdg-desktop-portal-gtk)$", { tag = "-default-opacity", opacity = "1 1" })
+o.window("^(dev.zed.Zed|org.gnome.Nautilus|org.gnome.Papers|org.gnome.Loupe|io.github.celluloid_player.Celluloid|net.nokyan.Resources|org.gnome.Resources|org.gnome.baobab|xdg-desktop-portal-gtk)$", { tag = "-default-opacity", opacity = "1 1" })
 LUAEOF
         chown "$_user:$_user" "$_bindings"
     fi

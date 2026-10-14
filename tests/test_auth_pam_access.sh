@@ -52,7 +52,7 @@ assert_file_not_contains "faillock inline overrides are removed" "$PAM_TARGET" '
 assert_file_not_contains "empty passwords are no longer accepted" "$PAM_TARGET" 'nullok'
 assert_file_contains "password quality is enforced before homed" "$PAM_TARGET" '^password requisite pam_pwquality.so retry=3 enforce_for_root$'
 assert_file_contains "unix consumes the validated password" "$PAM_TARGET" 'pam_unix.so.*use_authtok'
-assert_true "PAM backup preserves the original" 'cmp -s "$PAM_SANDBOX/original" "${PAM_TARGET}.kos-backup"'
+assert_true "PAM backup preserves the original" 'cmp -s "$PAM_SANDBOX/original" "${PAM_TARGET}.os-backup"'
 cp "$PAM_TARGET" "$PAM_SANDBOX/applied"
 assert_true "PAM migration is idempotent" 'pam_policy_reconcile "$PAM_TARGET" && cmp -s "$PAM_TARGET" "$PAM_SANDBOX/applied"'
 printf 'auth required pam_unix.so\n' > "$PAM_TARGET"

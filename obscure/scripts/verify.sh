@@ -30,17 +30,17 @@ check_user_gate() {
     [[ -d "$u_home/.config/yazi/plugins/obscure.yazi" ]] || return 1
     [[ -f "$u_home/.config/yazi/plugins/obscure.yazi/main.lua" ]] || return 1
     [[ -f "$u_home/.config/obscure/patterns" ]] || return 1
-    grep -qF "kos obscure" "$u_home/.config/yazi/yazi.toml" 2>/dev/null || return 1
+    grep -qF "os obscure" "$u_home/.config/yazi/yazi.toml" 2>/dev/null || return 1
     grep -qF 'run = "obscure"' "$u_home/.config/yazi/yazi.toml" 2>/dev/null || return 1
     grep -qF 'use = "obscure-view"' "$u_home/.config/yazi/yazi.toml" 2>/dev/null || return 1
-    grep -qF "kos obscure" "$u_home/.config/yazi/theme.toml" 2>/dev/null || return 1
+    grep -qF "os obscure" "$u_home/.config/yazi/theme.toml" 2>/dev/null || return 1
     return 0
 }
 
 check_user_idle() {
     local u_home="$1"
-    [[ ! -f "$u_home/.local/state/kos/indicators/stay-awake" ]] || return 1
-    [[ ! -f "$u_home/.local/state/kos/toggles/screensaver-off" ]] || return 1
+    [[ ! -f "$u_home/.local/state/omarchy/indicators/stay-awake" ]] || return 1
+    [[ ! -f "$u_home/.local/state/omarchy/toggles/screensaver-off" ]] || return 1
     return 0
 }
 

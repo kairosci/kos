@@ -1,2 +1,2 @@
-conf/kos/data/packages/linux-kos/*.patch -whitespace
-conf/kos/data/rootfs/usr/share/doc/limine-*/*.md -whitespace
+conf/os/data/packages/linux-os/*.patch -whitespace
+conf/os/data/rootfs/usr/share/doc/limine-*/*.md -whitespace

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 detect_system_timezone() {
-    local tz="${KOS_FORCE_TZ:-}"
+    local tz="${OS_FORCE_TZ:-}"
 
     if [[ -z "$tz" ]] && command -v timedatectl &>/dev/null; then
         tz=$(timedatectl show -p Timezone --value 2>/dev/null || printf '')

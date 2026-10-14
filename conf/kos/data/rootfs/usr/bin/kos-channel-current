@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# kos:summary=Print the active kos package channel
-set -euo pipefail
-if [[ ${KOS_PATH:-/usr/share/kos} != /usr/share/kos ]]; then
-    printf 'dev\n'
-else
-    kos-version-channel
-fi

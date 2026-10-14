@@ -1,0 +1,15 @@
+[Unit]
+Description=Maximum keyboard backlight
+After=systemd-udev-trigger.service
+ConditionPathExistsGlob=/sys/class/leds/*kbd_backlight*
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/os-keyboard-backlight --awake
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/sys/devices
+
+[Install]
+WantedBy=multi-user.target

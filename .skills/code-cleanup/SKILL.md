@@ -7,7 +7,7 @@ description: >-
 # Code Cleanup
 
 ## Overview
-This skill defines what is noise and what stays. Every script, hook, module, and test across kos and its subprojects (obscure, clean, ai, performance) must carry zero decoration: no banner output, no emoji, no narrative comments, no dead variables. Anything a machine or a test does not need is removed.
+This skill defines what is noise and what stays. Every script, hook, module, and test across os and its subprojects (obscure, clean, ai, performance) must carry zero decoration: no banner output, no emoji, no narrative comments, no dead variables. Anything a machine or a test does not need is removed.
 
 ## Banned Output Patterns
 Never emit separator or title banners. These exact shapes are forbidden in every file:

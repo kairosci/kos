@@ -34,12 +34,13 @@ if ((SYSTEM_SCOPE)); then
 fi
 
 for theme_name in "${themes[@]}"; do
+    [[ "$theme_name" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { printf 'Invalid theme: %s\n' "$theme_name" >&2; exit 2; }
     theme_dir="$SCRIPT_DIR/$theme_name"
     [[ -d "$theme_dir" ]] || continue
     src="$theme_dir/preview.png"
     [[ -f "$src" ]] || continue
 
-    user_dir="$TARGET_HOME/.config/kos/themes/$theme_name"
+    user_dir="$TARGET_HOME/.config/omarchy/themes/$theme_name"
     install -d -m 700 -o "$TARGET_USER" -g "$TARGET_USER" "$user_dir"
     if [[ -f "$user_dir/preview.png" ]]; then
         [[ -f "$user_dir/preview.bak.png" ]] || cp "$user_dir/preview.png" "$user_dir/preview.bak.png"
@@ -51,7 +52,7 @@ for theme_name in "${themes[@]}"; do
     fi
 
     if ((SYSTEM_SCOPE)); then
-        system_dir="/usr/share/kos/themes/$theme_name"
+        system_dir="/usr/share/omarchy/themes/$theme_name"
         [[ -d "$system_dir" ]] || continue
         theme_preview_store_overlay "$src" "$theme_name" || {
             printf 'Failed to record the system overlay for %s\n' "$theme_name" >&2
@@ -61,5 +62,5 @@ for theme_name in "${themes[@]}"; do
     fi
 done
 
-rm -rf "$TARGET_HOME/.cache/kos/theme-selector"
+rm -rf "$TARGET_HOME/.cache/omarchy/theme-selector"
 printf '%s\n' "preview applied"

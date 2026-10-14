@@ -115,7 +115,7 @@ printf '\n' >> "@SB@/wtype.log"
 exit 0
 EOF
 
-cat > "$SB/fakebin/kos-menu-select" << 'EOF'
+cat > "$SB/fakebin/omarchy-menu-select" << 'EOF'
 #!/bin/bash
 if [[ "${HERDR_FAKE_SELECT_MODE:-}" == "cancel" ]]; then
     exit 1
@@ -314,7 +314,7 @@ test_section "Installer Behaviour in Sandbox"
 
 sandbox_install() (
     export HOME="$SB/home" XDG_CONFIG_HOME="$SB/home/.config" XDG_DATA_HOME="$SB/home/.local/share"
-    export KOS_LANG="${1:-en}"
+    export OS_LANG="${1:-en}"
     if [[ "${3:-reset}" != "keep" ]]; then
         rm -rf "${SB:?}/home"
         mkdir -p "$SB/home/.config/hypr" "$SB/home/.local/share"
@@ -329,15 +329,15 @@ sandbox_install() (
 assert_true "sandbox install succeeds" \
     "[[ \"\$(sandbox_install en 1)\" == 0 ]]"
 assert_true "menu lands user scoped with 755" \
-    "[[ -x '$SB/home/.local/share/kos/herdr-keybindings-menu' ]] && [[ \"\$(stat -c %a '$SB/home/.local/share/kos/herdr-keybindings-menu')\" == 755 ]]"
+    "[[ -x '$SB/home/.local/share/omarchy/herdr-keybindings-menu' ]] && [[ \"\$(stat -c %a '$SB/home/.local/share/omarchy/herdr-keybindings-menu')\" == 755 ]]"
 assert_true "existing bindings survive the managed block" \
-    "grep -q 'SUPER + RETURN' '$SB/home/.config/hypr/bindings.lua' && grep -q 'kos-herdr-keys (managed)' '$SB/home/.config/hypr/bindings.lua'"
+    "grep -q 'SUPER + RETURN' '$SB/home/.config/hypr/bindings.lua' && grep -q 'os-herdr-keys (managed)' '$SB/home/.config/hypr/bindings.lua'"
 assert_true "managed block unbinds then rebinds super-ctrl-k" \
     "grep -q 'hl.unbind(\"SUPER + CTRL + K\")' '$SB/home/.config/hypr/bindings.lua' && grep -q 'o.bind(\"SUPER + CTRL + K\", \"Herdr keybindings\"' '$SB/home/.config/hypr/bindings.lua'"
 assert_true "repeated installs converge byte for byte" \
     "cp '$SB/home/.config/hypr/bindings.lua' '$SB/once.lua' && sandbox_install en 1 keep >/dev/null && sandbox_install en 1 keep >/dev/null && cmp -s '$SB/once.lua' '$SB/home/.config/hypr/bindings.lua'"
 assert_true "exactly one managed block survives" \
-    "[[ \$(grep -c '^-- kos-herdr-keys (managed)$' '$SB/home/.config/hypr/bindings.lua') -eq 1 ]]"
+    "[[ \$(grep -c '^-- os-herdr-keys (managed)$' '$SB/home/.config/hypr/bindings.lua') -eq 1 ]]"
 assert_true "missing bindings file warns but succeeds" \
     "[[ \"\$(sandbox_install en 0)\" == 0 ]] && grep -q 'Hyprland Herdr binding skipped' '$SB/install.err'"
 assert_true "english completion message is exact" \
@@ -345,7 +345,7 @@ assert_true "english completion message is exact" \
 assert_true "italian completion message is exact" \
     "sandbox_install it 1 >/dev/null && grep -qx 'Menu dei tasti di Herdr installato con successo.' '$SB/install.out'"
 assert_true "replaced menu keeps a single slot backup" \
-    "sandbox_install en 1 >/dev/null && printf 'stale' > '$SB/home/.local/share/kos/herdr-keybindings-menu' && sandbox_install en 1 keep >/dev/null && [[ -f '$SB/home/.local/share/kos/herdr-keybindings-menu.bak' ]] && [[ \$(ls '$SB/home/.local/share/kos' | grep -c 'herdr-keybindings-menu') -eq 2 ]]"
+    "sandbox_install en 1 >/dev/null && printf 'stale' > '$SB/home/.local/share/omarchy/herdr-keybindings-menu' && sandbox_install en 1 keep >/dev/null && [[ -f '$SB/home/.local/share/omarchy/herdr-keybindings-menu.bak' ]] && [[ \$(ls '$SB/home/.local/share/omarchy' | grep -c 'herdr-keybindings-menu') -eq 2 ]]"
 
 test_section "Wiring, Provisioning & Catalogues"
 
@@ -367,12 +367,12 @@ done
 assert_true "herdr keys keep placeholder parity" \
     "for k in make.herdr install.herdr_done defaults.herdrconf defaults.herdrconf_skipped herdr.bind_skipped; do n=\$(awk -F%s -v k=\"^\$k=\" '\$0 ~ k { print NF - 1 }' \"\$MSG_DIR/en.msg\"); for l in it fr de es pt; do m=\$(awk -F%s -v k=\"^\$k=\" '\$0 ~ k { print NF - 1 }' \"\$MSG_DIR/\$l.msg\"); [[ \"\$n\" == \"\$m\" ]] || exit 1; done; done"
 
-if [[ -x /usr/bin/kos-menu-herdr-keybindings || -x /usr/share/kos/bin/kos-menu-herdr-keybindings ]] && command -v herdr &>/dev/null; then
-    UPSTREAM="$(command -v kos-menu-herdr-keybindings)"
-    assert_true "display column matches upstream kos" \
+if [[ -x /usr/bin/omarchy-menu-herdr-keybindings || -x /usr/share/omarchy/bin/omarchy-menu-herdr-keybindings ]] && command -v herdr &>/dev/null; then
+    UPSTREAM="$(command -v omarchy-menu-herdr-keybindings)"
+    assert_true "display column matches upstream os" \
         "diff -q <(bash '$HERDR_MENU' --print 2>/dev/null) <(bash '$UPSTREAM' --print 2>/dev/null) >/dev/null"
 else
-    assert_warn "upstream parity skipped outside kos" "false"
+    assert_warn "upstream parity skipped outside os" "false"
 fi
 
 test_summary

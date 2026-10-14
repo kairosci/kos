@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ "${KOS_AI_DEBLOAT:-0}" != "1" ]]; then
+if [[ "${OS_AI_DEBLOAT:-0}" != "1" ]]; then
     printf '%s\n' "AI debloat is opt-in: run scripts/debloat-ai.sh --yes to proceed"
     return 0
 fi
 
 AI_CRASH_UNITS=(
-    kos-crash-watch.service
+    omarchy-crash-watch.service
 )
 
 log "Disabling AI-assisted crash reporting"
@@ -24,11 +24,11 @@ for user_home in /home/*; do
     done
 done
 
-log "Disabling kos agents plugin"
+log "Disabling os agents plugin"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    kos_as "$_user" plugin disable kos.agents 2>/dev/null || warn "agents plugin disable skipped for $_user"
+    omarchy_as "$_user" plugin disable omarchy.agents 2>/dev/null || warn "agents plugin disable skipped for $_user"
 done
 
 log "Removing standalone AI launchers (AI CLIs run inside the terminal only)"

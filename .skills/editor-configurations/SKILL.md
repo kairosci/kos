@@ -1,7 +1,7 @@
 ---
 name: editor-configurations
 description: >-
-  Procedures for managing Zed, OnlyOffice and Brave Origin configurations in Kos.
+  Procedures for managing Neovim, retired Micro, Zed, OnlyOffice and Brave Origin configurations in OS.
 ---
 
 # Editor Configurations
@@ -14,8 +14,8 @@ OnlyOffice handles word processing, spreadsheets and presentations. Merge its na
 
 ## Zed
 
-Zed is the sole editor for plain text, source files and projects. Nautilus keeps directory MIME handling; open projects with zed --new. Micro and Geany are removed and pinned by debloat; setup removes their managed launchers and helpers while preserving personal configuration. Zed settings use native JSON preferences and keymap. Merge user settings with `jq` when available and retain the documented fallback when it is not.
+Zed is the desktop editor for plain text, source files and projects. Nautilus keeps directory MIME handling; open graphical projects with `zed --new`. Packaged LazyVim is the terminal editor. The retired Micro installer removes its unreliable filemanager plugin and its startup setting while preserving unrelated settings and plugins, without changing the editor environment. `conf/nvim/install.sh` seeds the packaged LazyVim starter, preserves personal files and caches, and owns `EDITOR` and `VISUAL`. Geany remains retired. Zed settings use native JSON preferences and keymap. Merge user settings with `jq` when available and retain the documented fallback when it is not.
 
-Apply configurations through setup. `make theme` synchronizes folder icons and Zed colors from the active Kos palette.
+Apply configurations through setup. `make theme` synchronizes folder icons and Zed colors from the active OS palette.
 
 The setup stage discovers every `conf/*/install.sh` automatically and executes it inside each real user session before theme hooks. A new app config directory must provide an installer using `userconf.sh`; never edit browser profile databases or overwrite active browser preferences. Brave Origin's launcher reads its native flags file, while its existing profiles remain in the standard user config directory.

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-clean is the post debloat hygiene microcomponent for Kos on Arch Linux. It owns safe system and home cleanup with zero package installs beyond orphans and cache and zero touches to vaults and documents and installed apps.
+clean is the post debloat hygiene microcomponent for OS on Arch Linux. It owns safe system and home cleanup with zero package installs beyond orphans and cache and zero touches to vaults and documents and installed apps.
 
 ## Repository Architecture
 

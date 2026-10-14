@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# kos:summary=List available themes
-# kos:examples=kos theme list | kos theme set "Tokyo Night"
-
-{
-  find ~/.config/kos/themes/ -mindepth 1 -maxdepth 1 \( -type d -o -type l \) -printf '%f\n'
-  find "$KOS_PATH/themes/" -mindepth 1 -maxdepth 1 -type d -printf '%f\n'
-} | sort -u | sed -E 's/(^|-)([a-z])/\1\u\2/g; s/-/ /g'

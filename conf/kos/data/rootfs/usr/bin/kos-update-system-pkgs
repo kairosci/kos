@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-# kos:summary=Update system packages
-# kos:requires-sudo=true
-set -euo pipefail
-args=()
-[[ ${KOS_UPDATE_UNATTENDED:-0} != 1 ]] || args+=(--noconfirm)
-exec sudo pacman -Syu "${args[@]}"

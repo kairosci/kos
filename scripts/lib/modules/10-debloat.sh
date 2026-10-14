@@ -6,7 +6,6 @@ DEBLOAT=(
     btop
     gdu
     imv
-    micro
     mupdf
     mpv-mpris
     libreoffice-still
@@ -51,8 +50,7 @@ DEBLOAT=(
     zathura-pdf-mupdf
     dua-cli
     foot
-    neovim
-    kos-nvim
+    micro
 )
 
 log "debloat.start"
@@ -68,17 +66,9 @@ if [[ ${#INSTALLED_DEBLOAT[@]} -gt 0 ]]; then
     fi
 fi
 
-log "debloat.manifest"
-BASE_MANIFEST=/usr/share/kos/install/kos-base.packages
-if [[ -w "$BASE_MANIFEST" ]]; then
-    for pkg in "${DEBLOAT[@]}"; do
-        sed -i "/^${pkg}$/d" "$BASE_MANIFEST"
-    done
-fi
-
 log "debloat.pin"
 sed -i -E "/^[[:space:]]*IgnorePkg[[:space:]]*=/d" /etc/pacman.conf
-rm -f /etc/pacman.d/kos/ignore-pkgs.list
+rm -f /etc/pacman.d/omarchy/ignore-pkgs.list
 
 log "debloat.foot_cleanup"
 if ! pacman -Q foot &>/dev/null && ! command -v foot &>/dev/null; then
@@ -93,16 +83,17 @@ fi
 log "debloat.webapps"
 # shellcheck source=../userconf.sh
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
+source "$PROJECT_DIR/scripts/lib/retired-config.sh"
 for u_home in /home/*; do
     [[ -d "$u_home" ]] || continue
     rm -f "$u_home/.local/bin/geany-project" "$u_home/.local/bin/tode" \
         "$u_home/.local/share/applications/geany-project.desktop" \
         "$u_home/.local/share/applications/geany.desktop" \
-        "$u_home/.config/geany/colorschemes/kos.conf"
+        "$u_home/.config/geany/colorschemes/os.conf"
     for _retired_config in "$u_home/.config/geany" "$u_home/.config/tode" "$u_home/.local/share/tode"; do
         [[ -d "$_retired_config" ]] || continue
         _retired_user=$(basename "$u_home")
-        _retired_root="$u_home/.local/state/kos/retired"
+        _retired_root="$u_home/.local/state/omarchy/retired"
         install -d -m 700 -o "$_retired_user" -g "$_retired_user" "$_retired_root"
         _retired_backup=$(mktemp -d "$_retired_root/$(basename "$_retired_config").XXXXXX")
         mv "$_retired_config" "$_retired_backup/config"
@@ -123,10 +114,10 @@ for u_home in /home/*; do
     fi
 done
 for webapp in Basecamp "Google Contacts" "Google Maps" "Google Messages" "Google Photos" Discord HEY WhatsApp X YouTube Zoom; do
-    rm -f "/usr/share/kos/applications/$webapp.desktop"
+    rm -f "/usr/share/omarchy/applications/$webapp.desktop"
 done
-if [[ -d /usr/share/kos/applications ]]; then
-    if app_matches=$(grep -rlE 'kos-(launch-webapp|webapp-handler)' /usr/share/kos/applications 2>/dev/null); then
+if [[ -d /usr/share/omarchy/applications ]]; then
+    if app_matches=$(grep -rlE 'omarchy-(launch-webapp|webapp-handler)' /usr/share/omarchy/applications 2>/dev/null); then
         while IFS= read -r app_file; do
             [[ -f "$app_file" ]] && rm -f "$app_file"
         done <<< "$app_matches"
@@ -138,7 +129,7 @@ for u_home in /home/*; do
         rm -f "$u_home/.local/share/applications/$webapp.desktop"
     done
     if [[ -d "$u_home/.local/share/applications" ]]; then
-        if user_matches=$(grep -rlE 'kos-(launch-webapp|webapp-handler)' "$u_home/.local/share/applications" 2>/dev/null); then
+        if user_matches=$(grep -rlE 'omarchy-(launch-webapp|webapp-handler)' "$u_home/.local/share/applications" 2>/dev/null); then
             while IFS= read -r app_file; do
                 [[ -f "$app_file" ]] && rm -f "$app_file"
             done <<< "$user_matches"
@@ -151,11 +142,11 @@ for u_home in /home/*; do
     [[ -d "$u_home" ]] || continue
     _u=$(basename "$u_home")
     for hook_kind in pre-refresh-pacman.d post-update.d; do
-        mkdir -p "$u_home/.config/kos/hooks/$hook_kind"
-        if [[ -f "$PROJECT_DIR/hooks/$hook_kind/99-kos-persist" ]]; then
-            cp "$PROJECT_DIR/hooks/$hook_kind/99-kos-persist" "$u_home/.config/kos/hooks/$hook_kind/99-kos-persist"
-            chmod +x "$u_home/.config/kos/hooks/$hook_kind/99-kos-persist"
-            chown "$_u":"$_u" "$u_home/.config/kos/hooks/$hook_kind/99-kos-persist" 2>/dev/null || warn "debloat.hook_chown_failed" "$_u"
+        mkdir -p "$u_home/.config/omarchy/hooks/$hook_kind"
+        if [[ -f "$PROJECT_DIR/hooks/$hook_kind/99-os-persist" ]]; then
+            cp "$PROJECT_DIR/hooks/$hook_kind/99-os-persist" "$u_home/.config/omarchy/hooks/$hook_kind/99-os-persist"
+            chmod +x "$u_home/.config/omarchy/hooks/$hook_kind/99-os-persist"
+            chown "$_u":"$_u" "$u_home/.config/omarchy/hooks/$hook_kind/99-os-persist" 2>/dev/null || warn "debloat.hook_chown_failed" "$_u"
         fi
     done
 done

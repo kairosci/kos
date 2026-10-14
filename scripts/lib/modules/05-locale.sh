@@ -4,8 +4,8 @@ set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/../locale-map.sh"
 
-LOCALE_PROFILE="/etc/profile.d/kos-locale.sh"
-HOMES_ROOT="${KOS_HOMES_ROOT:-/home}"
+LOCALE_PROFILE="/etc/profile.d/os-locale.sh"
+HOMES_ROOT="${OS_HOMES_ROOT:-/home}"
 
 locale_enable_gen() {
     local target="$1"
@@ -71,21 +71,22 @@ locale_apply_hyprland() {
         fi
 
         _lu_tmp=$(mktemp) || { warn "locale.hyprland_skipped" "$_lu_user"; continue; }
-        sed '/^-- kos locale .*(managed)$/,/^-- end kos locale .*(managed)$/d' "$_lu_input" 2>/dev/null \
+        sed '/^-- os locale .*(managed)$/,/^-- end os locale .*(managed)$/d' "$_lu_input" 2>/dev/null \
             | sed -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}' > "$_lu_tmp" 2>/dev/null \
             || warn "locale.hyprland_skipped" "$_lu_user"
 
         cat >> "$_lu_tmp" <<EOF
 
--- kos locale (managed)
+-- os locale (managed)
 hl.config({
   input = {
     kb_layout = "$layout",
+    kb_options = "",
   },
 })
 hl.env("LANG", "$target")
 hl.env("LANGUAGE", "${target%%_*}")
--- end kos locale (managed)
+-- end os locale (managed)
 EOF
 
         if cat "$_lu_tmp" > "$_lu_input" 2>/dev/null; then
@@ -137,9 +138,16 @@ locale_main() {
 
     log "locale.hyprland"
     locale_apply_hyprland "$LOCALE_TARGET" "$LOCALE_XKB"
+    user_as "$PRIMARY_USER" bash -c '
+        set -euo pipefail
+        [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] || exit 0
+        hyprctl reload
+        errors=$(hyprctl configerrors)
+        [[ -z "$errors" ]] || { printf "%s\n" "$errors" >&2; exit 1; }
+    ' || err "restore.failed" "$PRIMARY_USER"
 
 }
 
-if [[ "${KOS_LOCALE_LIB_ONLY:-0}" != "1" ]]; then
+if [[ "${OS_LOCALE_LIB_ONLY:-0}" != "1" ]]; then
     locale_main
 fi

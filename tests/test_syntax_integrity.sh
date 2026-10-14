@@ -38,8 +38,8 @@ assert_file_executable "scripts/verify.sh is executable" "$PROJECT_DIR/scripts/v
 assert_file_executable "scripts/launch.sh is executable" "$PROJECT_DIR/scripts/launch.sh"
 assert_file_executable "scripts/run-setup.sh is executable" "$PROJECT_DIR/scripts/run-setup.sh"
 assert_file_executable "hooks/theme-set.d/folder-color is executable" "$PROJECT_DIR/hooks/theme-set.d/folder-color"
-assert_file_executable "hooks/pre-refresh-pacman.d/99-kos-persist is executable" "$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-kos-persist"
-assert_file_executable "hooks/post-update.d/99-kos-persist is executable" "$PROJECT_DIR/hooks/post-update.d/99-kos-persist"
+assert_file_executable "hooks/pre-refresh-pacman.d/99-os-persist is executable" "$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-os-persist"
+assert_file_executable "hooks/post-update.d/99-os-persist is executable" "$PROJECT_DIR/hooks/post-update.d/99-os-persist"
 assert_file_executable "conf/zed/install.sh is executable" "$PROJECT_DIR/conf/zed/install.sh"
 assert_file_executable "conf/herdr/install.sh is executable" "$PROJECT_DIR/conf/herdr/install.sh"
 assert_file_executable "herdr-keybindings-menu is executable" "$PROJECT_DIR/conf/herdr/data/herdr-keybindings-menu"
@@ -61,7 +61,7 @@ assert_file_contains "verify.sh uses strict mode" "$PROJECT_DIR/scripts/verify.s
 assert_file_contains "launch.sh uses strict mode" "$PROJECT_DIR/scripts/launch.sh" "set -euo pipefail"
 assert_file_contains "run-setup.sh uses strict mode" "$PROJECT_DIR/scripts/run-setup.sh" "set -euo pipefail"
 assert_file_contains "folder-color uses strict mode" "$PROJECT_DIR/hooks/theme-set.d/folder-color" "set -euo pipefail"
-assert_file_contains "pre-refresh persist hook uses strict mode" "$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-kos-persist" "set -euo pipefail"
-assert_file_contains "post-update persist hook uses strict mode" "$PROJECT_DIR/hooks/post-update.d/99-kos-persist" "set -euo pipefail"
+assert_file_contains "pre-refresh persist hook uses strict mode" "$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-os-persist" "set -euo pipefail"
+assert_file_contains "post-update persist hook uses strict mode" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "set -euo pipefail"
 
 test_summary

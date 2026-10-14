@@ -2,7 +2,9 @@
 
 Run `make setup REBUILD_PREVIEWS=1` to regenerate a preview for every installed system theme through the privileged pipeline.
 
-The capture runner applies each actual Kos theme, waits for its wallpaper and shell transition, opens sample Zed and Nautilus windows on an unused workspace, and captures the complete focused monitor. Application state is isolated from personal sessions. The original theme, background and workspace are restored on completion or failure.
+`conf/themes/data/excluded.list` excludes Solitude and Matte Black. Setup archives their stock assets and user overlays outside the native theme catalog; package and post-update hooks apply the same exclusions after updates. Capture verifies full monitor dimensions and that both displayed windows belong to the isolated sample processes. Notifications are temporarily silenced and their original state is restored on exit.
+
+The capture runner applies each actual OS theme, waits for its wallpaper and shell transition, opens sample Zed and Nautilus windows on an unused workspace, and captures the complete focused monitor. Application state is isolated from personal sessions. The original theme, background and workspace are restored on completion or failure.
 
 Previews are normalized by `scripts/lib/theme-preview.sh` to uniform geometry, RGBA depth 8 and density 72. Setup installs user overlays and the update hook preserves normalization. Stock previews remain available for restoration.
 

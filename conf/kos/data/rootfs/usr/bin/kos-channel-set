@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# kos:summary=Select the kos release channel
-# kos:args=<stable|preview>
-set -euo pipefail
-source "${KOS_LIB_PATH:-${KOS_PATH:-/usr/share/kos}/lib}/i18n.sh"
-i18n_init
-[[ $# == 1 && $1 =~ ^(stable|preview)$ ]] || err release.invalid
-sudo install -d -m 755 /etc/kos
-printf '%s\n' "$1" | sudo tee /etc/kos/channel >/dev/null

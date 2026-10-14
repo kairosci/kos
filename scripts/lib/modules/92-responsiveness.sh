@@ -6,18 +6,18 @@ log "performance.install"
 
 _performance_data="$PROJECT_ROOT/conf/performance/data"
 _oomd_changed=0
-cmp -s "$_performance_data/oomd.conf" /etc/systemd/oomd.conf.d/90-kos.conf || _oomd_changed=1
-install -Dm644 "$_performance_data/oomd.conf" /etc/systemd/oomd.conf.d/90-kos.conf
+cmp -s "$_performance_data/oomd.conf" /etc/systemd/oomd.conf.d/90-os.conf || _oomd_changed=1
+install -Dm644 "$_performance_data/oomd.conf" /etc/systemd/oomd.conf.d/90-os.conf
 for _slice in app background session; do
-    install -Dm644 "$_performance_data/$_slice.slice.conf" "/etc/systemd/user/$_slice.slice.d/90-kos.conf"
+    install -Dm644 "$_performance_data/$_slice.slice.conf" "/etc/systemd/user/$_slice.slice.d/90-os.conf"
 done
 for _slice in user user-; do
-    install -Dm644 "$_performance_data/memory.slice.conf" "/etc/systemd/system/$_slice.slice.d/90-kos-memory.conf"
+    install -Dm644 "$_performance_data/memory.slice.conf" "/etc/systemd/system/$_slice.slice.d/90-os-memory.conf"
 done
-install -Dm644 "$_performance_data/memory.slice.conf" /etc/systemd/user/session.slice.d/90-kos-memory.conf
+install -Dm644 "$_performance_data/memory.slice.conf" /etc/systemd/user/session.slice.d/90-os-memory.conf
 install -d -m755 /etc/systemd/system/user@.service.d
-sed 's/^\[Slice\]$/[Service]/' "$_performance_data/memory.slice.conf" > /etc/systemd/system/user@.service.d/90-kos-memory.conf
-chmod 644 /etc/systemd/system/user@.service.d/90-kos-memory.conf
+sed 's/^\[Slice\]$/[Service]/' "$_performance_data/memory.slice.conf" > /etc/systemd/system/user@.service.d/90-os-memory.conf
+chmod 644 /etc/systemd/system/user@.service.d/90-os-memory.conf
 
 systemctl daemon-reload
 systemctl enable --now systemd-oomd.socket systemd-oomd.service

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 OMAQT_URL="${OMAQT_URL:-}"
-OMAQT_DIR="${OMAQT_DIR:-/usr/share/kos/omaqt}"
+OMAQT_DIR="${OMAQT_DIR:-/usr/share/omarchy/omaqt}"
 
 if [[ -z "$OMAQT_URL" ]]; then
     log "omaqt.unconfigured"

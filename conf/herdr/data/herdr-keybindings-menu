@@ -449,7 +449,7 @@ main() {
     fi
     menu_height=$((monitor_height * 40 / 100))
 
-    selection="$(printf '%s\n' "$records" | cut -f1 | kos-menu-select 'Herdr keybindings' -- --width 800 --height "$menu_height" 2>/dev/null)" || exit 0
+    selection="$(printf '%s\n' "$records" | cut -f1 | omarchy-menu-select 'Herdr keybindings' -- --width 800 --height "$menu_height" 2>/dev/null)" || exit 0
     if [[ -z "$selection" ]]; then
         exit 0
     fi
@@ -471,8 +471,8 @@ main() {
         addr="$(herdr_window_by_pid 2>/dev/null)" || addr=""
     fi
     if [[ -z "$addr" ]]; then
-        if command -v kos-launch-terminal-herdr >/dev/null 2>&1; then
-            kos-launch-terminal-herdr >/dev/null 2>&1 || exit 0
+        if command -v omarchy-launch-terminal-herdr >/dev/null 2>&1; then
+            omarchy-launch-terminal-herdr >/dev/null 2>&1 || exit 0
         fi
         exit 0
     fi
