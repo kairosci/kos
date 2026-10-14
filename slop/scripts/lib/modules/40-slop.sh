@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ "${OS_AI_DEBLOAT:-0}" != "1" ]]; then
-    printf '%s\n' "AI debloat is opt-in: run scripts/debloat-ai.sh --yes to proceed"
+if [[ "${OS_SLOP_DEBLOAT:-0}" != "1" ]]; then
+    printf '%s\n' "AI debloat is opt-in: run scripts/debloat-slop.sh --yes to proceed"
     return 0
 fi
 

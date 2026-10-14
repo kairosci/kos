@@ -44,7 +44,7 @@ jobs:
             --sarif \
             --output semgrep.sarif \
             scripts hooks conf tests clean/scripts clean/scripts/lib/modules \
-            obscure/scripts obscure/scripts/lib/modules ai/scripts ai/scripts/lib/modules \
+            obscure/scripts obscure/scripts/lib/modules slop/scripts slop/scripts/lib/modules \
             performance/scripts performance/scripts/lib/modules
 
       - name: Upload SARIF results
