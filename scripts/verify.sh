@@ -83,7 +83,7 @@ for pkg in geany geany-plugins; do
     tcheck "check.pkg_removed" "! pacman -Q $pkg &>/dev/null" "$pkg"
 done
 tcheck "check.pkg_installed" "pacman -Q brave-origin-bin &>/dev/null" brave-origin-bin
-for pkg in zed neovim omarchy-nvim nautilus gvfs papers loupe celluloid baobab resources onlyoffice-bin; do
+for pkg in zed neovim omarchy-nvim nautilus gvfs papers loupe celluloid baobab resources onlyoffice-bin easyeffects calf lsp-plugins-lv2 mda.lv2 x42-plugins-lv2 zam-plugins-lv2; do
     tcheck "check.pkg_installed" "pacman -Q $pkg &>/dev/null" "$pkg"
 done
 tcheck "check.pkg_installed" "pacman -Q slack-desktop &>/dev/null" slack-desktop

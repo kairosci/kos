@@ -21,6 +21,7 @@ done
 log "defaults.graphical_apps"
 pacman -S --noconfirm --needed zed papers loupe celluloid baobab resources materia-gtk-theme || err "defaults.app_failed" "graphical desktop"
 
+pacman -S --noconfirm --needed easyeffects calf lsp-plugins-lv2 mda.lv2 x42-plugins-lv2 zam-plugins-lv2 || err "defaults.app_failed" "EasyEffects"
 
 log "gui.install_done" "LazyVim"
 pacman -S --noconfirm --needed neovim omarchy-nvim fd ripgrep lazygit tree-sitter-cli || err "defaults.app_failed" "LazyVim"

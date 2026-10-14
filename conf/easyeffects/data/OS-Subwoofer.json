@@ -1,0 +1,59 @@
+{
+  "output": {
+    "blocklist": [],
+    "plugins_order": ["filter#0", "bass_enhancer#0", "limiter#0"],
+    "filter#0": {
+      "bypass": false,
+      "input-gain": -6.0,
+      "output-gain": 0.0,
+      "frequency": 60.0,
+      "width": 4.0,
+      "gain": 0.0,
+      "quality": 0.707,
+      "balance": 0.0,
+      "type": "High-pass",
+      "mode": "BWC (BT)",
+      "decramp": "Off",
+      "equal-mode": "IIR",
+      "slope": "x2"
+    },
+    "bass_enhancer#0": {
+      "bypass": false,
+      "input-gain": 0.0,
+      "output-gain": 0.0,
+      "amount": -9.0,
+      "harmonics": 4.0,
+      "scope": 110.0,
+      "floor": 60.0,
+      "blend": 0.0,
+      "floor-active": true
+    },
+    "limiter#0": {
+      "bypass": false,
+      "input-gain": 0.0,
+      "output-gain": 0.0,
+      "mode": "Herm Thin",
+      "oversampling": "True Peak/24 bit",
+      "dithering": "None",
+      "sidechain-type": "Internal",
+      "lookahead": 5.0,
+      "attack": 5.0,
+      "release": 10.0,
+      "threshold": -2.0,
+      "sidechain-preamp": 0.0,
+      "stereo-link": 100.0,
+      "alr-attack": 5.0,
+      "alr-release": 50.0,
+      "alr-knee": 0.0,
+      "alr-knee-smooth": -5.0,
+      "alr": false,
+      "gain-boost": false,
+      "input-to-sidechain": -80.01,
+      "input-to-link": -80.01,
+      "sidechain-to-input": -80.01,
+      "sidechain-to-link": -80.01,
+      "link-to-input": -80.01,
+      "link-to-sidechain": -80.01
+    }
+  }
+}

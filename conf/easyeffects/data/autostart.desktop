@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Easy Effects
+Exec=easyeffects --service-mode
+Icon=com.github.wwmm.easyeffects
+Terminal=false
+StartupNotify=false
