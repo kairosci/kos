@@ -1,0 +1,5 @@
+{
+  "left": ["omarchy.menu", "omarchy.workspaces", "omarchy.keyboard-layout"],
+  "center": ["omarchy.clock", "omarchy.weather"],
+  "right": ["os.osmp", "omarchy.indicators", "omarchy.system-update", "omarchy.tray", "omarchy.agents", "omaconf.bluetooth", "omarchy.bluetooth", "omarchy.network", "omarchy.audio", "omarchy.monitor", "omaconf.power", "omarchy.power"]
+}
