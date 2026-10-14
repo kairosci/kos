@@ -7,7 +7,7 @@ log "power.suspend_resume"
 # shellcheck source=../keyboard-backlight-policy.sh
 source "$PROJECT_ROOT/scripts/lib/keyboard-backlight-policy.sh"
 
-rm -f /etc/systemd/sleep.conf.d/99-kos-deep-sleep.conf
+rm -f /etc/systemd/sleep.conf.d/99-os-deep-sleep.conf
 
 target_sleep_mode=""
 if [[ -r /sys/power/mem_sleep ]]; then
@@ -24,7 +24,7 @@ if [[ -n "$target_sleep_mode" ]]; then
     log "power.suspend_mode" "$target_sleep_mode"
     mkdir -p /etc/systemd/sleep.conf.d
     chmod 755 /etc/systemd/sleep.conf.d
-    cat > /etc/systemd/sleep.conf.d/99-kos-suspend.conf << SLEEP_CONF
+    cat > /etc/systemd/sleep.conf.d/99-os-suspend.conf << SLEEP_CONF
 [Sleep]
 AllowSuspend=yes
 AllowHibernation=yes
@@ -32,7 +32,7 @@ AllowSuspendThenHibernate=yes
 AllowHybridSleep=yes
 MemorySleepMode=$target_sleep_mode
 SLEEP_CONF
-    chmod 644 /etc/systemd/sleep.conf.d/99-kos-suspend.conf
+    chmod 644 /etc/systemd/sleep.conf.d/99-os-suspend.conf
 fi
 
 if lsmod 2>/dev/null | grep -qw nvidia || pacman -Q nvidia &>/dev/null || pacman -Q nvidia-open &>/dev/null || pacman -Q nvidia-dkms &>/dev/null; then

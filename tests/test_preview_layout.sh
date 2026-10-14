@@ -15,4 +15,11 @@ assert_true "odd monitor widths leave no missing column" '[[ "$(theme_preview_wi
 assert_false "invalid side fails" 'theme_preview_window_geometry "$monitor" middle'
 monitor='{"width":1920,"height":1080,"scale":0,"x":0,"y":0}'
 assert_false "invalid scale fails" 'theme_preview_window_geometry "$monitor" left'
+if command -v magick >/dev/null; then
+    SANDBOX=$(mktemp -d)
+    trap 'rm -rf "$SANDBOX"' EXIT
+    magick -size 2x2 xc:'#f0f0f0' -depth 16 "PNG64:$SANDBOX/rgba.png"
+    assert_true "live color checks normalize 16 bit RGBA screenshots to RGB" '[[ $(theme_preview_pixel_rgb "$SANDBOX/rgba.png" 1 1) == f0f0f0 ]]'
+    assert_false "live color checks reject invalid coordinates" 'theme_preview_pixel_rgb "$SANDBOX/rgba.png" invalid 1'
+fi
 test_summary

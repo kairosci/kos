@@ -2,11 +2,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-KOS_I18N_BOOT="${KOS_I18N_BOOT:-$SCRIPT_DIR/../i18n/i18n-boot.sh}"
-[[ -f "$KOS_I18N_BOOT" ]] || KOS_I18N_BOOT="$SCRIPT_DIR/../../scripts/lib/i18n-boot.sh"
-source "$KOS_I18N_BOOT"
+OS_I18N_BOOT="${OS_I18N_BOOT:-$SCRIPT_DIR/../i18n/i18n-boot.sh}"
+[[ -f "$OS_I18N_BOOT" ]] || OS_I18N_BOOT="$SCRIPT_DIR/../../scripts/lib/i18n-boot.sh"
+source "$OS_I18N_BOOT"
 
-COLORS="${KOS_THEME_COLORS:-$HOME/.local/state/kos/current/theme/colors.toml}"
+COLORS="${OS_THEME_COLORS:-$HOME/.local/state/omarchy/current/theme/colors.toml}"
 [[ -r "$COLORS" ]] || exit 0
 palette() {
     awk -F '"' -v key="$1" '$1 ~ "^[[:space:]]*" key "[[:space:]]*=" { print $2; exit }' "$COLORS"
@@ -19,15 +19,15 @@ for color in "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION"; do
     [[ "$color" =~ ^#[0-9a-fA-F]{6}$ ]] || { warn "hooks.gtk_palette_failed" "$COLORS"; exit 1; }
 done
 MODE="$(palette mode)"
-[[ "$MODE" == light ]] || MODE=dark
+[[ "$MODE" == light || "$MODE" == dark ]] || err "hooks.gtk_palette_failed" "$COLORS"
 if [[ "$MODE" == light ]]; then
     GTK_BASE_THEME=Materia-light
     GTK_DARK=false
-    GTK_ICONS=Kos-Qogir
+    GTK_ICONS=OS-Qogir
 else
     GTK_BASE_THEME=Materia-dark
     GTK_DARK=true
-    GTK_ICONS=Kos-Qogir
+    GTK_ICONS=OS-Qogir
 fi
 mix_color() {
     local percentage="$1" channel a b
@@ -43,7 +43,7 @@ HOVER=$(mix_color 10)
 BORDER=$(mix_color 18)
 MUTED=$(mix_color 55)
 THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v8" | sha256sum)
-GTK_THEME_NAME="Kos-${THEME_HASH:0:16}"
+GTK_THEME_NAME="OS-${THEME_HASH:0:16}"
 GTK_THEME_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/themes/$GTK_THEME_NAME"
 mkdir -p "$GTK_THEME_DIR/gtk-3.0" "$GTK_THEME_DIR/gtk-4.0"
 
@@ -53,10 +53,10 @@ for version in 3 4; do
     settings="$(mktemp "$config/.settings.XXXXXX")"
     if [[ -f "$config/settings.ini" ]]; then cat "$config/settings.ini" > "$settings"; fi
     temporary="$(mktemp "$config/.settings-new.XXXXXX")"
-    awk -v theme="$GTK_THEME_NAME" -v dark="$GTK_DARK" -v icons="$GTK_ICONS" '
+    awk -v theme="$GTK_THEME_NAME" -v dark="$GTK_DARK" -v icons="$GTK_ICONS" -v version="$version" '
         function managed() {
             print "gtk-theme-name=" theme
-            print "gtk-application-prefer-dark-theme=" dark
+            if (version == 3) print "gtk-application-prefer-dark-theme=" dark
             print "gtk-icon-theme-name=" icons
             print "gtk-cursor-theme-name=capitaine-cursors"
         }
@@ -69,7 +69,7 @@ for version in 3 4; do
     chmod 644 "$temporary"
     mv -f "$temporary" "$config/settings.ini"
     rm -f "$settings"
-    temporary="$(mktemp "$config/.kos.XXXXXX")"
+    temporary="$(mktemp "$config/.os.XXXXXX")"
     cat > "$temporary" <<EOF_CSS
 @define-color theme_bg_color $BACKGROUND;
 @define-color theme_base_color $BACKGROUND;
@@ -107,8 +107,7 @@ button.flat:hover, button.image-button:hover, row:hover { background-color: $HOV
 row:selected, row:selected:hover, .sidebar row:selected, .navigation-sidebar row:selected { background-color: $SELECTION; color: $FOREGROUND; }
 button.suggested-action { background-color: $ACCENT; color: $BACKGROUND; border-color: $ACCENT; }
 entry selection, textview text selection { background-color: $SELECTION; color: $FOREGROUND; }
-check, radio { border: 1px solid $BORDER; }
-check:checked, radio:checked { border-color: $ACCENT; }
+check, radio, check:checked, radio:checked { border: none; outline: none; box-shadow: none; }
 scale trough, progressbar trough { background-color: $HOVER; }
 scrollbar trough { background-color: transparent; }
 scrollbar slider { min-width: 8px; min-height: 8px; margin: 0; padding: 0; background-color: $MUTED; border: none; }
@@ -122,8 +121,21 @@ scale highlight, progressbar progress, levelbar block {
 button:active, row:active, menuitem:active { transition-duration: 60ms; }
 button:disabled, entry:disabled, spinbutton:disabled, check:disabled, radio:disabled, switch:disabled { transition: none; }
 .link, link { color: $ACCENT; }
+menu, popover.menu, popover.menu contents, popover.menu stack, popover.menu list { background-color: $BACKGROUND; color: $FOREGROUND; }
+menu { padding: 4px; border: 1px solid $BORDER; }
+popover.menu contents { padding: 4px; }
+menuitem, popover.menu modelbutton { min-height: 24px; padding: 4px 10px; margin: 0; border: none; background-color: $BACKGROUND; color: $FOREGROUND; }
+menuitem:hover, menuitem:selected, popover.menu modelbutton:hover, popover.menu modelbutton:selected { background-color: $SELECTION; color: $FOREGROUND; }
+menuitem:disabled, popover.menu modelbutton:disabled { color: $MUTED; }
+menuitem label, popover.menu modelbutton label { background-color: transparent; }
+menu separator, popover.menu separator { min-height: 1px; margin: 4px 6px; background-color: $BORDER; }
 
 EOF_CSS
+    if [[ "$version" == 3 ]]; then
+        cat >> "$temporary" <<EOF_CSS
+popover.menu { padding: 4px; border: 1px solid $BORDER; }
+EOF_CSS
+    fi
     if [[ "$version" == 4 ]]; then
         cat >> "$temporary" <<EOF_CSS
 :root {
@@ -146,27 +158,36 @@ EOF_CSS
   --accent-color: $ACCENT;
   --border-opacity: 0.15;
 }
+placessidebar .navigation-sidebar { padding: 6px; background-color: $SURFACE; }
+placessidebar .navigation-sidebar row { min-height: 28px; margin: 2px 0; padding: 4px 10px; border: none; border-left: 3px solid transparent; background-color: transparent; color: $FOREGROUND; }
+placessidebar .navigation-sidebar row:dir(rtl) { border-left: none; border-right: 3px solid transparent; }
+placessidebar .navigation-sidebar row:hover { background-color: $HOVER; }
+placessidebar .navigation-sidebar row:selected, placessidebar .navigation-sidebar row:selected:hover { background-color: $SELECTION; border-color: $ACCENT; color: $FOREGROUND; }
+placessidebar .navigation-sidebar row image { color: $MUTED; }
+placessidebar .navigation-sidebar row:selected image { color: $ACCENT; }
+placessidebar .navigation-sidebar .sidebar-button { min-width: 20px; min-height: 20px; padding: 2px; border: none; }
+placessidebar .navigation-sidebar row:disabled, placessidebar .navigation-sidebar row:disabled image { color: $MUTED; }
 EOF_CSS
     fi
     chmod 644 "$temporary"
-    mv -f "$temporary" "$config/kos.css"
+    mv -f "$temporary" "$config/os.css"
     if [[ "$version" == 3 ]]; then
         if [[ -f "$config/gtk.css" ]]; then
             temporary="$(mktemp "$config/.gtk.XXXXXX")"
-            awk '$0 != "@import url(\"kos.css\");" { print }' "$config/gtk.css" > "$temporary"
+            awk '$0 != "@import url(\"os.css\");" { print }' "$config/gtk.css" > "$temporary"
             chmod 644 "$temporary"
             mv -f "$temporary" "$config/gtk.css"
         fi
         printf '@import url("/usr/share/themes/%s/gtk-3.0/gtk.css");\n' "$GTK_BASE_THEME" > "$GTK_THEME_DIR/gtk-3.0/gtk.css"
-        cat "$config/kos.css" >> "$GTK_THEME_DIR/gtk-3.0/gtk.css"
+        cat "$config/os.css" >> "$GTK_THEME_DIR/gtk-3.0/gtk.css"
         cp "$GTK_THEME_DIR/gtk-3.0/gtk.css" "$GTK_THEME_DIR/gtk-3.0/gtk-dark.css"
     else
-        cp "$config/kos.css" "$GTK_THEME_DIR/gtk-4.0/gtk.css"
-        cp "$config/kos.css" "$GTK_THEME_DIR/gtk-4.0/gtk-dark.css"
+        cp "$config/os.css" "$GTK_THEME_DIR/gtk-4.0/gtk.css"
+        cp "$config/os.css" "$GTK_THEME_DIR/gtk-4.0/gtk-dark.css"
     fi
-    if [[ "$version" == 4 ]] && ! grep -qFx '@import url("kos.css");' "$config/gtk.css" 2>/dev/null; then
+    if [[ "$version" == 4 ]] && ! grep -qFx '@import url("os.css");' "$config/gtk.css" 2>/dev/null; then
         temporary="$(mktemp "$config/.gtk.XXXXXX")"
-        printf '%s\n' '@import url("kos.css");' > "$temporary"
+        printf '%s\n' '@import url("os.css");' > "$temporary"
         if [[ -f "$config/gtk.css" ]]; then cat "$config/gtk.css" >> "$temporary"; fi
         chmod 644 "$temporary"
         mv -f "$temporary" "$config/gtk.css"
@@ -174,7 +195,7 @@ EOF_CSS
 done
 printf '[Desktop Entry]\nName=%s\nType=X-GNOME-Metatheme\n[X-GNOME-Metatheme]\nGtkTheme=%s\nIconTheme=%s\n' "$GTK_THEME_NAME" "$GTK_THEME_NAME" "$GTK_ICONS" > "$GTK_THEME_DIR/index.theme"
 
-if [[ -z "${KOS_THEME_COLORS:-}" && -S "${XDG_RUNTIME_DIR:-/nonexistent}/bus" ]]; then
+if [[ -z "${OS_THEME_COLORS:-}" && -S "${XDG_RUNTIME_DIR:-/nonexistent}/bus" ]]; then
     gsettings set org.gnome.desktop.interface gtk-theme "$GTK_THEME_NAME"
     gsettings set org.gnome.desktop.interface color-scheme "prefer-$MODE"
     gsettings set org.gnome.desktop.interface icon-theme "$GTK_ICONS"

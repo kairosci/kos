@@ -11,7 +11,8 @@ source "$SCRIPT_DIR/test_lib.sh"
 
 test_section "Config Validity & Placement Regression"
 
-assert_file_contains "shell plugins module keeps omamp on the right" "$SHELL_PLUGINS_MODULE" "section right"
+assert_file_contains "shell plugins module keeps osmp on the right" "$SHELL_PLUGINS_MODULE" "section right"
+assert_true "Micro installer syntax valid" "bash -n '$PROJECT_DIR/conf/micro/install.sh'"
 
 
 
@@ -82,12 +83,12 @@ if ((UID != 0)); then
     assert_true "user config library never accumulates backups across runs" \
         "[[ \$(ls -1 '$USERCONF_SANDBOX/dst/' | grep -c 'payload') -eq 2 ]]"
 
-    printf '# rc\n\n# >>> kos sandbox >>>\nold() { :; }\n# <<< kos sandbox <<<\n' > "$USERCONF_SANDBOX/rc"
+    printf '# rc\n\n# >>> os sandbox >>>\nold() { :; }\n# <<< os sandbox <<<\n' > "$USERCONF_SANDBOX/rc"
     (
         set -euo pipefail
         # shellcheck source=../scripts/lib/userconf.sh
         source "$USERCONF_LIB"
-        install_shell_block "$USERCONF_SANDBOX/rc" "# >>> kos sandbox >>>" "# <<< kos sandbox <<<" << 'BLOCK'
+        install_shell_block "$USERCONF_SANDBOX/rc" "# >>> os sandbox >>>" "# <<< os sandbox <<<" << 'BLOCK'
 new() { :; }
 BLOCK
     ) 2>/dev/null
@@ -96,14 +97,14 @@ BLOCK
     assert_true "shell block writes the new body" \
         "grep -q 'new()' '$USERCONF_SANDBOX/rc'"
     assert_true "shell block writes exactly one marked range" \
-        "[[ \$(grep -c '>>> kos sandbox >>>' '$USERCONF_SANDBOX/rc') -eq 1 ]]"
+        "[[ \$(grep -c '>>> os sandbox >>>' '$USERCONF_SANDBOX/rc') -eq 1 ]]"
 
-    printf '# rc\n\n# >>> kos sandbox >>>\nnew() { :; }\n# <<< kos sandbox <<<\n' > "$USERCONF_SANDBOX/rc-idem"
+    printf '# rc\n\n# >>> os sandbox >>>\nnew() { :; }\n# <<< os sandbox <<<\n' > "$USERCONF_SANDBOX/rc-idem"
     (
         set -euo pipefail
         # shellcheck source=../scripts/lib/userconf.sh
         source "$USERCONF_LIB"
-        install_shell_block "$USERCONF_SANDBOX/rc-idem" "# >>> kos sandbox >>>" "# <<< kos sandbox <<<" << 'BLOCK'
+        install_shell_block "$USERCONF_SANDBOX/rc-idem" "# >>> os sandbox >>>" "# <<< os sandbox <<<" << 'BLOCK'
 new() { :; }
 BLOCK
     ) 2>/dev/null

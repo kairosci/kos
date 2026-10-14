@@ -1,6 +1,0 @@
-#!/bin/bash
-# kos:summary=Launch emojis
-# kos:group=menu
-# kos:examples=kos menu emoji
-
-kos-shell shell toggle kos.emojis

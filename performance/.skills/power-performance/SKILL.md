@@ -1,14 +1,14 @@
 ---
 name: power-performance
 description: >-
-  Procedures for managing battery charge threshold policy, low-battery hibernate protection, and safe runtime performance tuning on Kos.
+  Procedures for managing battery charge threshold policy, low-battery hibernate protection, and safe runtime performance tuning on OS.
 ---
 
 # Power Performance
 
 ## Overview
 
-This skill defines how the performance microcomponent protects battery longevity and session survival while applying a small set of runtime tunings that can never destabilize the desktop. The single source of truth for the charge limit is `/etc/kos/power.conf`. Every other artifact is generated from it by `scripts/setup.sh`, so the policy survives reboots, kernel updates, hotplug events, and suspend and resume cycles without manual intervention.
+This skill defines how the performance microcomponent protects battery longevity and session survival while applying a small set of runtime tunings that can never destabilize the desktop. The single source of truth for the charge limit is `/etc/os/power.conf`. Every other artifact is generated from it by `scripts/setup.sh`, so the policy survives reboots, kernel updates, hotplug events, and suspend and resume cycles without manual intervention.
 
 ## Battery Threshold Management
 

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Enable, disable, or toggle the touchpad
-# kos:args=[on|off|toggle]
-
-exec kos-toggle-input-device touchpad "${1:-toggle}"

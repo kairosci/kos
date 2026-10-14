@@ -1,6 +1,6 @@
 # ai
 
-Opt in AI debloat for Kos on Arch Linux. Nothing here runs alone. Terminal only, never separate windows.
+Opt in AI debloat for OS on Arch Linux. Nothing here runs alone. Terminal only, never separate windows.
 
 ## Index
 
@@ -21,7 +21,7 @@ bash tests/check.sh
 
 ## Central entry
 
-Real file for entry shows plan with zero option and exits. With request option it requires elevated privileges, exports explicit flag and calls the single module. It also defines per user Kos command launch with correct desktop environment.
+Real file for entry shows plan with zero option and exits. With request option it requires elevated privileges, exports explicit flag and calls the single module. It also defines per user OS command launch with correct desktop environment.
 
 Usage code without comments:
 
@@ -35,15 +35,15 @@ Observed behavior holds plan print and close with zero status with zero option a
 
 ## Single AI module
 
-Real file for module runs only when called from entry with active internal flag, otherwise it prints invite and exits with zero effects. Real actions in order hold per home disable and mask of crash watch unit in user scope and per home disable of agents plugin through per user Kos command and per home removal of desktop launchers with targeted globs in local path and system path removal with same globs.
+Real file for module runs only when called from entry with active internal flag, otherwise it prints invite and exits with zero effects. Real actions in order hold per home disable and mask of crash watch unit in user scope and per home disable of agents plugin through per user OS command and per home removal of desktop launchers with targeted globs in local path and system path removal with same globs.
 
 Inspection code without comments:
 
 ```bash
-printf '%s\n' "$KOS_AI_DEBLOAT"
+printf '%s\n' "$OS_AI_DEBLOAT"
 ls /home
-systemctl --user status kos-crash-watch.service
-kos plugin list
+systemctl --user status omarchy-crash-watch.service
+omarchy plugin list
 ls ~/.local/share/applications
 ls /usr/share/applications
 ```
@@ -77,4 +77,4 @@ bash -n scripts/lib/modules/40-ai.sh
 
 ## Shared rules
 
-Native Bash automation with rigid mode, foreground, warns for non critical steps, paths from real homes, strict idempotence. Details in `AGENTS.md`. Family contract in profile repo `kos/.github` inside `docs`.
+Native Bash automation with rigid mode, foreground, warns for non critical steps, paths from real homes, strict idempotence. Details in `AGENTS.md`. Family contract in profile repo `os/.github` inside `docs`.

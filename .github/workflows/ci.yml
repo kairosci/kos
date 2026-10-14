@@ -146,6 +146,19 @@ jobs:
       - name: Run Full Test Suite
         run: bash tests/run-all.sh
 
+  osmp-validation:
+    name: OSMP Media Plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Run OSMP Tests
+        run: npm test --prefix plugins/osmp
+
   ci-status-gate:
     name: CI Completion Status Gate
     runs-on: ubuntu-latest
@@ -157,6 +170,7 @@ jobs:
       - modular-pipeline-integrity
       - theming-and-hook-engine
       - arch-container-validation
+      - osmp-validation
     steps:
       - name: CI Success Assertion
-        run: echo "All kos CI jobs and test suites completed successfully."
+        run: echo "All os CI jobs and test suites completed successfully."

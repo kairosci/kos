@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# kos:summary=Update Arch signing keys
-# kos:requires-sudo=true
-set -euo pipefail
-exec sudo pacman -Syu --needed archlinux-keyring

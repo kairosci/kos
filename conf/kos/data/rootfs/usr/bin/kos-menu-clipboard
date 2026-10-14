@@ -1,6 +1,0 @@
-#!/bin/bash
-# kos:summary=Launch the clipboard manager
-# kos:group=menu
-# kos:examples=kos menu clipboard
-
-kos-shell shell toggle kos.clipboard

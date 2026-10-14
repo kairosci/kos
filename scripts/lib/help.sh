@@ -24,7 +24,6 @@ row herdr "make.herdr"
 row editors "make.editors"
 row lang "make.lang"
 row i18n-status "make.i18n_status"
-row iso "make.iso"
 row clean "make.clean"
 printf '\n'
 log "locale.supported" "${I18N_SUPPORTED[*]}"

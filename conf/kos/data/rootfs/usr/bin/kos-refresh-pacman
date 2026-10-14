@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# kos:summary=Restore the package configuration and update packages
-# kos:requires-sudo=true
-set -euo pipefail
-[[ $# -eq 0 || ${1:-} == stable ]] || exit 2
-sudo cp -a /etc/pacman.conf /etc/pacman.conf.bak
-sudo install -m 644 "${KOS_PATH:-/usr/share/kos}/default/pacman/pacman-stable.conf" /etc/pacman.conf
-kos-hook pre-refresh-pacman
-exec kos-update-system-pkgs

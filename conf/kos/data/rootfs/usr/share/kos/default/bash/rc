@@ -1,7 +1,0 @@
-: "${KOS_PATH:=/usr/share/kos}"
-source "$KOS_PATH/default/bash/envs"
-source "$KOS_PATH/default/bash/shell"
-source "$KOS_PATH/default/bash/aliases"
-source "$KOS_PATH/default/bash/functions"
-source "$KOS_PATH/default/bash/init"
-[[ $- == *i* ]] && bind -f "$KOS_PATH/default/bash/inputrc"

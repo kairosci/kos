@@ -2,8 +2,8 @@
 set -euo pipefail
 
 KEYRING_BACKEND=gnome-keyring
-if [[ -n "${KOS_KEYRING_BACKEND:-}" && "$KOS_KEYRING_BACKEND" != "$KEYRING_BACKEND" ]]; then
-    err "keyring.backend_invalid" "$KOS_KEYRING_BACKEND"
+if [[ -n "${OS_KEYRING_BACKEND:-}" && "$OS_KEYRING_BACKEND" != "$KEYRING_BACKEND" ]]; then
+    err "keyring.backend_invalid" "$OS_KEYRING_BACKEND"
 fi
 log "keyring.install"
 pacman -S --noconfirm --needed gnome-keyring seahorse libsecret pass
@@ -60,6 +60,6 @@ done
 if [[ -f /etc/pam.d/passwd ]]; then
     grep -Eq '^password[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so' /etc/pam.d/passwd || printf '\npassword optional pam_gnome_keyring.so use_authtok\n' >> /etc/pam.d/passwd
 fi
-install -d -m 755 /etc/kos
-printf '%s\n' "$KEYRING_BACKEND" > /etc/kos/keyring-backend
-chmod 644 /etc/kos/keyring-backend
+install -d -m 755 /etc/os
+printf '%s\n' "$KEYRING_BACKEND" > /etc/os/keyring-backend
+chmod 644 /etc/os/keyring-backend

@@ -1,7 +1,7 @@
 ---
 name: regression-prevention
 description: >-
-  Procedures and rules to strictly prevent system regressions, including service blockages, daemon failures, and double or frozen lockscreen issues in Kos.
+  Procedures and rules to strictly prevent system regressions, including service blockages, daemon failures, and double or frozen lockscreen issues in OS.
 ---
 
 # Regression Prevention and Desktop Stability

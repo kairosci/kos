@@ -11,7 +11,7 @@ hl.config({
   group = { groupbar = { gradients = false, gradient_rounding = 0 } },
 })
 
-hl.curve("kosSmooth", { type = "bezier", points = { { 0.25, 0.1 }, { 0.25, 1 } } })
+hl.curve("osSmooth", { type = "bezier", points = { { 0.25, 0.1 }, { 0.25, 1 } } })
 hl.animation({ leaf = "global", enabled = false })
 for _, leaf in ipairs({ "windows", "windowsIn", "windowsOut", "windowsMove", "borderangle", "workspaces", "workspacesIn", "workspacesOut", "specialWorkspace", "specialWorkspaceIn", "specialWorkspaceOut" }) do
   hl.animation({ leaf = leaf, enabled = false })
@@ -20,10 +20,10 @@ for _, leaf in ipairs({ "border", "fade", "fadeSwitch", "fadeShadow", "fadeGlow"
   hl.animation({ leaf = leaf, enabled = false })
 end
 for _, leaf in ipairs({ "fadeIn", "fadeLayersIn", "fadePopupsIn" }) do
-  hl.animation({ leaf = leaf, enabled = true, speed = 1.4, bezier = "kosSmooth" })
+  hl.animation({ leaf = leaf, enabled = true, speed = 1.4, bezier = "osSmooth" })
 end
 for _, leaf in ipairs({ "fadeOut", "fadeLayersOut", "fadePopupsOut" }) do
-  hl.animation({ leaf = leaf, enabled = true, speed = 1, bezier = "kosSmooth" })
+  hl.animation({ leaf = leaf, enabled = true, speed = 1, bezier = "osSmooth" })
 end
 
 o.window(".*", {
@@ -33,4 +33,6 @@ o.window(".*", {
   no_shadow = true,
   no_blur = true,
 })
+o.window({ float = true }, { max_size = { "monitor_w-2", "monitor_h-2" } })
+o.window("xdg-desktop-portal-gtk", { center = true, max_size = { "monitor_w-2", "monitor_h-2" } })
 o.window({ modal = false, tag = "negative:floating-window" }, { tile = true })

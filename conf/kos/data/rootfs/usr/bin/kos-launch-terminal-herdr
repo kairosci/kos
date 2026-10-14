@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Launch or attach to the persistent herdr session in a terminal
-
-exec kos-launch-terminal herdr

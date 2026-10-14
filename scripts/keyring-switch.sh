@@ -12,4 +12,4 @@ case "$backend" in
     *) err "keyring.backend_invalid" "${backend:-unset}" ;;
 esac
 
-exec pkexec env "KOS_KEYRING_BACKEND=$backend" bash "$script_dir/setup.sh"
+exec pkexec env "OS_KEYRING_BACKEND=$backend" bash "$script_dir/setup.sh"

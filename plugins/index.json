@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "plugins": [
     {
-      "id": "krosci.omamp",
-      "name": "MediaPlayer",
-      "source": "https://github.com/kos/omamp.git",
-      "path": "plugins/omamp",
+      "id": "os.osmp",
+      "name": "OSMP",
+      "version": "1.5.0",
+      "path": "plugins/osmp",
       "kind": "bar-widget",
-      "install": "kos plugin add https://github.com/kos/omamp.git --enable --yes"
+      "install": "make setup"
     }
   ]
 }

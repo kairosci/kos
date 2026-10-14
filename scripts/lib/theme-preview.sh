@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 
 THEME_PREVIEW_CANVAS="${THEME_PREVIEW_CANVAS:-1800x1012}"
-THEME_PREVIEW_BACKUP_DIR="${THEME_PREVIEW_BACKUP_DIR:-/var/cache/kos/theme-preview-stock}"
-THEME_PREVIEW_OVERLAY_STORE="${THEME_PREVIEW_OVERLAY_STORE:-/var/lib/kos/theme-preview-overlay}"
+THEME_PREVIEW_BACKUP_DIR="${THEME_PREVIEW_BACKUP_DIR:-/var/cache/os/theme-preview-stock}"
+THEME_PREVIEW_OVERLAY_STORE="${THEME_PREVIEW_OVERLAY_STORE:-/var/lib/os/theme-preview-overlay}"
 THEME_PREVIEW_DENSITY="${THEME_PREVIEW_DENSITY:-72}"
 THEME_PREVIEW_DEPTH="${THEME_PREVIEW_DEPTH:-8}"
+
+theme_preview_pixel_rgb() {
+    local file="$1" x="$2" y="$3" pixel
+    [[ "$x" =~ ^[0-9]+$ && "$y" =~ ^[0-9]+$ ]] || return 1
+    pixel=$(magick "$file" -depth 8 -format "%[hex:p{$x,$y}]" info:) || return 1
+    pixel=${pixel,,}
+    [[ "$pixel" =~ ^[0-9a-f]{6}([0-9a-f]{2})?$ ]] || return 1
+    printf '%s\n' "${pixel:0:6}"
+}
 
 theme_preview_window_geometry() {
     local monitor="$1" side="$2"
@@ -74,22 +83,23 @@ theme_preview_restore_overlays() {
             log "theming.preview_overlay_restored" "$(basename "$stored" .png)"
         else
             warn "theming.preview_resize_failed" "$target"
+            return 1
         fi
     done
 }
 
 theme_preview_normalize() {
-    command -v magick >/dev/null || return 0
-    command -v identify >/dev/null || return 0
-    local themes_root="${THEME_PREVIEW_THEMES_ROOT:-/usr/share/kos/themes}"
-    [[ -d "$themes_root" ]] || return 0
+    command -v magick >/dev/null || return 1
+    command -v identify >/dev/null || return 1
+    local themes_root="${THEME_PREVIEW_THEMES_ROOT:-/usr/share/omarchy/themes}"
+    [[ -d "$themes_root" ]] || return 1
     local backup_dir preview size original
     backup_dir="$THEME_PREVIEW_BACKUP_DIR"
     for preview in "$themes_root"/*/preview.png; do
         [[ -f "$preview" ]] || continue
         theme_preview_uniform "$preview" && continue
-        size="$(identify -format '%wx%h' "$preview" 2>/dev/null)" || continue
-        if [[ "$size" != "$THEME_PREVIEW_CANVAS" ]]; then
+        size="$(identify -format '%wx%h' "$preview" 2>/dev/null)" || return 1
+        if ! theme_preview_uniform "$preview"; then
             if ! mkdir -p "$backup_dir" 2>/dev/null; then
                 warn "theming.preview_backup_failed" "$backup_dir"
                 return 1

@@ -2,7 +2,7 @@
 
 install_user_file() {
     local src="$1" dest="$2" mode="${3:-644}"
-    [[ -f "$src" ]] || return 0
+    [[ -f "$src" ]] || return 1
     mkdir -p "$(dirname "$dest")" || return 1
     if [[ -f "$dest" ]]; then
         if cmp -s "$src" "$dest"; then
@@ -16,7 +16,9 @@ install_user_file() {
 }
 
 install_user_content() {
-    local dest="$1" mode="${2:-644}" tmp
+    local dest="$1" mode="${2:-644}" write_mode="${3:-replace}" tmp
+    [[ "$write_mode" == replace || "$write_mode" == preserve-inode ]] || return 1
+    [[ "$write_mode" != preserve-inode || ! -L "$dest" ]] || return 1
     mkdir -p "$(dirname "$dest")" || return 1
     tmp="$(mktemp "$dest.tmp.XXXXXX")" || return 1
     if ! cat > "$tmp"; then
@@ -42,7 +44,16 @@ install_user_content() {
         rm -f "$tmp"
         return 1
     fi
-    mv "$tmp" "$dest"
+    if [[ "$write_mode" == preserve-inode && -f "$dest" ]]; then
+        if ! cat "$tmp" > "$dest"; then
+            rm -f "$tmp"
+            return 1
+        fi
+        chmod "$mode" "$dest" || return 1
+        rm -f "$tmp"
+    else
+        mv "$tmp" "$dest"
+    fi
 }
 
 merge_user_ini() {
@@ -93,9 +104,10 @@ merge_user_ini() {
 }
 
 apply_user_gsettings() {
-    local src="$1" schema key value
+    local src="$1" override="${2:-}" schema key value
     while IFS=$'\t' read -r schema key value; do
         [[ -n "$schema" ]] || continue
+        [[ -z "$override" ]] || schema="$override"
         gsettings set "$schema" "$key" "$value" || return 1
     done < "$src"
 }

@@ -34,7 +34,7 @@ EOF
 
 if [[ $# -eq 0 ]]; then
     echo "Usage: $0 <owner>/<repo> [branch]"
-    echo "Example: $0 krosci/kos"
+    echo "Example: $0 krosci/os"
     exit 1
 fi
 

@@ -2,22 +2,21 @@
 
 set -euo pipefail
 
-OMAMP_GIT="https://github.com/kos/omamp.git"
-OMAMP_ID="krosci.omamp"
-
 log "shell_plugins.install"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    if _plugin_list=$(kos_as "$_user" plugin list --json 2>/dev/null); then
-        if grep -q "$OMAMP_ID" <<< "$_plugin_list"; then
-            log "shell_plugins.present" "$_user"
-        else
-            kos_as "$_user" plugin add "$OMAMP_GIT" --enable --yes 2>/dev/null || warn "shell_plugins.add_skipped" "$_user"
-        fi
-
-        kos_as "$_user" bar move "$OMAMP_ID" --section right --index 0 2>/dev/null || warn "shell_plugins.bar_failed" "$_user"
-    else
-        warn "shell_plugins.list_unavailable" "$_user"
+    _legacy="$user_home/.config/omarchy/plugins/krosci.omamp"
+    if [[ -e "$_legacy" || -L "$_legacy" ]]; then
+        omarchy_as "$_user" plugin disable krosci.omamp || err "defaults.app_failed" "osmp"
+        user_as "$_user" bash -c '
+            set -euo pipefail
+            archive="$HOME/.local/state/os/retired-plugins"
+            mkdir -p "$archive"
+            destination=$(mktemp -d "$archive/omamp.XXXXXX")
+            mv "$1" "$destination/plugin"
+        ' bash "$_legacy" || err "defaults.app_failed" "osmp"
     fi
+    omarchy_as "$_user" shell shell rescanPlugins || err "defaults.app_failed" "osmp"
+    omarchy_as "$_user" plugin enable os.osmp --section right --index 0 || err "defaults.app_failed" "osmp"
 done

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Overwrite the user config for hyprsunset with the Kos default and restart the service.
-
-kos-refresh-config hypr/hyprsunset.conf
-kos-restart-hyprsunset

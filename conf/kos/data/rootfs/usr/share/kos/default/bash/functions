@@ -1,1 +1,0 @@
-for f in $KOS_PATH/default/bash/fns/*; do source "$f"; done

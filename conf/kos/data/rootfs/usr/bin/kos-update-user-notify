@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Compatibility wrapper for kos-migrate-notify.
-# kos:hidden=true
-
-exec kos-migrate-notify "$@"

@@ -3,10 +3,10 @@
 set -euo pipefail
 
 log "power.charge"
-mkdir -p /etc/kos
-chmod 755 /etc/kos 2>/dev/null || warn "power.kos_chmod"
-printf '%s\n' 'BATTERY_CHARGE_LIMIT=75' > /etc/kos/power.conf
-chmod 644 /etc/kos/power.conf
+mkdir -p /etc/os
+chmod 755 /etc/os 2>/dev/null || warn "power.os_chmod"
+printf '%s\n' 'BATTERY_CHARGE_LIMIT=75' > /etc/os/power.conf
+chmod 644 /etc/os/power.conf
 
 # shellcheck source=scripts/lib/battery-driver.sh
 source "$PROJECT_ROOT/scripts/lib/battery-driver.sh"
@@ -16,12 +16,12 @@ if battery_driver_needs_recovery; then
 fi
 
 cat > /etc/udev/rules.d/98-battery-charge-threshold.rules << 'UDEV'
-ACTION=="add|change", SUBSYSTEM=="power_supply", ATTR{type}=="Battery", RUN+="/usr/local/libexec/kos-set-battery-charge-limit"
+ACTION=="add|change", SUBSYSTEM=="power_supply", ATTR{type}=="Battery", RUN+="/usr/local/libexec/os-set-battery-charge-limit"
 UDEV
 chmod 644 /etc/udev/rules.d/98-battery-charge-threshold.rules
-install -Dm755 "$PROJECT_ROOT/scripts/lib/set-battery-charge-limit.sh" /usr/local/libexec/kos-set-battery-charge-limit
-install -Dm644 "$PROJECT_ROOT/scripts/lib/battery-driver.sh" /usr/local/libexec/kos-battery-driver.sh
-install -Dm755 "$PROJECT_ROOT/scripts/lib/battery-charge-resume.sh" /usr/lib/systemd/system-sleep/kos-battery-charge-limit
+install -Dm755 "$PROJECT_ROOT/scripts/lib/set-battery-charge-limit.sh" /usr/local/libexec/os-set-battery-charge-limit
+install -Dm644 "$PROJECT_ROOT/scripts/lib/battery-driver.sh" /usr/local/libexec/os-battery-driver.sh
+install -Dm755 "$PROJECT_ROOT/scripts/lib/battery-charge-resume.sh" /usr/lib/systemd/system-sleep/os-battery-charge-limit
 udevadm control --reload-rules 2>/dev/null || warn "power.udev_reload_skipped"
 
 _udev_triggered=0
@@ -44,7 +44,7 @@ unset _battery _udev_triggered _udev_attempted
 
 mkdir -p /etc/tmpfiles.d
 cat > /etc/tmpfiles.d/battery-charge-threshold.conf << 'TMPFILES'
-d /run/kos 0755 root root -
+d /run/os 0755 root root -
 TMPFILES
 chmod 644 /etc/tmpfiles.d/battery-charge-threshold.conf
 systemd-tmpfiles --create /etc/tmpfiles.d/battery-charge-threshold.conf 2>/dev/null || warn "power.tmpfiles_skipped"
@@ -56,12 +56,12 @@ After=systemd-udev-trigger.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/libexec/kos-set-battery-charge-limit
+ExecStart=/usr/local/libexec/os-set-battery-charge-limit
 TimeoutStartSec=30
 NoNewPrivileges=yes
 ProtectHome=yes
 ProtectSystem=strict
-ReadWritePaths=/run/kos /sys/devices
+ReadWritePaths=/run/os /sys/devices
 
 [Install]
 WantedBy=multi-user.target
@@ -88,15 +88,15 @@ systemctl enable --now battery-charge-threshold.timer
 
 battery_query() {
     local key="$1" value=""
-    value=$(/usr/local/libexec/kos-set-battery-charge-limit --query "$key" 2>/dev/null) || value=""
+    value=$(/usr/local/libexec/os-set-battery-charge-limit --query "$key" 2>/dev/null) || value=""
     printf '%s' "$value"
 }
 
 BATTERY_POLICY=$(battery_query limit)
-[[ "$BATTERY_POLICY" =~ ^[0-9]+$ ]] || BATTERY_POLICY=$(sed -n 's/^BATTERY_CHARGE_LIMIT=\([0-9][0-9]*\)$/\1/p' /etc/kos/power.conf | head -1)
+[[ "$BATTERY_POLICY" =~ ^[0-9]+$ ]] || BATTERY_POLICY=$(sed -n 's/^BATTERY_CHARGE_LIMIT=\([0-9][0-9]*\)$/\1/p' /etc/os/power.conf | head -1)
 BATTERY_LIMIT="${BATTERY_POLICY}%"
 
-if ! /usr/local/libexec/kos-set-battery-charge-limit; then
+if ! /usr/local/libexec/os-set-battery-charge-limit; then
     warn "power.charge_write_rejected" "$BATTERY_LIMIT"
 fi
 

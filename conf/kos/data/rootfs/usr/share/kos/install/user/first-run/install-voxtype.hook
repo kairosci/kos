@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -e
-
-if kos-done ensure voxtype-install-invitation; then
-  kos-notification-send -u critical -g  "Install Dictation with Voxtype" \
-    "Click to install voice dictation for Kos." \
-    --exec kos-launch-floating-terminal-with-presentation kos-voxtype-install
-fi

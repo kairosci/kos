@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Clear the internal-monitor-disable toggle if no external display is connected.
-
-TOGGLE="$HOME/.local/state/kos/toggles/hypr/internal-monitor-disable.lua"
-
-if [[ -f $TOGGLE ]] && ! kos-hw-external-monitors; then
-  rm -f "$TOGGLE"
-fi

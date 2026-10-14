@@ -33,7 +33,7 @@ assert_file_contains "hardware module blacklists firewire" "$POWER_MODULE" "disa
 
 assert_file_exists "maintenance module exists" "$MAINT_MODULE"
 assert_file_contains "maintenance module schedules weekly audit" "$MAINT_MODULE" "/etc/cron.weekly/security-audit.sh"
-assert_file_contains "weekly audit has a timer when cron is absent" "$MAINT_MODULE" "systemctl enable --now kos-security-audit.timer"
+assert_file_contains "weekly audit has a timer when cron is absent" "$MAINT_MODULE" "systemctl enable --now os-security-audit.timer"
 check_audit_scheduler() (
     local scenario actions
     actions=$(mktemp)
@@ -51,9 +51,9 @@ check_audit_scheduler() (
         # shellcheck source=/dev/null
         source <(sed -n '/^if systemctl is-enabled --quiet cronie.service/,/^fi$/p' "$MAINT_MODULE")
         if [[ "$scenario" == absent ]]; then
-            [[ "$(cat "$actions")" == 'enable --now kos-security-audit.timer' ]] || return 1
+            [[ "$(cat "$actions")" == 'enable --now os-security-audit.timer' ]] || return 1
         else
-            [[ "$(cat "$actions")" == $'enable --now cronie.service\ndisable --now kos-security-audit.timer' ]] || return 1
+            [[ "$(cat "$actions")" == $'enable --now cronie.service\ndisable --now os-security-audit.timer' ]] || return 1
         fi
     done
 )

@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Detect ASUS Zenbook UX5406AA series laptops on Intel Panther Lake.
-
-kos-hw-match "ux5406aa" && kos-hw-intel-ptl

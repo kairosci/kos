@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Check if a toggle is enabled (flag file exists)
-# kos:args=<flag-name>
-
-[[ -f "$HOME/.local/state/kos/toggles/$1" ]]

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Display the Kos logo in the terminal using green color.
-
-clear
-echo -e "\033[32m"
-cat <$KOS_PATH/logo.txt
-echo -e "\033[0m"
-echo

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# kos:summary=Returns true when clamshell mode is active
-# kos:hidden=true
-
-# Clamshell = lid closed while driving one or more external monitors.
-kos-hw-laptop-closed && kos-hw-external-monitors

@@ -1,6 +1,6 @@
 # clean
 
-Safe system and home cleanup after debloat for Kos on Arch Linux. Hygiene only, never package installs or removals beyond orphans and cache.
+Safe system and home cleanup after debloat for OS on Arch Linux. Hygiene only, never package installs or removals beyond orphans and cache.
 
 ## Index
 
@@ -45,7 +45,7 @@ Idempotence holds each step on empty set ending with zero changes and each comma
 
 ## Home module
 
-Real file for home module holds per home conditional cleanup. When package results installed or binary present, it skips all for that app. Otherwise it removes config and cache and data paths listed for that app. Then it sweeps obsolete launchers and residual Kos webapps and thumbnails older than thirty days and trash older than thirty days.
+Real file for home module holds per home conditional cleanup. When package results installed or binary present, it skips all for that app. Otherwise it removes config and cache and data paths listed for that app. Then it sweeps obsolete launchers and residual OS webapps and thumbnails older than thirty days and trash older than thirty days.
 
 Covered apps hold kdenlive with dedicated config and cache and obs studio with dedicated config and obsidian with dedicated config and never vaults and libreoffice with config and cache and chromium with config and cache and system printers with dedicated config and nautilus and totem and evince and eog for GNOME stack and dolphin and okular and gwenview and haruna for KDE stack and kitty terminal configuration.
 
@@ -101,4 +101,4 @@ bash tests/test_system_cleanup.sh
 bash tests/test_home_cleanup.sh
 ```
 
-Operating rules in `AGENTS.md` and runbook in `.skills/system-cleanup`. Family contract in profile repo `kos/.github` inside `docs`.
+Operating rules in `AGENTS.md` and runbook in `.skills/system-cleanup`. Family contract in profile repo `os/.github` inside `docs`.
