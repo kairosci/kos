@@ -475,3 +475,4 @@ preview.capture_invalid=Geometría o propiedad de las ventanas inválida
 preview.zed_live_verified=Cambio de paleta Zed verificado sin reiniciar
 preview.zed_live_failed=Paleta Zed incorrecta esperado %s obtenido %s
 shell_plugins.not_configured=El complemento opcional osmp no está configurado
+fontconfig.match_failed=Fontconfig seleccionó una fuente web para %s

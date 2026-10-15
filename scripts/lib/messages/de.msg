@@ -475,3 +475,4 @@ preview.capture_invalid=Monitorgeometrie oder Fensterzuordnung ungültig
 preview.zed_live_verified=Zed-Palettenwechsel ohne Neustart geprüft
 preview.zed_live_failed=Zed-Palette stimmt nicht erwartet %s gemessen %s
 shell_plugins.not_configured=Optionales osmp-Plugin ist nicht eingerichtet
+fontconfig.match_failed=Fontconfig hat für %s eine Webschrift ausgewählt
