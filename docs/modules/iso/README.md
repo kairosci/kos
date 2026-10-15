@@ -56,4 +56,4 @@ The original upstream image is cached under `${XDG_CACHE_HOME:-$HOME/.cache}/os/
 
 ## Boot menu
 
-The current installed system uses Limine for snapshot entries and recovery. systemd-boot supports a configurable text menu and entry icons but has no full menu theme engine. Replacing the bootloader would also require replacing the project's snapshot synchronization and recovery path. Keep the current boot path until that migration can preserve and verify those recovery behaviors; do not advertise a full systemd-boot theme as supported.
+The current installed system uses Limine for snapshot entries and recovery. systemd-boot provides a simple text menu and its documented configuration has no graphical theme settings ([systemd-boot documentation](https://systemd.io/BOOT/)). Replacing the bootloader would also require replacing the project's snapshot synchronization and recovery path. Keep the current boot path until that migration can preserve and verify those recovery behaviors; do not advertise a full systemd-boot theme as supported.
