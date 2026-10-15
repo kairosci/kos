@@ -6,3 +6,4 @@ GRUB_TERMINAL=console
 GRUB_GFXMODE=auto
 GRUB_CMDLINE_LINUX_DEFAULT="quiet loglevel=3 lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
 GRUB_DISABLE_OS_PROBER=true
+GRUB_PRELOAD_MODULES="tpm"

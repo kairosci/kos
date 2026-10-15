@@ -13,6 +13,7 @@ assert_file_exists "cyan text menu generator exists" "$PROJECT_DIR/conf/bootload
 assert_file_exists "GRUB defaults reconciler exists" "$PROJECT_DIR/scripts/lib/grub-configure.sh"
 assert_file_contains "bootloader provisions GRUB with Btrfs snapshot support" "$PROJECT_DIR/scripts/lib/modules/27-bootloader.sh" 'grub grub-btrfs inotify-tools'
 assert_file_contains "bootloader configures a text console" "$PROJECT_DIR/conf/bootloader/grub" 'GRUB_TERMINAL=console'
+assert_file_contains "GRUB core preloads TPM measurement support" "$PROJECT_DIR/conf/bootloader/grub" 'GRUB_PRELOAD_MODULES="tpm"'
 assert_file_contains "boot menu uses cyan selection" "$PROJECT_DIR/conf/bootloader/08_os_console_theme" 'menu_color_highlight'
 assert_file_contains "snapshot overlay kernel parameter is configured" "$PROJECT_DIR/scripts/lib/modules/27-bootloader.sh" 'rd.live.overlay.overlayfs=1'
 assert_file_contains "snapshot watcher is enabled" "$PROJECT_DIR/scripts/lib/modules/27-bootloader.sh" 'grub-btrfsd.service'

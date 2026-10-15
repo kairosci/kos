@@ -12,7 +12,7 @@ ESP_PATH=$(findmnt --noheadings --raw --output TARGET --types vfat | head -n 1) 
 [[ -n "$ESP_PATH" && -d "$ESP_PATH" ]] || err "bootloader.esp_missing"
 [[ $(findmnt --noheadings --raw --output TARGET --types vfat | wc -l) -eq 1 ]] || err "bootloader.esp_ambiguous"
 install -d -m 755 "$ESP_PATH/EFI/os"
-grub-install --target=x86_64-efi --efi-directory="$ESP_PATH" --bootloader-id=os --recheck || err "bootloader.install_failed"
+grub-install --target=x86_64-efi --efi-directory="$ESP_PATH" --bootloader-id=os --modules=tpm --recheck || err "bootloader.install_failed"
 /usr/local/libexec/os-grub-configure
 if [[ -f /etc/default/grub-btrfs/config ]]; then
     if ! grep -Fxq 'GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="rd.live.overlay.overlayfs=1"' /etc/default/grub-btrfs/config; then

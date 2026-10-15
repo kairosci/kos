@@ -14,7 +14,7 @@ temporary=$(mktemp /etc/default/.grub.XXXXXX)
 trap 'rm -f -- "$temporary"' EXIT
 if [[ -f "$grub_cfg" ]]; then
     awk '
-        !/^[[:space:]]*GRUB_(DEFAULT|TIMEOUT|TIMEOUT_STYLE|DISTRIBUTOR|TERMINAL|GFXMODE|CMDLINE_LINUX_DEFAULT|DISABLE_OS_PROBER)=/ { print }
+        !/^[[:space:]]*GRUB_(DEFAULT|TIMEOUT|TIMEOUT_STYLE|DISTRIBUTOR|TERMINAL|GFXMODE|CMDLINE_LINUX_DEFAULT|DISABLE_OS_PROBER|PRELOAD_MODULES)=/ { print }
     ' "$grub_cfg" > "$temporary"
 fi
 cat -- "$managed" >> "$temporary"
