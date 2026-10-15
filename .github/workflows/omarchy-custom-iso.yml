@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing signed version tag to publish
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -22,7 +28,7 @@ jobs:
       - name: Validate release tag
         id: version
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
           [[ "$RELEASE_TAG" =~ ^v([0-9]+\.[0-9]+)$ ]]
@@ -35,7 +41,7 @@ jobs:
 
       - name: Stage complete OS configuration in the ISO overlay
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
           overlay="$RUNNER_TEMP/omarchy-overlay"
@@ -62,22 +68,38 @@ jobs:
           upstream_version="${BASH_REMATCH[1]}"
           final_iso="$RUNNER_TEMP/omarchy-${upstream_version}-custom-v${RELEASE_VERSION}.iso"
           mv "$RUNNER_TEMP/omarchy-custom.iso" "$final_iso"
-          sha256sum "$final_iso" > "$final_iso.sha256"
+          iso_name="$(basename "$final_iso")"
+          (cd "$RUNNER_TEMP" && sha256sum "$iso_name" > "$iso_name.sha256")
+          split --bytes=1900M --numeric-suffixes=0 --suffix-length=2 \
+            "$final_iso" "$final_iso.part-"
           echo "iso_path=$final_iso" >> "$GITHUB_OUTPUT"
+          echo "iso_name=$iso_name" >> "$GITHUB_OUTPUT"
           echo "upstream_version=$upstream_version" >> "$GITHUB_OUTPUT"
 
       - name: Publish ISO and checksum
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
           ISO_PATH: ${{ steps.build.outputs.iso_path }}
+          ISO_NAME: ${{ steps.build.outputs.iso_name }}
           UPSTREAM_VERSION: ${{ steps.build.outputs.upstream_version }}
         run: |
           set -euo pipefail
+          mapfile -t iso_parts < <(find "$RUNNER_TEMP" -maxdepth 1 -type f -name "$ISO_NAME.part-*" -print | LC_ALL=C sort)
+          ((${#iso_parts[@]} > 0))
+          release_assets=("${iso_parts[@]}" "$ISO_PATH.sha256")
+          notes="$RUNNER_TEMP/release-notes.md"
+          cat > "$notes" <<EOF
+          Based on upstream Omarchy ${UPSTREAM_VERSION} and configuration release ${RELEASE_TAG}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO.
+
+          The ISO is split into numbered parts because a GitHub release asset cannot exceed 2 GiB. Download every numbered part and the checksum, then reconstruct and verify the image with:
+
+          cat ${ISO_NAME}.part-* > ${ISO_NAME}
+          sha256sum -c ${ISO_NAME}.sha256
+          EOF
           gh release create "$RELEASE_TAG" \
-            "$ISO_PATH" \
-            "$ISO_PATH.sha256" \
+            "${release_assets[@]}" \
             --verify-tag \
             --title "Omarchy Custom ${RELEASE_VERSION}" \
-            --notes "Based on upstream Omarchy ${UPSTREAM_VERSION} and configuration release ${RELEASE_TAG}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO."
+            --notes-file "$notes"

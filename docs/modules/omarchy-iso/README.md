@@ -13,7 +13,24 @@ git tag -s v1.0
 git push origin v1.0
 ```
 
-The `Omarchy Custom ISO` GitHub Actions workflow validates the tag, downloads and verifies the latest stable upstream Omarchy ISO, overlays the repository at `/opt/os-custom`, rebuilds the image, and publishes a GitHub release with the ISO and its SHA-256 checksum. The custom release version identifies this repository configuration. The upstream Omarchy version appears in the ISO filename and release notes.
+The `Omarchy Custom ISO` GitHub Actions workflow validates the tag, downloads and verifies the latest stable upstream Omarchy ISO, overlays the repository at `/opt/os-custom`, rebuilds the image, and publishes a GitHub release with the ISO parts and its SHA-256 checksum. The custom release version identifies this repository configuration. The upstream Omarchy version appears in the ISO filename and release notes. The ISO parts are each smaller than GitHub's 2 GiB per-asset limit.
+
+To reconstruct and verify a downloaded image, run these commands in the directory containing all numbered parts and the matching checksum:
+
+```bash
+parts=(omarchy-*-custom-v1.0.iso.part-*)
+iso="${parts[0]%.part-*}"
+cat "${parts[@]}" > "$iso"
+sha256sum -c "$iso.sha256"
+```
+
+Replace `v1.0` in the asset pattern with the release version you downloaded.
+
+If a tag-triggered build fails before publishing, rerun the workflow from `main` with the existing tag:
+
+```bash
+gh workflow run omarchy-custom-iso.yml --ref main -f release_tag=v1.0
+```
 
 ## Install the configuration
 
