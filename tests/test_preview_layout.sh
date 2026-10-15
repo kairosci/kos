@@ -2,7 +2,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/test_lib.sh"
-source "$SCRIPT_DIR/../scripts/lib/theme-preview.sh"
+source "$SCRIPT_DIR/../modules/theme-previews/scripts/lib/theme-preview.sh"
 
 test_section "Preview Window Geometry"
 monitor='{"width":1920,"height":1080,"scale":1,"x":0,"y":0,"reserved":[0,32,0,0]}'

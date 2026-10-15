@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-source "$PROJECT_DIR/scripts/lib/theme-preview.sh"
+PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+source "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
 i18n_init

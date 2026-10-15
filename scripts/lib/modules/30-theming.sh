@@ -5,7 +5,7 @@ set -euo pipefail
 install -d -m 755 -o root -g root /usr/local/lib/os/messages /etc/pacman.d/hooks
 install -m 644 -o root -g root "$PROJECT_DIR/scripts/lib/i18n.sh" \
     "$PROJECT_DIR/scripts/lib/theme-policy.sh" \
-    "$PROJECT_DIR/scripts/lib/theme-preview.sh" \
+    "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh" \
     "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" /usr/local/lib/os/
 install -m 644 -o root -g root "$PROJECT_DIR/modules/conf/themes/data/excluded.list" /usr/local/lib/os/excluded-themes.list
 source "$PROJECT_DIR/scripts/lib/theme-policy.sh"
@@ -29,7 +29,7 @@ theme_policy_apply || err "theming.policy_failed"
 install -m 644 -o root -g root "$PROJECT_DIR/modules/conf/xdg-desktop-portal/data/portals.conf" \
     "$PROJECT_DIR/modules/conf/desktop/data/mpv.desktop" /usr/local/lib/os/
 install -m 644 -o root -g root "$PROJECT_DIR"/scripts/lib/messages/*.msg /usr/local/lib/os/messages/
-install -Dm755 -o root -g root "$PROJECT_DIR/scripts/lib/update-previews.sh" /usr/local/libexec/os-update-previews
+install -Dm755 -o root -g root "$PROJECT_DIR/modules/theme-previews/scripts/update-previews.sh" /usr/local/libexec/os-update-previews
 cat > /etc/pacman.d/hooks/99-os-theme-previews.hook << 'HOOK'
 [Trigger]
 Operation = Install
@@ -43,9 +43,9 @@ Exec = /usr/local/libexec/os-update-previews
 HOOK
 chmod 644 /etc/pacman.d/hooks/99-os-theme-previews.hook
 
-if [[ -f "$PROJECT_DIR/scripts/lib/theme-preview.sh" ]]; then
-    # shellcheck source=../theme-preview.sh
-    source "$PROJECT_DIR/scripts/lib/theme-preview.sh"
+if [[ -f "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh" ]]; then
+    # shellcheck source=../../../modules/theme-previews/scripts/lib/theme-preview.sh
+    source "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh"
 fi
 
 log "theming.desktop"
@@ -128,7 +128,7 @@ for user_home in /home/*; do
     rm -f "$_hook_dir/yazi-theme" "$user_home/.local/share/applications/yazi-terminal.desktop"
     cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/i18n-boot.sh" "$_i18n_dir/"
     cp "$PROJECT_DIR"/scripts/lib/messages/*.msg "$_i18n_dir/messages/"
-    cp "$PROJECT_DIR/scripts/lib/theme-preview.sh" "$_lib_dir/"
+    cp "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh" "$_lib_dir/"
     cp "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "$_lib_dir/"
     cp "$PROJECT_DIR/modules/conf/xdg-desktop-portal/data/portals.conf" "$_lib_dir/"
     cp "$PROJECT_DIR/modules/conf/desktop/data/mpv.desktop" "$_lib_dir/"
@@ -145,14 +145,14 @@ done
 
 if [[ "${OS_REBUILD_PREVIEWS:-0}" == 1 ]]; then
     mapfile -t _preview_themes < <(find /usr/share/omarchy/themes -mindepth 2 -maxdepth 2 -name colors.toml -printf '%h\n' | sed 's|.*/||' | sort)
-    bash -n "$PROJECT_DIR/theme-previews/rebuild-previews.sh"
-    user_as "$PRIMARY_USER" env "OMARCHY_PATH=${OMARCHY_PATH:-/usr/share/omarchy}" OS_APPLY_PIPELINE=1 bash "$PROJECT_DIR/theme-previews/rebuild-previews.sh" "${_preview_themes[@]}"
+    bash -n "$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh"
+    user_as "$PRIMARY_USER" env "OMARCHY_PATH=${OMARCHY_PATH:-/usr/share/omarchy}" OS_APPLY_PIPELINE=1 bash "$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh" "${_preview_themes[@]}"
 fi
-mapfile -t _preview_themes < <(find "$PROJECT_DIR/theme-previews" -mindepth 2 -maxdepth 2 -name preview.png -printf '%h\n' | sed 's|.*/||' | sort)
+mapfile -t _preview_themes < <(find "$PROJECT_DIR/modules/theme-previews" -mindepth 2 -maxdepth 2 -name preview.png -printf '%h\n' | sed 's|.*/||' | sort)
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    user_as "$_user" bash "$PROJECT_DIR/theme-previews/apply.sh" "${_preview_themes[@]}"
+    user_as "$_user" bash "$PROJECT_DIR/modules/theme-previews/apply.sh" "${_preview_themes[@]}"
 done
 
 _browser_palette="$(getent passwd "$PRIMARY_USER" | cut -d: -f6)/.local/state/omarchy/current/theme/colors.toml"

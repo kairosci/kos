@@ -45,7 +45,8 @@ jobs:
             --output semgrep.sarif \
             scripts hooks modules/conf tests modules/clean/scripts modules/clean/scripts/lib/modules \
             modules/obscure/scripts modules/obscure/scripts/lib/modules modules/slop/scripts modules/slop/scripts/lib/modules \
-            modules/performance/scripts modules/performance/scripts/lib/modules modules/omarchy-iso/scripts
+            modules/performance/scripts modules/performance/scripts/lib/modules modules/omarchy-iso/scripts \
+            modules/theme-previews/scripts modules/theme-previews/scripts/lib
 
       - name: Upload SARIF results
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

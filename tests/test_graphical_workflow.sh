@@ -127,7 +127,7 @@ assert_file_contains "OS file manager state records Nautilus" "$WORKFLOW_SANDBOX
 
 user_as() { return 1; }
 assert_false "desktop default failures propagate to callers" "desktop_workflow_defaults '$WORKFLOW_USER' '$WORKFLOW_SANDBOX/home'"
-assert_false "preview capture refuses direct session changes" "bash '$PROJECT_DIR/theme-previews/rebuild-previews.sh' fake-theme"
+assert_false "preview capture refuses direct session changes" "bash '$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh' fake-theme"
 
 binding_home="$WORKFLOW_SANDBOX/$WORKFLOW_USER"
 mkdir -p "$binding_home/.config/hypr"
