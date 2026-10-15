@@ -31,7 +31,7 @@ else
 $(error BACKEND must be gnome-keyring)
 endif
 
-.PHONY: help setup keyring verify test hook icons theme zed cli herdr editors clean lang i18n-status lint
+.PHONY: help setup keyring verify test hook icons theme zed cli herdr editors clean lang i18n-status lint iso-customize
 
 lint:
 	@if ! command -v shellcheck &> /dev/null; then \
@@ -46,7 +46,8 @@ lint:
 		modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
 		modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
 		modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \
-		modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh
+		modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh \
+		modules/omarchy-iso/scripts/*.sh
 
 help:
 	@bash scripts/lib/help.sh
@@ -93,6 +94,9 @@ lang:
 
 i18n-status:
 	@bash scripts/lib/i18n.sh
+
+iso-customize:
+	bash modules/omarchy-iso/scripts/customize.sh
 
 clean:
 	rm -f setup.log
