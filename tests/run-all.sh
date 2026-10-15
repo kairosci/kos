@@ -11,6 +11,7 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_kernel_hardening.sh" \
     "$SCRIPT_DIR/test_auth_pam_access.sh" \
     "$SCRIPT_DIR/test_firewall_network.sh" \
+    "$SCRIPT_DIR/test_resolver_failover.sh" \
     "$SCRIPT_DIR/test_debloat_theming.sh" \
     "$SCRIPT_DIR/test_security_tooling.sh" \
     "$SCRIPT_DIR/test_hardware_power.sh" \

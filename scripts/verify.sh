@@ -208,6 +208,7 @@ fi
 tcheck "check.sshd_service_hardened"   "[[ -f /etc/systemd/system/sshd.service.d/hardened.conf ]]"
 tcheck "check.networkmanager_intact" "! [[ -f /etc/NetworkManager/conf.d/security.conf ]]"
 tcheck "check.resolved_hardened" "[[ -f /etc/systemd/resolved.conf.d/hardened.conf ]]"
+tcheck "check.resolver_failover" "systemctl is-enabled --quiet os-resolver-failover.service && systemctl is-active --quiet os-resolver-failover.service"
 
 section verify.sec_tooling
 for pkg in lynis rkhunter clamav audit usbguard fail2ban apparmor; do
