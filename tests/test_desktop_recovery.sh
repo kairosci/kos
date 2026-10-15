@@ -34,13 +34,13 @@ snapper() {
         *) return 1 ;;
     esac
 }
-limine-snapper-sync() { printf 'limine\n' >> "$SNAPSHOT_TEST_COMMANDS"; }
+grub-mkconfig() { printf 'grub\n' >> "$SNAPSHOT_TEST_COMMANDS"; }
 test_section "Omarchy restore and Snapper baseline"
 assert_true "baseline is created and earlier removable snapshots are deleted" 'snapshot_baseline_reset && ! grep -qE "^(1|4)," "$SNAPSHOT_TEST_ROWS" && grep -q "^5," "$SNAPSHOT_TEST_ROWS"'
 assert_true "active and default snapshots survive" 'grep -q "^0," "$SNAPSHOT_TEST_ROWS" && grep -q "^2," "$SNAPSHOT_TEST_ROWS" && grep -q "^3," "$SNAPSHOT_TEST_ROWS"'
 assert_true "snapshots created after the baseline survive" 'grep -q "^6," "$SNAPSHOT_TEST_ROWS"'
 assert_true "deletion synchronizes reclaimed space" 'grep -qx -- "-c root delete --sync 1 4" "$SNAPSHOT_TEST_COMMANDS"'
-assert_true "Limine entries are synchronized after deletion" '[[ $(tail -1 "$SNAPSHOT_TEST_COMMANDS") == limine ]]'
+assert_true "GRUB snapshot entries are regenerated after deletion" '[[ $(tail -1 "$SNAPSHOT_TEST_COMMANDS") == grub ]]'
 assert_true "baseline creation precedes deletion" '[[ $(grep -n " create " "$SNAPSHOT_TEST_COMMANDS" | cut -d: -f1) -lt $(grep -n " delete " "$SNAPSHOT_TEST_COMMANDS" | cut -d: -f1) ]]'
 assert_true "repeated reset does not recreate the recorded baseline" 'snapshot_baseline_reset && [[ $(grep -c " create " "$SNAPSHOT_TEST_COMMANDS") == 1 ]]'
 export OS_SNAPSHOT_BASELINE_STATE="$SANDBOX/failure-state"

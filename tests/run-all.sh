@@ -14,7 +14,7 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_resolver_failover.sh" \
     "$SCRIPT_DIR/test_debloat_theming.sh" \
     "$SCRIPT_DIR/test_security_tooling.sh" \
-    "$SCRIPT_DIR/test_limine_theme.sh" \
+    "$SCRIPT_DIR/test_bootloader.sh" \
     "$SCRIPT_DIR/test_hardware_power.sh" \
     "$SCRIPT_DIR/test_modular_pipeline.sh" \
     "$SCRIPT_DIR/test_desktop_recovery.sh" \

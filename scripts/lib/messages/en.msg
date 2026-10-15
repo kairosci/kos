@@ -509,3 +509,11 @@ iso.repack_failed=Could not rebuild the bootable ISO
 iso.output_ready=OS ISO created: %s
 iso.signature_note=The upstream signature does not cover this customized image; its SHA-256 checksum was written beside it
 fontconfig.match_failed=Fontconfig selected a web font for %s
+
+bootloader.install=Installing the GRUB text bootloader
+bootloader.install_failed=Could not install or configure the GRUB bootloader
+bootloader.esp_missing=Could not find the EFI System Partition
+bootloader.esp_ambiguous=Expected exactly one EFI System Partition
+bootloader.initramfs_failed=Could not configure snapshot overlay support in the initramfs
+bootloader.daemon_failed=Could not enable the snapshot menu refresh service
+bootloader.config_failed=Could not generate the GRUB menu

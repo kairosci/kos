@@ -509,3 +509,11 @@ iso.repack_failed=No se pudo reconstruir la ISO arrancable
 iso.output_ready=ISO de OS creada: %s
 iso.signature_note=La firma upstream no cubre esta imagen personalizada; la suma SHA-256 se escribió junto a ella
 fontconfig.match_failed=Fontconfig seleccionó una fuente web para %s
+
+bootloader.install=Instalando el gestor de arranque textual GRUB
+bootloader.install_failed=No se pudo instalar o configurar GRUB
+bootloader.esp_missing=No se encontró la partición del sistema EFI
+bootloader.esp_ambiguous=Se esperaba exactamente una partición del sistema EFI
+bootloader.initramfs_failed=No se pudo configurar la compatibilidad de instantáneas en initramfs
+bootloader.daemon_failed=No se pudo activar el servicio de actualización del menú de instantáneas
+bootloader.config_failed=No se pudo generar el menú de GRUB

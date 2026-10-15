@@ -25,7 +25,7 @@ snapshot_baseline_inventory() {
 snapshot_baseline_reset() {
     local rows config baseline marker number protected state="${OS_SNAPSHOT_BASELINE_STATE:-/var/lib/os/snapshot-baseline}"
     local -a configs=() remove=()
-    if ! command -v snapper >/dev/null || ! command -v limine-snapper-sync >/dev/null; then
+    if ! command -v snapper >/dev/null || ! command -v grub-mkconfig; then
         return 1
     fi
     [[ ! -e /var/lib/pacman/db.lck ]] || return 1
@@ -79,5 +79,5 @@ snapshot_baseline_reset() {
         done
         log "snapshots.done" "$config" "$baseline" "${#remove[@]}"
     done
-    limine-snapper-sync || return 1
+    grub-mkconfig -o /boot/grub/grub.cfg || return 1
 }

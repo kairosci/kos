@@ -31,8 +31,9 @@ omarchy_as() {
     printf '%s\n' "$*" >> "$RECOVERY_TRACE"
     [[ ${RECOVERY_SHELL_FAIL:-0} == 0 ]]
 }
-limine-snapper-restore() {
+snapper() {
     [[ -f "$RECOVERY_HOME/.local/state/os/recovery-backups/snapshot-17/.complete" ]] || return 1
+    [[ "$*" == "-c root rollback" ]] || return 1
     printf 'restore\n' >> "$RECOVERY_TRACE"
     [[ ${RECOVERY_RESTORE_FAIL:-0} == 0 ]]
 }
@@ -45,7 +46,7 @@ printf 'root=/dev/mapper/root rootflags=subvol=/@/.snapshots/17/snapshot rw\n' >
 assert_equal "snapshot ID is derived from the boot parameters" "$(root_recovery_snapshot_id)" 17
 assert_false "snapshot boot refuses provisioning even without an overlay" 'root_setup_persistent'
 assert_true "restore saves backups on persistent home before native recovery" 'root_recovery_restore && grep -qx "original configuration" "$RECOVERY_HOME/.local/state/os/recovery-backups/snapshot-17/original"'
-assert_true "shell restart and IPC verification precede native restore" '[[ $(sed -n "1p" "$RECOVERY_TRACE") == "tester restart shell" && $(sed -n "2p" "$RECOVERY_TRACE") == "tester shell shell ping" && $(sed -n "3p" "$RECOVERY_TRACE") == "tester theme bg set $RECOVERY_HOME/wallpaper" && $(sed -n "4p" "$RECOVERY_TRACE") == restore ]]'
+assert_true "shell restart and IPC verification precede Snapper rollback" '[[ $(sed -n "1p" "$RECOVERY_TRACE") == "tester restart shell" && $(sed -n "2p" "$RECOVERY_TRACE") == "tester shell shell ping" && $(sed -n "3p" "$RECOVERY_TRACE") == "tester theme bg set $RECOVERY_HOME/wallpaper" && $(sed -n "4p" "$RECOVERY_TRACE") == restore ]]'
 printf 'changed RAM configuration\n' > "$OS_RESTORE_BACKUP_ROOT/tester/original"
 assert_true "retry preserves the first complete persistent backup" 'root_recovery_restore && grep -qx "original configuration" "$RECOVERY_HOME/.local/state/os/recovery-backups/snapshot-17/original"'
 : > "$RECOVERY_TRACE"

@@ -48,7 +48,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|limine) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -103,10 +103,10 @@ if [[ "$SETUP_SCOPE" == branding ]]; then
     exit 0
 fi
 
-if [[ "$SETUP_SCOPE" == limine ]]; then
+if [[ "$SETUP_SCOPE" == bootloader ]]; then
     source "$MODULES_DIR/00-env.sh" --functions-only
-    log "__stage" "27-limine-theme.sh"
-    source "$MODULES_DIR/27-limine-theme.sh"
+    log "__stage" "27-bootloader.sh"
+    source "$MODULES_DIR/27-bootloader.sh"
     log "__complete"
     exit 0
 fi
@@ -142,7 +142,7 @@ MODULE_FILES=(
     "$MODULES_DIR/23-fontconfig.sh"
     "$MODULES_DIR/24-user-configurations.sh"
     "$MODULES_DIR/25-desktop-cleanup.sh"
-    "$MODULES_DIR/27-limine-theme.sh"
+    "$MODULES_DIR/27-bootloader.sh"
     "$MODULES_DIR/30-theming.sh"
     "$MODULES_DIR/32-omaqt.sh"
     "$MODULES_DIR/35-shell-plugins.sh"
