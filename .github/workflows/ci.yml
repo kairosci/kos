@@ -66,7 +66,8 @@ jobs:
             modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
             modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
             modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \
-            modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh
+            modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh \
+            modules/omarchy-iso/scripts/*.sh
 
   idempotency-and-safety:
     name: Automation Safety & Idempotency Rules
