@@ -488,6 +488,15 @@ preview.zed_live_verified=Zed-Palettenwechsel ohne Neustart geprüft
 preview.zed_live_failed=Zed-Palette stimmt nicht erwartet %s gemessen %s
 shell_plugins.not_configured=Optionales osmp-Plugin ist nicht eingerichtet
 make.iso=Neueste Basis-ISO laden, lokales Overlay anwenden und neu erstellen
+make.os=os-Befehlsdispatcher installieren
+make.changelog=Release-Changelog in Prosa anzeigen
+os.cli_installed=os-Befehl installiert unter %s
+os.cli_skipped=os-Befehlsinstallation übersprungen für %s
+os.changelog_installed=Changelog veröffentlicht unter %s
+os.runtime_missing=omarchy-Laufzeit für diesen Befehl erforderlich
+os.dispatch_failed=os konnte %s nicht weiterleiten
+os.changelog_missing=Changelog nicht verfügbar unter %s
+os.changelog_unknown=unbekannte Release %s
 
 iso.usage=Aufruf: make iso oder customize.sh [--overlay DIR] [--output FILE]
 iso.dependency_missing=Erforderlicher Befehl fehlt: %s

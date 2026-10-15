@@ -25,6 +25,7 @@ EXPECTED_MODULES=(
     "30-theming.sh"
     "32-omaqt.sh"
     "35-shell-plugins.sh"
+    "36-os-cli.sh"
     "40-firewall.sh"
     "50-kernel.sh"
     "60-auth.sh"

@@ -31,7 +31,7 @@ else
 $(error BACKEND must be gnome-keyring)
 endif
 
-.PHONY: help setup keyring verify test hook icons theme zed cli herdr editors clean lang i18n-status lint iso
+.PHONY: help setup keyring verify test hook icons theme zed cli herdr os changelog editors clean lang i18n-status lint iso
 
 lint:
 	@if ! command -v shellcheck &> /dev/null; then \
@@ -48,7 +48,8 @@ lint:
 		modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
 		modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \
 		modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh \
-		modules/iso/scripts/*.sh
+		modules/iso/scripts/*.sh \
+		modules/os/bin/* modules/os/tests/*.sh
 
 help:
 	@bash scripts/lib/help.sh
@@ -87,6 +88,15 @@ cli:
 
 herdr:
 	bash modules/conf/herdr/install.sh
+
+os:
+	@mkdir -p ~/.local/bin ~/.local/share/os
+	@cp $(PROJECT_ROOT)/modules/os/bin/os ~/.local/bin/os
+	@chmod +x ~/.local/bin/os
+	@cp $(PROJECT_ROOT)/CHANGELOG.md ~/.local/share/os/CHANGELOG.md
+
+changelog:
+	@bash $(PROJECT_ROOT)/modules/os/bin/os changelog
 
 editors: zed cli
 

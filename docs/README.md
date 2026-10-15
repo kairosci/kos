@@ -8,7 +8,7 @@ The [project overview](root/README.md) explains installation and operation. The 
 
 ## Modules
 
-Application setup is documented in [application configuration](modules/conf/README.md), and desktop captures are described in [theme previews](modules/theme-previews/README.md). The [clean](modules/clean/README.md), [obscure](modules/obscure/README.md), and [performance](modules/performance/README.md) modules have dedicated documentation. The [OSMP plugin](modules/plugins/osmp/README.md) explains its local integration. [ISO release and customization](modules/iso/README.md) covers the generated installation media.
+Application setup is documented in [application configuration](modules/conf/README.md), and desktop captures are described in [theme previews](modules/theme-previews/README.md). The [clean](modules/clean/README.md), [obscure](modules/obscure/README.md), and [performance](modules/performance/README.md) modules have dedicated documentation. The [OSMP plugin](modules/plugins/osmp/README.md) explains its local integration. [ISO release and customization](modules/iso/README.md) covers the generated installation media. The [os command](modules/os/README.md) documents the hardened dispatcher and its release narratives.
 
 ## Agent runbooks
 

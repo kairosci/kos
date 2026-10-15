@@ -488,6 +488,15 @@ preview.zed_live_verified=Changement de palette Zed vérifié sans redémarrage
 preview.zed_live_failed=Palette Zed incorrecte attendu %s obtenu %s
 shell_plugins.not_configured=Plugin osmp facultatif non configuré
 make.iso=Télécharger la dernière ISO de base, appliquer l’overlay local et la reconstruire
+make.os=Installer le répartiteur de commandes os
+make.changelog=Afficher la prose du journal des versions
+os.cli_installed=commande os installée à %s
+os.cli_skipped=installation de la commande os ignorée pour %s
+os.changelog_installed=journal des versions publié à %s
+os.runtime_missing=runtime omarchy requis pour cette commande
+os.dispatch_failed=os n’a pas pu déléguer %s
+os.changelog_missing=journal des versions indisponible à %s
+os.changelog_unknown=version inconnue %s
 
 iso.usage=Utilisation : make iso ou customize.sh [--overlay DIR] [--output FILE]
 iso.dependency_missing=Commande requise indisponible : %s
