@@ -49,7 +49,7 @@ jobs:
           mkdir -p "$overlay/opt/os-custom" "$source_tree"
           git archive "$GITHUB_SHA" | tar -x -C "$source_tree"
           cp -aL "$source_tree/." "$overlay/opt/os-custom/"
-          printf 'release=%s\ncommit=%s\n' "$RELEASE_TAG" "$GITHUB_SHA" > "$overlay/opt/os-custom-release.txt"
+          printf 'commit=%s\n' "$GITHUB_SHA" > "$overlay/opt/os-custom-release.txt"
 
       - name: Build customized ISO
         id: build
@@ -66,7 +66,7 @@ jobs:
           upstream_name="$(basename "$upstream_iso")"
           [[ "$upstream_name" =~ ^omarchy-(.+)\.iso$ ]]
           upstream_version="${BASH_REMATCH[1]}"
-          final_iso="$RUNNER_TEMP/omarchy-${upstream_version}-custom-v${RELEASE_VERSION}.iso"
+          final_iso="$RUNNER_TEMP/omarchy-${upstream_version}-custom.iso"
           mv "$RUNNER_TEMP/omarchy-custom.iso" "$final_iso"
           iso_name="$(basename "$final_iso")"
           (cd "$RUNNER_TEMP" && sha256sum "$iso_name" > "$iso_name.sha256")
@@ -91,15 +91,26 @@ jobs:
           release_assets=("${iso_parts[@]}" "$ISO_PATH.sha256")
           notes="$RUNNER_TEMP/release-notes.md"
           cat > "$notes" <<EOF
-          Based on upstream Omarchy ${UPSTREAM_VERSION} and configuration release ${RELEASE_TAG}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO.
+          Based on upstream Omarchy ${UPSTREAM_VERSION}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO.
 
           The ISO is split into numbered parts because a GitHub release asset cannot exceed 2 GiB. Download every numbered part and the checksum, then reconstruct and verify the image with:
 
           cat ${ISO_NAME}.part-* > ${ISO_NAME}
           sha256sum -c ${ISO_NAME}.sha256
           EOF
-          gh release create "$RELEASE_TAG" \
-            "${release_assets[@]}" \
-            --verify-tag \
-            --title "Omarchy Custom ${RELEASE_VERSION}" \
-            --notes-file "$notes"
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            mapfile -t existing_assets < <(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name')
+            for asset in "${existing_assets[@]}"; do
+              gh release delete-asset "$RELEASE_TAG" "$asset" --yes
+            done
+            gh release edit "$RELEASE_TAG" \
+              --title "Omarchy Custom ${RELEASE_VERSION}" \
+              --notes-file "$notes"
+            gh release upload "$RELEASE_TAG" "${release_assets[@]}"
+          else
+            gh release create "$RELEASE_TAG" \
+              "${release_assets[@]}" \
+              --verify-tag \
+              --title "Omarchy Custom ${RELEASE_VERSION}" \
+              --notes-file "$notes"
+          fi
