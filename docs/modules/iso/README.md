@@ -57,3 +57,5 @@ The original upstream image is cached under `${XDG_CACHE_HOME:-$HOME/.cache}/os/
 ## Boot menu
 
 The installed system uses GRUB in text mode with cyan selection colors. The `grub-btrfs` package discovers Snapper snapshots and its daemon refreshes menu entries when snapshots change. Its mkinitcpio overlay hook allows read-only snapshots to boot with temporary writes held in memory. Recovery saves user configuration on persistent home storage, then uses Snapper rollback to make the selected snapshot the normal root. The bootloader setup supports UEFI systems with one discoverable EFI System Partition; systems with multiple EFI partitions or BIOS firmware require a separate installation path.
+
+GRUB preloads its TPM module so firmware systems with a TPM can measure GRUB commands and loaded boot files. This setup does not reproduce Limine's hash mismatch panic or provision signed Secure Boot keys, so systems that require those controls must retain their current trusted boot path until signed GRUB artifacts are configured.
