@@ -46,10 +46,12 @@ jobs:
           overlay="$RUNNER_TEMP/os-overlay"
           source_tree="$RUNNER_TEMP/os-source"
           mkdir -p "$overlay/opt/os" "$source_tree"
-          git archive "$GITHUB_SHA" | tar -x -C "$source_tree"
+          build_sha="$(git rev-parse HEAD)"
+          echo "BUILD_SHA=$build_sha" >> "$GITHUB_ENV"
+          git archive "$build_sha" | tar -x -C "$source_tree"
           cp -aL "$source_tree/." "$overlay/opt/os/"
           cp -aL "$source_tree/modules/iso/overlay/." "$overlay/"
-          printf 'commit=%s\n' "$GITHUB_SHA" > "$overlay/opt/os-release.txt"
+          printf 'commit=%s\n' "$build_sha" > "$overlay/opt/os-release.txt"
 
       - name: Build customized ISO
         id: build
@@ -65,9 +67,10 @@ jobs:
           mkdir -p "$(dirname "$inspected_tree")"
           xorriso -osirrox on \
             -indev "$RUNNER_TEMP/os-base.iso" \
-            -extract /opt/os "$inspected_tree"
-          diff -qr "$RUNNER_TEMP/os-overlay/opt/os" "$inspected_tree"
-          printf 'commit=%s\n' "$GITHUB_SHA" > "$RUNNER_TEMP/os-release.expected"
+            -extract /opt/os "$inspected_tree" \
+            -extract /opt/os-release.txt "$RUNNER_TEMP/os-inspected/opt/os-release.txt"
+          diff -qr -x .gitkeep "$RUNNER_TEMP/os-overlay/opt/os" "$inspected_tree"
+          printf 'commit=%s\n' "$BUILD_SHA" > "$RUNNER_TEMP/os-release.expected"
           cmp "$RUNNER_TEMP/os-release.expected" "$RUNNER_TEMP/os-inspected/opt/os-release.txt"
 
           final_iso="$RUNNER_TEMP/os-${RELEASE_TAG}.iso"
