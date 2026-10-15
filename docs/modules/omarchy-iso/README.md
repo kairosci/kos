@@ -9,7 +9,7 @@ After the change is merged, create and push a signed version tag from the curren
 ```bash
 git switch main
 git pull --rebase origin main
-git tag -s v1.0 -m "Omarchy Custom 1.0"
+git tag -s v1.0
 git push origin v1.0
 ```
 
