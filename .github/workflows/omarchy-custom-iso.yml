@@ -46,24 +46,38 @@ jobs:
           printf 'release=%s\ncommit=%s\n' "$RELEASE_TAG" "$GITHUB_SHA" > "$overlay/opt/os-custom-release.txt"
 
       - name: Build customized ISO
+        id: build
         env:
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
           bash modules/omarchy-iso/scripts/customize.sh \
             --overlay "$RUNNER_TEMP/omarchy-overlay" \
-            --output "$RUNNER_TEMP/omarchy-custom-${RELEASE_VERSION}.iso"
+            --output "$RUNNER_TEMP/omarchy-custom.iso"
+
+          upstream_iso="$(find "${XDG_CACHE_HOME:-$HOME/.cache}/os/omarchy-iso" -maxdepth 1 -type f -name 'omarchy-*.iso' -print -quit)"
+          [[ -n "$upstream_iso" ]]
+          upstream_name="$(basename "$upstream_iso")"
+          [[ "$upstream_name" =~ ^omarchy-(.+)\.iso$ ]]
+          upstream_version="${BASH_REMATCH[1]}"
+          final_iso="$RUNNER_TEMP/omarchy-${upstream_version}-custom-${RELEASE_VERSION}.iso"
+          mv "$RUNNER_TEMP/omarchy-custom.iso" "$final_iso"
+          sha256sum "$final_iso" > "$final_iso.sha256"
+          echo "iso_path=$final_iso" >> "$GITHUB_OUTPUT"
+          echo "upstream_version=$upstream_version" >> "$GITHUB_OUTPUT"
 
       - name: Publish ISO and checksum
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          ISO_PATH: ${{ steps.build.outputs.iso_path }}
+          UPSTREAM_VERSION: ${{ steps.build.outputs.upstream_version }}
         run: |
           set -euo pipefail
           gh release create "$RELEASE_TAG" \
-            "$RUNNER_TEMP/omarchy-custom-${RELEASE_VERSION}.iso" \
-            "$RUNNER_TEMP/omarchy-custom-${RELEASE_VERSION}.iso.sha256" \
+            "$ISO_PATH" \
+            "$ISO_PATH.sha256" \
             --verify-tag \
             --title "Omarchy Custom ${RELEASE_VERSION}" \
-            --generate-notes
+            --notes "Based on upstream Omarchy ${UPSTREAM_VERSION} and configuration release ${RELEASE_TAG}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO."

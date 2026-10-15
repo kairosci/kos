@@ -13,7 +13,7 @@ git tag -s omarchy-custom-v1.0.0 -m "Omarchy Custom 1.0.0"
 git push origin omarchy-custom-v1.0.0
 ```
 
-The `Omarchy Custom ISO` GitHub Actions workflow validates the tag, downloads and verifies the latest stable upstream Omarchy ISO, overlays the repository at `/opt/os-custom`, rebuilds the image, and publishes a GitHub release with the ISO and its SHA-256 checksum. The custom release version identifies this repository configuration; the upstream Omarchy version is embedded in the ISO filename and release notes.
+The `Omarchy Custom ISO` GitHub Actions workflow validates the tag, downloads and verifies the latest stable upstream Omarchy ISO, overlays the repository at `/opt/os-custom`, rebuilds the image, and publishes a GitHub release with the ISO and its SHA-256 checksum. The custom release version identifies this repository configuration. The upstream Omarchy version appears in the ISO filename and release notes.
 
 ## Install the configuration
 
