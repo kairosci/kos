@@ -4,6 +4,19 @@
 
 Native Bash configuration and hardening for the supported base system.
 
+## Installation
+
+Download the latest release image, assemble it and verify its SHA-256 checksum with the bundled helper:
+
+```bash
+curl -fsSL https://github.com/kairosci/os/releases/latest/download/download-release.sh | bash
+sha256sum -c os-v1.0.iso.sha256
+```
+
+The helper saves the ISO and checksum in the current directory. Use a release-specific version if you need a reproducible download. Write the verified ISO to a USB drive, boot from it and complete the base system installation. The full configuration repository is available on the live image at `/opt/os`; copy it to persistent storage, then run `make setup` from that copy after installation.
+
+See [the ISO guide](../modules/iso/README.md) for release details and alternate download commands.
+
 Install the supported base system first, then run `make setup` from this repository. Setup preserves the native desktop runtime and system identity. The full, keyboard, branding, desktop, fontconfig and recovery scopes are supported. Use `make setup SCOPE=branding` to install the cyan KMono system icon through the privileged pipeline. The ISO release embeds the complete tracked configuration at `/opt/os`; run `make setup` from a persistent copy after installation to apply it. Setup retains `neovim` and `omarchy-nvim` for LazyVim and removes Tensaku alongside the retired desktop alternatives while preserving personal configuration.
 
 `make setup SCOPE=fontconfig` prevents web only WOFF2 font files from being selected for desktop text, refreshes the font cache and restarts the desktop shell.
