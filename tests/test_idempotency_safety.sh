@@ -66,7 +66,7 @@ shell_sources() {
         'hooks/theme-set.d/*' \
         'hooks/pre-refresh-pacman.d/*' \
         'hooks/post-update.d/*' \
-        'conf/*/install.sh' \
+        'modules/conf/*/install.sh' \
         '*/scripts/*.sh' \
         '*/scripts/lib/*.sh' \
         '*/scripts/lib/modules/*.sh' \
@@ -92,7 +92,7 @@ production_sources() {
         'hooks/theme-set.d/*' \
         'hooks/pre-refresh-pacman.d/*' \
         'hooks/post-update.d/*' \
-        'conf/*/install.sh' \
+        'modules/conf/*/install.sh' \
         '*/scripts/*.sh' \
         '*/scripts/lib/*.sh' \
         '*/scripts/lib/modules/*.sh' \

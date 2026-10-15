@@ -127,7 +127,7 @@ verify_zed_live_theme() {
     local source="$1" config="$2" expected image pixel monitor x y
     expected=$(awk -F '"' '/^background[[:space:]]*=/ { print tolower(substr($2, 2)); exit }' "$source")
     [[ "$expected" =~ ^[0-9a-f]{6}$ ]] || err "preview.capture_invalid"
-    XDG_CONFIG_HOME="$config" OS_ZED_CONFIG_DIR="$config/zed-data/config" OS_THEME_COLORS="$source" bash "$PROJECT_DIR/conf/zed/theme.sh"
+    XDG_CONFIG_HOME="$config" OS_ZED_CONFIG_DIR="$config/zed-data/config" OS_THEME_COLORS="$source" bash "$PROJECT_DIR/modules/conf/zed/theme.sh"
     monitor=$(hyprctl -j monitors | jq -c --arg name "$CAPTURE_MONITOR" '.[] | select(.name == $name)')
     x=$(jq -r '.width * 0.4 | floor' <<< "$monitor")
     y=$(jq -r '.height * 0.9 | floor' <<< "$monitor")
@@ -155,8 +155,8 @@ for theme in "${themes[@]}"; do
     sleep 4
     palette="$HOME/.local/state/omarchy/current/theme/colors.toml"
     XDG_CONFIG_HOME="$config" XDG_DATA_HOME="$config/data" XDG_STATE_HOME="$config/state" XDG_BIN_HOME="$config/bin" \
-        OS_ZED_CONFIG_DIR="$config/zed-data/config" GSETTINGS_BACKEND=keyfile bash "$PROJECT_DIR/conf/zed/install.sh"
-    XDG_CONFIG_HOME="$config" GSETTINGS_BACKEND=keyfile bash "$PROJECT_DIR/conf/nautilus/install.sh"
+        OS_ZED_CONFIG_DIR="$config/zed-data/config" GSETTINGS_BACKEND=keyfile bash "$PROJECT_DIR/modules/conf/zed/install.sh"
+    XDG_CONFIG_HOME="$config" GSETTINGS_BACKEND=keyfile bash "$PROJECT_DIR/modules/conf/nautilus/install.sh"
     capture_settings=$(jq '.session.trust_all_worktrees = true | .languages.Rust.enable_language_server = false | .auto_install_extensions = {"html": false, "rust": false}' "$config/zed-data/config/settings.json")
     install_user_content "$config/zed-data/config/settings.json" 644 preserve-inode <<< "$capture_settings"
     XDG_CONFIG_HOME="$config" OS_THEME_COLORS="$palette" bash "$PROJECT_DIR/hooks/theme-set.d/gtk-theme"

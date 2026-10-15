@@ -29,7 +29,7 @@ for hook in micro-theme disk-theme btop-theme gtk-theme; do
     printf 'personal\n' > "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/$hook"
 done
 
-assert_true "OnlyOffice configuration installs" "bash '$PROJECT_DIR/conf/onlyoffice/install.sh'"
+assert_true "OnlyOffice configuration installs" "bash '$PROJECT_DIR/modules/conf/onlyoffice/install.sh'"
 assert_file_contains_literal "OnlyOffice keeps personal account data" "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf" 'appdata=personal-account'
 assert_file_contains_literal "OnlyOffice keeps unrelated preferences" "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf" 'keep=1'
 assert_file_contains_literal "OnlyOffice uses tabbed editing" "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf" 'editorWindowMode=false'
@@ -39,10 +39,10 @@ assert_true "OnlyOffice preferences remain private" "[[ \$(stat -c %a '$XDG_CONF
 assert_true "OnlyOffice backups remain private" "[[ \$(stat -c %a '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf.bak') == 600 ]]"
 before=$(sha256sum "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf")
 chmod 644 "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf.bak"
-assert_true "OnlyOffice configuration is idempotent" "bash '$PROJECT_DIR/conf/onlyoffice/install.sh'; [[ \"\$(sha256sum '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf')\" == '$before' ]]"
+assert_true "OnlyOffice configuration is idempotent" "bash '$PROJECT_DIR/modules/conf/onlyoffice/install.sh'; [[ \"\$(sha256sum '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf')\" == '$before' ]]"
 assert_true "idempotent installation reconciles backup privacy" "[[ \$(stat -c %a '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf.bak') == 600 ]]"
 
-assert_true "desktop migration installs" "bash '$PROJECT_DIR/conf/desktop/install.sh'"
+assert_true "desktop migration installs" "bash '$PROJECT_DIR/modules/conf/desktop/install.sh'"
 assert_file_contains_literal "desktop migration hides the required mpv backend" "$XDG_DATA_HOME/applications/mpv.desktop" 'Hidden=true'
 assert_file_contains_literal "desktop migration preserves personal shell settings" "$HOME/.bashrc" 'export PERSONAL=1'
 assert_file_not_contains "desktop migration removes retired shell helpers" "$HOME/.bashrc" 'function (mh|dh)'
@@ -53,7 +53,7 @@ for hook in micro-theme disk-theme btop-theme; do
     assert_false "desktop migration removes $hook" "[[ -e '$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/$hook' ]]"
 done
 before=$(sha256sum "$HOME/.bashrc" "$XDG_DATA_HOME/applications/mpv.desktop")
-assert_true "desktop migration is idempotent" "bash '$PROJECT_DIR/conf/desktop/install.sh'; [[ \"\$(sha256sum '$HOME/.bashrc' '$XDG_DATA_HOME/applications/mpv.desktop')\" == '$before' ]]"
+assert_true "desktop migration is idempotent" "bash '$PROJECT_DIR/modules/conf/desktop/install.sh'; [[ \"\$(sha256sum '$HOME/.bashrc' '$XDG_DATA_HOME/applications/mpv.desktop')\" == '$before' ]]"
 
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
 printf '# >>> os micro >>>\n' > "$SANDBOX/broken-rc"

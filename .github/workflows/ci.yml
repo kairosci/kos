@@ -25,7 +25,7 @@ jobs:
 
       - name: Validate Shell Syntax
         run: |
-          for sh_file in scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* conf/*/*.sh tests/*.sh */scripts/*.sh */scripts/lib/*.sh */scripts/lib/modules/*.sh */hooks/theme-set.d/* */hooks/pre-refresh-pacman.d/* */hooks/post-update.d/* */tests/*.sh; do
+          for sh_file in scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* modules/conf/*/*.sh tests/*.sh modules/*/scripts/*.sh modules/*/scripts/lib/*.sh modules/*/scripts/lib/modules/*.sh modules/*/hooks/theme-set.d/* modules/*/hooks/pre-refresh-pacman.d/* modules/*/hooks/post-update.d/* modules/*/tests/*.sh; do
             [ -f "$sh_file" ] || continue
             bash -n "$sh_file"
           done
@@ -61,12 +61,12 @@ jobs:
           shellcheck --severity=style \
             scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh \
             hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* \
-            conf/*/*.sh \
+            modules/conf/*/*.sh \
             tests/*.sh \
-            clean/scripts/*.sh clean/scripts/lib/modules/*.sh \
-            obscure/scripts/*.sh obscure/scripts/lib/modules/*.sh \
-            slop/scripts/*.sh slop/scripts/lib/modules/*.sh \
-            performance/scripts/*.sh performance/scripts/lib/modules/*.sh
+            modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
+            modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
+            modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \
+            modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh
 
   idempotency-and-safety:
     name: Automation Safety & Idempotency Rules
@@ -157,7 +157,7 @@ jobs:
           persist-credentials: false
 
       - name: Run OSMP Tests
-        run: npm test --prefix plugins/osmp
+        run: npm test --prefix modules/plugins/osmp
 
   ci-status-gate:
     name: CI Completion Status Gate

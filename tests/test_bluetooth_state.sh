@@ -18,7 +18,7 @@ QML
 printf '{}\n' > "$source_dir/Model.js"
 printf '{"id":"omarchy.bluetooth"}\n' > "$source_dir/manifest.json"
 printf '{"bar":{"layout":{"right":[{"id":"omarchy.bluetooth"},{"id":"omarchy.audio"}]}},"idle":{"lock":300}}\n' > "$XDG_CONFIG_HOME/omarchy/shell.json"
-installer="$SCRIPT_DIR/../conf/bluetooth/install.sh"
+installer="$SCRIPT_DIR/../modules/conf/bluetooth/install.sh"
 plugin="$XDG_CONFIG_HOME/omarchy/plugins/omaconf.bluetooth"
 test_section "Bluetooth state reconciliation"
 assert_true "installer generates a local clone" 'bash "$installer" && [[ -f "$plugin/Panel.qml" ]]'

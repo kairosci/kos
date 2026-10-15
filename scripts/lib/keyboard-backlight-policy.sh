@@ -11,9 +11,9 @@ install -Dm755 "$PROJECT_ROOT/scripts/lib/keyboard-backlight-resume.sh" /usr/lib
 cat > /etc/udev/rules.d/99-os-keyboard-backlight.rules << 'UDEV'
 ACTION=="add", SUBSYSTEM=="leds", KERNEL=="*kbd_backlight*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="os-keyboard-backlight@$name.service"
 UDEV
-install -m 644 "$PROJECT_ROOT/conf/power/data/os-keyboard-backlight.service" \
-    "$PROJECT_ROOT/conf/power/data/os-keyboard-backlight@.service" \
-    "$PROJECT_ROOT/conf/power/data/os-keyboard-backlight.timer" /etc/systemd/system/
+install -m 644 "$PROJECT_ROOT/modules/conf/power/data/os-keyboard-backlight.service" \
+    "$PROJECT_ROOT/modules/conf/power/data/os-keyboard-backlight@.service" \
+    "$PROJECT_ROOT/modules/conf/power/data/os-keyboard-backlight.timer" /etc/systemd/system/
 chmod 644 /etc/udev/rules.d/99-os-keyboard-backlight.rules \
     /etc/systemd/system/os-keyboard-backlight.{service,timer} \
     /etc/systemd/system/os-keyboard-backlight@.service

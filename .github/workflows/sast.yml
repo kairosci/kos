@@ -43,9 +43,9 @@ jobs:
             --config .semgrep.yml \
             --sarif \
             --output semgrep.sarif \
-            scripts hooks conf tests clean/scripts clean/scripts/lib/modules \
-            obscure/scripts obscure/scripts/lib/modules slop/scripts slop/scripts/lib/modules \
-            performance/scripts performance/scripts/lib/modules
+            scripts hooks modules/conf tests modules/clean/scripts modules/clean/scripts/lib/modules \
+            modules/obscure/scripts modules/obscure/scripts/lib/modules modules/slop/scripts modules/slop/scripts/lib/modules \
+            modules/performance/scripts modules/performance/scripts/lib/modules
 
       - name: Upload SARIF results
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

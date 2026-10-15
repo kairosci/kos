@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 DESKTOP_WORKFLOW_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DESKTOP_WORKFLOW_PORTALS="${DESKTOP_WORKFLOW_PORTALS:-$DESKTOP_WORKFLOW_LIB_DIR/../../conf/xdg-desktop-portal/data/portals.conf}"
-DESKTOP_WORKFLOW_MPV_ENTRY="${DESKTOP_WORKFLOW_MPV_ENTRY:-$DESKTOP_WORKFLOW_LIB_DIR/../../conf/desktop/data/mpv.desktop}"
+DESKTOP_WORKFLOW_PORTALS="${DESKTOP_WORKFLOW_PORTALS:-$DESKTOP_WORKFLOW_LIB_DIR/../../modules/conf/xdg-desktop-portal/data/portals.conf}"
+DESKTOP_WORKFLOW_MPV_ENTRY="${DESKTOP_WORKFLOW_MPV_ENTRY:-$DESKTOP_WORKFLOW_LIB_DIR/../../modules/conf/desktop/data/mpv.desktop}"
 [[ -f "$DESKTOP_WORKFLOW_MPV_ENTRY" ]] || DESKTOP_WORKFLOW_MPV_ENTRY="$DESKTOP_WORKFLOW_LIB_DIR/mpv.desktop"
 
 desktop_workflow_defaults() {
