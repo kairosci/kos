@@ -1,2 +1,6 @@
 overlay/*
 !overlay/.gitkeep
+!overlay/usr/
+!overlay/usr/share/
+!overlay/usr/share/pixmaps/
+!overlay/usr/share/pixmaps/os.png

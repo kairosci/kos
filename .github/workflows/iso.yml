@@ -49,6 +49,7 @@ jobs:
           mkdir -p "$overlay/opt/os" "$source_tree"
           git archive "$GITHUB_SHA" | tar -x -C "$source_tree"
           cp -aL "$source_tree/." "$overlay/opt/os/"
+          cp -aL "$source_tree/modules/iso/overlay/." "$overlay/"
           printf 'commit=%s\n' "$GITHUB_SHA" > "$overlay/opt/os-release.txt"
 
       - name: Build customized ISO
