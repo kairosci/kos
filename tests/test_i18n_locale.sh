@@ -128,7 +128,7 @@ assert_file_contains "Makefile exposes the canonical editor target" "$PROJECT_DI
 assert_file_contains "Makefile help is translated" "$PROJECT_DIR/Makefile" "lib/help.sh"
 assert_file_contains "Makefile hook target installs the i18n runtime" "$PROJECT_DIR/Makefile" "hooks/i18n"
 
-for installer in "$PROJECT_DIR"/conf/*/install.sh; do
+for installer in "$PROJECT_DIR"/modules/conf/*/install.sh; do
     assert_file_contains "$installer sources the i18n library" "$installer" "i18n.sh"
 done
 

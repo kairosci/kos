@@ -4,8 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-HERDR_MENU="$PROJECT_DIR/conf/herdr/data/herdr-keybindings-menu"
-HERDR_INSTALLER="$PROJECT_DIR/conf/herdr/install.sh"
+HERDR_MENU="$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu"
+HERDR_INSTALLER="$PROJECT_DIR/modules/conf/herdr/install.sh"
 MSG_DIR="$PROJECT_DIR/scripts/lib/messages"
 
 source "$SCRIPT_DIR/test_lib.sh"
@@ -351,12 +351,12 @@ test_section "Wiring, Provisioning & Catalogues"
 
 assert_file_contains "make herdr runs the installer" "$PROJECT_DIR/Makefile" 'herdr:'
 assert_true "make herdr body calls herdrconf" \
-    "grep -A1 '^herdr:' '$PROJECT_DIR/Makefile' | grep -q 'conf/herdr/install.sh'"
+    "grep -A1 '^herdr:' '$PROJECT_DIR/Makefile' | grep -q 'modules/conf/herdr/install.sh'"
 assert_file_contains "make phony lists herdr" "$PROJECT_DIR/Makefile" 'herdr'
-assert_file_contains "make lint covers every app config" "$PROJECT_DIR/Makefile" 'conf/\*/\*.sh'
+assert_file_contains "make lint covers every app config" "$PROJECT_DIR/Makefile" 'modules/conf/\*/\*.sh'
 assert_file_contains "make help lists herdr" "$PROJECT_DIR/scripts/lib/help.sh" 'row herdr "make.herdr"'
-assert_file_contains "setup discovers app installers per user" "$PROJECT_DIR/scripts/lib/modules/24-user-configurations.sh" 'conf/\*/install.sh'
-assert_file_contains "ci syntax job covers app installers" "$PROJECT_DIR/.github/workflows/ci.yml" 'conf/'
+assert_file_contains "setup discovers app installers per user" "$PROJECT_DIR/scripts/lib/modules/24-user-configurations.sh" 'modules/conf/\*/install.sh'
+assert_file_contains "ci syntax job covers app installers" "$PROJECT_DIR/.github/workflows/ci.yml" 'modules/conf/'
 assert_file_contains "test runner includes the herdr suite" "$PROJECT_DIR/tests/run-all.sh" "test_herdr_menu.sh"
 
 for lang in en it fr de es pt; do

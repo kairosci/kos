@@ -7,7 +7,7 @@ install -m 644 -o root -g root "$PROJECT_DIR/scripts/lib/i18n.sh" \
     "$PROJECT_DIR/scripts/lib/theme-policy.sh" \
     "$PROJECT_DIR/scripts/lib/theme-preview.sh" \
     "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" /usr/local/lib/os/
-install -m 644 -o root -g root "$PROJECT_DIR/conf/themes/data/excluded.list" /usr/local/lib/os/excluded-themes.list
+install -m 644 -o root -g root "$PROJECT_DIR/modules/conf/themes/data/excluded.list" /usr/local/lib/os/excluded-themes.list
 source "$PROJECT_DIR/scripts/lib/theme-policy.sh"
 for user_home in /home/*; do
     [[ -d "$user_home" && ! -L "$user_home" ]] || continue
@@ -26,8 +26,8 @@ for user_home in /home/*; do
     fi
 done
 theme_policy_apply || err "theming.policy_failed"
-install -m 644 -o root -g root "$PROJECT_DIR/conf/xdg-desktop-portal/data/portals.conf" \
-    "$PROJECT_DIR/conf/desktop/data/mpv.desktop" /usr/local/lib/os/
+install -m 644 -o root -g root "$PROJECT_DIR/modules/conf/xdg-desktop-portal/data/portals.conf" \
+    "$PROJECT_DIR/modules/conf/desktop/data/mpv.desktop" /usr/local/lib/os/
 install -m 644 -o root -g root "$PROJECT_DIR"/scripts/lib/messages/*.msg /usr/local/lib/os/messages/
 install -Dm755 -o root -g root "$PROJECT_DIR/scripts/lib/update-previews.sh" /usr/local/libexec/os-update-previews
 cat > /etc/pacman.d/hooks/99-os-theme-previews.hook << 'HOOK'
@@ -130,8 +130,8 @@ for user_home in /home/*; do
     cp "$PROJECT_DIR"/scripts/lib/messages/*.msg "$_i18n_dir/messages/"
     cp "$PROJECT_DIR/scripts/lib/theme-preview.sh" "$_lib_dir/"
     cp "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "$_lib_dir/"
-    cp "$PROJECT_DIR/conf/xdg-desktop-portal/data/portals.conf" "$_lib_dir/"
-    cp "$PROJECT_DIR/conf/desktop/data/mpv.desktop" "$_lib_dir/"
+    cp "$PROJECT_DIR/modules/conf/xdg-desktop-portal/data/portals.conf" "$_lib_dir/"
+    cp "$PROJECT_DIR/modules/conf/desktop/data/mpv.desktop" "$_lib_dir/"
     chmod 644 "$_i18n_dir/i18n.sh" "$_i18n_dir"/messages/*.msg "$_lib_dir/theme-preview.sh"
     chown "$_user":"$_user" "$user_home/.config/omarchy" "$user_home/.config/omarchy/hooks"
     chown -R "$_user":"$_user" "$_hook_dir" "$_i18n_dir" "$_lib_dir"

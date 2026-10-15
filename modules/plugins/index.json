@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "plugins": [
+    {
+      "id": "os.osmp",
+      "name": "OSMP",
+      "version": "1.5.0",
+      "path": "modules/plugins/osmp",
+      "kind": "bar-widget",
+      "install": "make setup"
+    }
+  ]
+}

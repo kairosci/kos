@@ -5,7 +5,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/test_lib.sh"
 SANDBOX=$(mktemp -d)
 trap 'rm -rf "$SANDBOX"' EXIT
-export THEME_POLICY_FILE="$PROJECT_DIR/conf/themes/data/excluded.list"
+export THEME_POLICY_FILE="$PROJECT_DIR/modules/conf/themes/data/excluded.list"
 export THEME_POLICY_ROOT="$SANDBOX/themes" THEME_POLICY_HOMES="$SANDBOX/homes" THEME_POLICY_ARCHIVE="$SANDBOX/archive"
 source "$PROJECT_DIR/scripts/lib/theme-policy.sh"
 mkdir -p "$THEME_POLICY_ROOT"/{matte-black,solitude,allowed} "$THEME_POLICY_HOMES/user/.config/omarchy/themes/matte-black"

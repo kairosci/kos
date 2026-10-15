@@ -18,14 +18,14 @@ os provisions and maintains a hardened OS desktop through native Bash automation
 
 ## Repository Architecture
 
-The repository is organized into functional components under dedicated paths, and each rule has exactly one home. The `scripts/` directory holds the root provisioning pipeline in `scripts/lib/modules/`, shared libraries in `scripts/lib/`, the verifier, the compatibility suite and interactive launchers. The `tests/` directory holds modular suites orchestrated by `tests/run-all.sh`. The `hooks/` directory holds OS desktop integration, split by lifecycle event. All per-application configuration modules live under `conf/<app>/`; each app folder owns its data files and user-scope installer. The `theme-previews/` directory holds preview generation and installation. The `slop/`, `clean/`, `obscure/` and `performance/` directories hold focused sub-projects, and `plugins/` holds the desktop plugin catalog. Operational runbooks live in `.skills/`, workflows are exposed through the `Makefile`, and continuous integration under `.github/workflows/ci.yml` runs syntax checks and the modular suites on every change.
+The repository is organized into functional components under dedicated paths, and each rule has exactly one home. The `scripts/` directory holds the root provisioning pipeline in `scripts/lib/modules/`, shared libraries in `scripts/lib/`, the verifier, the compatibility suite and interactive launchers. The `tests/` directory holds modular suites orchestrated by `tests/run-all.sh`. The `hooks/` directory holds OS desktop integration, split by lifecycle event. All per-application configuration modules live under `modules/conf/<app>/`; each app folder owns its data files and user-scope installer. The `theme-previews/` directory holds preview generation and installation. The `modules/slop/`, `modules/clean/`, `modules/obscure/` and `modules/performance/` directories hold focused sub-projects, and `modules/plugins/` holds the desktop plugin catalog. Operational runbooks live in `.skills/`, workflows are exposed through the `Makefile`, and continuous integration under `.github/workflows/ci.yml` runs syntax checks and the modular suites on every change.
 
 ## Execution Workflows
 
 The root setup also installs desktop responsiveness protection through
 `92-responsiveness.sh`: earlier OOM intervention for application and background
 slices, plus resource priority for the core session. See
-[the policy and its limitations](conf/performance/README.md). Existing swap and
+[the policy and its limitations](modules/conf/performance/README.md). Existing swap and
 hibernation remain intact. No configuration guarantees that a system never hangs.
 
 System operations run through the standard Makefile targets. Running `make setup` executes the full hardening and provisioning pipeline as root. Running `make verify` checks the security posture against the expected kernel, service and package assertions. Running `make test` executes the modular test suite. Running `make hook` installs the desktop theme hooks and the i18n runtime for the current user, while `make icons` forces an immediate color update for the active theme and `make theme` synchronizes folder icons together with editor themes for Zed. Running `make zed`, `make cli` installs an individual configuration module, and `make editors` installs all of them. Running `make lang` lists the supported languages and marks the active one, while `make i18n-status` reports the resolved catalog and message count and `make clean` purges local execution logs.
@@ -40,13 +40,13 @@ The `scripts/lib/` directory holds code that more than one component needs. The 
 
 ## Configuration Modules
 
-Each app configuration under `conf/` owns its files and user-scope installer. Configuration installers use the shared user config library. The CLI module installs shared shell helpers and quick cards. Packaged LazyVim is the mouse-enabled terminal project editor; Zed provides desktop project editing. Zed merges its base settings with the Linux overlay, installs the keymap and optional snippets, and remains the desktop editor for files and projects.
+Each app configuration under `modules/conf/` owns its files and user-scope installer. Configuration installers use the shared user config library. The CLI module installs shared shell helpers and quick cards. Packaged LazyVim is the mouse-enabled terminal project editor; Zed provides desktop project editing. Zed merges its base settings with the Linux overlay, installs the keymap and optional snippets, and remains the desktop editor for files and projects.
 
 Because every installer routes through the user config library, replacing a managed file keeps a single slot backup instead of an unbounded series of timestamped ones, and a managed shell block is removed and rewritten in place on every run. The result is that repeated installs converge on the same content rather than accumulating state.
 
 ## Application Keybindings
 
-OS's Super shortcuts remain owned by Hyprland. In the apps, Ctrl+S saves, Ctrl+F searches the current document, Ctrl+C/X/V copy, cut and paste in each app's context, and Ctrl+Q closes the editor or browser. Zed uses the VS Code keymap. LazyVim provides simple save and quit shortcuts plus F1 help, F2 explorer, F3 project search and F4 settings menus; see [the terminal editor guide](conf/nvim/README.md). The private browser shortcut remains on OS's Super+Shift+Alt+B chord and starts Brave Origin in incognito mode.
+OS's Super shortcuts remain owned by Hyprland. In the apps, Ctrl+S saves, Ctrl+F searches the current document, Ctrl+C/X/V copy, cut and paste in each app's context, and Ctrl+Q closes the editor or browser. Zed uses the VS Code keymap. LazyVim provides simple save and quit shortcuts plus F1 help, F2 explorer, F3 project search and F4 settings menus; see [the terminal editor guide](modules/conf/nvim/README.md). The private browser shortcut remains on OS's Super+Shift+Alt+B chord and starts Brave Origin in incognito mode.
 
 ## Theme Previews
 
@@ -86,7 +86,7 @@ Follow the project conventions. Commit messages use the Conventional Commits for
 
 Report security issues through the [private vulnerability reporting policy](SECURITY.md).
 
-The setup pipeline discovers all `conf/*/install.sh` automatically, including Brave Origin, and applies them in the correct user environment. New app configs need their native installer; browser profiles and personal data remain in their native directories. GTK uses Materia and exact Omarchy palette overrides, including libadwaita CSS variables. Folder icons use a generated Qogir accent overlay. First setup defaults to dark mode; subsequent user theme selections are preserved. Yazi and its managed integration are retired.
+The setup pipeline discovers all `modules/conf/*/install.sh` automatically, including Brave Origin, and applies them in the correct user environment. New app configs need their native installer; browser profiles and personal data remain in their native directories. GTK uses Materia and exact Omarchy palette overrides, including libadwaita CSS variables. Folder icons use a generated Qogir accent overlay. First setup defaults to dark mode; subsequent user theme selections are preserved. Yazi and its managed integration are retired.
 
 `make setup REBUILD_PREVIEWS=1` applies every theme to the actual desktop and captures the entire monitor, including wallpaper, bar and sample application windows, before restoring the original theme, background and workspace.
 

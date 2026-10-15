@@ -41,8 +41,12 @@ lint:
 	shellcheck --severity=style \
 		scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh \
 		hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* \
-		conf/*/*.sh \
-		tests/*.sh
+		modules/conf/*/*.sh \
+		tests/*.sh \
+		modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
+		modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
+		modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \
+		modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh
 
 help:
 	@bash scripts/lib/help.sh
@@ -74,13 +78,13 @@ theme:
 	@bash hooks/theme-set.d/zed-theme
 
 zed:
-	bash conf/zed/install.sh
+	bash modules/conf/zed/install.sh
 
 cli:
-	bash conf/cli/install.sh
+	bash modules/conf/cli/install.sh
 
 herdr:
-	bash conf/herdr/install.sh
+	bash modules/conf/herdr/install.sh
 
 editors: zed cli
 

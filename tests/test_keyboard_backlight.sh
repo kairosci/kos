@@ -95,7 +95,7 @@ assert_true "setup installs keyboard boot and device services in an isolated roo
 assert_file_contains_literal "device events queue systemd work instead of blocking udev" "$KEYBOARD_SANDBOX/root/etc/udev/rules.d/99-os-keyboard-backlight.rules" 'ENV{SYSTEMD_WANTS}+="os-keyboard-backlight@$name.service"'
 DEVICE_UNIT="$KEYBOARD_SANDBOX/root/etc/systemd/system/os-keyboard-backlight@.service"
 assert_true "device unit is ordered after the native brightness restore" "instance='samsung-galaxybook::kbd_backlight'; expected=\"systemd-backlight@leds:\$instance.service\"; resolved=\$(sed \"s/%i/\$instance/g\" '$DEVICE_UNIT'); grep -qxF \"Wants=\$expected\" <<< \"\$resolved\" && grep -qxF \"After=\$expected\" <<< \"\$resolved\""
-assert_true "setup installs and enables early boot reconciliation" "grep -qxF 'enable os-keyboard-backlight.service' '$KEYBOARD_COMMANDS' && cmp '$PROJECT_DIR/conf/power/data/os-keyboard-backlight@.service' '$DEVICE_UNIT'"
+assert_true "setup installs and enables early boot reconciliation" "grep -qxF 'enable os-keyboard-backlight.service' '$KEYBOARD_COMMANDS' && cmp '$PROJECT_DIR/modules/conf/power/data/os-keyboard-backlight@.service' '$DEVICE_UNIT'"
 boot_hash=$(sha256sum "$KEYBOARD_SANDBOX/root/etc/systemd/system/"* "$KEYBOARD_SANDBOX/root/etc/udev/rules.d/"*)
 assert_true "repeated keyboard setup produces identical units" "PROJECT_ROOT='$PROJECT_DIR' bash '$KEYBOARD_SANDBOX/provision.sh'; [[ \"\$boot_hash\" == \"\$(sha256sum '$KEYBOARD_SANDBOX/root/etc/systemd/system/'* '$KEYBOARD_SANDBOX/root/etc/udev/rules.d/'*)\" ]]"
 assert_false "failed systemd reconciliation stops keyboard setup" "KEYBOARD_CONTROL_FAIL=1 PROJECT_ROOT='$PROJECT_DIR' bash '$KEYBOARD_SANDBOX/provision.sh'"

@@ -53,10 +53,10 @@ Detailed manifests were stored temporarily under `/tmp/os-baseline.8uINio`; they
 | U10 | Review project editor workflow | Mouse-enabled LazyVim, visible commands and personal config preservation |
 | U11 | Validate and release the desktop changes | Native screenshots, compatibility checks and tested recovery |
 
-The [offline GTK prototype](../conf/gtk/preview.html) is an exploratory artifact. It does not change installed GTK behavior. Actual native picker context-menu suppression requires toolkit-level validation; a prototype toggle does not establish that capability.
+The [offline GTK prototype](../modules/conf/gtk/preview.html) is an exploratory artifact. It does not change installed GTK behavior. Actual native picker context-menu suppression requires toolkit-level validation; a prototype toggle does not establish that capability.
 
 ## Delivery gates
 
 Complete each sprint in a feature branch with scoped review, meaningful tests and a recovery procedure. After user authorization to apply, use the privileged setup pipeline and compare against the relevant baseline. Preserve automatic tiling, the single-lockscreen invariant, audio, networking, authentication, Secret Service and existing swap or hibernation.
 
-The [terminal editor guide](../conf/nvim/README.md) documents the staged LazyVim workflow. Configuration is edited in Lua; mouse support does not create a graphical settings application. Plugin updates and language-tool downloads remain user-level executable supply-chain changes and require review.
+The [terminal editor guide](../modules/conf/nvim/README.md) documents the staged LazyVim workflow. Configuration is edited in Lua; mouse support does not create a graphical settings application. Plugin updates and language-tool downloads remain user-level executable supply-chain changes and require review.

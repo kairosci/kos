@@ -42,7 +42,7 @@ source "$SCRIPT_DIR/lib/i18n.sh"
 i18n_init || exit 1
 
 section "Script Syntax & Code Integrity"
-for sh_file in "$PROJECT_DIR"/scripts/*.sh "$PROJECT_DIR"/hooks/theme-set.d/* "$PROJECT_DIR"/conf/*/*.sh; do
+for sh_file in "$PROJECT_DIR"/scripts/*.sh "$PROJECT_DIR"/hooks/theme-set.d/* "$PROJECT_DIR"/modules/conf/*/*.sh; do
     [[ -f "$sh_file" ]] || continue
     check "syntax check: $(basename "$sh_file")" "bash -n '$sh_file'"
 done

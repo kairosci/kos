@@ -7,7 +7,7 @@ SANDBOX=$(mktemp -d)
 trap 'rm -rf "$SANDBOX"' EXIT
 export HOME="$SANDBOX/home" XDG_CONFIG_HOME="$SANDBOX/config" OS_LANG=en
 CONFIG="$XDG_CONFIG_HOME/omarchy"
-INSTALLER="$PROJECT_DIR/conf/menubar/install.sh"
+INSTALLER="$PROJECT_DIR/modules/conf/menubar/install.sh"
 mkdir -p "$CONFIG"
 cat > "$CONFIG/shell.json" <<'JSON'
 {"idle":{"lock":321},"bar":{"position":"bottom","transparent":true,"layout":{"left":["omarchy.menu","omarchy.workspaces",{"id":"personal.widget","custom":7}],"center":["omarchy.keyboard-layout"],"right":[{"id":"omarchy.clock","format":"HH:mm"},{"id":"omaconf.power","custom":9},"omarchy.tray"]}}}
