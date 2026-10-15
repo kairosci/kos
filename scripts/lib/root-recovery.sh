@@ -45,7 +45,7 @@ root_recovery_shell() {
 root_recovery_restore() {
     local snapshot backup user home destination backups="${OS_RESTORE_BACKUP_ROOT:-/var/lib/os/omarchy-restore}"
     snapshot=$(root_recovery_snapshot_id) || return 1
-    command -v limine-snapper-restore >/dev/null || return 1
+    command -v snapper >/dev/null || return 1
     for backup in "$backups"/*; do
         [[ -d "$backup" && ! -L "$backup" ]] || continue
         user=${backup##*/}
@@ -73,6 +73,6 @@ root_recovery_restore() {
     done
     root_recovery_shell || return 1
     log "recovery.restore" "$snapshot"
-    limine-snapper-restore || return 1
+    snapper -c root rollback || return 1
     log "recovery.reboot"
 }

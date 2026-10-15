@@ -509,3 +509,11 @@ iso.repack_failed=Bootfähige ISO konnte nicht neu erstellt werden
 iso.output_ready=OS-ISO erstellt: %s
 iso.signature_note=Die upstream-Signatur gilt nicht für dieses angepasste Abbild; die SHA-256-Prüfsumme wurde daneben gespeichert
 fontconfig.match_failed=Fontconfig hat für %s eine Webschrift ausgewählt
+
+bootloader.install=GRUB Text Bootloader wird installiert
+bootloader.install_failed=GRUB Bootloader konnte nicht installiert oder konfiguriert werden
+bootloader.esp_missing=EFI Systempartition wurde nicht gefunden
+bootloader.esp_ambiguous=Es wird genau eine EFI Systempartition erwartet
+bootloader.initramfs_failed=Snapshot Overlay Unterstützung im Initramfs konnte nicht konfiguriert werden
+bootloader.daemon_failed=Snapshot Menü Aktualisierungsdienst konnte nicht aktiviert werden
+bootloader.config_failed=GRUB Menü konnte nicht erstellt werden

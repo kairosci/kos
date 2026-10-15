@@ -21,7 +21,7 @@ EXPECTED_MODULES=(
     "22-portals.sh"
     "23-fontconfig.sh"
     "25-desktop-cleanup.sh"
-    "27-limine-theme.sh"
+    "27-bootloader.sh"
     "30-theming.sh"
     "32-omaqt.sh"
     "35-shell-plugins.sh"
