@@ -19,7 +19,7 @@ Documentation is stored under `docs/`. Root-level files and paths required by Gi
 - [Obscure](modules/obscure/README.md)
 - [Performance](modules/performance/README.md)
 - [OSMP plugin](modules/plugins/osmp/README.md)
-- [Omarchy ISO customizer](modules/omarchy-iso/README.md)
+- [ISO release and customization](modules/iso/README.md)
 
 ## Agent runbooks
 

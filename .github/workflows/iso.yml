@@ -1,4 +1,4 @@
-name: Omarchy Custom ISO
+name: ISO
 
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-and-release:
-    name: Build and publish Omarchy Custom ISO
+    name: Build and publish OS ISO
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -44,12 +44,13 @@ jobs:
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
-          overlay="$RUNNER_TEMP/omarchy-overlay"
-          source_tree="$RUNNER_TEMP/os-custom-source"
-          mkdir -p "$overlay/opt/os-custom" "$source_tree"
+          overlay="$RUNNER_TEMP/os-overlay"
+          source_tree="$RUNNER_TEMP/os-source"
+          mkdir -p "$overlay/opt/os" "$source_tree"
           git archive "$GITHUB_SHA" | tar -x -C "$source_tree"
-          cp -aL "$source_tree/." "$overlay/opt/os-custom/"
-          printf 'commit=%s\n' "$GITHUB_SHA" > "$overlay/opt/os-custom-release.txt"
+          cp -aL "$source_tree/." "$overlay/opt/os/"
+          cp -aL "$source_tree/modules/iso/overlay/." "$overlay/"
+          printf 'commit=%s\n' "$GITHUB_SHA" > "$overlay/opt/os-release.txt"
 
       - name: Build customized ISO
         id: build
@@ -57,17 +58,17 @@ jobs:
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
-          bash modules/omarchy-iso/scripts/customize.sh \
-            --overlay "$RUNNER_TEMP/omarchy-overlay" \
-            --output "$RUNNER_TEMP/omarchy-custom.iso"
+          bash modules/iso/scripts/customize.sh \
+            --overlay "$RUNNER_TEMP/os-overlay" \
+            --output "$RUNNER_TEMP/os-base.iso"
 
-          upstream_iso="$(find "${XDG_CACHE_HOME:-$HOME/.cache}/os/omarchy-iso" -maxdepth 1 -type f -name 'omarchy-*.iso' -print -quit)"
+          upstream_iso="$(find "${XDG_CACHE_HOME:-$HOME/.cache}/os/iso" -maxdepth 1 -type f -name 'omarchy-*.iso' -print -quit)"
           [[ -n "$upstream_iso" ]]
           upstream_name="$(basename "$upstream_iso")"
           [[ "$upstream_name" =~ ^omarchy-(.+)\.iso$ ]]
           upstream_version="${BASH_REMATCH[1]}"
           final_iso="$RUNNER_TEMP/os-${RELEASE_TAG}.iso"
-          mv "$RUNNER_TEMP/omarchy-custom.iso" "$final_iso"
+          mv "$RUNNER_TEMP/os-base.iso" "$final_iso"
           iso_name="$(basename "$final_iso")"
           (cd "$RUNNER_TEMP" && sha256sum "$iso_name" > "$iso_name.sha256")
           split --bytes=1900M --numeric-suffixes=0 --suffix-length=2 \
@@ -88,10 +89,10 @@ jobs:
           set -euo pipefail
           mapfile -t iso_parts < <(find "$RUNNER_TEMP" -maxdepth 1 -type f -name "$ISO_NAME.part-*" -print | LC_ALL=C sort)
           ((${#iso_parts[@]} > 0))
-          release_assets=("${iso_parts[@]}" "$ISO_PATH.sha256" modules/omarchy-iso/scripts/download-release.sh)
+          release_assets=("${iso_parts[@]}" "$ISO_PATH.sha256" modules/iso/scripts/download-release.sh)
           notes="$RUNNER_TEMP/release-notes.md"
           cat > "$notes" <<EOF
-          Based on upstream Omarchy ${UPSTREAM_VERSION}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO.
+          Based on the upstream base image ${UPSTREAM_VERSION}. Its checksum was verified before customization. The upstream signature does not cover the modified ISO.
 
           The ISO is split into numbered parts. Download the attached download-release.sh script and run it with ${RELEASE_TAG} to download, assemble, and verify the image.
           EOF

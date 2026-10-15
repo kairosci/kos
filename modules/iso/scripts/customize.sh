@@ -40,9 +40,9 @@ OVERLAY_DIR="$(cd "$OVERLAY_DIR" && pwd -P)"
 OVERLAY_ENTRIES="$(find "$OVERLAY_DIR" -mindepth 1 \! -type d \! -type f -print -quit)"
 [[ -z "$OVERLAY_ENTRIES" ]] || err "iso.overlay_special" "$OVERLAY_ENTRIES"
 
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/os/omarchy-iso"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/os/iso"
 mkdir -p "$CACHE_DIR"
-WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/os-omarchy-iso.XXXXXXXX")"
+WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/os-iso.XXXXXXXX")"
 OUTPUT_TEMP=""
 cleanup() {
     [[ -z "$OUTPUT_TEMP" ]] || rm -f -- "$OUTPUT_TEMP" "$OUTPUT_TEMP.sha256"
@@ -88,7 +88,7 @@ fi
 iso_checksum_valid || err "iso.checksum_failed"
 
 if [[ -z "$OUTPUT_PATH" ]]; then
-    OUTPUT_PATH="$PWD/omarchy-$VERSION-custom.iso"
+    OUTPUT_PATH="$PWD/os-$VERSION.iso"
 fi
 OUTPUT_DIR="$(dirname "$OUTPUT_PATH")"
 [[ -d "$OUTPUT_DIR" ]] || err "iso.output_dir" "$OUTPUT_DIR"
@@ -97,7 +97,7 @@ OUTPUT_NAME="$(basename "$OUTPUT_PATH")"
 [[ "$OUTPUT_NAME" != . && "$OUTPUT_NAME" != .. ]] || err "iso.output_invalid"
 OUTPUT_PATH="$OUTPUT_DIR/$OUTPUT_NAME"
 [[ "$OUTPUT_PATH" != "$ISO_PATH" ]] || err "iso.output_same_input"
-OUTPUT_TEMP="$(mktemp "$OUTPUT_DIR/.omarchy-custom.XXXXXXXX")"
+OUTPUT_TEMP="$(mktemp "$OUTPUT_DIR/.os-iso.XXXXXXXX")"
 
 mapfile -d '' -t OVERLAY_FILES < <(find "$OVERLAY_DIR" -type f ! -name .gitkeep -print0 | LC_ALL=C sort -z)
 ((${#OVERLAY_FILES[@]} > 0)) || err "iso.overlay_empty" "$OVERLAY_DIR"
