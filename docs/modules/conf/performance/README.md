@@ -37,16 +37,7 @@ Existing zram and disk swap are preserved, including hibernation configuration.
 The module does not swap off a full device, change CPU governors, disable
 watchdogs, change kernel hardening or install a second OOM daemon.
 
-Generated configuration:
-
-- `/etc/systemd/oomd.conf.d/90-os.conf`
-- `/etc/systemd/user/app.slice.d/90-os.conf`
-- `/etc/systemd/user/background.slice.d/90-os.conf`
-- `/etc/systemd/user/session.slice.d/90-os.conf`
-- `/etc/systemd/user/session.slice.d/90-os-memory.conf`
-- `/etc/systemd/system/user.slice.d/90-os-memory.conf`
-- `/etc/systemd/system/user-.slice.d/90-os-memory.conf`
-- `/etc/systemd/system/user@.service.d/90-os-memory.conf`
+Generated configuration is written to `/etc/systemd/oomd.conf.d/90-os.conf`, `/etc/systemd/user/app.slice.d/90-os.conf`, `/etc/systemd/user/background.slice.d/90-os.conf`, `/etc/systemd/user/session.slice.d/90-os.conf`, `/etc/systemd/user/session.slice.d/90-os-memory.conf`, `/etc/systemd/system/user.slice.d/90-os-memory.conf`, `/etc/systemd/system/user-.slice.d/90-os-memory.conf` and `/etc/systemd/system/user@.service.d/90-os-memory.conf`.
 
 `data/memory.slice.conf` is the single source of the memory protection value.
 The service drop-in changes only the section header. The 512 MiB allowance
