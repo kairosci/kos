@@ -48,7 +48,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|recovery|desktop|fontconfig) ;;
+    full|keyboard|recovery|desktop|fontconfig|branding) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -92,6 +92,14 @@ if [[ "$SETUP_SCOPE" == keyboard ]]; then
     # shellcheck source=lib/keyboard-backlight-policy.sh
     source "$SCRIPT_DIR/lib/keyboard-backlight-policy.sh"
     log "setup.keyboard_done"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == branding ]]; then
+    BRAND_ICON="$PROJECT_ROOT/modules/iso/assets/kmono-cyan.png"
+    [[ -s "$BRAND_ICON" && ! -L "$BRAND_ICON" ]] || err "branding.install_failed" "$BRAND_ICON"
+    install -Dm644 -- "$BRAND_ICON" /usr/share/pixmaps/os.png || err "branding.install_failed" /usr/share/pixmaps/os.png
+    log "__complete"
     exit 0
 fi
 

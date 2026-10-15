@@ -1,18 +1,18 @@
 # os
 
-`make setup RUN_MIGRATIONS=1` runs native Omarchy migrations before OS provisioning. If omarchy-nvim is absent, legacy Neovim configuration is archived under `~/.local/state/omarchy/retired/` before migrations. Later provisioning installs the packaged LazyVim starter. Migration failures stop setup without fabricating completion markers.
+`make setup RUN_MIGRATIONS=1` runs supported upstream migration routines before OS provisioning. If `omarchy-nvim` is absent, legacy Neovim configuration is archived under `~/.local/state/omarchy/retired/` before migrations. Later provisioning installs the packaged LazyVim starter. Migration failures stop setup without fabricating completion markers.
 
-Native Bash configuration and hardening for an existing Omarchy installation.
+Native Bash configuration and hardening for the supported base system.
 
-Install Omarchy first, then run `make setup` from this repository. Setup preserves the Omarchy runtime and system identity. The full, keyboard, desktop, fontconfig and recovery scopes are supported. The Omarchy Custom ISO release embeds the complete tracked configuration at `/opt/os-custom`; run `make setup` from a persistent copy after installing Omarchy to apply it. Setup retains `neovim` and `omarchy-nvim` for LazyVim and removes Tensaku alongside the retired desktop alternatives while preserving personal configuration.
+Install the supported base system first, then run `make setup` from this repository. Setup preserves the native desktop runtime and system identity. The full, keyboard, branding, desktop, fontconfig and recovery scopes are supported. Use `make setup SCOPE=branding` to install the cyan KMono system icon through the privileged pipeline. The ISO release embeds the complete tracked configuration at `/opt/os`; run `make setup` from a persistent copy after installation to apply it. Setup retains `neovim` and `omarchy-nvim` for LazyVim and removes Tensaku alongside the retired desktop alternatives while preserving personal configuration.
 
-`make setup SCOPE=fontconfig` prevents web only WOFF2 font files from being selected for desktop text, refreshes the font cache and restarts the Omarchy shell.
+`make setup SCOPE=fontconfig` prevents web only WOFF2 font files from being selected for desktop text, refreshes the font cache and restarts the desktop shell.
 
-`sudo make setup SCOPE=desktop` restores the native terminal configs and reconciles the running Omarchy shell and wallpaper without package provisioning. Previous terminal configs are preserved under `~/.local/state/os/desktop-defaults/`. It also works during a snapshot boot.
+`sudo make setup SCOPE=desktop` restores the native terminal configs and reconciles the running desktop shell and wallpaper without package provisioning. Previous terminal configs are preserved under `~/.local/state/os/desktop-defaults/`. It also works during a snapshot boot.
 
 When booted into a Snapper snapshot with a temporary overlay root, run `sudo make setup SCOPE=recovery` first. This saves configuration restore backups on the persistent home filesystem and invokes the native Limine snapshot restore. Reboot into the normal system before running full setup or resetting the snapshot history.
 
-To restore the native Omarchy desktop on an existing installation and start a new snapshot history, run `make setup RESTORE_OMARCHY=1 RESET_SNAPSHOTS=1`. Existing Hyprland, Omarchy and Bash configurations are backed up under `/var/lib/os/omarchy-restore/` before restoring packaged defaults. After every setup stage succeeds, a new baseline snapshot is created before older snapshots are deleted. Active and default snapshots are preserved, and Limine snapshot entries are synchronized. Repeating the command preserves the recorded baseline and completed configuration restore.
+To restore native desktop defaults on an existing installation and start a new snapshot history, run `make setup RESTORE_OMARCHY=1 RESET_SNAPSHOTS=1`. Existing Hyprland, desktop shell and Bash configurations are backed up under `/var/lib/os/omarchy-restore/` before restoring packaged defaults. After every setup stage succeeds, a new baseline snapshot is created before older snapshots are deleted. Active and default snapshots are preserved, and Limine snapshot entries are synchronized. Repeating the command preserves the recorded baseline and completed configuration restore.
 
 ## Overview
 
@@ -88,7 +88,7 @@ Follow the project conventions. Commit messages use the Conventional Commits for
 
 Report security issues through the [private vulnerability reporting policy](SECURITY.md).
 
-The setup pipeline discovers all `modules/conf/*/install.sh` automatically, including Brave Origin, and applies them in the correct user environment. New app configs need their native installer; browser profiles and personal data remain in their native directories. GTK uses Materia and exact Omarchy palette overrides, including libadwaita CSS variables. Folder icons use a generated Qogir accent overlay. First setup defaults to dark mode; subsequent user theme selections are preserved. Yazi and its managed integration are retired.
+The setup pipeline discovers all `modules/conf/*/install.sh` automatically, including Brave Origin, and applies them in the correct user environment. New app configs need their native installer; browser profiles and personal data remain in their native directories. GTK uses Materia and exact desktop palette overrides, including libadwaita CSS variables. Folder icons use a generated Qogir accent overlay. First setup defaults to dark mode; subsequent user theme selections are preserved. Yazi and its managed integration are retired.
 
 `make setup REBUILD_PREVIEWS=1` applies every theme to the actual desktop and captures the entire monitor, including wallpaper, bar and sample application windows, before restoring the original theme, background and workspace.
 
@@ -96,7 +96,7 @@ Zed opens project directories directly with `zed --new /path/to/project` or the 
 
 Main accepts changes only through squash pull requests with signed commits and current CI, SAST and Main PR provenance checks. No bypass actors or direct pushes are permitted. Enable the local guard with `git config core.hooksPath .githooks`; the server ruleset remains authoritative even when local hooks are disabled.
 
-Desktop package and MIME runtime assertions run on installed Omarchy systems. Bare Arch CI containers still execute source, generated configuration and sandboxed backend checks without requiring a provisioned graphical desktop.
+Desktop package and MIME runtime assertions run on provisioned systems. Bare Arch CI containers still execute source, generated configuration and sandboxed backend checks without requiring a graphical desktop.
 
 ## Package update messages
 

@@ -1,1 +1,0 @@
-../../docs/modules/omarchy-iso/README.md

@@ -25,7 +25,7 @@ row editors "make.editors"
 row lang "make.lang"
 row i18n-status "make.i18n_status"
 row clean "make.clean"
-row iso-customize "make.iso_customize"
+row iso "make.iso"
 printf '\n'
 log "locale.supported" "${I18N_SUPPORTED[*]}"
 log "locale.language_active" "$I18N_LANG"
