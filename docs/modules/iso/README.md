@@ -32,6 +32,24 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\download-release.ps1
 
 Pass `-Tag v1.3` to select a specific release or `-OutputDirectory "$HOME\Downloads"` to choose where the verified ISO and checksum are saved. The helper refuses to overwrite an ISO or checksum already present in the output directory.
 
+## Verify image contents without installing
+
+The ISO workflow verifies the configuration before publishing. It extracts `/opt/os` from the finished image and compares every file with the materialized repository tree at the tagged commit. It also checks the release commit marker. This verifies the bundled configuration without booting or installing the image.
+
+You can inspect a downloaded image locally with `xorriso`. The comparison below uses the signed release tag as the source, follows repository symlinks in the same way as the ISO build, extracts the bundled configuration into a temporary directory, and compares file contents:
+
+```bash
+tag=v1.4
+temporary_directory="$(mktemp -d)"
+mkdir -p "$temporary_directory/source" "$temporary_directory/materialized" "$temporary_directory/image"
+git archive "$tag" | tar -x -C "$temporary_directory/source"
+cp -aL "$temporary_directory/source/." "$temporary_directory/materialized/"
+xorriso -osirrox on -indev "os-${tag}.iso" -extract /opt/os "$temporary_directory/image/os"
+diff -qr "$temporary_directory/materialized" "$temporary_directory/image/os"
+```
+
+An empty `diff` result means the repository tree in the image matches the tagged source. The workflow also compares the marker at `/opt/os-release.txt` with the commit used to build that release.
+
 ## Apply the configuration
 
 The complete tracked repository is available on the live image at `/opt/os`. The image does not silently provision or overwrite an installed system. After installation, copy `/opt/os` to persistent storage and run `make setup` from that copy. The setup pipeline applies the repository configuration and preserves the supported base desktop runtime.
