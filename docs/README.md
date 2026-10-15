@@ -1,26 +1,15 @@
 # Documentation
 
-Documentation is stored under `docs/`. Root-level files and paths required by GitHub or repository tools are symbolic links to their canonical documents here. Module documentation and agent runbooks also retain symlinks at their expected paths.
+Repository documentation is maintained in this directory. Root paths required by GitHub or repository tools resolve to their canonical documents here, and module runbooks are exposed through the paths expected by their projects.
 
 ## Repository
 
-- [Project overview](root/README.md)
-- [Agent instructions](root/AGENTS.md)
-- [Security policy](root/SECURITY.md)
-- [Audit](root/AUDIT.md)
-- [Security and desktop roadmap](security-roadmap.md)
-- [Pull request template](github/PULL_REQUEST_TEMPLATE.md)
+The [project overview](root/README.md) explains installation and operation. The [agent instructions](root/AGENTS.md) define repository ownership and change policy. The [security policy](root/SECURITY.md) describes vulnerability reporting, while the [audit](root/AUDIT.md) records verified security and system findings. The [security and desktop roadmap](security-roadmap.md) tracks planned work. GitHub pull requests use the [empty body template](github/PULL_REQUEST_TEMPLATE.md).
 
 ## Modules
 
-- [Application configuration](modules/conf/README.md)
-- [Theme previews](modules/theme-previews/README.md)
-- [Clean](modules/clean/README.md)
-- [Obscure](modules/obscure/README.md)
-- [Performance](modules/performance/README.md)
-- [OSMP plugin](modules/plugins/osmp/README.md)
-- [ISO release and customization](modules/iso/README.md)
+Application setup is documented in [application configuration](modules/conf/README.md), and desktop captures are described in [theme previews](modules/theme-previews/README.md). The [clean](modules/clean/README.md), [obscure](modules/obscure/README.md), and [performance](modules/performance/README.md) modules have dedicated documentation. The [OSMP plugin](modules/plugins/osmp/README.md) explains its local integration. [ISO release and customization](modules/iso/README.md) covers the generated installation media.
 
 ## Agent runbooks
 
-Runbooks are stored under [skills](skills/) and exposed at the `.skills/` paths used by repository tooling.
+Operational runbooks are stored in [skills](skills/) and exposed through the `.skills/` paths used by repository tooling.
