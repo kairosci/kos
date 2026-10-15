@@ -71,6 +71,10 @@ os_resolve_runtime() {
         OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}"
         export OMARCHY_PATH
     fi
+    if ! command -v omarchy >/dev/null 2>&1 && [[ -x "$OMARCHY_PATH/bin/omarchy" ]]; then
+        PATH="$OMARCHY_PATH/bin:$PATH"
+        export PATH
+    fi
     local uid=""
     uid="$(id -u 2>/dev/null || printf '')"
     if [[ -z "${XDG_RUNTIME_DIR:-}" && -n "$uid" && -d "/run/user/$uid" ]]; then
@@ -100,9 +104,15 @@ os_changelog() {
         return 0
     fi
     local want="$1"
-    [[ "$want" != v* ]] && want="v$want"
+    local tag="## Release $1"
+    if [[ "$want" == [Uu]nreleased ]]; then
+        tag="## Unreleased"
+    else
+        [[ "$want" == v* ]] || want="v$want"
+        tag="## Release $want"
+    fi
     local printed=""
-    printed="$(awk -v tag="## Release $want" '$0 == tag { show = 1; print; next } show && /^## Release / { exit } show { print }' "$file")"
+    printed="$(awk -v tag="$tag" '$0 == tag { show = 1; print; next } show && /^## (Release )?/ { exit } show { print }' "$file")"
     if [[ -z "$printed" ]]; then
         os_err "os.changelog_unknown" "$want"
         return 1
