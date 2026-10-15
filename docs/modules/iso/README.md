@@ -2,7 +2,7 @@
 
 The `iso` component builds a bootable image from the latest stable upstream base image. Each published image contains the complete tracked repository at `/opt/os`, a release commit marker at `/opt/os-release.txt`, and the cyan KMono icon at `/usr/share/pixmaps/os.png`. The same icon source is kept in `modules/iso/assets/kmono-cyan.png`.
 
-The image name is `os-vX.Y.iso`. Releases use the version alone as the release heading, for example `v1.0`. GitHub Releases stores the ISO as numbered parts to stay within the per-file upload limit, alongside `os-vX.Y.iso.sha256` and the `download-release.sh` helper.
+The image name is `os-vX.Y.iso`. Releases use the version alone as the release heading, for example `v1.3`. GitHub Releases stores the ISO as numbered parts to stay within the per-file upload limit, alongside `os-vX.Y.iso.sha256`, `download-release.sh`, and `download-release.ps1`. Published versions are immutable; changes to a release asset require a new version.
 
 ## Download the latest image
 
@@ -21,6 +21,17 @@ bash download-release.sh v1.0 /path/to/output
 
 Omit the tag to select the latest release. The optional tag is useful for reproducible downloads.
 
+## Download the latest image on Windows
+
+The PowerShell helper discovers the latest release, downloads every ISO part and the checksum, assembles the image, and verifies SHA-256 before saving it. Windows PowerShell 5.1 or PowerShell 7 is supported.
+
+```powershell
+Invoke-WebRequest -Uri https://github.com/kairosci/os/releases/latest/download/download-release.ps1 -OutFile .\download-release.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\download-release.ps1
+```
+
+Pass `-Tag v1.3` to select a specific release or `-OutputDirectory "$HOME\Downloads"` to choose where the verified ISO and checksum are saved. The helper refuses to overwrite an ISO or checksum already present in the output directory.
+
 ## Apply the configuration
 
 The complete tracked repository is available on the live image at `/opt/os`. The image does not silently provision or overwrite an installed system. After installation, copy `/opt/os` to persistent storage and run `make setup` from that copy. The setup pipeline applies the repository configuration and preserves the supported base desktop runtime.
@@ -38,11 +49,13 @@ git tag -s v1.0
 git push origin v1.0
 ```
 
-If a tagged build fails before publishing, rerun the `ISO` workflow from `main` with the existing tag:
+If a tagged build fails before publishing a release, rerun the `ISO` workflow from `main` with the existing signed tag:
 
 ```bash
 gh workflow run iso.yml --ref main -f release_tag=v1.0
 ```
+
+The workflow refuses to replace a published release. Publish a corrected image or helper under a new version.
 
 ## Build locally
 
