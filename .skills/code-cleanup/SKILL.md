@@ -27,7 +27,7 @@ Keep exactly these comment classes and delete everything else:
 - `# shellcheck ...` directives (`source=`, `disable=`); they drive the linter.
 - AppArmor `#include <...>` lines inside profile heredocs; they are profile syntax, not comments.
 - Test fixture data inside heredocs (commented config lines the parser under test must ignore, fake-script shebangs); removing them changes test semantics.
-- Scope contracts asserted by tests (for example the slop module out-of-scope list covering mise and tensaku, which `slop/tests/check.sh` greps for); removing them breaks the suite.
+- Scope contracts asserted by tests (for example the slop module out-of-scope list covering mise and tensaku, which `modules/slop/tests/check.sh` greps for); removing them breaks the suite.
 Delete narrative file headers, usage prose that duplicates `--help` or plan output, numbered section markers (`# 1. ...`), and any comment restating what the next lines already say. Never add comments to the Makefile or hook scripts.
 
 ## Procedure

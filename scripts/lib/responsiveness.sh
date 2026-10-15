@@ -13,24 +13,24 @@ responsiveness_user_systemctl() {
 
 responsiveness_files_match() {
     local root="$1" slice
-    cmp -s "$root/conf/performance/data/oomd.conf" /etc/systemd/oomd.conf.d/90-os.conf || return 1
+    cmp -s "$root/modules/conf/performance/data/oomd.conf" /etc/systemd/oomd.conf.d/90-os.conf || return 1
     for slice in app background session; do
-        cmp -s "$root/conf/performance/data/$slice.slice.conf" "/etc/systemd/user/$slice.slice.d/90-os.conf" || return 1
+        cmp -s "$root/modules/conf/performance/data/$slice.slice.conf" "/etc/systemd/user/$slice.slice.d/90-os.conf" || return 1
     done
     for slice in user user-; do
-        cmp -s "$root/conf/performance/data/memory.slice.conf" "/etc/systemd/system/$slice.slice.d/90-os-memory.conf" || return 1
+        cmp -s "$root/modules/conf/performance/data/memory.slice.conf" "/etc/systemd/system/$slice.slice.d/90-os-memory.conf" || return 1
     done
-    cmp -s "$root/conf/performance/data/memory.slice.conf" /etc/systemd/user/session.slice.d/90-os-memory.conf || return 1
-    cmp -s <(sed 's/^\[Slice\]$/[Service]/' "$root/conf/performance/data/memory.slice.conf") /etc/systemd/system/user@.service.d/90-os-memory.conf || return 1
+    cmp -s "$root/modules/conf/performance/data/memory.slice.conf" /etc/systemd/user/session.slice.d/90-os-memory.conf || return 1
+    cmp -s <(sed 's/^\[Slice\]$/[Service]/' "$root/modules/conf/performance/data/memory.slice.conf") /etc/systemd/system/user@.service.d/90-os-memory.conf || return 1
 }
 
 responsiveness_runtime() {
     local root="$1" slice value report limit duration swap uid expected_limit
     systemctl is-enabled --quiet systemd-oomd.service || return 1
     systemctl is-active --quiet systemd-oomd.service || return 1
-    limit=$(sed -n 's/^DefaultMemoryPressureLimit=//p' "$root/conf/performance/data/oomd.conf") || return 1
-    duration=$(sed -n 's/^DefaultMemoryPressureDurationSec=//p' "$root/conf/performance/data/oomd.conf") || return 1
-    swap=$(sed -n 's/^SwapUsedLimit=//p' "$root/conf/performance/data/oomd.conf") || return 1
+    limit=$(sed -n 's/^DefaultMemoryPressureLimit=//p' "$root/modules/conf/performance/data/oomd.conf") || return 1
+    duration=$(sed -n 's/^DefaultMemoryPressureDurationSec=//p' "$root/modules/conf/performance/data/oomd.conf") || return 1
+    swap=$(sed -n 's/^SwapUsedLimit=//p' "$root/modules/conf/performance/data/oomd.conf") || return 1
     expected_limit=$(( ${limit%%%} * 4294967295 / 100 ))
     report=$(LC_ALL=C oomctl --no-pager) || return 1
     grep -qxF "Swap Used Limit: ${swap%%%}.00%" <<< "$report" || return 1

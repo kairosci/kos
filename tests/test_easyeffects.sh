@@ -17,7 +17,7 @@ set -euo pipefail
 MOCK
 chmod 755 "$SANDBOX/bin/pacman"
 export PATH="$SANDBOX/bin:$PATH"
-INSTALLER="$PROJECT_DIR/conf/easyeffects/install.sh"
+INSTALLER="$PROJECT_DIR/modules/conf/easyeffects/install.sh"
 PRESET="$XDG_DATA_HOME/easyeffects/output/OS-Subwoofer.json"
 
 test_section "EasyEffects Bass Preset"
@@ -62,7 +62,7 @@ chmod 755 "$SANDBOX/bin/easyeffects"
 export MOCK_EASYEFFECTS_COMMANDS="$SANDBOX/native-commands" MOCK_EASYEFFECTS_LOADED="$SANDBOX/loaded"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-source "$PROJECT_DIR/conf/easyeffects/apply.sh"
+source "$PROJECT_DIR/modules/conf/easyeffects/apply.sh"
 i18n_init
 PRESET=OS-Subwoofer
 STATE="$SANDBOX/activation"

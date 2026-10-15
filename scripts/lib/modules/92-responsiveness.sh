@@ -4,7 +4,7 @@ set -euo pipefail
 log "performance.install"
 [[ -r /sys/fs/cgroup/cgroup.controllers && -r /proc/pressure/memory ]] || err "performance.unsupported"
 
-_performance_data="$PROJECT_ROOT/conf/performance/data"
+_performance_data="$PROJECT_ROOT/modules/conf/performance/data"
 _oomd_changed=0
 cmp -s "$_performance_data/oomd.conf" /etc/systemd/oomd.conf.d/90-os.conf || _oomd_changed=1
 install -Dm644 "$_performance_data/oomd.conf" /etc/systemd/oomd.conf.d/90-os.conf

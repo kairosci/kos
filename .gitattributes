@@ -1,2 +1,2 @@
-conf/os/data/packages/linux-os/*.patch -whitespace
-conf/os/data/rootfs/usr/share/doc/limine-*/*.md -whitespace
+modules/conf/os/data/packages/linux-os/*.patch -whitespace
+modules/conf/os/data/rootfs/usr/share/doc/limine-*/*.md -whitespace

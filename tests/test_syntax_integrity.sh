@@ -9,13 +9,13 @@ source "$SCRIPT_DIR/test_lib.sh"
 
 test_section "Script Syntax & Code Integrity"
 
-for sh_file in "$PROJECT_DIR"/scripts/*.sh "$PROJECT_DIR"/scripts/lib/*.sh "$PROJECT_DIR"/scripts/lib/modules/*.sh "$PROJECT_DIR"/hooks/theme-set.d/* "$PROJECT_DIR"/hooks/pre-refresh-pacman.d/* "$PROJECT_DIR"/hooks/post-update.d/* "$PROJECT_DIR"/conf/*/*.sh "$PROJECT_DIR"/tests/*.sh; do
+for sh_file in "$PROJECT_DIR"/scripts/*.sh "$PROJECT_DIR"/scripts/lib/*.sh "$PROJECT_DIR"/scripts/lib/modules/*.sh "$PROJECT_DIR"/hooks/theme-set.d/* "$PROJECT_DIR"/hooks/pre-refresh-pacman.d/* "$PROJECT_DIR"/hooks/post-update.d/* "$PROJECT_DIR"/modules/conf/*/*.sh "$PROJECT_DIR"/tests/*.sh; do
     [[ -f "$sh_file" ]] || continue
     fname=$(basename "$sh_file")
     assert_true "syntax check: $fname" "bash -n '$sh_file'"
 done
 
-assert_true "syntax check: herdr-keybindings-menu" "bash -n '$PROJECT_DIR/conf/herdr/data/herdr-keybindings-menu'"
+assert_true "syntax check: herdr-keybindings-menu" "bash -n '$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu'"
 assert_file_exists "Bash SAST workflow exists" "$PROJECT_DIR/.github/workflows/sast.yml"
 assert_file_exists "SAST dependency manifest exists" "$PROJECT_DIR/requirements-sast.txt"
 assert_file_exists "Local Bash SAST rules exist" "$PROJECT_DIR/.semgrep.yml"
@@ -40,9 +40,9 @@ assert_file_executable "scripts/run-setup.sh is executable" "$PROJECT_DIR/script
 assert_file_executable "hooks/theme-set.d/folder-color is executable" "$PROJECT_DIR/hooks/theme-set.d/folder-color"
 assert_file_executable "hooks/pre-refresh-pacman.d/99-os-persist is executable" "$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-os-persist"
 assert_file_executable "hooks/post-update.d/99-os-persist is executable" "$PROJECT_DIR/hooks/post-update.d/99-os-persist"
-assert_file_executable "conf/zed/install.sh is executable" "$PROJECT_DIR/conf/zed/install.sh"
-assert_file_executable "conf/herdr/install.sh is executable" "$PROJECT_DIR/conf/herdr/install.sh"
-assert_file_executable "herdr-keybindings-menu is executable" "$PROJECT_DIR/conf/herdr/data/herdr-keybindings-menu"
+assert_file_executable "modules/conf/zed/install.sh is executable" "$PROJECT_DIR/modules/conf/zed/install.sh"
+assert_file_executable "modules/conf/herdr/install.sh is executable" "$PROJECT_DIR/modules/conf/herdr/install.sh"
+assert_file_executable "herdr-keybindings-menu is executable" "$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu"
 
 for mod in "$PROJECT_DIR"/scripts/lib/modules/*.sh; do
     [[ -f "$mod" ]] || continue

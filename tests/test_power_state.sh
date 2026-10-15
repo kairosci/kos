@@ -20,7 +20,7 @@ function chargeThresholdActive(d, onBattery, states) {
 JS
 printf '{"id":"omarchy.power"}\n' > "$source_dir/manifest.json"
 printf '{"bar":{"layout":{"right":[{"id":"omarchy.audio"},{"id":"omarchy.power","showPercentage":true}]}},"idle":{"lock":300}}\n' > "$XDG_CONFIG_HOME/omarchy/shell.json"
-installer="$SCRIPT_DIR/../conf/power/install.sh"
+installer="$SCRIPT_DIR/../modules/conf/power/install.sh"
 plugin="$XDG_CONFIG_HOME/omarchy/plugins/omaconf.power"
 test_section "Power charging state"
 assert_true "installer generates the power clone" 'bash "$installer" && [[ -f "$plugin/Model.js" ]]'

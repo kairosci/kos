@@ -149,9 +149,9 @@ assert_file_not_contains "Geany window rules are retired" "$binding_home/.config
 assert_true "editor binding migration is idempotent" "before=\$(sha256sum '$binding_home/.config/hypr/bindings.lua'); bash '$WORKFLOW_SANDBOX/rebind.sh'; [[ \"\$before\" == \"\$(sha256sum '$binding_home/.config/hypr/bindings.lua')\" ]]"
 
 CONFIG_STAGE="$PROJECT_DIR/scripts/lib/modules/24-user-configurations.sh"
-mkdir -p "$WORKFLOW_SANDBOX/project/conf/brave" "$WORKFLOW_SANDBOX/project/conf/new-app"
-printf '#!/bin/bash\nprintf "brave loaded\\n"\n' > "$WORKFLOW_SANDBOX/project/conf/brave/install.sh"
-printf '#!/bin/bash\nprintf "new app loaded\\n"\n' > "$WORKFLOW_SANDBOX/project/conf/new-app/install.sh"
+mkdir -p "$WORKFLOW_SANDBOX/project/modules/conf/brave" "$WORKFLOW_SANDBOX/project/modules/conf/new-app"
+printf '#!/bin/bash\nprintf "brave loaded\\n"\n' > "$WORKFLOW_SANDBOX/project/modules/conf/brave/install.sh"
+printf '#!/bin/bash\nprintf "new app loaded\\n"\n' > "$WORKFLOW_SANDBOX/project/modules/conf/new-app/install.sh"
 run_config_stage() (
     PROJECT_DIR="$WORKFLOW_SANDBOX/project"
     # shellcheck disable=SC2329
@@ -163,7 +163,7 @@ run_config_stage() (
 )
 assert_true "config discovery installs Brave and a newly added app automatically" \
     "run_config_stage > '$WORKFLOW_SANDBOX/config-log'; grep -q 'brave loaded' '$WORKFLOW_SANDBOX/config-log' && grep -q 'new app loaded' '$WORKFLOW_SANDBOX/config-log'"
-printf '#!/bin/bash\nexit 7\n' > "$WORKFLOW_SANDBOX/project/conf/new-app/install.sh"
+printf '#!/bin/bash\nexit 7\n' > "$WORKFLOW_SANDBOX/project/modules/conf/new-app/install.sh"
 assert_false "failed app configuration stops provisioning" "run_config_stage"
 assert_false "Yazi is absent from the live package database" "command -v pacman >/dev/null && pacman -Q yazi >/dev/null 2>&1"
 
@@ -182,8 +182,8 @@ case "$1" in
 esac
 MOCK
 chmod 755 "$WORKFLOW_SANDBOX/resources-bin/gsettings"
-assert_true "Resources GNOME schema applies supported preferences without retired keys" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=org.gnome.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-modern" bash "$PROJECT_DIR/conf/resources/install.sh" && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-modern") == 2 ]]'
-assert_true "legacy Resources retains its detailed sidebar preference" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=net.nokyan.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-legacy" bash "$PROJECT_DIR/conf/resources/install.sh" && grep -qx "set net.nokyan.Resources sidebar-details true" "$WORKFLOW_SANDBOX/resources-legacy" && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-legacy") == 3 ]]'
-assert_false "missing Resources schema stops configuration visibly" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=missing RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-missing" bash "$PROJECT_DIR/conf/resources/install.sh"'
+assert_true "Resources GNOME schema applies supported preferences without retired keys" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=org.gnome.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-modern" bash "$PROJECT_DIR/modules/conf/resources/install.sh" && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-modern") == 2 ]]'
+assert_true "legacy Resources retains its detailed sidebar preference" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=net.nokyan.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-legacy" bash "$PROJECT_DIR/modules/conf/resources/install.sh" && grep -qx "set net.nokyan.Resources sidebar-details true" "$WORKFLOW_SANDBOX/resources-legacy" && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-legacy") == 3 ]]'
+assert_false "missing Resources schema stops configuration visibly" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=missing RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-missing" bash "$PROJECT_DIR/modules/conf/resources/install.sh"'
 
 test_summary

@@ -41,7 +41,7 @@ if [[ $EUID -eq 0 ]]; then
 fi
 source "$OS_DESKTOP_WORKFLOW"
 DESKTOP_WORKFLOW_PORTALS="$SCRIPT_DIR/../lib/portals.conf"
-[[ -f "$DESKTOP_WORKFLOW_PORTALS" ]] || DESKTOP_WORKFLOW_PORTALS="$SCRIPT_DIR/../../conf/xdg-desktop-portal/data/portals.conf"
+[[ -f "$DESKTOP_WORKFLOW_PORTALS" ]] || DESKTOP_WORKFLOW_PORTALS="$SCRIPT_DIR/../../modules/conf/xdg-desktop-portal/data/portals.conf"
 if [[ $EUID -eq 0 ]]; then
     DESKTOP_WORKFLOW_PORTALS=/usr/local/lib/os/portals.conf
 fi
