@@ -99,7 +99,7 @@ if [[ "$SETUP_SCOPE" == branding ]]; then
     BRAND_ICON="$PROJECT_ROOT/modules/iso/assets/kmono-cyan.png"
     [[ -s "$BRAND_ICON" && ! -L "$BRAND_ICON" ]] || err "branding.install_failed" "$BRAND_ICON"
     install -Dm644 -- "$BRAND_ICON" /usr/share/pixmaps/os.png || err "branding.install_failed" /usr/share/pixmaps/os.png
-    log "__complete"
+    log "branding.completed"
     exit 0
 fi
 

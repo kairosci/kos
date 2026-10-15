@@ -472,6 +472,7 @@ recovery.shell_ready=Omarchy Shell gestartet und IPC geprüft
 recovery.terminals_ready=Originale Terminalkonfigurationen wiederhergestellt Sicherungen in %s
 setup.stage_missing=Erforderlicher Einrichtungsschritt fehlt: %s
 branding.install_failed=KMono-Systemsymbol kann nicht installiert werden: %s
+branding.completed=KMono-Systemsymbol installiert
 theming.policy_failed=Anwenden der Themenausschlüsse fehlgeschlagen
 preview.pipeline=Vorschauen über das Setup erzeugen
 preview.usage=Aufruf: %s <Thema> [Thema...]

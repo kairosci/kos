@@ -472,6 +472,7 @@ recovery.shell_ready=Omarchy shell started and IPC verified
 recovery.terminals_ready=Original terminal configurations restored backups in %s
 setup.stage_missing=Required setup stage is missing: %s
 branding.install_failed=Cannot install the KMono system icon: %s
+branding.completed=KMono system icon installed
 theming.policy_failed=Applying the theme exclusions failed
 preview.pipeline=Run preview regeneration through setup
 preview.usage=Usage: %s <theme> [theme...]

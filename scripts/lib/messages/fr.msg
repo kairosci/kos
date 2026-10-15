@@ -472,6 +472,7 @@ recovery.shell_ready=Shell Omarchy démarré et IPC vérifié
 recovery.terminals_ready=Configurations originales des terminaux restaurées sauvegardes dans %s
 setup.stage_missing=Étape obligatoire absente : %s
 branding.install_failed=Impossible d’installer l’icône système KMono : %s
+branding.completed=Icône système KMono installée
 theming.policy_failed=Échec des exclusions de thèmes
 preview.pipeline=Régénérez les aperçus via le setup
 preview.usage=Usage : %s <thème> [thème...]
