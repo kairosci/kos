@@ -1,0 +1,69 @@
+name: Omarchy Custom ISO
+
+on:
+  push:
+    tags:
+      - 'omarchy-custom-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build and publish Omarchy Custom ISO
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out tagged configuration
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Validate release tag
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^omarchy-custom-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]
+          echo "version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+
+      - name: Install ISO tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes curl jq xorriso
+
+      - name: Stage complete OS configuration in the ISO overlay
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          overlay="$RUNNER_TEMP/omarchy-overlay"
+          source_tree="$RUNNER_TEMP/os-custom-source"
+          mkdir -p "$overlay/opt/os-custom" "$source_tree"
+          git archive "$GITHUB_SHA" | tar -x -C "$source_tree"
+          cp -aL "$source_tree/." "$overlay/opt/os-custom/"
+          printf 'release=%s\ncommit=%s\n' "$RELEASE_TAG" "$GITHUB_SHA" > "$overlay/opt/os-custom-release.txt"
+
+      - name: Build customized ISO
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          bash modules/omarchy-iso/scripts/customize.sh \
+            --overlay "$RUNNER_TEMP/omarchy-overlay" \
+            --output "$RUNNER_TEMP/omarchy-custom-${RELEASE_VERSION}.iso"
+
+      - name: Publish ISO and checksum
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            "$RUNNER_TEMP/omarchy-custom-${RELEASE_VERSION}.iso" \
+            "$RUNNER_TEMP/omarchy-custom-${RELEASE_VERSION}.iso.sha256" \
+            --verify-tag \
+            --title "Omarchy Custom ${RELEASE_VERSION}" \
+            --generate-notes
