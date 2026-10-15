@@ -107,6 +107,7 @@ assert_true "desktop installer stages KMono branding in Fastfetch and the screen
 assert_true "screensaver uses the KMono ASCII logo" "cmp -s '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt' '$BRANDING_HOME/.config/omarchy/branding/screensaver.txt'"
 assert_true "Fastfetch uses the KMono ASCII logo and identifies the system as os" "cmp -s '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt' '$BRANDING_HOME/.config/omarchy/branding/about.txt' && grep -q 'OS  os' '$BRANDING_HOME/.config/fastfetch/config.jsonc'"
 assert_false "KMono terminal logo contains no non-ASCII characters" "LC_ALL=C grep -q '[^ -~]' '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt'"
+assert_false "KMono terminal logo contains no wordmark lettering" "grep -Eiq 'k[[:space:]]*m[[:space:]]*o[[:space:]]*n[[:space:]]*o' '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt'"
 assert_true "desktop setup preserves previous branding in backups" "grep -qx 'old screensaver logo' '$BRANDING_HOME/.config/omarchy/branding/screensaver.txt.bak' && grep -qx 'old About logo' '$BRANDING_HOME/.config/omarchy/branding/about.txt.bak'"
 assert_false "screensaver is enabled by default" "[[ -e '$BRANDING_HOME/.local/state/omarchy/toggles/screensaver-off' ]]"
 assert_true "Fastfetch configuration is valid JSON" "jq empty '$PROJECT_DIR/modules/conf/desktop/data/fastfetch/config.jsonc'"
