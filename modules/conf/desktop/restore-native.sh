@@ -17,9 +17,9 @@ for file in kitty/kitty.conf alacritty/alacritty.toml ghostty/config foot/foot.i
     fi
     install_user_file "$UPSTREAM/$file" "$CONFIG_HOME/$file"
 done
-for asset in logo.txt:screensaver.txt icon.txt:about.txt; do
-    source="$UPSTREAM/../${asset%%:*}"
-    file="omarchy/branding/${asset#*:}"
+for asset in screensaver.txt about.txt; do
+    source="$SCRIPT_DIR/data/branding/kmono.txt"
+    file="omarchy/branding/$asset"
     [[ -r "$source" ]] || err "defaults.app_failed" branding
     if [[ -f "$CONFIG_HOME/$file" && ! -e "$BACKUP/$file" ]]; then
         mkdir -p "$BACKUP/${file%/*}"
@@ -28,4 +28,6 @@ for asset in logo.txt:screensaver.txt icon.txt:about.txt; do
     fi
     install_user_file "$source" "$CONFIG_HOME/$file"
 done
+install_user_file "$SCRIPT_DIR/data/fastfetch/config.jsonc" "$CONFIG_HOME/fastfetch/config.jsonc"
+rm -f "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/toggles/screensaver-off"
 log "recovery.terminals_ready" "$BACKUP"

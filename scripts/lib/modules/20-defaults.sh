@@ -20,6 +20,11 @@ done
 
 log "defaults.graphical_apps"
 pacman -S --noconfirm --needed zed papers loupe celluloid baobab resources materia-gtk-theme || err "defaults.app_failed" "graphical desktop"
+pacman -S --noconfirm --needed fastfetch || err "defaults.app_failed" "Fastfetch"
+
+BRAND_ICON="$PROJECT_ROOT/modules/iso/assets/kmono-cyan.png"
+[[ -s "$BRAND_ICON" && ! -L "$BRAND_ICON" ]] || err "branding.install_failed" "$BRAND_ICON"
+install -Dm644 -- "$BRAND_ICON" /usr/share/pixmaps/os.png || err "branding.install_failed" /usr/share/pixmaps/os.png
 
 pacman -S --noconfirm --needed easyeffects calf lsp-plugins-lv2 mda.lv2 x42-plugins-lv2 zam-plugins-lv2 || err "defaults.app_failed" "EasyEffects"
 

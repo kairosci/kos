@@ -74,6 +74,8 @@ assert_file_contains "defaults module provisions herdrconf menu" "$PROJECT_DIR/s
 assert_file_contains "defaults module installs Baobab disk analyzer" "$DEFAULTS_MODULE" "baobab"
 assert_file_contains "defaults module installs LazyVim symbol navigation dependencies" "$DEFAULTS_MODULE" "universal-ctags"
 assert_file_contains "defaults module provisions LazyVim for terminal projects" "$DEFAULTS_MODULE" "pacman -S --noconfirm --needed neovim omarchy-nvim"
+assert_file_contains_literal "defaults module provisions Fastfetch" "$DEFAULTS_MODULE" "--needed fastfetch"
+assert_file_contains "defaults module installs the KMono system icon" "$DEFAULTS_MODULE" "/usr/share/pixmaps/os.png"
 assert_file_contains "defaults module provisions diskconf" "$PROJECT_DIR/scripts/lib/modules/24-user-configurations.sh" "modules/conf/\*/install.sh"
 assert_file_contains "shell plugins module enables the local OS media player" "$SHELL_PLUGINS_MODULE" 'plugin enable os.osmp'
 assert_file_contains "env module defines omarchy_as helper" "$PROJECT_DIR/scripts/lib/modules/00-env.sh" "omarchy_as\(\)"
@@ -93,6 +95,26 @@ assert_file_contains "keyring module selects GNOME backend" "$PROJECT_DIR/script
 assert_file_contains "keyring module provisions Seahorse" "$PROJECT_DIR/scripts/lib/modules/62-keyring.sh" "seahorse"
 assert_file_contains "keyring switch accepts GNOME backend" "$PROJECT_DIR/scripts/keyring-switch.sh" "gnome-keyring)"
 assert_file_contains "Makefile exposes the keyring selection target" "$PROJECT_DIR/Makefile" "scripts/keyring-switch.sh"
+
+BRANDING_HOME=$(mktemp -d)
+trap 'rm -rf "$BRANDING_HOME"' EXIT
+mkdir -p "$BRANDING_HOME/.config/omarchy/branding" "$BRANDING_HOME/.config/fastfetch" "$BRANDING_HOME/.local/state/omarchy/toggles" "$BRANDING_HOME/.local/share/applications"
+: > "$BRANDING_HOME/.bashrc"
+printf 'old screensaver logo\n' > "$BRANDING_HOME/.config/omarchy/branding/screensaver.txt"
+printf 'old About logo\n' > "$BRANDING_HOME/.config/omarchy/branding/about.txt"
+touch "$BRANDING_HOME/.local/state/omarchy/toggles/screensaver-off"
+assert_true "desktop installer stages KMono branding in Fastfetch and the screensaver" "HOME='$BRANDING_HOME' XDG_CONFIG_HOME='$BRANDING_HOME/.config' XDG_STATE_HOME='$BRANDING_HOME/.local/state' XDG_DATA_HOME='$BRANDING_HOME/.local/share' bash '$PROJECT_DIR/modules/conf/desktop/install.sh'"
+assert_true "screensaver uses the KMono ASCII logo" "cmp -s '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt' '$BRANDING_HOME/.config/omarchy/branding/screensaver.txt'"
+assert_true "Fastfetch uses the KMono ASCII logo and identifies the system as os" "cmp -s '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt' '$BRANDING_HOME/.config/omarchy/branding/about.txt' && grep -q 'OS  os' '$BRANDING_HOME/.config/fastfetch/config.jsonc'"
+assert_false "KMono terminal logo contains no non-ASCII characters" "LC_ALL=C grep -q '[^ -~]' '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt'"
+assert_true "desktop setup preserves previous branding in backups" "grep -qx 'old screensaver logo' '$BRANDING_HOME/.config/omarchy/branding/screensaver.txt.bak' && grep -qx 'old About logo' '$BRANDING_HOME/.config/omarchy/branding/about.txt.bak'"
+assert_false "screensaver is enabled by default" "[[ -e '$BRANDING_HOME/.local/state/omarchy/toggles/screensaver-off' ]]"
+assert_true "Fastfetch configuration is valid JSON" "jq empty '$PROJECT_DIR/modules/conf/desktop/data/fastfetch/config.jsonc'"
+if command -v fastfetch >/dev/null 2>&1; then
+    assert_true "Fastfetch renders the OS label from the installed profile" "HOME='$BRANDING_HOME' fastfetch --config '$BRANDING_HOME/.config/fastfetch/config.jsonc' --pipe false > '$BRANDING_HOME/fastfetch.out'"
+    assert_true "Fastfetch renders the KMono ASCII mark" "grep -q '######' '$BRANDING_HOME/fastfetch.out'"
+    assert_true "Fastfetch identifies the system as os" "grep -q 'OS  os' '$BRANDING_HOME/fastfetch.out'"
+fi
 
 PERSIST_PRE="$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-os-persist"
 assert_file_exists "pre-refresh persist hook exists in repo" "$PERSIST_PRE"
