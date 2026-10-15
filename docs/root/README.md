@@ -22,7 +22,7 @@ Install the supported base system first, then run `make setup` from this reposit
 
 `sudo make setup SCOPE=desktop` restores the native terminal configs and reconciles the running desktop shell and wallpaper without package provisioning. Previous terminal configs are preserved under `~/.local/state/os/desktop-defaults/`. It also works during a snapshot boot.
 
-When booted into a Snapper snapshot with a temporary overlay root, run `sudo make setup SCOPE=recovery` first. This saves configuration restore backups on the persistent home filesystem and invokes the native Limine snapshot restore. Reboot into the normal system before running full setup or resetting the snapshot history.
+When booted into a Snapper snapshot with a temporary overlay root, run `sudo make setup SCOPE=recovery` first. This saves configuration restore backups on the persistent home filesystem and invokes the native Limine snapshot restore. Reboot into the normal system before running full setup or resetting the snapshot history. `make setup SCOPE=limine` applies the KMono cyan Limine menu theme through the privileged setup pipeline and installs its update hook. `make setup SCOPE=security` reconciles the security stack and weekly audit schedule without running desktop provisioning.
 
 To restore native desktop defaults on an existing installation and start a new snapshot history, run `make setup RESTORE_OMARCHY=1 RESET_SNAPSHOTS=1`. Existing Hyprland, desktop shell and Bash configurations are backed up under `/var/lib/os/omarchy-restore/` before restoring packaged defaults. After every setup stage succeeds, a new baseline snapshot is created before older snapshots are deleted. Active and default snapshots are preserved, and Limine snapshot entries are synchronized. Repeating the command preserves the recorded baseline and completed configuration restore.
 
@@ -77,6 +77,8 @@ Kernel security is enforced through a single sysctl drop-in with full address sp
 ## Access Control and System Hardening
 
 Authentication locks accounts after a configured number of consecutive failed attempts through `faillock.conf`, password complexity is required through `pwquality.conf` and core dumps are disabled globally. SSH denies root login and password authentication while enforcing modern ciphers, and the daemon is isolated through systemd drop-ins with strict filesystem and privilege restrictions. The UFW firewall denies incoming traffic by default and allows outgoing. Host tooling integrates AppArmor mandatory access control, auditd logging, fail2ban monitoring, USBGuard device authorization, ClamAV scanning and weekly automated audits.
+
+The weekly audit runs ClamAV over `/home`, `/root`, `/etc`, `/usr`, `/opt`, `/var` and `/boot`, records Arch advisory data, and marks any advisory for review. It never deletes or quarantines detections. Repository bots scan source and dependency changes; they do not certify the running host or guarantee that a system has no malware, CVEs or information leaks.
 
 ## Desktop Parity and Debloat Strategy
 

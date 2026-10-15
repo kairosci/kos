@@ -21,6 +21,7 @@ EXPECTED_MODULES=(
     "22-portals.sh"
     "23-fontconfig.sh"
     "25-desktop-cleanup.sh"
+    "27-limine-theme.sh"
     "30-theming.sh"
     "32-omaqt.sh"
     "35-shell-plugins.sh"
@@ -36,6 +37,7 @@ EXPECTED_MODULES=(
     "90-hardware-power.sh"
     "91-suspend-resume.sh"
     "92-responsiveness.sh"
+    "94-security-audit.sh"
     "95-maintenance.sh"
 )
 
@@ -59,6 +61,7 @@ assert_file_contains "32-omaqt tracks the omaqt checkout" "$MODULES_DIR/32-omaqt
 assert_file_contains "10-debloat defines DEBLOAT array" "$MODULES_DIR/10-debloat.sh" "DEBLOAT=\("
 assert_file_contains "85-security-stack defines SECURITY_PKGS array" "$MODULES_DIR/85-security-stack.sh" "SECURITY_PKGS=\("
 assert_file_contains "setup.sh checks EUID root requirement" "$PROJECT_DIR/scripts/setup.sh" "EUID -eq 0"
+assert_file_contains "security scope reconciles security and audit stages" "$PROJECT_DIR/scripts/setup.sh" 'SETUP_SCOPE.*security'
 
 for scope in migrate release iso kernel; do
     assert_false "setup rejects retired $scope scope" "OS_LOG_STDOUT=1 bash '$PROJECT_DIR/scripts/setup.sh' --scope '$scope'"

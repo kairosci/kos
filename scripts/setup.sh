@@ -48,7 +48,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|recovery|desktop|fontconfig|branding) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|limine) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -103,6 +103,24 @@ if [[ "$SETUP_SCOPE" == branding ]]; then
     exit 0
 fi
 
+if [[ "$SETUP_SCOPE" == limine ]]; then
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    log "__stage" "27-limine-theme.sh"
+    source "$MODULES_DIR/27-limine-theme.sh"
+    log "__complete"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == security ]]; then
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    log "__stage" "85-security-stack.sh"
+    source "$MODULES_DIR/85-security-stack.sh"
+    log "__stage" "94-security-audit.sh"
+    source "$MODULES_DIR/94-security-audit.sh"
+    log "__complete"
+    exit 0
+fi
+
 PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
 if [[ "$PRIMARY_USER" == root ]] || ! id "$PRIMARY_USER" >/dev/null; then
     err "__cannot_determine_user"
@@ -124,6 +142,7 @@ MODULE_FILES=(
     "$MODULES_DIR/23-fontconfig.sh"
     "$MODULES_DIR/24-user-configurations.sh"
     "$MODULES_DIR/25-desktop-cleanup.sh"
+    "$MODULES_DIR/27-limine-theme.sh"
     "$MODULES_DIR/30-theming.sh"
     "$MODULES_DIR/32-omaqt.sh"
     "$MODULES_DIR/35-shell-plugins.sh"
@@ -139,6 +158,7 @@ MODULE_FILES=(
     "$MODULES_DIR/90-hardware-power.sh"
     "$MODULES_DIR/91-suspend-resume.sh"
     "$MODULES_DIR/92-responsiveness.sh"
+    "$MODULES_DIR/94-security-audit.sh"
     "$MODULES_DIR/95-maintenance.sh"
 )
 

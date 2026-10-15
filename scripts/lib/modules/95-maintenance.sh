@@ -9,46 +9,6 @@ if [[ -f /etc/pacman.d/hooks/99-verify-inserted-keyrings.hook ]] &&
     rm -f /etc/pacman.d/hooks/99-verify-inserted-keyrings.hook
 fi
 
-log "maint.weekly"
-mkdir -p /etc/cron.weekly
-cat > /etc/cron.weekly/security-audit.sh << 'AUDITEOF'
-#!/usr/bin/env bash
-set -euo pipefail
-/usr/bin/lynis --cron system >> /var/log/lynis-audit.log 2>&1
-/usr/bin/rkhunter --check --skip-keypress --report-warnings-only >> /var/log/rkhunter-audit.log 2>&1
-AUDITEOF
-chmod 755 /etc/cron.weekly/security-audit.sh
-cat > /etc/systemd/system/os-security-audit.service << 'SERVICE'
-[Unit]
-Description=OS security audit
-
-[Service]
-Type=oneshot
-ExecStart=/etc/cron.weekly/security-audit.sh
-Nice=19
-IOSchedulingClass=idle
-SERVICE
-cat > /etc/systemd/system/os-security-audit.timer << 'TIMER'
-[Unit]
-Description=Weekly OS security audit
-
-[Timer]
-OnCalendar=weekly
-Persistent=true
-RandomizedDelaySec=1h
-
-[Install]
-WantedBy=timers.target
-TIMER
-chmod 644 /etc/systemd/system/os-security-audit.{service,timer}
-systemctl daemon-reload
-if systemctl is-enabled --quiet cronie.service || systemctl is-active --quiet cronie.service; then
-    systemctl enable --now cronie.service
-    systemctl disable --now os-security-audit.timer
-else
-    systemctl enable --now os-security-audit.timer
-fi
-
 log "maint.logs"
 cat > /etc/logrotate.d/security << 'LOGROTATE'
 /var/log/sudo-io/*

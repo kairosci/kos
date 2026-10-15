@@ -7,6 +7,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 SEC_MODULE="$PROJECT_DIR/scripts/lib/modules/85-security-stack.sh"
 POWER_MODULE="$PROJECT_DIR/scripts/lib/modules/90-hardware-power.sh"
 MAINT_MODULE="$PROJECT_DIR/scripts/lib/modules/95-maintenance.sh"
+AUDIT_MODULE="$PROJECT_DIR/scripts/lib/modules/94-security-audit.sh"
 SECURITY_STACK_MODULE="$PROJECT_DIR/scripts/lib/modules/85-security-stack.sh"
 SERVICES_MODULE="$PROJECT_DIR/scripts/lib/modules/80-services.sh"
 
@@ -32,8 +33,13 @@ assert_file_contains "hardware module blacklists protocols" "$POWER_MODULE" "dis
 assert_file_contains "hardware module blacklists firewire" "$POWER_MODULE" "disable-firewire.conf"
 
 assert_file_exists "maintenance module exists" "$MAINT_MODULE"
-assert_file_contains "maintenance module schedules weekly audit" "$MAINT_MODULE" "/etc/cron.weekly/security-audit.sh"
-assert_file_contains "weekly audit has a timer when cron is absent" "$MAINT_MODULE" "systemctl enable --now os-security-audit.timer"
+assert_file_exists "security audit module exists" "$AUDIT_MODULE"
+assert_file_contains "security audit module schedules weekly audit" "$AUDIT_MODULE" "/etc/cron.weekly/security-audit.sh"
+assert_file_contains "weekly audit scans installed system paths with ClamAV" "$AUDIT_MODULE" "clamdscan --fdpass --multiscan --infected"
+assert_file_contains "weekly audit records Arch advisories" "$AUDIT_MODULE" "arch-audit --show-cve"
+assert_file_contains "weekly audit flags Arch advisory results for review" "$AUDIT_MODULE" "arch-audit --quiet --show-cve"
+assert_file_contains "weekly audit fails when advisories need review" "$AUDIT_MODULE" "arch-audit-review"
+assert_file_contains "weekly audit has a timer when cron is absent" "$AUDIT_MODULE" "systemctl enable --now os-security-audit.timer"
 check_audit_scheduler() (
     local scenario actions
     actions=$(mktemp)
@@ -49,7 +55,7 @@ check_audit_scheduler() (
     for scenario in enabled active absent; do
         : > "$actions"
         # shellcheck source=/dev/null
-        source <(sed -n '/^if systemctl is-enabled --quiet cronie.service/,/^fi$/p' "$MAINT_MODULE")
+        source <(sed -n '/^if systemctl is-enabled --quiet cronie.service/,/^fi$/p' "$AUDIT_MODULE")
         if [[ "$scenario" == absent ]]; then
             [[ "$(cat "$actions")" == 'enable --now os-security-audit.timer' ]] || return 1
         else

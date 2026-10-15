@@ -35,3 +35,9 @@ Lynis suggestions include tighter service isolation, password expiry, separate p
 In the isolated capture session, Nautilus reports unavailable Mutter and Tracker services and network mounts. Its actual windows were verified and captured; no fictitious GNOME services were introduced and errors were not hidden. OSMP is installed from the canonical local sources through setup; the unavailable former plugin repository is no longer requested.
 
 Execution logs are in `/tmp/os-final-setup.log`, `/tmp/os-final-tests.log`, `/tmp/os-final-verify.log`, `/tmp/os-final-lint.log`, `/tmp/os-final-semgrep.json`, `/tmp/os-package-audit.json` and `/tmp/os-lynis-output.log`. These are temporary local artifacts; privileged reports may be readable only by root.
+
+## Follow-up on October 15, 2026
+
+The current `arch-audit --json` check returned 23 tracker records and `arch-audit --upgradable` returned no package names. This does not close the 20 records that were not individually reviewed in the earlier assessment; the tracker includes records with no fixed version and needs package-by-package adjudication. The new weekly audit reports all tracker findings for review rather than treating an empty upgradable list as a clean bill of health.
+
+ClamAV's updater and daemon are active, and its signature database was current at the time of inspection. The on-demand scan of `/home/krosci` ran for ten minutes and was stopped before completion; it reported no infected files before stopping, but produced repeated `cli_realpath: Invalid arguments` warnings for unsupported filesystem objects. This is not a clean scan verdict. The repository changes add a weekly scan of system and user paths, but the privileged setup scope could not be applied because this session had no interactive Polkit authentication agent. No live Limine or audit schedule changes were made.
