@@ -10,10 +10,9 @@ Download the latest release image, assemble it and verify its SHA-256 checksum w
 
 ```bash
 curl -fsSL https://github.com/kairosci/os/releases/latest/download/download-release.sh | bash
-sha256sum -c os-v1.0.iso.sha256
 ```
 
-The helper saves the ISO and checksum in the current directory. Use a release-specific version if you need a reproducible download. Write the verified ISO to a USB drive, boot from it and complete the base system installation. The full configuration repository is available on the live image at `/opt/os`; copy it to persistent storage, then run `make setup` from that copy after installation.
+The helper saves the ISO and checksum in the current directory, then verifies the assembled image against that checksum. Use a release-specific version if you need a reproducible download. Write the verified ISO to a USB drive, boot from it and complete the base system installation. The full configuration repository is available on the live image at `/opt/os`; copy it to persistent storage, then run `make setup` from that copy after installation.
 
 See [the ISO guide](../modules/iso/README.md) for release details and alternate download commands.
 
