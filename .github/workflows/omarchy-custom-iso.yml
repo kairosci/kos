@@ -66,7 +66,7 @@ jobs:
           upstream_name="$(basename "$upstream_iso")"
           [[ "$upstream_name" =~ ^omarchy-(.+)\.iso$ ]]
           upstream_version="${BASH_REMATCH[1]}"
-          final_iso="$RUNNER_TEMP/omarchy-${upstream_version}-custom.iso"
+          final_iso="$RUNNER_TEMP/os-${RELEASE_TAG}.iso"
           mv "$RUNNER_TEMP/omarchy-custom.iso" "$final_iso"
           iso_name="$(basename "$final_iso")"
           (cd "$RUNNER_TEMP" && sha256sum "$iso_name" > "$iso_name.sha256")
@@ -88,15 +88,12 @@ jobs:
           set -euo pipefail
           mapfile -t iso_parts < <(find "$RUNNER_TEMP" -maxdepth 1 -type f -name "$ISO_NAME.part-*" -print | LC_ALL=C sort)
           ((${#iso_parts[@]} > 0))
-          release_assets=("${iso_parts[@]}" "$ISO_PATH.sha256")
+          release_assets=("${iso_parts[@]}" "$ISO_PATH.sha256" modules/omarchy-iso/scripts/download-release.sh)
           notes="$RUNNER_TEMP/release-notes.md"
           cat > "$notes" <<EOF
           Based on upstream Omarchy ${UPSTREAM_VERSION}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO.
 
-          The ISO is split into numbered parts because a GitHub release asset cannot exceed 2 GiB. Download every numbered part and the checksum, then reconstruct and verify the image with:
-
-          cat ${ISO_NAME}.part-* > ${ISO_NAME}
-          sha256sum -c ${ISO_NAME}.sha256
+          The ISO is split into numbered parts. Download the attached download-release.sh script and run it with ${RELEASE_TAG} to download, assemble, and verify the image.
           EOF
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             mapfile -t existing_assets < <(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name')
@@ -104,13 +101,13 @@ jobs:
               gh release delete-asset "$RELEASE_TAG" "$asset" --yes
             done
             gh release edit "$RELEASE_TAG" \
-              --title "Omarchy Custom ${RELEASE_VERSION}" \
+              --title "$RELEASE_TAG" \
               --notes-file "$notes"
             gh release upload "$RELEASE_TAG" "${release_assets[@]}"
           else
             gh release create "$RELEASE_TAG" \
               "${release_assets[@]}" \
               --verify-tag \
-              --title "Omarchy Custom ${RELEASE_VERSION}" \
+              --title "$RELEASE_TAG" \
               --notes-file "$notes"
           fi
