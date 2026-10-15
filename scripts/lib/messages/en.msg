@@ -488,6 +488,15 @@ preview.zed_live_verified=Zed live palette change verified without restarting
 preview.zed_live_failed=Zed live palette check failed expected %s actual %s
 shell_plugins.not_configured=Optional osmp plugin is not configured
 make.iso=Download the latest base ISO, apply the local overlay and rebuild it
+make.os=Install the os command dispatcher
+make.changelog=Show the release changelog prose
+os.cli_installed=os command installed at %s
+os.cli_skipped=os command install skipped for %s
+os.changelog_installed=Changelog published at %s
+os.runtime_missing=omarchy runtime is required for this command
+os.dispatch_failed=os could not dispatch %s
+os.changelog_missing=changelog is unavailable at %s
+os.changelog_unknown=unknown release %s
 
 iso.usage=Usage: make iso or customize.sh [--overlay DIR] [--output FILE]
 iso.dependency_missing=Required command is missing: %s
