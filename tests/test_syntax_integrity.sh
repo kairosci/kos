@@ -33,6 +33,18 @@ assert_file_contains "shared suite runner reports executed assertions" "$PROJECT
 assert_file_contains "shared suite runner counts assertion results" "$PROJECT_DIR/tests/run-suite-list.sh" 'pass|fail|warn'
 assert_file_contains_literal "root modules live under lib" "$PROJECT_DIR/scripts/setup.sh" 'MODULES_DIR="$SCRIPT_DIR/lib/modules"'
 
+markdown_lists=0
+markdown_scan_failed=0
+while IFS= read -r -d '' markdown_file; do
+    if grep -qE '^[[:space:]]*([-*+][[:space:]]+|[0-9]+[.)][[:space:]]+)' "$PROJECT_DIR/$markdown_file"; then
+        markdown_lists=1
+    else
+        grep_status=$?
+        [[ "$grep_status" -eq 1 ]] || markdown_scan_failed=1
+    fi
+done < <(git -C "$PROJECT_DIR" ls-files -z -- '*.md' '*.mdx')
+assert_true "tracked Markdown documentation uses prose instead of lists" "[[ '$markdown_lists' -eq 0 && '$markdown_scan_failed' -eq 0 ]]"
+
 assert_file_executable "scripts/setup.sh is executable" "$PROJECT_DIR/scripts/setup.sh"
 assert_file_executable "scripts/verify.sh is executable" "$PROJECT_DIR/scripts/verify.sh"
 assert_file_executable "scripts/launch.sh is executable" "$PROJECT_DIR/scripts/launch.sh"
