@@ -73,5 +73,6 @@ printf 'previous terminal\n' > "$RECOVERY_HOME/.config/kitty/kitty.conf"
 chown() { return 0; }
 assert_true "desktop recovery restores native terminal configs with a persistent backup" 'SETUP_SCOPE=desktop root_recovery_shell && cmp "$OMARCHY_PATH/config/kitty/kitty.conf" "$RECOVERY_HOME/.config/kitty/kitty.conf" && grep -qx "previous terminal" "$RECOVERY_HOME/.local/state/os/desktop-defaults/kitty/kitty.conf"'
 assert_true "repeated desktop recovery preserves the first terminal backup" 'SETUP_SCOPE=desktop root_recovery_shell && grep -qx "previous terminal" "$RECOVERY_HOME/.local/state/os/desktop-defaults/kitty/kitty.conf"'
-assert_true "desktop recovery installs the original screensaver and About branding" 'cmp "$OMARCHY_PATH/logo.txt" "$RECOVERY_HOME/.config/omarchy/branding/screensaver.txt" && cmp "$OMARCHY_PATH/icon.txt" "$RECOVERY_HOME/.config/omarchy/branding/about.txt"'
+assert_true "desktop recovery installs the KMono ASCII logo for screensaver and About" 'cmp "$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt" "$RECOVERY_HOME/.config/omarchy/branding/screensaver.txt" && cmp "$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt" "$RECOVERY_HOME/.config/omarchy/branding/about.txt"'
+assert_true "desktop recovery installs the OS Fastfetch identity and logo" 'cmp "$PROJECT_DIR/modules/conf/desktop/data/fastfetch/config.jsonc" "$RECOVERY_HOME/.config/fastfetch/config.jsonc" && grep -q "source.*omarchy/branding/about.txt" "$RECOVERY_HOME/.config/fastfetch/config.jsonc"'
 test_summary
