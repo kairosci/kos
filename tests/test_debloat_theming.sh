@@ -41,16 +41,16 @@ assert_file_contains "theming module installs hooks" "$THEMING_MODULE" "hooks/th
 assert_file_contains "theming module propagates color-scheme from the active theme" "$PROJECT_DIR/hooks/theme-set.d/gtk-theme" "gsettings set org.gnome.desktop.interface color-scheme"
 assert_file_not_contains "theming module does not write GTK settings" "$THEMING_MODULE" "gtk-settings"
 assert_file_contains "theming module routes Qt through the xdgdesktop platform theme" "$THEMING_MODULE" 'QT_QPA_PLATFORMTHEME", "xdgdesktop"'
-assert_file_exists "theme preview apply helper exists" "$PROJECT_DIR/theme-previews/apply.sh"
-assert_file_contains "theme preview apply creates missing user overlays" "$PROJECT_DIR/theme-previews/apply.sh" 'install -d -m 700'
-assert_file_contains "theme preview apply clears selector cache" "$PROJECT_DIR/theme-previews/apply.sh" 'theme-selector'
+assert_file_exists "theme preview apply helper exists" "$PROJECT_DIR/modules/theme-previews/apply.sh"
+assert_file_contains "theme preview apply creates missing user overlays" "$PROJECT_DIR/modules/theme-previews/apply.sh" 'install -d -m 700'
+assert_file_contains "theme preview apply clears selector cache" "$PROJECT_DIR/modules/theme-previews/apply.sh" 'theme-selector'
 
-REBUILD_PREVIEWS="$PROJECT_DIR/theme-previews/rebuild-previews.sh"
+REBUILD_PREVIEWS="$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh"
 assert_file_exists "theme preview rebuild helper exists" "$REBUILD_PREVIEWS"
 assert_file_not_contains "rebuild script no longer hardcodes a default theme list" "$REBUILD_PREVIEWS" 'themes=\(last-horizon lupine\)'
 assert_file_not_contains "rebuild script no longer special-cases lupine" "$REBUILD_PREVIEWS" "theme.*==.*'lupine'"
 
-PREVIEW_LIB="$PROJECT_DIR/scripts/lib/theme-preview.sh"
+PREVIEW_LIB="$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh"
 assert_file_exists "theme preview normalization library exists" "$PREVIEW_LIB"
 assert_file_contains "theme preview library declares the canvas" "$PREVIEW_LIB" "THEME_PREVIEW_CANVAS"
 assert_file_contains "theme preview canvas matches the stock theme grid" "$PREVIEW_LIB" "1800x1012"
@@ -70,16 +70,16 @@ assert_file_contains "post-update hook resolves the deployed preview library" "$
 assert_file_contains "post-update hook reapplies preview normalization" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "theme_preview_normalize"
 assert_file_contains "setup deploys privileged preview transaction hook" "$THEMING_MODULE" '99-os-theme-previews.hook'
 assert_file_contains "preview hook targets packaged themes" "$THEMING_MODULE" 'Target = usr/share/omarchy/themes/'
-assert_file_contains "preview transaction uses only privileged libraries" "$PROJECT_DIR/scripts/lib/update-previews.sh" 'source /usr/local/lib/os/theme-preview.sh'
+assert_file_contains "preview transaction uses only privileged libraries" "$PROJECT_DIR/modules/theme-previews/scripts/update-previews.sh" 'source /usr/local/lib/os/theme-preview.sh'
 assert_false "user hook no longer warns about privileged previews" "grep -q 'hooks.preview_size_reapply_root_skipped' '$PROJECT_DIR/hooks/post-update.d/99-os-persist'"
 
-REBUILD_GEOMETRY="$PROJECT_DIR/theme-previews/rebuild-previews.sh"
+REBUILD_GEOMETRY="$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh"
 assert_file_contains "rebuild script captures Zed" "$REBUILD_GEOMETRY" 'capture_app zed'
 assert_file_contains "rebuild script captures Nautilus" "$REBUILD_GEOMETRY" 'capture_app org.gnome.Nautilus'
 assert_file_contains "rebuild script fills both halves of the work area" "$REBUILD_GEOMETRY" 'theme_preview_window_geometry'
 assert_file_contains "rebuild script writes the composite as rgba" "$REBUILD_GEOMETRY" 'PNG32:\$output_dir/preview.png'
 
-PREVIEW_APPLY="$PROJECT_DIR/theme-previews/apply.sh"
+PREVIEW_APPLY="$PROJECT_DIR/modules/theme-previews/apply.sh"
 assert_file_contains "apply helper supports a system scope" "$PREVIEW_APPLY" "SYSTEM_SCOPE"
 assert_file_contains "apply helper installs system previews as root" "$PREVIEW_APPLY" 'install -m 644 -o root -g root'
 assert_file_contains "apply helper records the overlay for the post-update hook" "$PREVIEW_APPLY" "theme_preview_store_overlay"
@@ -99,7 +99,7 @@ if command -v magick &>/dev/null; then
         warn() { printf '%s\n' "$1" >&2; }
         # shellcheck disable=SC2329
         log() { :; }
-        # shellcheck source=../scripts/lib/theme-preview.sh
+        # shellcheck source=../modules/theme-previews/scripts/lib/theme-preview.sh
         source "$PREVIEW_LIB"
         THEME_PREVIEW_THEMES_ROOT="$PREVIEW_SANDBOX/themes"
         THEME_PREVIEW_BACKUP_DIR="$PREVIEW_SANDBOX/cache"

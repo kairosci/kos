@@ -18,6 +18,6 @@ Theme hooks are staged in the repository and installed through setup. Setup and 
 
 Preview regeneration applies each real system theme, captures the complete active monitor with wallpaper, shell and sample graphical applications, and restores the original theme, background and workspace on success, failure or interruption. Run it only through `make setup REBUILD_PREVIEWS=1`. Isolate sample application state, select capture windows by their owned process groups and never publish personal windows or browser profiles.
 
-`scripts/lib/theme-preview.sh` owns uniform geometry, RGBA depth 8 and density 72. Preserve stock assets for restore and reapply normalization after package updates. Every theme is passed explicitly.
+`modules/theme-previews/scripts/lib/theme-preview.sh` owns uniform geometry, RGBA depth 8 and density 72. Preserve stock assets for restore and reapply normalization after package updates. Every theme is passed explicitly.
 
 Generate GTK themes with a palette-derived stable name so a theme switch reloads GTK's native theme provider. GTK 3 palette rules belong in that generated theme rather than a user CSS provider cached at startup. Preserve unrelated user CSS. Libadwaita applications also receive GTK 4 user CSS; already running applications that cache it require reopening before those overrides change.

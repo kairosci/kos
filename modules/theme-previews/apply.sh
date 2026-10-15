@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 TARGET_USER="${SUDO_USER:-${PKEXEC_UID:-$USER}}"
 if ((EUID != 0)); then TARGET_USER=$(id -un); fi
 SYSTEM_SCOPE=0
@@ -30,7 +30,7 @@ if ((SYSTEM_SCOPE)); then
         printf 'System scope requires explicit themes so stock artwork is never pinned.\n' >&2
         exit 2
     }
-    source "$PROJECT_DIR/scripts/lib/theme-preview.sh"
+    source "$SCRIPT_DIR/scripts/lib/theme-preview.sh"
 fi
 
 for theme_name in "${themes[@]}"; do

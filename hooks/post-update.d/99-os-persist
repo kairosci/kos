@@ -54,7 +54,7 @@ user_as() {
         "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus" "$@"
 }
 OS_THEME_PREVIEW="${OS_THEME_PREVIEW:-$SCRIPT_DIR/../lib/theme-preview.sh}"
-[[ -f "$OS_THEME_PREVIEW" ]] || OS_THEME_PREVIEW="$SCRIPT_DIR/../../scripts/lib/theme-preview.sh"
+[[ -f "$OS_THEME_PREVIEW" ]] || OS_THEME_PREVIEW="$SCRIPT_DIR/../../modules/theme-previews/scripts/lib/theme-preview.sh"
 if [[ $EUID -eq 0 ]]; then
     OS_THEME_PREVIEW=/usr/local/lib/os/theme-preview.sh
 fi

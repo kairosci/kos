@@ -40,6 +40,7 @@ lint:
 	fi
 	shellcheck --severity=style \
 		scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh \
+		modules/theme-previews/scripts/*.sh modules/theme-previews/scripts/lib/*.sh \
 		hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* \
 		modules/conf/*/*.sh \
 		tests/*.sh \

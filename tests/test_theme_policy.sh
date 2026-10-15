@@ -18,8 +18,8 @@ assert_true "an updated stock theme is removed again" 'mkdir "$THEME_POLICY_ROOT
 assert_false "linked theme roots are rejected" 'ln -s "$THEME_POLICY_ROOT" "$SANDBOX/linked" && theme_policy_prune "$SANDBOX/linked" "$SANDBOX/other"'
 printf '../outside\n' > "$SANDBOX/invalid.list"
 assert_false "invalid exclusion paths cannot escape the theme root" 'THEME_POLICY_FILE="$SANDBOX/invalid.list" theme_policy_apply'
-assert_false "preview installation rejects traversal before filesystem writes" 'bash "$PROJECT_DIR/theme-previews/apply.sh" ../outside'
-assert_file_contains_literal "capture verifies monitor dimensions before export" "$PROJECT_DIR/theme-previews/rebuild-previews.sh" '== "$monitor_geometry"'
-assert_file_contains_literal "capture validates window ownership" "$PROJECT_DIR/theme-previews/rebuild-previews.sh" 'index($pid) != null'
-assert_file_contains_literal "capture restores notification state" "$PROJECT_DIR/theme-previews/rebuild-previews.sh" 'setDnd "$ORIGINAL_DND"'
+assert_false "preview installation rejects traversal before filesystem writes" 'bash "$PROJECT_DIR/modules/theme-previews/apply.sh" ../outside'
+assert_file_contains_literal "capture verifies monitor dimensions before export" "$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh" '== "$monitor_geometry"'
+assert_file_contains_literal "capture validates window ownership" "$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh" 'index($pid) != null'
+assert_file_contains_literal "capture restores notification state" "$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh" 'setDnd "$ORIGINAL_DND"'
 test_summary
