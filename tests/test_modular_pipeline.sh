@@ -30,6 +30,7 @@ EXPECTED_MODULES=(
     "62-keyring.sh"
     "70-ssh.sh"
     "80-services.sh"
+    "81-resolver-failover.sh"
     "85-security-stack.sh"
     "89-battery-charge.sh"
     "90-hardware-power.sh"

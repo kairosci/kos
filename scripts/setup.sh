@@ -125,6 +125,7 @@ MODULE_FILES=(
     "$MODULES_DIR/62-keyring.sh"
     "$MODULES_DIR/70-ssh.sh"
     "$MODULES_DIR/80-services.sh"
+    "$MODULES_DIR/81-resolver-failover.sh"
     "$MODULES_DIR/85-security-stack.sh"
     "$MODULES_DIR/89-battery-charge.sh"
     "$MODULES_DIR/90-hardware-power.sh"

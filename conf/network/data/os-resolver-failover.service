@@ -1,0 +1,24 @@
+[Unit]
+Description=Monitor DNS resolution and switch providers on failure
+After=NetworkManager.service systemd-resolved.service
+Wants=NetworkManager.service systemd-resolved.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/libexec/os-resolver-failover
+Restart=always
+RestartSec=15s
+RuntimeDirectory=os-resolver-failover
+RuntimeDirectoryMode=0755
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/etc/systemd/resolved.conf /etc/NetworkManager/conf.d
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
