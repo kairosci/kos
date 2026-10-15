@@ -54,7 +54,7 @@ jobs:
       - name: Build customized ISO
         id: build
         env:
-          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
           bash modules/omarchy-iso/scripts/customize.sh \
