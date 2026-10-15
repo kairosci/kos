@@ -47,7 +47,7 @@
       "alr-knee": 0.0,
       "alr-knee-smooth": -5.0,
       "alr": false,
-      "gain-boost": false,
+      "gain-boost": true,
       "input-to-sidechain": -80.01,
       "input-to-link": -80.01,
       "sidechain-to-input": -80.01,
