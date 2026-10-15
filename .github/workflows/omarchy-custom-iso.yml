@@ -3,7 +3,7 @@ name: Omarchy Custom ISO
 on:
   push:
     tags:
-      - 'omarchy-custom-v*'
+      - 'v*'
 
 permissions:
   contents: write
@@ -25,7 +25,7 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          [[ "$RELEASE_TAG" =~ ^omarchy-custom-v([0-9]+\.[0-9]+)$ ]]
+          [[ "$RELEASE_TAG" =~ ^v([0-9]+\.[0-9]+)$ ]]
           echo "version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
 
       - name: Install ISO tooling
