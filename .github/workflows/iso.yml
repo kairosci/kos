@@ -23,6 +23,7 @@ jobs:
       - name: Check out tagged configuration
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
           persist-credentials: false
 
       - name: Validate release tag
@@ -59,6 +60,15 @@ jobs:
           bash modules/iso/scripts/customize.sh \
             --overlay "$RUNNER_TEMP/os-overlay" \
             --output "$RUNNER_TEMP/os-base.iso"
+
+          inspected_tree="$RUNNER_TEMP/os-inspected/opt/os"
+          mkdir -p "$(dirname "$inspected_tree")"
+          xorriso -osirrox on \
+            -indev "$RUNNER_TEMP/os-base.iso" \
+            -extract /opt/os "$inspected_tree"
+          diff -qr "$RUNNER_TEMP/os-overlay/opt/os" "$inspected_tree"
+          printf 'commit=%s\n' "$GITHUB_SHA" > "$RUNNER_TEMP/os-release.expected"
+          cmp "$RUNNER_TEMP/os-release.expected" "$RUNNER_TEMP/os-inspected/opt/os-release.txt"
 
           final_iso="$RUNNER_TEMP/os-${RELEASE_TAG}.iso"
           mv "$RUNNER_TEMP/os-base.iso" "$final_iso"
