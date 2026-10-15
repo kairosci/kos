@@ -2,7 +2,7 @@
 
 The `iso` component builds a bootable image from the latest stable upstream base image. Each published image contains the complete tracked repository at `/opt/os`, a release commit marker at `/opt/os-release.txt`, and the cyan KMono icon at `/usr/share/pixmaps/os.png`. The same icon source is kept in `modules/iso/assets/kmono-cyan.png`.
 
-The image name is `os-vX.Y.iso`. Releases use the version alone as the release heading, for example `v1.3`. GitHub Releases stores the ISO as numbered parts to stay within the per-file upload limit, alongside `os-vX.Y.iso.sha256`, `download-release.sh`, and `download-release.ps1`. Published versions are immutable; changes to a release asset require a new version.
+The image name is `os-vX.Y.iso`. Releases use the version alone as the release heading, for example `v1.4`. GitHub Releases stores the ISO as numbered parts to stay within the per-file upload limit, alongside `os-vX.Y.iso.sha256`, `download-release.sh`, and `download-release.ps1`. Published versions are immutable; changes to a release asset require a new version.
 
 ## Download the latest image
 
@@ -16,7 +16,7 @@ Choose an output directory by downloading and running the helper directly:
 
 ```bash
 curl -fsSLo download-release.sh https://github.com/kairosci/os/releases/latest/download/download-release.sh
-bash download-release.sh v1.0 /path/to/output
+bash download-release.sh v1.4 /path/to/output
 ```
 
 Omit the tag to select the latest release. The optional tag is useful for reproducible downloads.
@@ -30,7 +30,25 @@ Invoke-WebRequest -Uri https://github.com/kairosci/os/releases/latest/download/d
 powershell -NoProfile -ExecutionPolicy Bypass -File .\download-release.ps1
 ```
 
-Pass `-Tag v1.3` to select a specific release or `-OutputDirectory "$HOME\Downloads"` to choose where the verified ISO and checksum are saved. The helper refuses to overwrite an ISO or checksum already present in the output directory.
+Pass `-Tag v1.4` to select a specific release or `-OutputDirectory "$HOME\Downloads"` to choose where the verified ISO and checksum are saved. The helper refuses to overwrite an ISO or checksum already present in the output directory.
+
+## Verify image contents without installing
+
+The ISO workflow verifies the configuration before publishing. It extracts `/opt/os` from the finished image and compares every file with the materialized repository tree at the tagged commit. It also checks the release commit marker. This verifies the bundled configuration without booting or installing the image.
+
+You can inspect a downloaded image locally with `xorriso`. The comparison below uses the signed release tag as the source, follows repository symlinks in the same way as the ISO build, extracts the bundled configuration into a temporary directory, and compares file contents:
+
+```bash
+tag=v1.4
+temporary_directory="$(mktemp -d)"
+mkdir -p "$temporary_directory/source" "$temporary_directory/materialized" "$temporary_directory/image"
+git archive "$tag" | tar -x -C "$temporary_directory/source"
+cp -aL "$temporary_directory/source/." "$temporary_directory/materialized/"
+xorriso -osirrox on -indev "os-${tag}.iso" -extract /opt/os "$temporary_directory/image/os"
+diff -qr "$temporary_directory/materialized" "$temporary_directory/image/os"
+```
+
+An empty `diff` result means the repository tree in the image matches the tagged source. The workflow also compares the marker at `/opt/os-release.txt` with the commit used to build that release.
 
 ## Apply the configuration
 
@@ -52,7 +70,7 @@ git push origin v1.0
 If a tagged build fails before publishing a release, rerun the `ISO` workflow from `main` with the existing signed tag:
 
 ```bash
-gh workflow run iso.yml --ref main -f release_tag=v1.0
+gh workflow run iso.yml --ref main -f release_tag=v1.4
 ```
 
 The workflow refuses to replace a published release. Publish a corrected image or helper under a new version.
@@ -62,7 +80,7 @@ The workflow refuses to replace a published release. Publish a corrected image o
 Run `make iso` to rebuild the latest stable upstream image using `modules/iso/overlay/`. Overlay paths are relative to the image root. The default output is `os-X.Y.Z.iso` and its SHA-256 checksum. To choose another overlay and output path:
 
 ```bash
-bash modules/iso/scripts/customize.sh --overlay /path/to/overlay --output /path/to/os-v1.0.iso
+bash modules/iso/scripts/customize.sh --overlay /path/to/overlay --output /path/to/os-v1.4.iso
 ```
 
 The original upstream image is cached under `${XDG_CACHE_HOME:-$HOME/.cache}/os/iso/`. Upstream source names remain in the build script only where required to locate and verify the base image.
