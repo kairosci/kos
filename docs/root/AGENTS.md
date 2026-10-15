@@ -83,6 +83,8 @@ At the start of every task, read every `.skills/*/SKILL.md` into the agent conte
 
 Treat `main` as read-only. All changes, including maintenance and GitHub policy changes, originate on a feature branch and enter `main` through a pull request. Never push directly to `main`, force push it, or rewrite its published history. Published commits remain historical facts; corrections and reversions also require pull requests.
 
+Published releases are immutable by default. Never replace, delete, or add assets to an existing release, move or reuse a published version tag, or rewrite its release metadata. Corrected artifacts and release notes require a new version, and release automation must fail when the target version already exists. Keep every published version available as a historical record.
+
 The canonical GitHub ruleset is `.github/main-ruleset.json`: no bypass actors, no branch creation or deletion, no force pushes, signed commits, linear history, squash-only pull requests, no mandatory approvals, stale approval dismissal, no additional latest push approval, resolved review threads, and successful CI and SAST checks against the latest base. Do not enable the blanket update restriction: without bypass actors it also blocks legitimate PR merges. Apply repository settings with the GitHub API and verify the active ruleset after applying it.
 
 ## OS Media Player
