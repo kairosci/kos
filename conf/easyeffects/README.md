@@ -1,6 +1,6 @@
 # EasyEffects
 
-`install.sh` is discovered by the user configuration stage of `make setup`. It installs and initially activates the `OS-Subwoofer` output preset through EasyEffects' native CLI and enables native desktop autostart. Subsequent setup runs preserve an explicitly selected different preset. The original EasyEffects databases are saved privately under the user's OS state directory before first application; existing presets remain available.
+`install.sh` is discovered by the user configuration stage of `make setup`. It installs and initially activates the `OS-Subwoofer` output preset through EasyEffects' native CLI and enables native desktop autostart. The preset enables the limiter's threshold boost to raise the limited signal toward 0 dB while retaining input headroom and a -2 dB peak ceiling. Subsequent setup runs preserve an explicitly selected different preset. The original EasyEffects databases are saved privately under the user's OS state directory before first application; existing presets remain available.
 
 The preset targets perceived bass on laptop speakers rather than physical subwoofer extension. It uses a 60 Hz high-pass with 6 dB input headroom, moderate harmonics below 110 Hz, and a final true peak limiter at -2 dB with threshold boost and automatic leveling disabled. It preserves the hardware output, volume, mute state and microphone effects. A limiter reduces digital clipping risk; it cannot guarantee freedom from speaker distortion at high listening volumes.
 

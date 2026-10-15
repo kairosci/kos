@@ -14,7 +14,7 @@ STATE="${XDG_STATE_HOME:-$HOME/.local/state}/os/easyeffects"
 for package in easyeffects calf lsp-plugins-lv2; do
     pacman -Q "$package" >/dev/null || err "defaults.app_failed" "$package"
 done
-jq -e '.output.plugins_order == ["filter#0", "bass_enhancer#0", "limiter#0"] and .output["limiter#0"].bypass == false and .output["limiter#0"]["threshold"] <= -2 and .output["limiter#0"]["gain-boost"] == false' \
+jq -e '.output.plugins_order == ["filter#0", "bass_enhancer#0", "limiter#0"] and .output["limiter#0"].bypass == false and .output["limiter#0"]["threshold"] <= -2 and .output["limiter#0"]["gain-boost"] == true' \
     "$SCRIPT_DIR/data/$PRESET.json" >/dev/null || err "defaults.app_failed" "$PRESET"
 mkdir -p "$STATE/before-setup"
 chmod 700 "$STATE" "$STATE/before-setup"

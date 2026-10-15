@@ -22,7 +22,7 @@ PRESET="$XDG_DATA_HOME/easyeffects/output/OS-Subwoofer.json"
 
 test_section "EasyEffects Bass Preset"
 assert_true "EasyEffects module installs without a live session" "bash '$INSTALLER'"
-assert_true "bass preset reserves headroom and ends with an active limiter" "jq -e '.output.plugins_order[-1] == \"limiter#0\" and .output[\"filter#0\"][\"input-gain\"] <= -6 and .output[\"limiter#0\"].bypass == false and .output[\"limiter#0\"][\"threshold\"] <= -2 and .output[\"limiter#0\"][\"gain-boost\"] == false and .output[\"limiter#0\"].alr == false' '$PRESET'"
+assert_true "bass preset boosts limited output while reserving headroom" "jq -e '.output.plugins_order[-1] == \"limiter#0\" and .output[\"filter#0\"][\"input-gain\"] <= -6 and .output[\"limiter#0\"].bypass == false and .output[\"limiter#0\"][\"threshold\"] <= -2 and .output[\"limiter#0\"][\"gain-boost\"] == true and .output[\"limiter#0\"].alr == false' '$PRESET'"
 assert_true "preset affects output only with an internal sidechain" "jq -e 'has(\"input\") == false and .output[\"limiter#0\"][\"sidechain-type\"] == \"Internal\"' '$PRESET'"
 assert_true "preset limits low frequency energy" "jq -e '.output[\"filter#0\"].type == \"High-pass\" and .output[\"filter#0\"].frequency >= 60 and .output[\"bass_enhancer#0\"][\"floor-active\"] == true' '$PRESET'"
 assert_file_contains_literal "personal preset survives installation" "$XDG_DATA_HOME/easyeffects/output/Personal.json" '"personal":true'
