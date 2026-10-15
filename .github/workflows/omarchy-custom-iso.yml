@@ -1,0 +1,113 @@
+name: Omarchy Custom ISO
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing signed version tag to publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build and publish Omarchy Custom ISO
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out tagged configuration
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Validate release tag
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v([0-9]+\.[0-9]+)$ ]]
+          echo "version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+
+      - name: Install ISO tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes curl jq xorriso
+
+      - name: Stage complete OS configuration in the ISO overlay
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          overlay="$RUNNER_TEMP/omarchy-overlay"
+          source_tree="$RUNNER_TEMP/os-custom-source"
+          mkdir -p "$overlay/opt/os-custom" "$source_tree"
+          git archive "$GITHUB_SHA" | tar -x -C "$source_tree"
+          cp -aL "$source_tree/." "$overlay/opt/os-custom/"
+          printf 'commit=%s\n' "$GITHUB_SHA" > "$overlay/opt/os-custom-release.txt"
+
+      - name: Build customized ISO
+        id: build
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          bash modules/omarchy-iso/scripts/customize.sh \
+            --overlay "$RUNNER_TEMP/omarchy-overlay" \
+            --output "$RUNNER_TEMP/omarchy-custom.iso"
+
+          upstream_iso="$(find "${XDG_CACHE_HOME:-$HOME/.cache}/os/omarchy-iso" -maxdepth 1 -type f -name 'omarchy-*.iso' -print -quit)"
+          [[ -n "$upstream_iso" ]]
+          upstream_name="$(basename "$upstream_iso")"
+          [[ "$upstream_name" =~ ^omarchy-(.+)\.iso$ ]]
+          upstream_version="${BASH_REMATCH[1]}"
+          final_iso="$RUNNER_TEMP/os-${RELEASE_TAG}.iso"
+          mv "$RUNNER_TEMP/omarchy-custom.iso" "$final_iso"
+          iso_name="$(basename "$final_iso")"
+          (cd "$RUNNER_TEMP" && sha256sum "$iso_name" > "$iso_name.sha256")
+          split --bytes=1900M --numeric-suffixes=0 --suffix-length=2 \
+            "$final_iso" "$final_iso.part-"
+          echo "iso_path=$final_iso" >> "$GITHUB_OUTPUT"
+          echo "iso_name=$iso_name" >> "$GITHUB_OUTPUT"
+          echo "upstream_version=$upstream_version" >> "$GITHUB_OUTPUT"
+
+      - name: Publish ISO and checksum
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          ISO_PATH: ${{ steps.build.outputs.iso_path }}
+          ISO_NAME: ${{ steps.build.outputs.iso_name }}
+          UPSTREAM_VERSION: ${{ steps.build.outputs.upstream_version }}
+        run: |
+          set -euo pipefail
+          mapfile -t iso_parts < <(find "$RUNNER_TEMP" -maxdepth 1 -type f -name "$ISO_NAME.part-*" -print | LC_ALL=C sort)
+          ((${#iso_parts[@]} > 0))
+          release_assets=("${iso_parts[@]}" "$ISO_PATH.sha256" modules/omarchy-iso/scripts/download-release.sh)
+          notes="$RUNNER_TEMP/release-notes.md"
+          cat > "$notes" <<EOF
+          Based on upstream Omarchy ${UPSTREAM_VERSION}. The upstream checksum was verified before customization. The upstream signature does not cover this modified ISO.
+
+          The ISO is split into numbered parts. Download the attached download-release.sh script and run it with ${RELEASE_TAG} to download, assemble, and verify the image.
+          EOF
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            mapfile -t existing_assets < <(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name')
+            for asset in "${existing_assets[@]}"; do
+              gh release delete-asset "$RELEASE_TAG" "$asset" --yes
+            done
+            gh release edit "$RELEASE_TAG" \
+              --title "$RELEASE_TAG" \
+              --notes-file "$notes"
+            gh release upload "$RELEASE_TAG" "${release_assets[@]}"
+          else
+            gh release create "$RELEASE_TAG" \
+              "${release_assets[@]}" \
+              --verify-tag \
+              --title "$RELEASE_TAG" \
+              --notes-file "$notes"
+          fi
