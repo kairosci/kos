@@ -137,7 +137,7 @@ jobs:
     steps:
       - name: Setup Arch Environment
         run: |
-          pacman -Syu --noconfirm base-devel git sudo jq python python-yaml lua quickshell
+          pacman -Syu --noconfirm base-devel git sudo jq python python-yaml lua quickshell imagemagick
           useradd -m -G wheel testuser
           echo "testuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 

@@ -106,6 +106,7 @@ if [[ "$SETUP_SCOPE" == settings || "$SETUP_SCOPE" == wallpaper ]]; then
         _settings_errors=$(user_as "$PRIMARY_USER" hyprctl configerrors) || err "session.validation_failed" Hyprland
         [[ -z "${_settings_errors//[[:space:]]/}" ]] || err "session.validation_failed" "$_settings_errors"
     else
+        source "$SCRIPT_DIR/lib/wallpaper.sh"
         user_as "$PRIMARY_USER" bash "$PROJECT_DIR/modules/conf/desktop/scripts/install-wallpaper.sh"
         user_as "$PRIMARY_USER" bash -c '
             set -euo pipefail

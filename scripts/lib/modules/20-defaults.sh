@@ -79,6 +79,7 @@ fi
 
 log "defaults.system_settings"
 source "$PROJECT_DIR/scripts/lib/hyprmod.sh"
+source "$PROJECT_DIR/scripts/lib/wallpaper.sh"
 
 log "defaults.filemanager"
 for pkg in nautilus gvfs gvfs-mtp file-roller; do
