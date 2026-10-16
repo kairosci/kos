@@ -150,12 +150,22 @@ assert_true "editor binding migration is idempotent" "before=\$(sha256sum '$bind
 
 CONFIG_STAGE="$PROJECT_DIR/scripts/lib/modules/24-user-configurations.sh"
 mkdir -p "$WORKFLOW_SANDBOX/project/modules/conf/brave" "$WORKFLOW_SANDBOX/project/modules/conf/new-app"
+mkdir -p "$WORKFLOW_SANDBOX/project/data/component/application"
+printf '{"fixture":{}}\n' > "$WORKFLOW_SANDBOX/project/data/component/application/policy.json"
 printf '#!/bin/bash\nprintf "brave loaded\\n"\n' > "$WORKFLOW_SANDBOX/project/modules/conf/brave/install.sh"
 printf '#!/bin/bash\nprintf "new app loaded\\n"\n' > "$WORKFLOW_SANDBOX/project/modules/conf/new-app/install.sh"
 run_config_stage() (
     PROJECT_DIR="$WORKFLOW_SANDBOX/project"
     # shellcheck disable=SC2329
-    user_as() { shift; "$@"; }
+    user_as() {
+        shift
+        if [[ "$1" == lua ]]; then
+            [[ "${CONFIG_LUA_FAIL:-0}" == 0 ]] || return 7
+            printf 'lua settings loaded\n'
+        else
+            "$@"
+        fi
+    }
     # shellcheck disable=SC2329
     err() { exit 1; }
     # shellcheck source=../scripts/lib/modules/24-user-configurations.sh
@@ -165,6 +175,7 @@ assert_true "config discovery installs Brave and a newly added app automatically
     "run_config_stage > '$WORKFLOW_SANDBOX/config-log'; grep -q 'brave loaded' '$WORKFLOW_SANDBOX/config-log' && grep -q 'new app loaded' '$WORKFLOW_SANDBOX/config-log'"
 printf '#!/bin/bash\nexit 7\n' > "$WORKFLOW_SANDBOX/project/modules/conf/new-app/install.sh"
 assert_false "failed app configuration stops provisioning" "run_config_stage"
+assert_false "failed Lua settings stop provisioning" "CONFIG_LUA_FAIL=1 run_config_stage"
 assert_false "Yazi is absent from the live package database" "command -v pacman >/dev/null && pacman -Q yazi >/dev/null 2>&1"
 
 mkdir -p "$WORKFLOW_SANDBOX/resources-bin"

@@ -9,9 +9,9 @@ trap 'rm -rf "$UPDATE_SANDBOX"' EXIT
 mkdir -p "$UPDATE_SANDBOX"/{bin,trusted,hooks/post-update.d,hooks/i18n,hooks/lib,homes,run/user/1234}
 cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$UPDATE_SANDBOX/trusted/"
 printf 'theme_policy_apply() { return 0; }\n' > "$UPDATE_SANDBOX/trusted/theme-policy.sh"
-cp -r "$PROJECT_DIR/scripts/lib/messages" "$UPDATE_SANDBOX/trusted/"
+cp -r "$PROJECT_DIR/data/catalog" "$UPDATE_SANDBOX/trusted/messages"
 cp "$PROJECT_DIR/scripts/lib/i18n-boot.sh" "$PROJECT_DIR/scripts/lib/i18n.sh" "$UPDATE_SANDBOX/hooks/i18n/"
-cp -r "$PROJECT_DIR/scripts/lib/messages" "$UPDATE_SANDBOX/hooks/i18n/"
+cp -r "$PROJECT_DIR/data/catalog" "$UPDATE_SANDBOX/hooks/i18n/messages"
 sed -e 's/\$EUID/${HOOK_TEST_EUID}/g' \
     -e "s|export PATH=/usr/bin:/usr/sbin:/bin:/sbin|export PATH=$UPDATE_SANDBOX/bin:/usr/bin:/bin|g" \
     -e "s|/usr/local/lib/os|$UPDATE_SANDBOX/trusted|g" \

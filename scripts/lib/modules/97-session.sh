@@ -12,7 +12,7 @@ for _session_directory in data scripts qml; do
 done
 rm -f /usr/local/lib/os/session/data/clean.lua /usr/local/lib/os/session/data/runtime.lua /usr/local/lib/os/session/data/shell.jq
 install -m 644 "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/userconf.sh" /usr/local/lib/os/
-install -m 644 "$PROJECT_DIR"/scripts/lib/messages/*.msg /usr/local/lib/os/messages/
+install -m 644 "$PROJECT_DIR"/data/catalog/*.msg /usr/local/lib/os/messages/
 
 [[ "${1:-}" != --files-only ]] || return 0
 

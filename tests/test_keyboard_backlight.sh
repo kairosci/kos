@@ -101,20 +101,20 @@ assert_true "repeated keyboard setup produces identical units" "PROJECT_ROOT='$P
 assert_false "failed systemd reconciliation stops keyboard setup" "KEYBOARD_CONTROL_FAIL=1 PROJECT_ROOT='$PROJECT_DIR' bash '$KEYBOARD_SANDBOX/provision.sh'"
 printf '0\n' > "$OS_KEYBOARD_LEDS_ROOT/vendor::kbd_backlight/brightness"
 keyboard_runtime="$KEYBOARD_SANDBOX/root/usr/local/lib/os"
-assert_true "scoped policy installs its trusted message runtime" "cmp '$PROJECT_DIR/scripts/lib/i18n.sh' '$keyboard_runtime/i18n.sh' && cmp '$PROJECT_DIR/scripts/lib/messages/en.msg' '$keyboard_runtime/messages/en.msg'"
+assert_true "scoped policy installs its trusted message runtime" "cmp '$PROJECT_DIR/scripts/lib/i18n.sh' '$keyboard_runtime/i18n.sh' && cmp '$PROJECT_DIR/data/catalog/en.msg' '$keyboard_runtime/messages/en.msg'"
 sed -e "s|/usr/local/lib/os|$keyboard_runtime|g" -e 's/\$EUID/0/g' \
     "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/root/usr/local/libexec/os-keyboard-backlight"
 assert_true "device activation restores a level overwritten by native boot restore" "command=\$(sed -n 's/^ExecStart=//p' '$DEVICE_UNIT'); command=\${command/\/usr\/local\/libexec\/os-keyboard-backlight/\$KEYBOARD_SANDBOX\/root\/usr\/local\/libexec\/os-keyboard-backlight}; bash -c \"\$command\" && [[ \"\$(cat '$OS_KEYBOARD_LEDS_ROOT/vendor::kbd_backlight/brightness')\" == 3 ]]"
 sed -e 's/\$EUID/${KEYBOARD_TEST_EUID}/g' -e "s|/usr/local/lib/os|$keyboard_runtime|g" "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/keyboard-root.sh"
 cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$KEYBOARD_SANDBOX/"
-cp -r "$PROJECT_DIR/scripts/lib/messages" "$KEYBOARD_SANDBOX/"
+cp -r "$PROJECT_DIR/data/catalog" "$KEYBOARD_SANDBOX/messages"
 printf 'touch "%s"\nexit 93\n' "$KEYBOARD_SANDBOX/untrusted-ran" > "$KEYBOARD_SANDBOX/untrusted.sh"
 assert_true "root keyboard checks ignore user supplied bootstrap code" "KEYBOARD_TEST_EUID=0 OS_I18N_BOOT='$KEYBOARD_SANDBOX/untrusted.sh' bash '$KEYBOARD_SANDBOX/keyboard-root.sh' --check && [[ ! -e '$KEYBOARD_SANDBOX/untrusted-ran' ]]"
 SETUP_PROJECT="$KEYBOARD_SANDBOX/setup-project"
-mkdir -p "$SETUP_PROJECT/scripts/lib/modules" "$SETUP_PROJECT/bin" "$SETUP_PROJECT/omarchy"
+mkdir -p "$SETUP_PROJECT/scripts/lib/modules" "$SETUP_PROJECT/bin" "$SETUP_PROJECT/omarchy" "$SETUP_PROJECT/data"
 cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$SETUP_PROJECT/scripts/lib/"
 printf '%s\n' 'root_setup_persistent() { return 0; }' > "$SETUP_PROJECT/scripts/lib/root-recovery.sh"
-cp -r "$PROJECT_DIR/scripts/lib/messages" "$SETUP_PROJECT/scripts/lib/"
+cp -r "$PROJECT_DIR/data/catalog" "$SETUP_PROJECT/data/"
 sed -e 's/\$EUID/${SETUP_TEST_EUID}/g' -e "s|/usr/share/omarchy|$SETUP_PROJECT/omarchy|g" "$PROJECT_DIR/scripts/setup.sh" > "$SETUP_PROJECT/scripts/setup.sh"
 cat > "$SETUP_PROJECT/scripts/lib/target-user.sh" <<'MOCK'
 target_user_resolve() {
@@ -143,7 +143,7 @@ printf '%s\n' 'source "$PROJECT_ROOT/scripts/lib/keyboard-backlight-policy.sh"' 
 SETUP_TRACE="$KEYBOARD_SANDBOX/setup-trace"
 run_setup_scope() {
     PATH="$SETUP_PROJECT/bin:$PATH" SETUP_TEST_EUID="${SETUP_TEST_EUID:-0}" OS_LOG_STDOUT=1 SETUP_TRACE="$SETUP_TRACE" \
-        OS_I18N_DIR="$SETUP_PROJECT/scripts/lib/messages" bash "$SETUP_PROJECT/scripts/setup.sh" "$@"
+        OS_I18N_DIR="$SETUP_PROJECT/data/catalog" bash "$SETUP_PROJECT/scripts/setup.sh" "$@"
 }
 : > "$SETUP_TRACE"
 assert_true "keyboard setup scope runs without resolving an unrelated desktop user" "run_setup_scope --scope keyboard && [[ \"\$(cat '$SETUP_TRACE')\" == keyboard ]]"

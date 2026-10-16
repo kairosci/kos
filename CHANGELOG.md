@@ -4,6 +4,8 @@ This file is the single narrative source for what changed in every release. It i
 
 ## Unreleased
 
+The migration now targets Lua exclusively. Lua owns the boot parser and renderer, native process arguments, JSON and INI handling, message catalogs and atomic publication. Seven desktop application configurations use Lua components with external data. Ruby sources and runtime dependencies are retired, and the previous Bash source remains archived in v1.0.
+
 La pubblicazione delle configurazioni utente è atomica per evitare file Hyprland temporaneamente mancanti. La versione precedente è conservata nell archivio verificabile `v1.0`; la roadmap e quattro nuove skill governano la migrazione modulare Ruby e Lua. I cataloghi Ruby coprono le sei lingue e la generazione GRUB usa un unico percorso verificato anche per sicurezza e snapshot.
 
 Desktop health reconciliation restores the audio effects application, DNS monitor and matching keyboard runtime. HyprMod gains compact adaptive navigation, separate layout policy and uniform symbolic icons while GTK retains native control geometry. Calendar, weather and clock move into normal tiling applications accessible from the menu. Boot assessment begins the Ruby migration with integrity checked EFI and snapshot inventory.

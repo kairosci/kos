@@ -9,13 +9,23 @@ rules:
       - pattern: curl ... | bash
       - pattern: wget ... | sh
       - pattern: wget ... | bash
-  - id: ruby.security.executable-configuration
-    message: Configuration must remain data and must never be evaluated as Ruby code.
+  - id: lua.security.executable-data
+    message: Data files must not be evaluated as Lua source.
     severity: ERROR
     languages:
-      - ruby
-    pattern-either:
-      - pattern: eval(...)
-      - pattern: $OBJECT.instance_eval($CODE)
-      - pattern: $OBJECT.class_eval($CODE)
-      - pattern: $OBJECT.module_eval($CODE)
+      - generic
+    paths:
+      include:
+        - src/**/*.lua
+    pattern-regex: '\b(loadstring|loadfile|dofile)\s*\('
+  - id: lua.security.unowned-process-execution
+    message: Native processes must use the shared argument quoting implementation.
+    severity: ERROR
+    languages:
+      - generic
+    paths:
+      include:
+        - src/**/*.lua
+      exclude:
+        - src/core/process.lua
+    pattern-regex: '\b(os\.execute|io\.popen)\s*\('

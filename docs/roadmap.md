@@ -1,26 +1,17 @@
-# Migrazione strutturale a Ruby e Lua
+# Migrazione integrale a Lua
 
-L'obiettivo è Arch indipendente da Omarchy con funzioni equivalenti. Il runtime attuale dipende ancora da Omarchy. Questa roadmap distingue implementazione, applicazione e verifica hardware; nessun esito viene dedotto dalla sola presenza di un pacchetto.
+Il linguaggio obiettivo è esclusivamente Lua. Ruby viene ritirato. La struttura definitiva separa algoritmi in `src/`, componenti in `src/component/`, dati in `data/` e ingressi essenziali in `script/`. Le applicazioni native mantengono i formati di interfaccia richiesti dalla piattaforma.
 
-| Sprint | Ambito e dipendenze | Criterio di completamento | Stato |
-| --- | --- | --- | --- |
-| Conservazione | Archivio della versione Bash precedente | Archivio verificabile, commit di origine, nessuna esecuzione automatica | Archivio creato in `v1.0` |
-| Sessione stabile | Pubblicazione atomica e strumenti desktop | Test di scrittura concorrente, Lua e QML validi, nessun errore live, menu popolato | Applicato e verificato nella sessione attiva |
-| Interfacce coerenti | GTK e HyprMod, dipende dalla sessione stabile | Layout compatto adattivo, icone simboliche, preferenze personali conservate | Implementato e applicato |
-| Dominio di avvio | Parser Ruby, policy JSON e menu GRUB | Integrità EFI, argomenti cifratura e resume conservati, test negativi e sintassi | Implementato e applicato come candidato |
-| Avvio hardware | Dipende dal dominio di avvio | Avvio GRUB reale, sblocco, sessione, rete, audio, sospensione e recupero | Da eseguire |
-| Cataloghi Ruby | Sei lingue, stessa policy di precedenza e errori di avvio localizzati | Test delle sei lingue, selezione della lingua e chiave mancante | Implementato e applicato |
-| Fondazioni Ruby | Cataloghi, percorsi XDG, processo e pubblicazione file | Classi con responsabilità reali, errori localizzati, test isolati e contratto installato | Da implementare |
-| Moduli Ruby | Provisioning, pacchetti, sicurezza, temi, verifica | Ogni modulo sostituisce tutti i suoi chiamanti e supera prove di equivalenza e idempotenza | Da implementare dopo le fondazioni |
-| Runtime Lua | Configurazione, input, monitor, menu e tema indipendenti | Sessione di prova senza sorgenti Omarchy, parità misurata dell'inventario Arch | Da implementare |
-| Consolidamento | Dipende da tutte le verifiche precedenti | Rimozione dipendenze Omarchy e Bash attivo, CI Ruby/Lua completa, avvio a freddo e recupero provati | Da eseguire |
+| Sprint | Risultato richiesto | Stato |
+| --- | --- | --- |
+| Conservazione | Backup Bash verificabile in `v1.0`, escluso da installazione e discovery | Completato |
+| Fondazioni Lua | Processi, JSON, lettura file, cataloghi e pubblicazione atomica senza Ruby | Implementato, verifica in corso |
+| Avvio Lua | Parser EFI, BLAKE2b, parametri cifratura e resume, generazione e pubblicazione GRUB | Implementato, applicazione in corso |
+| Componenti desktop | Riscrittura dei produttori di configurazione e degli hook in `src/component/`, dati centralizzati | Sette applicazioni migrate; altri produttori da sostituire |
+| Provisioning Lua | Pacchetti, sicurezza, alimentazione, manutenzione e verifica tramite componenti Lua | Da implementare |
+| Consolidamento struttura | Eliminazione di `modules/` e degli algoritmi Bash attivi, soli ingressi necessari in `script/` | Da completare dopo le sostituzioni |
+| Parità Arch | Runtime indipendente, prova avvio, sospensione, recupero e inventario delle funzioni | Verifica hardware aperta |
 
-## Proprietà dei moduli
+I primi componenti vengono sostituiti insieme ai loro chiamanti installati. I cataloghi canonici si trovano in `data/catalog/`; comandi nativi, selezione lingua e layout del runtime sono policy in `data/core/`; struttura del menu e policy di avvio sono in `data/component/boot/`. Configurazioni non valide interrompono il flusso prima della pubblicazione. Nessun dato viene eseguito come codice.
 
-`modules/platform/arch/` possiede inventario e dominio di avvio; `modules/conf/session/` possiede adattatore Lua, menu e verifica della sessione; `modules/conf/hyprmod/` possiede impostazioni grafiche e loro policy; `modules/conf/gtk/` e gli hook di tema possiedono la palette. I moduli mantengono dati in `data/`, algoritmi in `scripts/`, interfacce native nelle rispettive directory e test presso il modulo quando indipendenti.
-
-La pubblicazione resta esclusivamente nella pipeline privilegiata. La migrazione Ruby dovrà sostituirne le responsabilità mantenendo lo stesso ingresso, senza duplicare due implementazioni attive. Il backup `v1.0` non partecipa a installazione, CI o discovery dei moduli.
-
-## Evidenze richieste
-
-Per ciascuno sprint registrare comandi, risultati e limiti verificati nel relativo PR. Le sei lingue condividono chiavi e argomenti. Valori di policy restano dichiarati nei dati; percorsi e capacità vengono rilevati. Configurazioni mancanti o invalide interrompono l'operazione prima della pubblicazione. Un riavvio non ancora eseguito resta una verifica aperta.
+La pipeline `make setup` resta l'unico percorso di applicazione al sistema. La migrazione è completa soltanto quando non rimangono algoritmi Bash o Ruby attivi: spostare i vecchi file o chiamarli da Lua non soddisfa il requisito. Il collaudo del prossimo avvio resta distinto dai test automatici.

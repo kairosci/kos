@@ -13,7 +13,7 @@ user_as "$PRIMARY_USER" bash -c '
     done
     install_user_file "$1/scripts/lib/i18n.sh" "$config/i18n/i18n.sh"
     install_user_file "$1/scripts/lib/i18n-boot.sh" "$config/i18n/i18n-boot.sh"
-    for catalog in "$1"/scripts/lib/messages/*.msg; do
+    for catalog in "$1"/data/catalog/*.msg; do
         install_user_file "$catalog" "$config/i18n/messages/${catalog##*/}"
     done
     install_user_file "$1/hooks/post-update.d/99-os-persist" "$config/post-update.d/99-os-persist" 755

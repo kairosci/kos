@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-ruby "$SCRIPT_DIR/../modules/core/tests/publication_test.rb"
+lua "$SCRIPT_DIR/lua/run.lua" "$(dirname "$SCRIPT_DIR")" publisher

@@ -1,0 +1,10 @@
+{
+  "catalog": "data/catalog",
+  "locale": "data/core/locale.json",
+  "commands": "data/core/commands.json",
+  "bootPolicy": "data/component/boot/policy.json",
+  "bootFormat": "data/component/boot/render.json",
+  "bootFiles": "data/component/boot/files.json",
+  "applications": "data/component/application/policy.json",
+  "paths": "data/core/paths.json"
+}

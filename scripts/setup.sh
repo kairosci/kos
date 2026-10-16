@@ -53,7 +53,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|desktop-tools|grub-trial|boot-trial-select) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|desktop-tools|grub-trial|boot-trial-select|lua-applications) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$OS_INTERFACE_PREVIEW" == 0 || "$SETUP_SCOPE" == interface ]] || err "setup.invalid_args"
@@ -119,7 +119,7 @@ if [[ "$SETUP_SCOPE" == settings || "$SETUP_SCOPE" == wallpaper ]]; then
             source "$1"
             install_user_file "$2" "${XDG_CONFIG_HOME:-$HOME/.config}/os/hooks/theme-set.d/wallpaper" 755
             install_user_file "$3" "${XDG_CONFIG_HOME:-$HOME/.config}/os/hooks/post-update.d/99-os-persist" 755
-            for catalog in "$4"/scripts/lib/messages/*.msg; do
+            for catalog in "$4"/data/catalog/*.msg; do
                 install_user_file "$catalog" "${XDG_CONFIG_HOME:-$HOME/.config}/os/hooks/i18n/messages/${catalog##*/}"
             done
         ' bash "$PROJECT_DIR/scripts/lib/userconf.sh" "$PROJECT_DIR/hooks/theme-set.d/wallpaper" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "$PROJECT_DIR"
@@ -141,12 +141,19 @@ if [[ "$SETUP_SCOPE" == desktop-tools ]]; then
     exit 0
 fi
 
+if [[ "$SETUP_SCOPE" == lua-applications ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    user_as "$PRIMARY_USER" lua -E "$PROJECT_DIR/src/main.lua" "$PROJECT_DIR" apply-applications || err "defaults.app_failed" "Lua applications"
+    exit 0
+fi
+
 if [[ "$SETUP_SCOPE" == boot-trial-select ]]; then
     source "$SCRIPT_DIR/lib/boot-assessment.sh"
     boot_assessment /var/lib/os/boot-assessment
     grub-script-check /boot/grub/grub.cfg || err "bootloader.config_failed"
     source "$SCRIPT_DIR/lib/boot-trial-select.sh"
-    boot_trial_select "$PROJECT_DIR/modules/platform/arch/data/boot.json" || err "bootloader.install_failed"
+    boot_trial_select "$PROJECT_DIR/data/component/boot/policy.json" || err "bootloader.install_failed"
     exit 0
 fi
 

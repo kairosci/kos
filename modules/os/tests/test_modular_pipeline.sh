@@ -26,7 +26,7 @@ assert_file_contains "help lists the os target" "$ROOT_DIR/scripts/lib/help.sh" 
 assert_file_contains "help lists the changelog target" "$ROOT_DIR/scripts/lib/help.sh" "make.changelog"
 
 for lang in en it fr de es pt; do
-    assert_file_contains "catalog $lang defines the os install message" "$ROOT_DIR/scripts/lib/messages/$lang.msg" "os.cli_installed="
+    assert_file_contains "catalog $lang defines the os install message" "$ROOT_DIR/data/catalog/$lang.msg" "os.cli_installed="
 done
 
 test_summary

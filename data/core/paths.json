@@ -1,0 +1,8 @@
+{
+  "homeVariable": "HOME",
+  "roots": {
+    "config": {"variable": "XDG_CONFIG_HOME", "relative": ".config"},
+    "data": {"variable": "XDG_DATA_HOME", "relative": ".local/share"},
+    "state": {"variable": "XDG_STATE_HOME", "relative": ".local/state"}
+  }
+}

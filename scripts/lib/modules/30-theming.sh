@@ -28,7 +28,7 @@ done
 theme_policy_apply || err "theming.policy_failed"
 install -m 644 -o root -g root "$PROJECT_DIR/modules/conf/xdg-desktop-portal/data/portals.conf" \
     "$PROJECT_DIR/modules/conf/desktop/data/mpv.desktop" /usr/local/lib/os/
-install -m 644 -o root -g root "$PROJECT_DIR"/scripts/lib/messages/*.msg /usr/local/lib/os/messages/
+install -m 644 -o root -g root "$PROJECT_DIR"/data/catalog/*.msg /usr/local/lib/os/messages/
 install -Dm755 -o root -g root "$PROJECT_DIR/modules/theme-previews/scripts/update-previews.sh" /usr/local/libexec/os-update-previews
 cat > /etc/pacman.d/hooks/99-os-theme-previews.hook << 'HOOK'
 [Trigger]
@@ -128,7 +128,7 @@ for user_home in /home/*; do
     mkdir -p "$_hook_dir" "$_i18n_dir/messages" "$_lib_dir"
     rm -f "$_hook_dir/yazi-theme" "$user_home/.local/share/applications/yazi-terminal.desktop"
     cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/i18n-boot.sh" "$_i18n_dir/"
-    cp "$PROJECT_DIR"/scripts/lib/messages/*.msg "$_i18n_dir/messages/"
+    cp "$PROJECT_DIR"/data/catalog/*.msg "$_i18n_dir/messages/"
     cp "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh" "$_lib_dir/"
     cp "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "$_lib_dir/"
     cp "$PROJECT_DIR/modules/conf/xdg-desktop-portal/data/portals.conf" "$_lib_dir/"

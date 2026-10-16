@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-ruby "$PROJECT_DIR/modules/platform/arch/tests/boot_menu_test.rb"
+lua "$SCRIPT_DIR/lua/run.lua" "$(dirname "$SCRIPT_DIR")" boot

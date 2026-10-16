@@ -1,0 +1,14 @@
+{
+  "preamble": ["set timeout=%d", "set default=%d", "terminal_output console", "insmod part_gpt", "insmod fat", "insmod chain"],
+  "normal": "set menu_color_normal=%s",
+  "highlight": "set menu_color_highlight=%s",
+  "entry": ["menuentry %s {", "  search --no-floppy --fs-uuid --set=root %s", "  chainloader %s %s", "}"],
+  "timeoutMinimum": 1,
+  "timeoutMaximum": 60,
+  "terminal": "console",
+  "digestLength": 128,
+  "headerSize": 64,
+  "minimumPeSize": 24,
+  "efiSignature": "MZ",
+  "peSignature": "PE\u0000\u0000"
+}

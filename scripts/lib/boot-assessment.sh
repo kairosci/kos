@@ -18,6 +18,6 @@ boot_assessment() {
     for file in /etc/mkinitcpio.d/*.preset; do
         [[ ! -f "$file" ]] || install -m 600 "$file" "$destination/${file##*/}"
     done
-    env -u RUBYOPT -u RUBYLIB ruby "$PROJECT_DIR/modules/platform/arch/scripts/boot-menu.rb" report /boot/limine.conf /boot > "$destination/verified-menu.json"
+    lua -E "$PROJECT_DIR/src/main.lua" "$PROJECT_DIR" report /boot/limine.conf /boot > "$destination/verified-menu.json"
     jq '{entries:(.entries|length),trialBootVerified}' "$destination/verified-menu.json"
 }

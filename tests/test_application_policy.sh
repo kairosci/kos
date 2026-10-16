@@ -31,7 +31,7 @@ for hook in micro-theme disk-theme btop-theme gtk-theme; do
     printf 'personal\n' > "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/$hook"
 done
 
-assert_true "OnlyOffice configuration installs" "bash '$PROJECT_DIR/modules/conf/onlyoffice/install.sh'"
+assert_true "OnlyOffice configuration installs" "lua -E '$PROJECT_DIR/src/main.lua' '$PROJECT_DIR' apply-settings onlyoffice"
 assert_file_contains_literal "OnlyOffice keeps personal account data" "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf" 'appdata=personal-account'
 assert_file_contains_literal "OnlyOffice keeps unrelated preferences" "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf" 'keep=1'
 assert_file_contains_literal "OnlyOffice uses tabbed editing" "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf" 'editorWindowMode=false'
@@ -41,7 +41,7 @@ assert_true "OnlyOffice preferences remain private" "[[ \$(stat -c %a '$XDG_CONF
 assert_true "OnlyOffice backups remain private" "[[ \$(stat -c %a '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf.bak') == 600 ]]"
 before=$(sha256sum "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf")
 chmod 644 "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf.bak"
-assert_true "OnlyOffice configuration is idempotent" "bash '$PROJECT_DIR/modules/conf/onlyoffice/install.sh'; [[ \"\$(sha256sum '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf')\" == '$before' ]]"
+assert_true "OnlyOffice configuration is idempotent" "lua -E '$PROJECT_DIR/src/main.lua' '$PROJECT_DIR' apply-settings onlyoffice; [[ \"\$(sha256sum '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf')\" == '$before' ]]"
 assert_true "idempotent installation reconciles backup privacy" "[[ \$(stat -c %a '$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf.bak') == 600 ]]"
 
 assert_true "desktop migration installs" "bash '$PROJECT_DIR/modules/conf/desktop/install.sh'"

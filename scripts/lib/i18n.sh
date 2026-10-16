@@ -2,6 +2,9 @@
 
 I18N_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 I18N_DIR="${OS_I18N_DIR:-$I18N_LIB_DIR/messages}"
+if [[ -r "$I18N_LIB_DIR/../../data/core/layout.json" ]]; then
+    I18N_DIR="${OS_I18N_DIR:-$I18N_LIB_DIR/../../data/catalog}"
+fi
 I18N_SUPPORTED=(en it fr de es pt)
 I18N_LANG=""
 
