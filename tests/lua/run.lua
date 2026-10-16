@@ -45,6 +45,7 @@ if arg[2] == "json" then
         assert(inventory:classify("module/tool", "#!/usr/bin/env bash\nexit 0\n") == "shell")
         assert(inventory:classify("module/tool", "#!/bin/sh\nexit 0\n") == "shell")
         assert(inventory:classify("module/test.rb", "") == "ruby")
+        assert(inventory:classify("data/hidden.sh", "") == "shell")
         suite:reject(function() inventory:classify("script/os-lua", "#!/bin/bash\nbash legacy.sh\n") end)
     end)
     suite:test("JSON round trips arrays false null and Unicode", function()

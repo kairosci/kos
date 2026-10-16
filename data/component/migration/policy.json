@@ -6,7 +6,8 @@
     "modules",
     "hooks",
     "tests",
-    ".github"
+    ".github",
+    "data"
   ],
   "starters": {
     "script/os-lua": "343b7de3601c1d455716df476e5c738109ed0546f74e803faaa1df443230f27166ddb11b4603d359f6b14eac58b2522d274f509fbd1c9301962f3680c5a68245",
