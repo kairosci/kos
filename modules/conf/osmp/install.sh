@@ -11,9 +11,20 @@ SOURCE="$PROJECT_DIR/modules/plugins/osmp"
 TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/os/plugins/os.osmp"
 migrate_user_config_dir "$HOME"
 [[ ! -L "$TARGET" ]] || err "defaults.app_failed" "osmp"
-omarchy plugin validate "$SOURCE"
-for file in "$SOURCE"/src/* "$SOURCE/manifest.json" "$SOURCE/LICENSE"; do
+STAGE=$(mktemp -d)
+trap 'rm -rf -- "$STAGE"' EXIT
+[[ -d "$SOURCE/src" && ! -L "$SOURCE/src" ]] || err "defaults.app_failed" "osmp"
+for file in "$SOURCE"/src/* "$SOURCE/manifest.json"; do
+    [[ -f "$file" && ! -L "$file" ]] || err "defaults.app_failed" "osmp"
     relative="${file#"$SOURCE"/}"
+    install_user_file "$file" "$STAGE/$relative"
+done
+license="$PROJECT_DIR/docs/modules/plugins/osmp/LICENSE"
+[[ -f "$license" && ! -L "$license" ]] || err "defaults.app_failed" "osmp"
+install_user_file "$license" "$STAGE/LICENSE"
+omarchy plugin validate "$STAGE"
+for file in "$STAGE"/src/* "$STAGE/manifest.json" "$STAGE/LICENSE"; do
+    relative="${file#"$STAGE"/}"
     [[ ! -L "$TARGET/$relative" ]] || err "defaults.app_failed" "osmp"
     install_user_file "$file" "$TARGET/$relative"
 done

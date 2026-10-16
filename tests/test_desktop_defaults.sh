@@ -80,7 +80,7 @@ assert_file_contains "defaults module provisions LazyVim for terminal projects" 
 assert_file_contains_literal "defaults module provisions Fastfetch" "$DEFAULTS_MODULE" "--needed fastfetch"
 assert_file_contains "defaults module installs the KMono system icon" "$DEFAULTS_MODULE" "/usr/share/pixmaps/os.png"
 assert_file_contains "defaults module provisions diskconf" "$PROJECT_DIR/scripts/lib/modules/24-user-configurations.sh" "modules/conf/\*/install.sh"
-assert_file_contains "shell plugins module enables the standalone OS media panel" "$SHELL_PLUGINS_MODULE" 'plugin enable os.media'
+assert_file_contains "shell plugins module reconciles the native catalog" "$SHELL_PLUGINS_MODULE" 'shell shell rescanPlugins'
 assert_file_contains "env module defines omarchy_as helper" "$PROJECT_DIR/scripts/lib/modules/00-env.sh" "omarchy_as\(\)"
 assert_file_contains "omarchy_as forwards the user session bus" "$PROJECT_DIR/scripts/lib/modules/00-env.sh" "DBUS_SESSION_BUS_ADDRESS"
 assert_file_contains "defaults module configures Brave through xdg-settings" "$DEFAULTS_MODULE" "xdg-settings set default-web-browser brave-origin.desktop"

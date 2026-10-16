@@ -91,7 +91,7 @@ The canonical GitHub ruleset is `.github/main-ruleset.json`: no bypass actors, n
 
 ## OS Media Player
 
-`modules/plugins/osmp/` owns the OSMP sources and manifest. `modules/conf/osmp/install.sh` installs the local sources as `os.osmp` through shared user configuration helpers; the session module adapts them into the standalone `os.media` panel and `35-shell-plugins.sh` enables that panel with native Omarchy commands. Archive the previous `krosci.omamp` installation before retiring it. Keep manifest and package versions synchronized. Never download another copy of this locally owned plugin from a remote repository.
+`modules/plugins/osmp/` owns the OSMP sources and manifest. `modules/conf/osmp/install.sh` validates a standalone payload containing only runtime sources, manifest and the canonical license, then installs it as `os.osmp` through shared user configuration helpers. Documentation links never enter that payload. `35-shell-plugins.sh` refreshes the native catalog and retires the previous `krosci.omamp` installation with an archive. Do not enable the retired `os.media` popup; the menu launches Celluloid as a normal application. Keep manifest and package versions synchronized. Never download another copy of this locally owned plugin from a remote repository.
 
 ## Graphical Theme Integration
 

@@ -114,8 +114,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Install Test Dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq lua5.4
 
       - name: Run Debloat & Theming Tests
         run: bash tests/test_debloat_theming.sh

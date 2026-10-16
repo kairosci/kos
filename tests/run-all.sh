@@ -23,6 +23,7 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_lua_catalog.sh" \
     "$SCRIPT_DIR/test_lua_data.sh" \
     "$SCRIPT_DIR/test_lua_applications.sh" \
+    "$SCRIPT_DIR/test_osmp_install.sh" \
     "$SCRIPT_DIR/test_configuration_publication.sh" \
     "$SCRIPT_DIR/test_hardware_power.sh" \
     "$SCRIPT_DIR/test_modular_pipeline.sh" \
