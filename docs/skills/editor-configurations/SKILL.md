@@ -6,7 +6,7 @@ description: >-
 
 # Editor Configurations
 
-`modules/conf/<app>/` is the single home for application configurations. Each app folder owns its data and exposes one user-scope installer. Every installer uses `scripts/lib/userconf.sh` for atomic installs, backups and marked shell blocks.
+Migrated application data lives under `data/component/application/` and algorithms under `src/component/application/` or the owning Lua domain. `modules/conf/<app>/` retains native integration and installers that are still pending replacement. Retained installers use `scripts/lib/userconf.sh` for publication, backups and marked shell blocks.
 
 ## OnlyOffice
 
@@ -14,7 +14,7 @@ OnlyOffice handles word processing, spreadsheets and presentations. Its migrated
 
 ## Zed
 
-Zed is the desktop editor for plain text, source files and projects. Nautilus keeps directory MIME handling; open graphical projects with `zed --new`. Packaged LazyVim is the terminal editor. The retired Micro installer removes its unreliable filemanager plugin and its startup setting while preserving unrelated settings and plugins, without changing the editor environment. `modules/conf/nvim/install.sh` seeds the packaged LazyVim starter, preserves personal files and caches, and owns `EDITOR` and `VISUAL`. Geany remains retired. Zed settings use native JSON preferences and keymap. Merge user settings with `jq` when available and retain the documented fallback when it is not.
+Zed is the desktop editor for plain text, source files and projects. Nautilus keeps directory MIME handling; open graphical projects with `zed --new`. Packaged LazyVim is the terminal editor. The retired Micro installer removes its unreliable filemanager plugin and its startup setting while preserving unrelated settings and plugins, without changing the editor environment. `modules/conf/nvim/install.sh` seeds the packaged LazyVim starter, preserves personal files and caches, and owns `EDITOR` and `VISUAL`. Geany remains retired. Zed base and Linux preferences live in `data/component/application/zed/`; adaptive resource policy lives in `data/component/performance/`. Merge settings through Lua and complete generation before invoking the retained watched-file writer. Preserve its inode and avoid rewriting unchanged settings. The keymap and theme adapter remain pending migration.
 
 Apply configurations through setup. `make theme` synchronizes folder icons and Zed colors from the active OS palette.
 

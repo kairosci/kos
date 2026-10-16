@@ -1,41 +1,51 @@
 {
   "desktop-tools": {
-    "label": "Desktop tools"
+    "label": "Desktop tools",
+    "icon": "󰒓"
   },
   "desktop-tools.calendar": {
     "label": "Calendar",
-    "action": "os app calendar"
+    "action": "os app calendar",
+    "icon": "󰃭"
   },
   "desktop-tools.weather": {
     "label": "Weather",
-    "action": "os app weather"
+    "action": "os app weather",
+    "icon": "󰖐"
   },
   "desktop-tools.clock": {
     "label": "Clock",
-    "action": "os app clock"
+    "action": "os app clock",
+    "icon": "󰥔"
   },
   "desktop-tools.audio": {
     "label": "Audio",
-    "action": "os app audio"
+    "action": "os app audio",
+    "icon": "󰕾"
   },
   "desktop-tools.network": {
     "label": "Network",
-    "action": "os app network"
+    "action": "os app network",
+    "icon": "󰖩"
   },
   "desktop-tools.bluetooth": {
     "label": "Bluetooth",
-    "action": "os app bluetooth"
+    "action": "os app bluetooth",
+    "icon": "󰂯"
   },
   "desktop-tools.settings": {
     "label": "Hyprland settings",
-    "action": "os app settings"
+    "action": "os app settings",
+    "icon": "󰒓"
   },
   "desktop-tools.resources": {
     "label": "Resources",
-    "action": "os app resources"
+    "action": "os app resources",
+    "icon": "󰍛"
   },
   "desktop-tools.media": {
     "label": "Media player",
-    "action": "os app media"
+    "action": "os app media",
+    "icon": "󰎁"
   }
 }

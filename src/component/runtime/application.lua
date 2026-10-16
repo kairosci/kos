@@ -54,6 +54,20 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
+    if mode == "secure-home" then
+        assert(config and esp == nil, "invalid_home_arguments")
+        return require("core.paths").new(File.json(self.root .. "/" .. self.layout.paths)):protectHome(self.process, config)
+    end
+    if mode == "apply-build-environment" then
+        assert((config == nil or config == "--defer") and esp == nil, "invalid_environment_arguments")
+        local Paths = require("core.paths")
+        return require("component.performance.environment").new(self.process, Paths.new(File.json(self.root .. "/" .. self.layout.paths)), Publisher.new(self.process), File.json(self.root .. "/" .. self.layout.performance)):apply(config == "--defer")
+    end
+    if mode == "render-zed-settings" then
+        local performance = require("component.performance.editor").new(self.root, self.process, File.json(self.root .. "/" .. self.layout.performance))
+        io.write(Json.encode(performance:render(config)), "\n")
+        return
+    end
     if mode == "migration-report" or mode == "verify-full-lua" then
         local inventory = require("component.migration.inventory").new(self.root, self.process, File.json(self.root .. "/" .. self.layout.migration))
         local report = inventory:report()

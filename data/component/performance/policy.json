@@ -1,0 +1,71 @@
+{
+  "memoryInfo": "/proc/meminfo",
+  "memoryFraction": 0.5,
+  "workerMemoryKiB": 2097152,
+  "reservedProcessors": 2,
+  "maximumWorkers": 4,
+  "primingWorkers": 2,
+  "syntaxCacheCapacity": 64,
+  "defaults": [
+    "data/component/application/zed/settings.json",
+    "data/component/application/zed/linux.json"
+  ],
+  "optionsPath": [
+    "lsp",
+    "rust-analyzer",
+    "initialization_options"
+  ],
+  "calculated": [
+    {
+      "path": [
+        "numThreads"
+      ],
+      "value": "workers"
+    },
+    {
+      "path": [
+        "cachePriming",
+        "numThreads"
+      ],
+      "value": "priming"
+    },
+    {
+      "path": [
+        "cargo",
+        "extraEnv",
+        "CARGO_BUILD_JOBS"
+      ],
+      "value": "workers",
+      "string": true
+    },
+    {
+      "path": [
+        "check",
+        "extraEnv",
+        "CARGO_BUILD_JOBS"
+      ],
+      "value": "workers",
+      "string": true
+    },
+    {
+      "path": [
+        "lru",
+        "capacity"
+      ],
+      "value": "cache"
+    }
+  ],
+  "environment": {
+    "values": {
+      "CARGO_BUILD_JOBS": "workers"
+    },
+    "exportPrefix": "export ",
+    "root": "config",
+    "file": "environment.d/90-os-build.conf",
+    "mode": "644",
+    "shellRoot": "home",
+    "shellFile": ".bashrc",
+    "first": "# >>> os build resources >>>",
+    "last": "# <<< os build resources <<<"
+  }
+}

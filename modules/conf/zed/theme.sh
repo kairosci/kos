@@ -49,7 +49,7 @@ if [[ -f "$CONFIG/settings.json" ]]; then
 else
     SETTINGS='{}'
 fi
-SETTINGS=$(jq --argjson p "$PALETTE" --argjson style "$STYLE" '
+SETTINGS=$(jq -S --argjson p "$PALETTE" --argjson style "$STYLE" '
     .theme = {mode: $p.mode, dark: "One Dark", light: "One Light"} |
     .theme_overrides = ((.theme_overrides // {}) * {"One Dark": $style, "One Light": $style})
 ' <<< "$SETTINGS")
