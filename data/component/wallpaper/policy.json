@@ -67,5 +67,7 @@
     "activePalette": "theme/colors.toml",
     "stockBackgrounds": "theme/backgrounds",
     "activeBackground": "background"
-  }
+  },
+  "runtimeCurrent": "current",
+  "runtimeManifest": "manifest.json"
 }

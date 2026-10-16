@@ -13,3 +13,5 @@ La lettura binaria accetta qualsiasi tipo di file. JSON e INI hanno parser dedic
 La presenza dei vecchi componenti sotto `modules/` e `scripts/` indica lavoro ancora aperto. L'archivio `v1.0` non è un backend del nuovo runtime e non viene eseguito. La roadmap separa implementazione, applicazione live e collaudo hardware.
 
 Il controllo di completamento vive in `src/component/migration/`, con radici e digest degli starter in `data/component/migration/`. `migration-report` restituisce i residui come JSON; `verify-full-lua` termina con errore se la migrazione è incompleta. La presenza di test verdi sui componenti già sostituiti non modifica quel verdetto.
+
+Il runtime degli sfondi viene pubblicato come bundle immutabile: sorgenti e JSON vengono validati prima di cambiare atomicamente il collegamento `current`. Il manifest rileva anche file rimossi. Una pubblicazione fallita mantiene il bundle precedente e rimuove lo staging; contenuti identici non creano una nuova versione.

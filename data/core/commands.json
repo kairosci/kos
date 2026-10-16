@@ -17,5 +17,7 @@
   "renderWallpaper": ["/usr/bin/magick"],
   "runtimeFiles": ["/usr/bin/find"],
   "desktopDatabase": ["/usr/bin/update-desktop-database"],
-  "repositoryFiles": ["/usr/bin/git"]
+  "repositoryFiles": ["/usr/bin/git"],
+  "validateLua": ["/usr/bin/luac", "-p"],
+  "removeDirectory": ["/usr/bin/rm", "-r", "--"]
 }
