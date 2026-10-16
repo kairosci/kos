@@ -113,8 +113,8 @@ fi
 log "security.apparmor"
 if pacman -Q apparmor &>/dev/null; then
     mkdir -p /etc/apparmor.d
-    if command -v grub-mkconfig &>/dev/null && [[ -f /etc/default/grub ]]; then
-        grub-mkconfig -o /boot/grub/grub.cfg || warn "security.apparmor_failed"
+    if command -v os-grub-menu &>/dev/null; then
+        os-grub-menu || warn "security.apparmor_failed"
     else
         warn "security.apparmor_boot_unsupported"
     fi

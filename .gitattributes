@@ -1,2 +1,3 @@
 modules/conf/os/data/packages/linux-os/*.patch -whitespace
+modules/conf/hyprmod/data/*.patch -whitespace
 modules/conf/os/data/rootfs/usr/share/doc/limine-*/*.md -whitespace

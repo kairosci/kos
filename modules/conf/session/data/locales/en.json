@@ -266,7 +266,15 @@
     "Routing crumbs": "Routing crumbs",
     "Sorting frames": "Sorting frames",
     "Wiring bits": "Wiring bits",
-    "Counting collisions": "Counting collisions"
+    "Counting collisions": "Counting collisions",
+    "Desktop tools": "Desktop tools",
+    "Calendar": "Calendar",
+    "Weather": "Weather",
+    "Clock": "Clock",
+    "Bluetooth": "Bluetooth",
+    "Hyprland settings": "Hyprland settings",
+    "Resources": "Resources",
+    "Media player": "Media player"
   },
   "patterns": [
     {

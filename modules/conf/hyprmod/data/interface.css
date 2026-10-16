@@ -1,0 +1,15 @@
+window.os-hyprmod .navigation-sidebar row {
+  min-height: 32px;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+window.os-hyprmod .navigation-sidebar row image { -gtk-icon-size: 16px; }
+window.os-hyprmod .navigation-sidebar row .title { font-size: 0.95em; }
+window.os-hyprmod preferencesgroup { margin-bottom: 4px; }
+window.os-hyprmod row.activatable { min-height: 38px; }
+window.os-hyprmod .reset-button { min-width: 28px; min-height: 28px; }
+window.os-hyprmod .reset-button:focus-visible { opacity: 1; }
+window.os-hyprmod .sidebar-separator { margin: 6px 8px; }
+window.os-hyprmod statuspage .icon { -gtk-icon-size: 48px; }
+window.os-hyprmod statuspage .title { font-size: 1.2em; }
+window.os-hyprmod statuspage .description { font-size: 0.95em; }

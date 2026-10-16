@@ -20,8 +20,13 @@ locale_init
 
 SETUP_SCOPE=full
 scope_specified=0
+OS_INTERFACE_PREVIEW=0
 while (($#)); do
     case "$1" in
+        --preview-interface)
+            OS_INTERFACE_PREVIEW=1
+            shift
+            ;;
         --rebuild-previews)
             OS_REBUILD_PREVIEWS=1
             shift
@@ -48,9 +53,10 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|desktop-tools|grub-trial|boot-trial-select) ;;
     *) err "setup.invalid_args" ;;
 esac
+[[ "$OS_INTERFACE_PREVIEW" == 0 || "$SETUP_SCOPE" == interface ]] || err "setup.invalid_args"
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
 [[ "$SETUP_SCOPE" == full || "${OS_RUN_MIGRATIONS:-0}" != 1 ]] || err "setup.invalid_args"
 [[ "$SETUP_SCOPE" == full || ( "${OS_RESTORE_OMARCHY:-0}" != 1 && "${OS_RESET_SNAPSHOTS:-0}" != 1 ) ]] || err "setup.invalid_args"
@@ -118,6 +124,58 @@ if [[ "$SETUP_SCOPE" == settings || "$SETUP_SCOPE" == wallpaper ]]; then
             done
         ' bash "$PROJECT_DIR/scripts/lib/userconf.sh" "$PROJECT_DIR/hooks/theme-set.d/wallpaper" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "$PROJECT_DIR"
     fi
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == desktop-tools ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    _tools_packages=()
+    while IFS= read -r _tools_package; do
+        [[ "$_tools_package" =~ ^[a-z0-9][a-z0-9-]*$ ]] || err "env.aur_invalid" "$_tools_package"
+        _tools_packages+=("$_tools_package")
+    done < "$PROJECT_DIR/modules/conf/session/data/desktop-packages.list"
+    OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm --needed "${_tools_packages[@]}" || err "defaults.app_failed" "desktop tools"
+    source "$MODULES_DIR/36-os-cli.sh"
+    source "$MODULES_DIR/97-session.sh"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == boot-trial-select ]]; then
+    source "$SCRIPT_DIR/lib/boot-assessment.sh"
+    boot_assessment /var/lib/os/boot-assessment
+    grub-script-check /boot/grub/grub.cfg || err "bootloader.config_failed"
+    source "$SCRIPT_DIR/lib/boot-trial-select.sh"
+    boot_trial_select "$PROJECT_DIR/modules/platform/arch/data/boot.json" || err "bootloader.install_failed"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == grub-trial ]]; then
+    source "$SCRIPT_DIR/lib/grub-trial.sh"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == boot-assessment ]]; then
+    source "$SCRIPT_DIR/lib/boot-assessment.sh"
+    boot_assessment /var/lib/os/boot-assessment
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == interface ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    source "$MODULES_DIR/36-os-cli.sh"
+    source "$SCRIPT_DIR/lib/desktop-interface.sh"
+    if [[ "${OS_INTERFACE_PREVIEW:-0}" == 1 ]]; then
+        user_as "$PRIMARY_USER" uwsm-app -t service -- hyprmod || err "defaults.app_failed" HyprMod
+    fi
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == desktop-health ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    source "$SCRIPT_DIR/lib/desktop-health.sh"
     exit 0
 fi
 

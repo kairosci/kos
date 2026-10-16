@@ -266,7 +266,15 @@
     "Routing crumbs": "Transmissão de dados",
     "Sorting frames": "Transmissão de dados",
     "Wiring bits": "Transmissão de dados",
-    "Counting collisions": "Transmissão de dados"
+    "Counting collisions": "Transmissão de dados",
+    "Desktop tools": "Ferramentas do ambiente",
+    "Calendar": "Calendário",
+    "Weather": "Tempo",
+    "Clock": "Relógio",
+    "Bluetooth": "Bluetooth",
+    "Hyprland settings": "Definições Hyprland",
+    "Resources": "Recursos",
+    "Media player": "Leitor multimédia"
   },
   "patterns": [
     {

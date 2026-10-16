@@ -1,0 +1,14 @@
+{
+  "esp": "/boot",
+  "candidateId": "OS-GRUB",
+  "candidateLabel": "OS GRUB trial",
+  "fallbackImage": "/EFI/limine/limine_x64.efi",
+  "menu": {
+    "timeout": 5,
+    "default": 0,
+    "terminal": "console",
+    "colorNormal": "white/black",
+    "colorHighlight": "black/cyan",
+    "rootTitle": "OS"
+  }
+}

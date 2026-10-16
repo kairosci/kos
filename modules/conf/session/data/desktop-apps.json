@@ -1,0 +1,41 @@
+{
+  "desktop-tools": {
+    "label": "Desktop tools"
+  },
+  "desktop-tools.calendar": {
+    "label": "Calendar",
+    "action": "os app calendar"
+  },
+  "desktop-tools.weather": {
+    "label": "Weather",
+    "action": "os app weather"
+  },
+  "desktop-tools.clock": {
+    "label": "Clock",
+    "action": "os app clock"
+  },
+  "desktop-tools.audio": {
+    "label": "Audio",
+    "action": "os app audio"
+  },
+  "desktop-tools.network": {
+    "label": "Network",
+    "action": "os app network"
+  },
+  "desktop-tools.bluetooth": {
+    "label": "Bluetooth",
+    "action": "os app bluetooth"
+  },
+  "desktop-tools.settings": {
+    "label": "Hyprland settings",
+    "action": "os app settings"
+  },
+  "desktop-tools.resources": {
+    "label": "Resources",
+    "action": "os app resources"
+  },
+  "desktop-tools.media": {
+    "label": "Media player",
+    "action": "os app media"
+  }
+}

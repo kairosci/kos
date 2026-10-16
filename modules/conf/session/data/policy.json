@@ -6,7 +6,7 @@
   },
   "clockWidget": {
     "id": "os.clockwidget",
-    "enabled": true,
+    "enabled": false,
     "anchor": "top-right",
     "format": "HH:mm"
   },

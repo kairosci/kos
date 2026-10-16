@@ -14,6 +14,8 @@ rm -f /usr/local/lib/os/session/data/clean.lua /usr/local/lib/os/session/data/ru
 install -m 644 "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/userconf.sh" /usr/local/lib/os/
 install -m 644 "$PROJECT_DIR"/scripts/lib/messages/*.msg /usr/local/lib/os/messages/
 
+[[ "${1:-}" != --files-only ]] || return 0
+
 for user_home in /home/*; do
     [[ -d "$user_home" && -f "$user_home/.config/hypr/hyprland.lua" ]] || continue
     _session_user=${user_home##*/}
@@ -30,7 +32,7 @@ for user_home in /home/*; do
             install_user_file "$2" "$HOME/.config/os/hooks/post-update.d/99-os-persist" 755
         ' bash "$PROJECT_DIR/scripts/lib/userconf.sh" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" || err "session.validation_failed" "post-update hook"
     fi
-    if [[ "${SETUP_SCOPE:-full}" == session ]]; then
+    if [[ "${SETUP_SCOPE:-full}" == session || "${SETUP_SCOPE:-full}" == desktop-tools ]]; then
         _session_runtime=$(jq -r '.runtime' "$user_home/.local/share/os/session/data/policy.json")
         user_as "$_session_user" systemctl --user set-environment "QS_CONFIG_PATH=$_session_runtime/shell" || err "session.validation_failed" "Quickshell environment"
         user_as "$_session_user" hyprctl reload config-only || err "session.validation_failed" Hyprland

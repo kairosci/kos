@@ -40,10 +40,11 @@ mix_color() {
 }
 SURFACE=$BACKGROUND
 HOVER=$(mix_color 10)
-PRESSED=$(mix_color 15)
-BORDER=$(mix_color 18)
 MUTED=$(mix_color 55)
-THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "ui-flat-v9" | sha256sum)
+template="${XDG_DATA_HOME:-$HOME/.local/share}/os/gtk/palette.css.in"
+[[ -r "$template" ]] || template="$SCRIPT_DIR/../../modules/conf/gtk/data/palette.css.in"
+[[ -r "$template" ]] || err "hooks.gtk_palette_failed" "$template"
+THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "$(sha256sum "$template")" | sha256sum)
 GTK_THEME_NAME="OS-${THEME_HASH:0:16}"
 GTK_THEME_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/themes/$GTK_THEME_NAME"
 mkdir -p "$GTK_THEME_DIR/gtk-3.0" "$GTK_THEME_DIR/gtk-4.0"
@@ -71,94 +72,9 @@ for version in 3 4; do
     mv -f "$temporary" "$config/settings.ini"
     rm -f "$settings"
     temporary="$(mktemp "$config/.os.XXXXXX")"
-    cat > "$temporary" <<EOF_CSS
-@define-color theme_bg_color $BACKGROUND;
-@define-color theme_base_color $BACKGROUND;
-@define-color theme_fg_color $FOREGROUND;
-@define-color theme_text_color $FOREGROUND;
-@define-color theme_selected_bg_color $SELECTION;
-@define-color theme_selected_fg_color $FOREGROUND;
-@define-color accent_bg_color $ACCENT;
-@define-color accent_color $ACCENT;
-@define-color accent_fg_color $BACKGROUND;
-* { border-radius: 0; box-shadow: none; text-shadow: none; background-image: none; transition: none; }
-window, dialog, .background, menubar, menu, menuitem, notebook, notebook header, notebook tab, viewport, scrolledwindow, stack, .view, .card, .boxed-list, .boxed-list row, popover > contents, tooltip { background-color: $BACKGROUND; color: $FOREGROUND; }
-headerbar, toolbar, .sidebar { background-color: $SURFACE; color: $FOREGROUND; }
-treeview, iconview, textview, entry, list { background-color: $BACKGROUND; color: $FOREGROUND; }
-view:selected, treeview:selected, iconview:selected, .view:selected, row:selected { background-color: $SELECTION; color: $FOREGROUND; }
-window, dialog, .background, .navigation-sidebar, .card, .boxed-list, .boxed-list row, popover > contents, menu, tooltip, headerbar, entry, button, notebook tab { border-radius: 0; box-shadow: none; background-image: none; }
-decoration { border-radius: 0; box-shadow: none; margin: 0; }
-headerbar, toolbar { min-height: 30px; padding: 3px 6px; box-shadow: none; border-bottom: 1px solid $BORDER; }
-headerbar windowcontrols { margin: 0; }
-button { min-height: 24px; border-radius: 0; border-color: $BORDER; background-color: $BACKGROUND; color: $FOREGROUND; background-image: none; box-shadow: none; padding: 4px 8px; }
-entry { border-radius: 0; min-height: 24px; padding: 3px 6px; }
-.navigation-sidebar row, .sidebar row { border-radius: 0; padding: 4px 8px; }
-.navigation-sidebar { background-color: $SURFACE; color: $FOREGROUND; }
-popover > contents, tooltip { border: 1px solid $BORDER; }
-button:focus-visible, entry:focus-visible, row:focus-visible, checkbutton:focus-visible, switch:focus-visible, scale:focus-visible, notebook tab:focus-visible { outline: 2px solid $ACCENT; outline-offset: -2px; }
-button:hover { background-color: $HOVER; border-color: $ACCENT; }
-entry:focus, entry:focus-within, spinbutton:focus-within { border-color: $ACCENT; }
-toolbar button { min-height: 20px; min-width: 20px; padding: 3px 5px; }
-separator { background-color: $BORDER; }
-check:checked, radio:checked, scale highlight, progressbar progress { background-color: $ACCENT; color: $BACKGROUND; }
-entry:disabled { color: $MUTED; }
-button.flat, button.image-button, .sidebar row, .navigation-sidebar row { background-color: transparent; border-color: transparent; }
-button.flat:hover, button.image-button:hover, row:hover { background-color: $HOVER; }
-row:selected, row:selected:hover, .sidebar row:selected, .navigation-sidebar row:selected { background-color: $SELECTION; color: $FOREGROUND; }
-button.suggested-action { background-color: $ACCENT; color: $BACKGROUND; border-color: $ACCENT; }
-button.image-button { min-width: 24px; padding: 4px; }
-button:active, button.flat:active, button.image-button:active { background-color: $PRESSED; border-color: $ACCENT; }
-button:checked, button.flat:checked, button.image-button:checked { background-color: $SELECTION; color: $FOREGROUND; border-color: $ACCENT; }
-button:checked:hover, button.flat:checked:hover, button.image-button:checked:hover { background-color: $SELECTION; border-color: $ACCENT; }
-button.suggested-action:hover, button.suggested-action:active, button.suggested-action:checked { background-color: $ACCENT; color: $BACKGROUND; border-color: $FOREGROUND; }
-button:disabled, button.flat:disabled, button.image-button:disabled, button.suggested-action:disabled { background-color: transparent; color: $MUTED; border-color: transparent; }
-entry, spinbutton { border: 1px solid $BORDER; background-color: $BACKGROUND; color: $FOREGROUND; caret-color: $ACCENT; }
-row:active, menuitem:active, modelbutton:active { background-color: $PRESSED; }
-row:selected:active { background-color: $SELECTION; }
-notebook header { padding: 0; border-bottom: 1px solid $BORDER; }
-notebook tab { min-height: 28px; padding: 4px 12px; border-bottom: 2px solid transparent; }
-notebook tab:hover { background-color: $HOVER; }
-notebook tab:checked { background-color: $BACKGROUND; border-bottom-color: $ACCENT; }
-.boxed-list { border: 1px solid $BORDER; }
-.boxed-list row { border-bottom: 1px solid $BORDER; }
-.boxed-list row:last-child { border-bottom: none; }
-check:not(:checked):not(:indeterminate), radio:not(:checked):not(:indeterminate) { background-color: $BACKGROUND; outline: 1px solid $MUTED; outline-offset: -1px; }
-check:indeterminate, radio:indeterminate { background-color: $ACCENT; color: $BACKGROUND; }
-switch { background-color: $HOVER; border: 1px solid $BORDER; }
-switch:checked { background-color: $ACCENT; border-color: $ACCENT; }
-switch slider { background-color: $FOREGROUND; border: none; }
-switch:checked slider { background-color: $BACKGROUND; }
-check:disabled, radio:disabled, switch:disabled, scale:disabled { color: $MUTED; }
-entry selection, textview text selection { background-color: $SELECTION; color: $FOREGROUND; }
-check, radio, check:checked, radio:checked { border: none; outline: none; box-shadow: none; }
-scale trough, progressbar trough { background-color: $HOVER; }
-scrollbar trough { background-color: transparent; }
-scrollbar slider { min-width: 8px; min-height: 8px; margin: 0; padding: 0; background-color: $MUTED; border: none; }
-scrollbar slider:hover { background-color: $ACCENT; }
-button, entry, spinbutton, searchentry, combobox, dropdown, row, menuitem, modelbutton, notebook tab, tabs tab, check, radio, switch, switch slider, scale slider, scrollbar slider, expander, link, .link {
-  transition: background-color 120ms ease-out, color 120ms ease-out, border-color 120ms ease-out, outline-color 120ms ease-out;
-}
-scale highlight, progressbar progress, levelbar block {
-  transition: background-color 140ms ease-out, border-color 140ms ease-out;
-}
-button:active, row:active, menuitem:active { transition-duration: 60ms; }
-button:disabled, entry:disabled, spinbutton:disabled, check:disabled, radio:disabled, switch:disabled { transition: none; }
-.link, link { color: $ACCENT; }
-menu, popover.menu, popover.menu contents, popover.menu stack, popover.menu list { background-color: $BACKGROUND; color: $FOREGROUND; }
-menu { padding: 4px; border: 1px solid $BORDER; }
-popover.menu contents { padding: 4px; }
-menuitem, popover.menu modelbutton { min-height: 24px; padding: 4px 10px; margin: 0; border: none; background-color: $BACKGROUND; color: $FOREGROUND; }
-menuitem:hover, menuitem:selected, popover.menu modelbutton:hover, popover.menu modelbutton:selected { background-color: $SELECTION; color: $FOREGROUND; }
-menuitem:disabled, popover.menu modelbutton:disabled { color: $MUTED; }
-menuitem label, popover.menu modelbutton label { background-color: transparent; }
-menu separator, popover.menu separator { min-height: 1px; margin: 4px 6px; background-color: $BORDER; }
-
-EOF_CSS
-    if [[ "$version" == 3 ]]; then
-        cat >> "$temporary" <<EOF_CSS
-popover.menu { padding: 4px; border: 1px solid $BORDER; }
-EOF_CSS
-    fi
+    sed -e "s/@BACKGROUND@/$BACKGROUND/g" -e "s/@FOREGROUND@/$FOREGROUND/g" \
+        -e "s/@ACCENT@/$ACCENT/g" -e "s/@SELECTION@/$SELECTION/g" -e "s/@SURFACE@/$SURFACE/g" \
+        "$template" > "$temporary"
     if [[ "$version" == 4 ]]; then
         cat >> "$temporary" <<EOF_CSS
 :root {

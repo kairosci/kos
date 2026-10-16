@@ -31,7 +31,7 @@ os - hardened Omarchy command dispatcher
 
 Usage:
   os <group> <command> [args...]
-  os app [--resolve] <browser|editor|files|settings> [args...]
+  os app [--resolve] <browser|editor|files|settings|calendar|weather|clock|audio|network|bluetooth|resources|media> [args...]
   os commands [--all] [--json] [--check]
   os changelog [release]
   os version

@@ -159,7 +159,10 @@ assert_true "retired os panels are dropped from the migrated shell" "jq --slurpf
 assert_true "an empty Apps catalogue fails runtime verification" "! SESSION_TEST_APPS_EMPTY=1 bash '$WORK_DIR/harness.sh' '$PROJECT_DIR'"
 source "$PROJECT_DIR/modules/conf/session/scripts/clock.sh"
 declare -A test_clock=()
-ClockWidget::new test_clock "$PROJECT_DIR/modules/conf/session" "$WORK_DIR/clock" "$PROJECT_DIR/modules/conf/session/data/policy.json"
+jq '.clockWidget.enabled = true' "$PROJECT_DIR/modules/conf/session/data/policy.json" > "$WORK_DIR/enabled-policy.json"
+ClockWidget::new test_clock "$PROJECT_DIR/modules/conf/session" "$WORK_DIR/clock" "$WORK_DIR/enabled-policy.json"
 assert_true "clock staging produces a service plugin from separate policy and manifest data" "ClockWidget::stage test_clock && jq -e '.id == \"os.clockwidget\" and .kinds == [\"service\"] and .entryPoints.service == \"ClockWidget.qml\"' '$WORK_DIR/clock/plugins/os.clockwidget/manifest.json' && cmp '$PROJECT_DIR/modules/conf/session/qml/ClockWidget.qml' '$WORK_DIR/clock/plugins/os.clockwidget/ClockWidget.qml'"
 assert_true "disabling the clock removes its plugin without creating a bar" "jq '.clockWidget.enabled = false' '$PROJECT_DIR/modules/conf/session/data/policy.json' > '$WORK_DIR/disabled-policy.json' && jq --slurpfile policy '$WORK_DIR/disabled-policy.json' --slurpfile defaults '$PROJECT_DIR/modules/conf/session/data/shell.json' -f '$PROJECT_DIR/modules/conf/session/scripts/shell.jq' '$WORK_DIR/shell-new.json' | jq -e '([.plugins[] | if type == \"string\" then . else .id end] | index(\"os.clockwidget\") == null) and ([.bar.layout[][]] | length == 0)'"
+assert_true "desktop tools expose tiling applications instead of popup panels" "jq -e '.[\"desktop-tools.calendar\"].action==\"os app calendar\" and .[\"desktop-tools.weather\"].action==\"os app weather\" and .[\"desktop-tools.clock\"].action==\"os app clock\"' '$PROJECT_DIR/modules/conf/session/data/desktop-apps.json'"
+assert_true "desktop clock widget is disabled in favor of the clock app" "jq -e '.clockWidget.enabled==false' '$PROJECT_DIR/modules/conf/session/data/policy.json'"
 test_summary

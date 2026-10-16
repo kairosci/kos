@@ -13,7 +13,7 @@ install_hyprmod() {
     for file in hyprland.lua bindings.lua hyprland-gui.lua; do
         [[ ! -L "$config/hypr/$file" ]] || err "session.validation_failed" "$file"
     done
-    version=$({ sha256sum "$SCRIPT_DIR/data/requirements.lock"; pacman -Q python; } | sha256sum)
+    version=$({ sha256sum "$SCRIPT_DIR/data/requirements.lock" "$SCRIPT_DIR/data/interface.patch" "$SCRIPT_DIR/data/interface.css" "$SCRIPT_DIR/data/interface.json" "$SCRIPT_DIR/data/icons.tsv"; pacman -Q python; } | sha256sum)
     environment="$data/os/hyprmod/${version:0:16}"
     if [[ ! -x "$environment/bin/hyprmod" || ! -f "$environment/complete" ]]; then
         if [[ ! -x "$environment/bin/python" ]]; then
@@ -22,6 +22,8 @@ install_hyprmod() {
         uv pip install --python "$environment/bin/python" --require-hashes --no-deps --no-build-isolation -r "$SCRIPT_DIR/data/requirements.lock"
     fi
     bash "$SCRIPT_DIR/scripts/check-runtime.sh" "$SCRIPT_DIR/data/native-minimums.tsv" "$environment" || err "defaults.app_failed" HyprMod
+    source "$SCRIPT_DIR/scripts/interface.sh"
+    hyprmod_interface "$SCRIPT_DIR" "$environment"
     icon=$(find "$environment/lib" -path '*/hyprmod/data/icons/hicolor/scalable/apps/io.github.bluemancz.hyprmod.svg' -type f -print -quit)
     [[ -n "$icon" ]] || err "defaults.app_failed" HyprMod
     [[ ! -e "$data/os/hyprmod/current" || -L "$data/os/hyprmod/current" ]] || err "session.validation_failed" HyprMod

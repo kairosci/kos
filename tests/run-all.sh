@@ -18,6 +18,10 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_debloat_theming.sh" \
     "$SCRIPT_DIR/test_security_tooling.sh" \
     "$SCRIPT_DIR/test_bootloader.sh" \
+    "$SCRIPT_DIR/test_boot_menu.sh" \
+    "$SCRIPT_DIR/test_boot_trial_select.sh" \
+    "$SCRIPT_DIR/test_ruby_catalog.sh" \
+    "$SCRIPT_DIR/test_configuration_publication.sh" \
     "$SCRIPT_DIR/test_hardware_power.sh" \
     "$SCRIPT_DIR/test_modular_pipeline.sh" \
     "$SCRIPT_DIR/test_desktop_recovery.sh" \
@@ -48,5 +52,6 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_session_i18n.sh" \
     "$SCRIPT_DIR/test_config_rename.sh" \
     "$SCRIPT_DIR/test_hyprmod.sh" \
+    "$SCRIPT_DIR/test_desktop_health.sh" \
     "$SCRIPT_DIR/test_wallpaper.sh" \
     "$SCRIPT_DIR/test_session_catalog.sh"

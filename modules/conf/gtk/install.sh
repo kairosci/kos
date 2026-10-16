@@ -8,6 +8,7 @@ source "$PROJECT_DIR/scripts/lib/userconf.sh"
 locale_init
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 install_user_file "$SCRIPT_DIR/data/tiling.lua" "$CONFIG_HOME/hypr/os-gtk.lua"
+install_user_file "$SCRIPT_DIR/data/palette.css.in" "${XDG_DATA_HOME:-$HOME/.local/share}/os/gtk/palette.css.in"
 if [[ -f "$CONFIG_HOME/hypr/hyprland.lua" ]]; then
     install_shell_block "$CONFIG_HOME/hypr/hyprland.lua" '-- os gtk tiling (managed)' '-- end os gtk tiling (managed)' <<'LUA'
 require("os-gtk")

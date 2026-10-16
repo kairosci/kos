@@ -26,7 +26,12 @@ BRAND_ICON="$PROJECT_ROOT/modules/iso/assets/kmono-cyan.png"
 [[ -s "$BRAND_ICON" && ! -L "$BRAND_ICON" ]] || err "branding.install_failed" "$BRAND_ICON"
 install -Dm644 -- "$BRAND_ICON" /usr/share/pixmaps/os.png || err "branding.install_failed" /usr/share/pixmaps/os.png
 
-pacman -S --noconfirm --needed easyeffects calf lsp-plugins-lv2 mda.lv2 x42-plugins-lv2 zam-plugins-lv2 || err "defaults.app_failed" "EasyEffects"
+_easyeffects_packages=()
+while IFS= read -r _easyeffects_package; do
+    [[ "$_easyeffects_package" =~ ^[a-z0-9][a-z0-9.-]*$ ]] || err "env.aur_invalid" "$_easyeffects_package"
+    _easyeffects_packages+=("$_easyeffects_package")
+done < "$PROJECT_DIR/modules/conf/easyeffects/data/packages.list"
+pacman -S --noconfirm --needed "${_easyeffects_packages[@]}" || err "defaults.app_failed" "EasyEffects"
 
 log "gui.install_done" "LazyVim"
 pacman -S --noconfirm --needed neovim omarchy-nvim fd ripgrep lazygit tree-sitter-cli || err "defaults.app_failed" "LazyVim"

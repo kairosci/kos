@@ -1,0 +1,20 @@
+@define-color theme_bg_color @BACKGROUND@;
+@define-color theme_base_color @BACKGROUND@;
+@define-color theme_fg_color @FOREGROUND@;
+@define-color theme_text_color @FOREGROUND@;
+@define-color theme_selected_bg_color @SELECTION@;
+@define-color theme_selected_fg_color @FOREGROUND@;
+@define-color accent_bg_color @ACCENT@;
+@define-color accent_color @ACCENT@;
+@define-color accent_fg_color @BACKGROUND@;
+.background, .view { background-color: @BACKGROUND@; color: @FOREGROUND@; }
+headerbar, .navigation-sidebar { background-color: @SURFACE@; color: @FOREGROUND@; }
+entry, spinbutton, textview text { color: @FOREGROUND@; caret-color: @ACCENT@; }
+entry selection, textview text selection, row:selected { background-color: @SELECTION@; color: @FOREGROUND@; }
+button:focus-visible, entry:focus-visible, row:focus-visible { outline-color: @ACCENT@; }
+.link, link { color: @ACCENT@; }
+row:selected, row:selected:hover, .sidebar row:selected, .navigation-sidebar row:selected { background-color: @SELECTION@; color: @FOREGROUND@; }
+button.suggested-action { background-color: @ACCENT@; color: @BACKGROUND@; border-color: @ACCENT@; }
+scrollbar slider { min-width: 8px; min-height: 8px; margin: 0; padding: 0; }
+button, entry, spinbutton, row { transition: background-color 120ms ease-out, color 120ms ease-out, border-color 120ms ease-out; }
+scale highlight, progressbar progress { transition: background-color 140ms ease-out; }

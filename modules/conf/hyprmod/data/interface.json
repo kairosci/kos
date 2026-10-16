@@ -1,0 +1,5 @@
+{
+  "window": {"width":960,"height":680,"minimumWidth":360,"minimumHeight":360},
+  "sidebar": {"minimum":180,"maximum":220,"fraction":0.24,"collapseBelow":760},
+  "content": {"maximum":860,"tightenBelow":640,"margin":16,"spacing":16}
+}

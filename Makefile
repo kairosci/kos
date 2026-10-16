@@ -8,6 +8,7 @@ RESTORE_OMARCHY ?= 0
 RESET_SNAPSHOTS ?= 0
 RUN_MIGRATIONS ?= 0
 SCOPE ?= full
+PREVIEW_INTERFACE ?= 0
 
 ifeq ($(filter $(REBUILD_PREVIEWS),0 1),)
 $(error REBUILD_PREVIEWS must be 0 or 1)
@@ -56,7 +57,7 @@ help:
 	@bash scripts/lib/help.sh
 
 setup:
-	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh --scope "$(SCOPE)" $(if $(filter 1,$(REBUILD_PREVIEWS)),--rebuild-previews) $(if $(filter 1,$(RESTORE_OMARCHY)),--restore-omarchy) $(if $(filter 1,$(RESET_SNAPSHOTS)),--reset-snapshots) $(if $(filter 1,$(RUN_MIGRATIONS)),--run-migrations)
+	pkexec bash $(PROJECT_ROOT)/scripts/setup.sh --scope "$(SCOPE)" $(if $(filter 1,$(REBUILD_PREVIEWS)),--rebuild-previews) $(if $(filter 1,$(RESTORE_OMARCHY)),--restore-omarchy) $(if $(filter 1,$(RESET_SNAPSHOTS)),--reset-snapshots) $(if $(filter 1,$(RUN_MIGRATIONS)),--run-migrations) $(if $(filter 1,$(PREVIEW_INTERFACE)),--preview-interface)
 
 keyring:
 	bash $(PROJECT_ROOT)/scripts/keyring-switch.sh "$(KEYRING_BACKEND)"
