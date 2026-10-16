@@ -48,7 +48,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -118,6 +118,12 @@ if [[ "$SETUP_SCOPE" == settings || "$SETUP_SCOPE" == wallpaper ]]; then
             done
         ' bash "$PROJECT_DIR/scripts/lib/userconf.sh" "$PROJECT_DIR/hooks/theme-set.d/wallpaper" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "$PROJECT_DIR"
     fi
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == cli ]]; then
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    source "$MODULES_DIR/36-os-cli.sh"
     exit 0
 fi
 

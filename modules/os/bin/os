@@ -31,6 +31,7 @@ os - hardened Omarchy command dispatcher
 
 Usage:
   os <group> <command> [args...]
+  os app [--resolve] <browser|editor|files|settings> [args...]
   os commands [--all] [--json] [--check]
   os changelog [release]
   os version
@@ -38,7 +39,7 @@ Usage:
 
 Behavior:
   os prepares OMARCHY_PATH with the session runtime and message bus
-  and forwards every group command to the native omarchy entrypoint.
+  and forwards remaining group commands to the native omarchy entrypoint.
 USAGE
 }
 
@@ -62,6 +63,17 @@ if ! os_lib_init 2>/dev/null; then
     OS_I18N_FALLBACK=1
 fi
 
+os_session_environment() {
+    local uid
+    uid=$(id -u) || return 1
+    if [[ -z "${XDG_RUNTIME_DIR:-}" && -d "/run/user/$uid" ]]; then
+        export XDG_RUNTIME_DIR="/run/user/$uid"
+    fi
+    if [[ -z "${DBUS_SESSION_BUS_ADDRESS:-}" && -S "/run/user/$uid/bus" ]]; then
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus"
+    fi
+}
+
 os_resolve_runtime() {
     if [[ -z "${OMARCHY_PATH:-}" ]]; then
         if [[ -f /usr/share/omarchy/default/bash/env-bootstrap ]]; then
@@ -75,14 +87,7 @@ os_resolve_runtime() {
         PATH="$OMARCHY_PATH/bin:$PATH"
         export PATH
     fi
-    local uid=""
-    uid="$(id -u 2>/dev/null || printf '')"
-    if [[ -z "${XDG_RUNTIME_DIR:-}" && -n "$uid" && -d "/run/user/$uid" ]]; then
-        export XDG_RUNTIME_DIR="/run/user/$uid"
-    fi
-    if [[ -z "${DBUS_SESSION_BUS_ADDRESS:-}" && -n "$uid" && -S "/run/user/$uid/bus" ]]; then
-        export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus"
-    fi
+    os_session_environment
 }
 
 os_find_changelog() {
@@ -137,6 +142,22 @@ os_main() {
         return 1
     fi
     case "${1:-}" in
+        app)
+            shift
+            local library="$OS_BIN_DIR/../scripts/lib/app-launch.sh" policy="$OS_BIN_DIR/../data/app-launch.json"
+            if [[ ! -r "$library" ]]; then
+                library=/usr/share/os/lib/app-launch.sh
+                policy=/usr/share/os/data/app-launch.json
+            fi
+            if [[ ! -r "$library" ]]; then
+                os_err os.app_dependency_missing "$library"
+                return 1
+            fi
+            # shellcheck source=../scripts/lib/app-launch.sh
+            source "$library"
+            os_app_main "$policy" "$@"
+            return $?
+            ;;
         -h|--help|help)
             os_usage
             return 0

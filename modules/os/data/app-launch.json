@@ -1,0 +1,6 @@
+{
+  "browser": {"selector":"browser","fallbackMime":"x-scheme-handler/https","privateAction":"new-private-window"},
+  "editor": {"selector":"mime","mime":"text/plain"},
+  "files": {"selector":"mime","mime":"inode/directory"},
+  "settings": {"selector":"desktop","desktop":"io.github.bluemancz.hyprmod.desktop"}
+}
