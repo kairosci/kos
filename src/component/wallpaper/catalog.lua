@@ -33,17 +33,21 @@ function Catalog.run(root, output, chooser, archive, policy_path)
     for _, path in ipairs(catalog:entries(output)) do
         if path ~= target and path:match("%.png$") then catalog:retire(path) end
     end
+    local present = false
     for _, path in ipairs(catalog:entries(chooser)) do
-        if path ~= chooser .. "/" .. name then catalog:retire(path) end
+        if path ~= chooser .. "/" .. name then catalog:retire(path)
+        else present = true end
     end
     local destination = chooser .. "/" .. name
-    local existing = io.open(destination, "rb")
+    local existing, failure, code = io.open(destination, "rb")
+    assert(existing or code == 2, failure)
     if existing then
         assert(existing:close())
         local resolved = catalog.process:run("realpath", {destination}):gsub("\n$", "")
-        if resolved == target then return end
+        local expected = catalog.process:run("realpath", {target}):gsub("\n$", "")
+        if resolved == expected then return end
         catalog:retire(destination)
-    end
+    elseif present then catalog:retire(destination) end
     local staging = catalog.process:run("temporary", {"-d", chooser .. "/.publish.XXXXXXXX"}):gsub("\n$", "")
     local temporary = staging .. "/" .. name
     catalog.process:run("symbolicLink", {target, temporary})

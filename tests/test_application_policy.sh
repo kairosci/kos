@@ -14,7 +14,7 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export OMARCHY_PATH="$SANDBOX/omarchy"
 export OS_LANG=en
-mkdir -p "$XDG_CONFIG_HOME/onlyoffice" "$XDG_CONFIG_HOME/micro" "$XDG_CONFIG_HOME/gdu" "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d"
+mkdir -p "$OMARCHY_PATH/themes" "$XDG_CONFIG_HOME/onlyoffice" "$XDG_CONFIG_HOME/micro" "$XDG_CONFIG_HOME/gdu" "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d"
 printf '[General]\neditorWindowMode=true\nappdata=personal-account\n[Personal]\nkeep=1\n' > "$XDG_CONFIG_HOME/onlyoffice/DesktopEditors.conf"
 printf 'personal\n' > "$XDG_CONFIG_HOME/micro/settings.json"
 printf 'personal\n' > "$XDG_CONFIG_HOME/gdu/gdu.yaml"
