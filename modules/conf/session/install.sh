@@ -14,48 +14,127 @@ DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 NATIVE="${OMARCHY_PATH:-/usr/share/omarchy}"
 [[ -f "$CONFIG_HOME/hypr/hyprland.lua" && -f "$CONFIG_HOME/omarchy/shell.json" ]] || exit 0
-for dependency in lua luac jq Hyprland; do
+for dependency in lua jq Hyprland qs; do
     command -v "$dependency" >/dev/null || err "session.validation_failed" "$dependency"
 done
 STAGE=$(mktemp -d)
 trap 'rm -rf -- "$STAGE"' EXIT
-mkdir -p "$STAGE/config/hypr" "$STAGE/data/os/hypr" "$STAGE/menu" "$STAGE/blocks"
-cp "$SCRIPT_DIR/data/runtime.lua" "$STAGE/data/os/hypr/runtime.lua"
+mkdir -p "$STAGE/config/hypr" "$STAGE/data/os/hypr" "$STAGE/data/os/session/data" "$STAGE/plugins" "$STAGE/blocks"
+jq -e '.menu.width >= 320 and .menu.width <= 600 and (.panels | length > 0)' "$SCRIPT_DIR/data/policy.json" > /dev/null || err "session.validation_failed" policy.json
+jq --arg runtime "$NATIVE" '.runtime = $runtime' "$SCRIPT_DIR/data/policy.json" > "$STAGE/data/os/session/data/policy.json"
+POLICY="$STAGE/data/os/session/data/policy.json"
+cp "$SCRIPT_DIR/scripts/runtime.lua" "$STAGE/data/os/hypr/runtime.lua"
 for file in "$CONFIG_HOME/hypr/"*.lua; do
     [[ -f "$file" && ! -L "$file" ]] || err "session.validation_failed" "$file"
-    lua "$SCRIPT_DIR/data/clean.lua" "$file" "$STATE_HOME/os/hypr-blocks/${file##*/}" "$STAGE/blocks/${file##*/}" \
+    previous="$STATE_HOME/os/hypr-blocks/${file##*/}.json"
+    if [[ ! -f "$previous" && -f "$STATE_HOME/os/hypr-blocks/${file##*/}" ]]; then
+        previous="$STAGE/blocks/legacy-${file##*/}.json"
+        lua "$SCRIPT_DIR/scripts/legacy-state.lua" "$STATE_HOME/os/hypr-blocks/${file##*/}" > "$previous"
+    fi
+    bash "$SCRIPT_DIR/scripts/clean-hypr.sh" "$file" "$previous" "$STAGE/blocks/${file##*/}.json" \
         > "$STAGE/config/hypr/${file##*/}" || err "session.validation_failed" "$file"
 done
-for file in Menu.qml MenuModel.js BarWidget.qml; do
-    cp "$NATIVE/shell/plugins/menu/$file" "$STAGE/menu/$file"
-done
-[[ $(grep -Fc 'Style.space(300)), panel.width' "$STAGE/menu/Menu.qml") == 1 ]] || err "session.validation_failed" "menu width"
-sed -i 's/Style.space(300)), panel.width/Style.space(360)), panel.width/' "$STAGE/menu/Menu.qml"
-sed -i 's@/extensions/omarchy-menu.jsonc@/extensions/os-menu.json@' "$STAGE/menu/Menu.qml"
-jq '.id = "os.menu" | .name = "OS menu" | .author = "OS" | .omarchy = {clonedFrom: "omarchy.menu"}' \
-    "$NATIVE/shell/plugins/menu/manifest.json" > "$STAGE/menu/manifest.json"
-jq -f "$SCRIPT_DIR/data/shell.jq" "$CONFIG_HOME/omarchy/shell.json" > "$STAGE/shell.json"
-MENU_SOURCE="$CONFIG_HOME/omarchy/extensions/omarchy-menu.jsonc"
-if [[ -f "$MENU_SOURCE" ]]; then
-    jq -Rs 'gsub("(?m)^\\s*//[^\\n]*(\\n|$)"; "") | gsub(",(?<ending>\\s*[}\\]])"; .ending) | fromjson | (.items // .)' \
-        "$MENU_SOURCE" > "$STAGE/personal-menu.json" || err "session.validation_failed" "$MENU_SOURCE"
+while IFS=$'\t' read -r key label command; do
+    label=$(t "$label")
+    jq -nr --arg key "$key" --arg label "$label" --arg command "$command" \
+        '"hl.unbind(" + ($key|@json) + ")\no.bind(" + ($key|@json) + ", " + ($label|@json) + ", " + ($command|@json) + ")"' >> "$STAGE/session-bindings.lua"
+done < <(jq -r '.[] | [.key,.labelKey,.command] | @tsv' "$SCRIPT_DIR/data/bindings.json")
+install_shell_block "$STAGE/config/hypr/bindings.lua" '-- os session controls (managed)' '-- end os session controls (managed)' < "$STAGE/session-bindings.lua"
+bash "$SCRIPT_DIR/scripts/clean-hypr.sh" "$STAGE/config/hypr/bindings.lua" "$STAGE/blocks/bindings.lua.json" "$STAGE/blocks/bindings-next.lua.json" > "$STAGE/bindings.lua"
+mv "$STAGE/bindings.lua" "$STAGE/config/hypr/bindings.lua"
+mv "$STAGE/blocks/bindings-next.lua.json" "$STAGE/blocks/bindings.lua.json"
+
+MENU_ID=$(jq -r '.menu.id' "$POLICY")
+mkdir -p "$STAGE/plugins/$MENU_ID"
+lua "$SCRIPT_DIR/scripts/prepare-menu.lua" "$NATIVE/shell/plugins/menu/Menu.qml" "$SCRIPT_DIR/qml/MenuSupport.qml.inc" > "$STAGE/plugins/$MENU_ID/Menu.qml"
+cp "$NATIVE/shell/plugins/menu/MenuModel.js" "$STAGE/plugins/$MENU_ID/"
+cp "$SCRIPT_DIR/qml/AppCatalog.qml" "$STAGE/plugins/$MENU_ID/"
+jq --slurpfile policy "$POLICY" '.id = $policy[0].menu.id | .name = $policy[0].menu.name | .author = "OS" | .kinds = ["menu"] | .entryPoints = {menu: .entryPoints.menu} | .omarchy = {clonedFrom: .id} | .omarchy.clonedFrom = "omarchy.menu" | del(.barWidget)' \
+    "$NATIVE/shell/plugins/menu/manifest.json" > "$STAGE/plugins/$MENU_ID/manifest.json"
+CONTROLS_ID=$(jq -r '.controls.id' "$POLICY")
+mkdir -p "$STAGE/plugins/$CONTROLS_ID"
+cp "$SCRIPT_DIR/qml/NoBar.qml" "$STAGE/plugins/$CONTROLS_ID/"
+cp "$SCRIPT_DIR/qml/ControlContext.qml" "$SCRIPT_DIR/qml/ControlPopup.qml" "$STAGE/plugins/$CONTROLS_ID/"
+jq '{schemaVersion:1,id:.controls.id,name:.controls.name,version:"1.0.0",kinds:["bar"],entryPoints:{bar:"NoBar.qml"}}' "$POLICY" > "$STAGE/plugins/$CONTROLS_ID/manifest.json"
+while IFS=$'\t' read -r panel id mode directory entry manifest; do
+    if [[ "$mode" == media ]]; then
+        source_dir="$CONFIG_HOME/omarchy/plugins/$directory"
+        manifest_path="$CONFIG_HOME/omarchy/plugins/os.osmp/manifest.json"
+    else
+        source_dir="$NATIVE/shell/plugins/$directory"
+        manifest_path="$source_dir/$manifest"
+    fi
+    [[ "$id" =~ ^os\.[a-z]+$ && -f "$source_dir/$entry" && -f "$manifest_path" ]] || err "session.validation_failed" "$id"
+    target="$STAGE/plugins/$id"
+    mkdir -p "$target"
+    cp -aL "$source_dir/." "$target/"
+    lua "$SCRIPT_DIR/scripts/prepare-panel.lua" "$source_dir/$entry" "$SCRIPT_DIR/qml/PanelSupport.qml.inc" "$mode" "$CONTROLS_ID" > "$target/$entry"
+    if [[ "$mode" == media ]]; then
+        printf 'import "../%s"\n' "$CONTROLS_ID" > "$target/MediaPopup.qml"
+        sed 's/^PopupCard {/ControlPopup {/' "$source_dir/MediaPopup.qml" >> "$target/MediaPopup.qml"
+    fi
+    jq --arg id "$id" --arg entry "$entry" '.omarchy = {clonedFrom:.id} | .id = $id | .author = "OS" | .kinds = ["panel"] | .entryPoints = {panel:$entry} | .keepLoaded = true | del(.barWidget)' \
+        "$manifest_path" > "$target/manifest.json"
+done < <(jq -r '.panels[] | [.source,.id,(.mode // "panel"),(.directory // ("panels/" + .source)),(.entry // "Panel.qml"),(.manifest // "manifest.json")] | @tsv' "$POLICY")
+jq --slurpfile policy "$POLICY" --slurpfile defaults "$SCRIPT_DIR/data/shell.json" -f "$SCRIPT_DIR/scripts/shell.jq" \
+    "$CONFIG_HOME/omarchy/shell.json" > "$STAGE/shell.json"
+lua "$SCRIPT_DIR/scripts/jsonc.lua" "$NATIVE/default/omarchy/omarchy-menu.jsonc" \
+    | jq --slurpfile policy "$POLICY" -f "$SCRIPT_DIR/scripts/filter-menu.jq" > "$STAGE/data/os/session/data/menu.json"
+if [[ -f "$CONFIG_HOME/omarchy/extensions/omarchy-menu.jsonc" ]]; then
+    lua "$SCRIPT_DIR/scripts/jsonc.lua" "$CONFIG_HOME/omarchy/extensions/omarchy-menu.jsonc" | jq --slurpfile policy "$POLICY" -f "$SCRIPT_DIR/scripts/filter-menu.jq" > "$STAGE/personal-menu.json"
 else
     printf '{}\n' > "$STAGE/personal-menu.json"
 fi
-jq --slurpfile personal "$STAGE/personal-menu.json" \
-    --arg bar "$(t session.menu_bar)" --arg show "$(t session.menu_show)" \
-    --arg hide "$(t session.menu_hide)" --arg settings "$(t session.menu_settings)" \
-    --arg position "$(t session.menu_position)" \
-    '$personal[0] + (.bar.label = $bar | .bar.description = $bar | .["bar.show"].label = $show | .["bar.hide"].label = $hide | .["bar.settings"].label = $settings | .["bar.position"].label = $position)' \
-    "$SCRIPT_DIR/data/menu.json" > "$STAGE/extension.json"
-[[ -x /usr/lib/qt6/bin/qmlformat ]] || err "session.validation_failed" "qmlformat"
-/usr/lib/qt6/bin/qmlformat -n "$STAGE/menu/Menu.qml" > /dev/null || err "session.validation_failed" "Menu.qml"
+if [[ -f "$CONFIG_HOME/omarchy/extensions/os-menu.json" ]]; then
+    lua "$SCRIPT_DIR/scripts/jsonc.lua" "$CONFIG_HOME/omarchy/extensions/os-menu.json" \
+        | jq --slurpfile policy "$POLICY" -f "$SCRIPT_DIR/scripts/filter-menu.jq" > "$STAGE/previous-menu.json"
+    jq -s '.[0] * .[1]' "$STAGE/personal-menu.json" "$STAGE/previous-menu.json" > "$STAGE/personal-next.json"
+    mv "$STAGE/personal-next.json" "$STAGE/personal-menu.json"
+fi
+cp "$SCRIPT_DIR/data/menu.json" "$STAGE/managed-menu.json"
+while IFS=$'\t' read -r id key; do
+    jq --arg id "$id" --arg label "$(t "$key")" '.[$id].label = $label | del(.[$id].labelKey)' "$STAGE/managed-menu.json" > "$STAGE/menu-next.json"
+    mv "$STAGE/menu-next.json" "$STAGE/managed-menu.json"
+done < <(jq -r 'to_entries[] | select(.value.labelKey != null) | [.key,.value.labelKey] | @tsv' "$SCRIPT_DIR/data/menu.json")
+jq -s '.[0] * .[1]' "$STAGE/personal-menu.json" "$STAGE/managed-menu.json" > "$STAGE/extension.json"
+cp "$NATIVE/default/omarchy/launcher.hides" "$STAGE/data/os/session/data/launcher.hides"
+[[ -x /usr/lib/qt6/bin/qmlformat ]] || err "session.validation_failed" qmlformat
+while IFS= read -r -d '' file; do
+    /usr/lib/qt6/bin/qmlformat -n "$file" > /dev/null || err "session.validation_failed" "$file"
+done < <(find "$STAGE/plugins" -name '*.qml' -print0)
+mkdir -p "$STAGE/validator"
+cp "$SCRIPT_DIR/qml/Validate.qml" "$STAGE/validator/shell.qml"
+for directory in Commons Ui services; do ln -s "$NATIVE/shell/$directory" "$STAGE/validator/$directory"; done
+find "$STAGE/plugins" -name '*.qml' -print0 | jq -Rs 'split("\u0000") | map(select(length > 0))' > "$STAGE/components.json"
+session_display="${WAYLAND_DISPLAY:-}"
+if session_environment=$(systemctl --user show-environment); then
+    while IFS= read -r entry; do
+        case "$entry" in WAYLAND_DISPLAY=*) session_display="${entry#WAYLAND_DISPLAY=}" ;; esac
+    done <<< "$session_environment"
+fi
+session_socket="$session_display"
+[[ "$session_display" == /* ]] || session_socket="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/$session_display"
+if [[ -n "$session_display" && -S "$session_socket" ]]; then
+    if ! env QT_QPA_PLATFORM=wayland WAYLAND_DISPLAY="$session_display" OMARCHY_PATH="$NATIVE" OS_SESSION_COMPONENTS="$STAGE/components.json" \
+        timeout 25 qs -p "$STAGE/validator" > "$STAGE/qml-validation.log" 2>&1 \
+        || ! grep -q 'session-components-valid' "$STAGE/qml-validation.log"; then
+        cat "$STAGE/qml-validation.log"
+        err "session.validation_failed" QML
+    fi
+elif [[ "${OS_SESSION_REQUIRE_ENGINE:-0}" == 1 ]]; then
+    err "session.validation_failed" Wayland
+else
+    warn "session.engine_deferred"
+fi
 XDG_DATA_HOME="$STAGE/data" OS_HYPR_CONFIG_ROOT="$STAGE/config/hypr" \
     Hyprland --verify-config --config "$STAGE/config/hypr/hyprland.lua" > "$STAGE/validation.log" 2>&1 || {
         cat "$STAGE/validation.log"
-        err "session.validation_failed" "Hyprland"
+        err "session.validation_failed" Hyprland
     }
 grep -qx 'config ok' "$STAGE/validation.log" || { cat "$STAGE/validation.log"; err "session.validation_failed" Hyprland; }
+if [[ ! -f "$STATE_HOME/os/session/original-shell.json" ]]; then
+    install_user_file "$CONFIG_HOME/omarchy/shell.json" "$STATE_HOME/os/session/original-shell.json" 600
+fi
 install_user_file "$STAGE/data/os/hypr/runtime.lua" "$DATA_HOME/os/hypr/runtime.lua"
 if [[ -f "$DATA_HOME/omarchy/herdr-keybindings-menu" ]]; then
     install_user_file "$DATA_HOME/omarchy/herdr-keybindings-menu" "$DATA_HOME/os/herdr-keybindings-menu" 755
@@ -65,14 +144,38 @@ for file in "$STAGE/config/hypr/"*.lua; do
     install_user_file "$file" "$CONFIG_HOME/hypr/${file##*/}"
 done
 install_user_file "$STAGE/config/hypr/hyprland.lua" "$CONFIG_HOME/hypr/hyprland.lua"
-for file in "$STAGE/blocks/"*.lua; do
+for file in "$STAGE/blocks/"*.lua.json; do
     install_user_file "$file" "$STATE_HOME/os/hypr-blocks/${file##*/}" 600
+    legacy="$STATE_HOME/os/hypr-blocks/${file##*/}"
+    legacy="${legacy%.json}"
+    if [[ -f "$legacy" ]]; then
+        install_user_file "$legacy" "$STATE_HOME/os/session/retired-blocks/${legacy##*/}" 600
+        rm "$legacy"
+    fi
 done
-for file in Menu.qml MenuModel.js BarWidget.qml manifest.json; do
-    install_user_file "$STAGE/menu/$file" "$CONFIG_HOME/omarchy/plugins/os.menu/$file"
+for file in "$STAGE/data/os/session/data/"*; do
+    install_user_file "$file" "$DATA_HOME/os/session/data/${file##*/}" 600
 done
+while IFS= read -r -d '' file; do
+    install_user_file "$file" "$CONFIG_HOME/omarchy/plugins/${file#"$STAGE/plugins/"}"
+done < <(find "$STAGE/plugins" -type f ! -name manifest.json -print0)
+while IFS= read -r -d '' file; do
+    install_user_file "$file" "$CONFIG_HOME/omarchy/plugins/${file#"$STAGE/plugins/"}"
+done < <(find "$STAGE/plugins" -name manifest.json -print0)
 install_user_file "$STAGE/extension.json" "$CONFIG_HOME/omarchy/extensions/os-menu.json" 600
 install_user_file "$STAGE/shell.json" "$CONFIG_HOME/omarchy/shell.json" 600
+install_user_file "$SCRIPT_DIR/scripts/environment.sh" "$DATA_HOME/os/session/scripts/environment.sh" 600
+for file in "$HOME/.bashrc" "$HOME/.zshrc"; do
+    [[ -f "$file" ]] || continue
+    install_shell_block "$file" '# os quickshell default (managed)' '# end os quickshell default (managed)' <<'SHELL'
+source "${XDG_DATA_HOME:-$HOME/.local/share}/os/session/scripts/environment.sh"
+SHELL
+done
+jq -r '"QS_CONFIG_PATH=" + .runtime + "/shell"' "$POLICY" > "$STAGE/environment.conf"
+install_user_file "$STAGE/environment.conf" "$CONFIG_HOME/environment.d/60-os-quickshell.conf" 600
+if [[ -L "$CONFIG_HOME/quickshell/default" && "$(readlink -f "$CONFIG_HOME/quickshell/default")" == "$(readlink -f "$NATIVE/shell")" ]]; then
+    rm "$CONFIG_HOME/quickshell/default"
+fi
 mkdir -p "$STATE_HOME/omarchy/toggles"
 install_user_content "$STATE_HOME/omarchy/toggles/bar-off" 600 < /dev/null
 log "session.configured"

@@ -89,11 +89,11 @@ The canonical GitHub ruleset is `.github/main-ruleset.json`: no bypass actors, n
 
 ## OS Media Player
 
-`modules/plugins/osmp/` owns the OSMP sources and manifest. `modules/conf/osmp/install.sh` installs the local plugin as `os.osmp` through shared user configuration helpers; `35-shell-plugins.sh` enables it with native Omarchy commands. Archive the previous `krosci.omamp` installation before retiring it. Keep manifest and package versions synchronized. Never download another copy of this locally owned plugin from a remote repository.
+`modules/plugins/osmp/` owns the OSMP sources and manifest. `modules/conf/osmp/install.sh` installs the local sources as `os.osmp` through shared user configuration helpers; the session module adapts them into the standalone `os.media` panel and `35-shell-plugins.sh` enables that panel with native Omarchy commands. Archive the previous `krosci.omamp` installation before retiring it. Keep manifest and package versions synchronized. Never download another copy of this locally owned plugin from a remote repository.
 
 ## Graphical Theme Integration
 
-`modules/conf/session/` owns commentless user Hyprland Lua normalization, the external OS runtime adapter, the wider local menu clone and the hidden bar policy. `97-session.sh` reconciles it after other configuration producers and `make setup SCOPE=session` validates staged Lua and QML, reloads and checks Hyprland, then restarts and checks the shell. Keep native runtime files read only and retain theme, monitor, idle and input behavior. The root post-update hook regenerates the installed local menu from the current packaged source.
+`modules/conf/session/` owns commentless user Hyprland Lua normalization, the external OS runtime adapter, the wider local menu, the Quickshell default environment and standalone controls without a bar surface. Policy, menu entries and bindings belong in `data/`; algorithms belong in `scripts/` and interface components in `qml/`. Managed state is JSON, never executable Lua. Apps reads desktop entries and is verified as a populated runtime model. `97-session.sh` reconciles the module after other configuration producers and `make setup SCOPE=session` validates staged Lua and QML before applying and checking the session. Keep native runtime files read only and retain theme, monitor, idle and input behavior. The root post-update hook regenerates installed adapters from current packaged sources.
 
 `24-user-configurations.sh` discovers all `modules/conf/*/install.sh` after package provisioning and applies them through `user_as`. Brave Origin uses its native flags config and existing profile directory. Never replace active browser profile databases or preferences with static repository files.
 

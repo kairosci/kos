@@ -19,7 +19,7 @@ local function strip(text, literals, keep_comments)
       local first, last = text:find(ending, start + #equals + 2, true)
       assert(first, "Unterminated Lua block")
       if comment then
-        result[#result + 1] = keep_comments and text:sub(i, last) or (" " .. ("\n"):rep(select(2, text:sub(i, last):gsub("\n", ""))))
+        result[#result + 1] = keep_comments and literal(text:sub(i, last)) or (" " .. ("\n"):rep(select(2, text:sub(i, last):gsub("\n", ""))))
       else
         result[#result + 1] = literal(text:sub(i, last))
       end
@@ -71,8 +71,7 @@ if arg[2] then
   if state then
     local data = state:read("*a")
     state:close()
-    previous = assert(load(data, "@managed-state", "t", {}))()
-    assert(type(previous) == "table")
+    for key, value in data:gmatch("([^%z]+)%z([^%z]*)%z") do previous[key] = value end
   end
 end
 local literals = {}
@@ -105,17 +104,11 @@ end
 source = normalize(source) .. "\n"
 assert(not source:lower():find("omarchy", 1, true), "Unmapped runtime reference in " .. arg[1])
 assert(load(source, "@" .. arg[1]))
-if arg[3] then
+if arg[3] and arg[3] ~= "" then
   for key, body in pairs(blocks) do previous[key] = body end
-  local keys = {}
-  for key in pairs(previous) do keys[#keys + 1] = key end
-  table.sort(keys)
   local state = assert(io.open(arg[3], "w"))
-  state:write("return {\n")
-  for _, key in ipairs(keys) do
-    state:write(string.format("[%q] = %q,\n", key, previous[key]))
-  end
-  state:write("}\n")
+  local encode = dofile(arg[0]:match("^(.*[/])") .. "json.lua")
+  state:write(encode(previous))
   state:close()
 end
 io.write(source)

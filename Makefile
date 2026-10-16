@@ -43,6 +43,7 @@ lint:
 		modules/theme-previews/scripts/*.sh modules/theme-previews/scripts/lib/*.sh \
 		hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* \
 		modules/conf/*/*.sh \
+		modules/conf/*/scripts/*.sh \
 		tests/*.sh \
 		modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
 		modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \

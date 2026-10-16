@@ -62,6 +62,7 @@ jobs:
             scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh \
             hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* \
             modules/conf/*/*.sh \
+            modules/conf/*/scripts/*.sh \
             tests/*.sh \
             modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
             modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
@@ -136,7 +137,7 @@ jobs:
     steps:
       - name: Setup Arch Environment
         run: |
-          pacman -Syu --noconfirm base-devel git sudo jq python python-yaml lua
+          pacman -Syu --noconfirm base-devel git sudo jq python python-yaml lua quickshell
           useradd -m -G wheel testuser
           echo "testuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 

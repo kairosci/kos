@@ -28,7 +28,6 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_herdr_menu.sh" \
     "$SCRIPT_DIR/test_application_policy.sh" \
     "$SCRIPT_DIR/test_easyeffects.sh" \
-    "$SCRIPT_DIR/test_menubar.sh" \
     "$SCRIPT_DIR/test_desktop_cleanup.sh" \
     "$SCRIPT_DIR/test_graphical_workflow.sh" \
     "$SCRIPT_DIR/test_gui_integration.sh" \
@@ -42,4 +41,5 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_keyboard_backlight.sh" \
     "$SCRIPT_DIR/test_iso_verify.sh" \
     "$SCRIPT_DIR/test_iso_download.sh" \
-    "$SCRIPT_DIR/test_session.sh"
+    "$SCRIPT_DIR/test_session.sh" \
+    "$SCRIPT_DIR/test_session_catalog.sh"
