@@ -67,25 +67,25 @@ session_layout() {
         --slurpfile defaults "$PROJECT_DIR/modules/conf/session/data/shell.json" \
         -f "$PROJECT_DIR/modules/conf/session/scripts/shell.jq" "$1"
 }
-assert_true "panel migration preserves the idle policy and calendar preferences" "session_layout '$WORK_DIR/shell.json' > '$WORK_DIR/shell-new.json' && jq -e '.idle.lock == 300 and .bar.id == \"os.controls\" and ([.bar.layout[][]] | length == 0) and (.plugins | any(. == \"personal.plugin\")) and (.plugins | any(type == \"object\" and .id == \"os.clock\" and .format == \"HH:mm\"))' '$WORK_DIR/shell-new.json'"
+assert_true "panel migration preserves the idle policy and calendar preferences" "session_layout '$WORK_DIR/shell.json' > '$WORK_DIR/shell-new.json' && jq -e '.idle.lock == 300 and ([.bar.layout[][]] | length == 0) and (.plugins | any(. == \"personal.plugin\")) and (.plugins | any(type == \"object\" and .id == \"os.menu\"))' '$WORK_DIR/shell-new.json'"
 assert_true "panel migration is idempotent" "session_layout '$WORK_DIR/shell-new.json' > '$WORK_DIR/shell-again.json' && cmp '$WORK_DIR/shell-new.json' '$WORK_DIR/shell-again.json'"
 printf '%s\n' '{"learn":{},"learn.arch":{},"bar":{},"style.bar.position":{},"apps":{"provider":"apps"},"personal":{}}' > "$WORK_DIR/menu.json"
 assert_true "menu filtering removes Learn and bar routes while retaining Apps and personal entries" "jq --slurpfile policy '$PROJECT_DIR/modules/conf/session/data/policy.json' -f '$PROJECT_DIR/modules/conf/session/scripts/filter-menu.jq' '$WORK_DIR/menu.json' | jq -e 'keys == [\"apps\",\"personal\"]'"
 printf '%s\n' '{"literal":",}","url":"https://example.org",/* block */"items":[1,2,],}' > "$WORK_DIR/jsonc.json"
 assert_true "JSONC parsing preserves strings while stripping comments and trailing commas" "lua '$PROJECT_DIR/modules/conf/session/scripts/jsonc.lua' '$WORK_DIR/jsonc.json' | jq -e '.literal == \",}\" and .url == \"https://example.org\" and .items == [1,2]'"
 assert_true "managed state is JSON data rather than executable Lua" "jq -e 'type == \"object\" and has(\"os locale\")' '$WORK_DIR/state-new.lua'"
-mkdir -p "$WORK_DIR/homes/tester/.config/"{hypr,omarchy/plugins/os.menu,omarchy/extensions} "$WORK_DIR/trusted"
+mkdir -p "$WORK_DIR/homes/tester/.config/"{hypr,os/plugins/os.menu,os/extensions} "$WORK_DIR/trusted"
 for file in Menu.qml MenuModel.js manifest.json; do
-    printf 'fixture\n' > "$WORK_DIR/homes/tester/.config/omarchy/plugins/os.menu/$file"
+    printf 'fixture\n' > "$WORK_DIR/homes/tester/.config/os/plugins/os.menu/$file"
 done
 while IFS= read -r id; do
-    mkdir -p "$WORK_DIR/homes/tester/.config/omarchy/plugins/$id"
-    touch "$WORK_DIR/homes/tester/.config/omarchy/plugins/$id/fixture"
-done < <(jq -r '.menu.id,.controls.id,.panels[].id' "$PROJECT_DIR/modules/conf/session/data/policy.json")
+    mkdir -p "$WORK_DIR/homes/tester/.config/os/plugins/$id"
+    touch "$WORK_DIR/homes/tester/.config/os/plugins/$id/fixture"
+done < <(jq -r '.menu.id,.panels[].id' "$PROJECT_DIR/modules/conf/session/data/policy.json")
 mkdir -p "$WORK_DIR/homes/tester/.local/share/os/session/data"
 printf '{}\n' > "$WORK_DIR/homes/tester/.local/share/os/session/data/policy.json"
-printf '{}\n' > "$WORK_DIR/homes/tester/.config/omarchy/extensions/os-menu.json"
-printf '{}\n' > "$WORK_DIR/homes/tester/.config/omarchy/shell.json"
+printf '{}\n' > "$WORK_DIR/homes/tester/.config/os/extensions/os-menu.json"
+printf '{}\n' > "$WORK_DIR/homes/tester/.config/os/shell.json"
 touch "$WORK_DIR/homes/tester/.config/hypr/hyprland.lua"
 sed -e "s|/usr/local/lib/os|$WORK_DIR/trusted|g" -e "s|/home/\*|$WORK_DIR/homes/*|g" \
     "$PROJECT_DIR/scripts/lib/modules/97-session.sh" > "$WORK_DIR/stage.sh"
@@ -102,7 +102,7 @@ user_as() {
             if [[ "$*" == *'qs ipc call shell ping' ]]; then
                 printf 'ok\n'
             elif [[ "${SESSION_TEST_CHANGE:-0}" == 1 ]]; then
-                printf 'changed\n' >> "$SESSION_TEST_ROOT/homes/tester/.config/omarchy/plugins/os.menu/Menu.qml"
+                printf 'changed\n' >> "$SESSION_TEST_ROOT/homes/tester/.config/os/plugins/os.menu/Menu.qml"
             fi
             ;;
         hyprctl)
@@ -129,12 +129,10 @@ omarchy_as() {
         local route
         route=$(awk '$2 == "menu" && $3 == "summon" { route=$4 } END { print route }' "$SESSION_TEST_ROOT/commands.log")
         if [[ "${SESSION_TEST_APPS_EMPTY:-0}" == 1 ]]; then
-            printf '{"policyLoaded":true,"availableApps":0,"modelApps":0,"menus":["apps","controls"]}\n'
+            printf '{"policyLoaded":true,"availableApps":0,"modelApps":0,"menus":["apps"]}\n'
         else
-            printf '{"policyLoaded":true,"availableApps":10,"modelApps":10,"renderedWidth":400,"route":"%s","menus":["apps","controls"]}\n' "$route"
+            printf '{"policyLoaded":true,"availableApps":10,"modelApps":10,"renderedWidth":400,"route":"%s","menus":["apps"]}\n' "$route"
         fi
-    elif [[ "$1 $2" == 'shell os.controls' ]]; then
-        printf '{"barSurface":false,"barSize":0}\n'
     elif [[ "$1 $2 ${3:-}" == 'shell shell call' ]]; then
         local opened=false
         if [[ $(awk -v id="$4" '($4 == "summon" || $4 == "hide") && $5 == id { action=$4 } END { print action }' "$SESSION_TEST_ROOT/commands.log") == summon ]]; then opened=true; fi
@@ -152,5 +150,11 @@ assert_true "unchanged configuration checks the menu without restarting the shel
 assert_true "changed menu configuration restarts the shell after validation" "SESSION_TEST_CHANGE=1 bash '$WORK_DIR/harness.sh' '$PROJECT_DIR' && grep -q 'restart shell' '$WORK_DIR/commands.log'"
 : > "$WORK_DIR/commands.log"
 assert_true "compositor errors prevent a shell restart" "! SESSION_TEST_CHANGE=1 SESSION_TEST_ERRORS=1 bash '$WORK_DIR/harness.sh' '$PROJECT_DIR' && ! grep -q 'restart shell' '$WORK_DIR/commands.log'"
+assert_true "controls and panels are retired from the session policy" "jq -e 'has(\"controls\") | not' '$PROJECT_DIR/modules/conf/session/data/policy.json' && jq -e '.panels == []' '$PROJECT_DIR/modules/conf/session/data/policy.json'"
+assert_true "session bindings carry no panel shortcuts" "jq -e '. == []' '$PROJECT_DIR/modules/conf/session/data/bindings.json'"
+assert_true "managed menu data is retired" "[[ ! -e '$PROJECT_DIR/modules/conf/session/data/menu.json' ]]"
+assert_true "installer retires previously installed control copies" "grep -q 'os.controls' '$PROJECT_DIR/modules/conf/session/install.sh'"
+printf '%s\n' '{"plugins":[{"id":"os.audio"},{"id":"personal.plugin"}],"bar":{"layout":[]}}' > "$WORK_DIR/stale-shell.json"
+assert_true "retired os panels are dropped from the migrated shell" "jq --slurpfile policy '$PROJECT_DIR/modules/conf/session/data/policy.json' --slurpfile defaults '$PROJECT_DIR/modules/conf/session/data/shell.json' -f '$PROJECT_DIR/modules/conf/session/scripts/shell.jq' '$WORK_DIR/stale-shell.json' | jq -e '[.plugins[] | if type == \"string\" then . else .id end] | index(\"os.audio\") == null'"
 assert_true "an empty Apps catalogue fails runtime verification" "! SESSION_TEST_APPS_EMPTY=1 bash '$WORK_DIR/harness.sh' '$PROJECT_DIR'"
 test_summary

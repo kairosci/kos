@@ -12,7 +12,7 @@ local function replace(source, target)
 end
 replace('readonly property var appLibrary: root.shell ? root.shell.appLibrary : null', 'readonly property var appLibrary: appCatalog')
 replace('property string defaultMenuPath: omarchyPath + "/default/omarchy/omarchy-menu.jsonc"', 'property string defaultMenuPath: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/os/session/data/menu.json"')
-replace('property string userMenuPath: Quickshell.env("HOME") + "/.config/omarchy/extensions/omarchy-menu.jsonc"', 'property string userMenuPath: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/omarchy/extensions/os-menu.json"')
+replace('property string userMenuPath: Quickshell.env("HOME") + "/.config/omarchy/extensions/omarchy-menu.jsonc"', 'property string userMenuPath: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/os/extensions/os-menu.json"')
 replace('Style.space(300)), panel.width', 'Style.space(root.sessionPolicy ? root.sessionPolicy.menu.width : 0)), panel.width')
 replace('ConfirmDialog {', 'ControlConfirmDialog {')
 replace('text: row.label', 'text: row.kind === "app" ? row.label : SessionI18n.text(row.label)')

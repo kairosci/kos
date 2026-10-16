@@ -6,7 +6,7 @@ log "shell_plugins.install"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    _legacy="$user_home/.config/omarchy/plugins/krosci.omamp"
+    _legacy="$user_home/.config/os/plugins/krosci.omamp"
     if [[ -e "$_legacy" || -L "$_legacy" ]]; then
         omarchy_as "$_user" plugin disable krosci.omamp || err "defaults.app_failed" "osmp"
         user_as "$_user" bash -c '

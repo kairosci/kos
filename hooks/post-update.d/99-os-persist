@@ -94,7 +94,7 @@ for user_home in "${user_homes[@]}"; do
     user_as "$_user" bash /usr/local/lib/os/session/install.sh || err "session.validation_failed" "$_user"
   fi
   for _hook in folder-color gtk-theme shell-icons; do
-    _hook_path="$user_home/.config/omarchy/hooks/theme-set.d/$_hook"
+    _hook_path="$user_home/.config/os/hooks/theme-set.d/$_hook"
     if [[ -f "$_hook_path" ]]; then
       user_as "$_user" bash "$_hook_path" || warn "hooks.icons_reapply_skipped" "$_user"
     fi
