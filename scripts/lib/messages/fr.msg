@@ -517,6 +517,13 @@ iso.repacking=Application de l’overlay et reconstruction de l’ISO amorçable
 iso.repack_failed=Impossible de reconstruire l’ISO amorçable
 iso.output_ready=ISO OS créée : %s
 iso.signature_note=La signature upstream ne couvre pas cette image personnalisée ; la somme SHA-256 a été écrite à côté
+iso.verify_usage=Utilisation : verify-iso.sh --iso FILE --ref REF [--expected-commit SHA]
+iso.verify_iso_missing=L’image ISO n’existe pas : %s
+iso.verify_ref_invalid=Référence git non valide : %s
+iso.verify_extract_failed=Impossible d’extraire la configuration embarquée de %s
+iso.verify_content_mismatch=La configuration de l’ISO ne correspond pas à l’arborescence du dépôt
+iso.verify_marker_mismatch=Le marqueur de release de l’ISO ne correspond pas au commit attendu
+iso.verify_ok=Vérification ISO réussie : %s
 fontconfig.match_failed=Fontconfig a sélectionné une police web pour %s
 
 bootloader.install=Installation du chargeur de démarrage textuel GRUB

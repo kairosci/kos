@@ -39,4 +39,6 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_responsiveness.sh" \
     "$SCRIPT_DIR/test_test_harness.sh" \
     "$SCRIPT_DIR/test_update_hooks.sh" \
-    "$SCRIPT_DIR/test_keyboard_backlight.sh"
+    "$SCRIPT_DIR/test_keyboard_backlight.sh" \
+    "$SCRIPT_DIR/test_iso_verify.sh" \
+    "$SCRIPT_DIR/test_iso_download.sh"
