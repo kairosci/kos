@@ -537,3 +537,6 @@ session.validation_failed=Session configuration validation failed for %s
 session.configured=Session configuration validated and installed
 session.engine_deferred=No active Wayland session the QML engine check is deferred until the next session setup
 iso.release_exists=Release %s already exists and cannot be modified
+defaults.system_settings=Installing the Hyprland settings application
+wallpaper.failed=Could not generate wallpapers for %s
+wallpaper.deferred=No active monitor using the configured wallpaper size

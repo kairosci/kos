@@ -48,7 +48,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -92,6 +92,32 @@ if [[ "$SETUP_SCOPE" == keyboard ]]; then
     # shellcheck source=lib/keyboard-backlight-policy.sh
     source "$SCRIPT_DIR/lib/keyboard-backlight-policy.sh"
     log "setup.keyboard_done"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == settings || "$SETUP_SCOPE" == wallpaper ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    if [[ "$SETUP_SCOPE" == settings ]]; then
+        source "$SCRIPT_DIR/lib/hyprmod.sh"
+        source "$MODULES_DIR/36-os-cli.sh"
+        user_as "$PRIMARY_USER" bash "$PROJECT_DIR/modules/conf/hyprmod/install.sh"
+        user_as "$PRIMARY_USER" hyprctl reload config-only || err "session.validation_failed" Hyprland
+        _settings_errors=$(user_as "$PRIMARY_USER" hyprctl configerrors) || err "session.validation_failed" Hyprland
+        [[ -z "${_settings_errors//[[:space:]]/}" ]] || err "session.validation_failed" "$_settings_errors"
+    else
+        source "$SCRIPT_DIR/lib/wallpaper.sh"
+        user_as "$PRIMARY_USER" bash "$PROJECT_DIR/modules/conf/desktop/scripts/install-wallpaper.sh"
+        user_as "$PRIMARY_USER" bash -c '
+            set -euo pipefail
+            source "$1"
+            install_user_file "$2" "${XDG_CONFIG_HOME:-$HOME/.config}/os/hooks/theme-set.d/wallpaper" 755
+            install_user_file "$3" "${XDG_CONFIG_HOME:-$HOME/.config}/os/hooks/post-update.d/99-os-persist" 755
+            for catalog in "$4"/scripts/lib/messages/*.msg; do
+                install_user_file "$catalog" "${XDG_CONFIG_HOME:-$HOME/.config}/os/hooks/i18n/messages/${catalog##*/}"
+            done
+        ' bash "$PROJECT_DIR/scripts/lib/userconf.sh" "$PROJECT_DIR/hooks/theme-set.d/wallpaper" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "$PROJECT_DIR"
+    fi
     exit 0
 fi
 

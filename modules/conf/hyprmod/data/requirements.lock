@@ -1,0 +1,6 @@
+hyprmod @ https://github.com/BlueManCZ/hyprmod/archive/e148d221cc62edaa8d1b8ffac0f0a57edcb8e3c1.tar.gz --hash=sha256:2ea491d982ff260e2f8122d50bf54be911a3762ec28c889bab6d6d1ce15506cd
+hyprland-config==0.9.19 --hash=sha256:61aa0a478c1c77f8e4932ceae2291f6e54149509cafe91490ad2d4989a718058
+hyprland-schema==0.7.1 --hash=sha256:97637f24ac593232e388f99b079c4166cc8e321775e9097470f3b467cda551dc
+hyprland-state==0.4.7 --hash=sha256:ef4e4db2f0769d49c1c3291ebb8ddcaa9fc1d59c1022e0a75407b49b794ab269
+hyprland-monitors==0.9.0 --hash=sha256:0f6eeb3dae2a9db0a5eaaeca09aa63f4ff0d31d6ff7dbe763245b501208f1989
+hyprland-socket==0.12.2 --hash=sha256:4f1d007b7f9165447c39c66c578012bd2628331aeadb3a81c2fe2229711dc4d7
