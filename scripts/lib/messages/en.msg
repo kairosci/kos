@@ -553,4 +553,3 @@ session.menu_layout_next=Next keyboard layout
 session.menu_keyboard_settings=Keyboard settings
 session.engine_deferred=No active Wayland session the QML engine check is deferred until the next session setup
 iso.release_exists=Release %s already exists and cannot be modified
-iso.candidate_missing=No signed published candidate matches the source of %s

@@ -48,22 +48,22 @@ The image is rebuilt from an upstream installer image. Its upstream checksum is 
 
 ## Publish a release
 
-Create and push a signed `vX.Y-rc.N` tag from a reviewed, merged commit for a prerelease candidate. GitHub Actions builds the image and publishes assets to the prerelease with that exact heading. Create and push a signed `vX.Y` tag on the same commit for a stable release; the workflow reuses the newest signed prerelease candidate on that commit without rebuilding and publishes it under the new stable heading:
+Create and push a signed `vX.Y` tag from a reviewed, merged commit. GitHub Actions builds the image and publishes assets to the stable release with that exact heading:
 
 ```bash
 git switch main
 git pull --rebase origin main
-git tag -s v1.7-rc.1
-git push origin v1.7-rc.1
+git tag -s v1.7
+git push origin v1.7
 ```
 
 If a tagged build fails before publishing a release, rerun the `ISO` workflow from `main` with the existing signed tag:
 
 ```bash
-gh workflow run iso.yml --ref main -f release_tag=v1.7-rc.1
+gh workflow run iso.yml --ref main -f release_tag=v1.7
 ```
 
-The workflow refuses to replace a published release. Publish a corrected image or helper under a new version. Download helpers accept both stable and prerelease tags.
+The workflow refuses to replace a published release. Publish a corrected image or helper under a new version.
 
 ## Build locally
 
