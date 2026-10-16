@@ -38,14 +38,6 @@
       "id": "os.weather"
     },
     {
-      "source": "tray",
-      "id": "os.tray",
-      "mode": "tray",
-      "directory": "bar/widgets",
-      "entry": "Tray.qml",
-      "manifest": "Tray.manifest.json"
-    },
-    {
       "source": "media",
       "id": "os.media",
       "mode": "media",

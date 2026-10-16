@@ -97,7 +97,7 @@ while IFS=$'\t' read -r id key; do
     jq --arg id "$id" --arg label "$(t "$key")" '.[$id].label = $label | del(.[$id].labelKey)' "$STAGE/managed-menu.json" > "$STAGE/menu-next.json"
     mv "$STAGE/menu-next.json" "$STAGE/managed-menu.json"
 done < <(jq -r 'to_entries[] | select(.value.labelKey != null) | [.key,.value.labelKey] | @tsv' "$SCRIPT_DIR/data/menu.json")
-jq -s '.[0] * .[1]' "$STAGE/personal-menu.json" "$STAGE/managed-menu.json" > "$STAGE/extension.json"
+jq -s '.[0] * .[1] | del(.["controls.tray"])' "$STAGE/personal-menu.json" "$STAGE/managed-menu.json" > "$STAGE/extension.json"
 cp "$NATIVE/default/omarchy/launcher.hides" "$STAGE/data/os/session/data/launcher.hides"
 jq -n --arg language "$I18N_LANG" --slurpfile catalogue "$SCRIPT_DIR/data/locales/$I18N_LANG.json" \
     '{language:$language,messages:$catalogue[0].messages,patterns:$catalogue[0].patterns,folded:($catalogue[0].messages | to_entries | map({key:(.key|ascii_downcase),value:.value}) | from_entries)}' \
@@ -184,6 +184,7 @@ while IFS= read -r -d '' file; do
     install_user_file "$file" "$CONFIG_HOME/omarchy/plugins/${file#"$STAGE/plugins/"}"
 done < <(find "$STAGE/plugins" -name manifest.json -print0)
 install_user_file "$STAGE/extension.json" "$CONFIG_HOME/omarchy/extensions/os-menu.json" 600
+rm -rf "$CONFIG_HOME/omarchy/plugins/os.tray"
 install_user_file "$STAGE/shell.json" "$CONFIG_HOME/omarchy/shell.json" 600
 install_user_file "$SCRIPT_DIR/scripts/environment.sh" "$DATA_HOME/os/session/scripts/environment.sh" 600
 for file in "$HOME/.bashrc" "$HOME/.zshrc"; do

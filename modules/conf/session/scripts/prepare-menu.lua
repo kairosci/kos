@@ -16,6 +16,7 @@ replace('property string userMenuPath: Quickshell.env("HOME") + "/.config/omarch
 replace('Style.space(300)), panel.width', 'Style.space(root.sessionPolicy ? root.sessionPolicy.menu.width : 0)), panel.width')
 replace('ConfirmDialog {', 'ControlConfirmDialog {')
 replace('text: row.label', 'text: row.kind === "app" ? row.label : SessionI18n.text(row.label)')
+replace('if (active === "apps") {', 'if (active === "apps" || active === "controls") {')
 local ending = assert(text:find("}%s*$"))
 text = text:sub(1, ending - 1) .. read(assert(arg[2])) .. '\n  AppCatalog { id: appCatalog; policy: root.sessionPolicy }\n' .. text:sub(ending)
 io.write(text)

@@ -43,4 +43,5 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_iso_download.sh" \
     "$SCRIPT_DIR/test_session.sh" \
     "$SCRIPT_DIR/test_session_i18n.sh" \
+    "$SCRIPT_DIR/test_wallpaper.sh" \
     "$SCRIPT_DIR/test_session_catalog.sh"

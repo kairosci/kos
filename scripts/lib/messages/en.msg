@@ -546,7 +546,6 @@ session.menu_weather=Weather
 session.menu_notifications=Notifications
 session.menu_media=Media
 session.menu_update=Updates
-session.menu_tray=Tray applications
 session.menu_workspaces=Workspaces
 session.menu_keyboard=Keyboard
 session.menu_layout_next=Next keyboard layout

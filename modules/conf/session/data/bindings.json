@@ -43,10 +43,5 @@
     "key": "SUPER + CTRL + code:17",
     "labelKey": "session.menu_weather",
     "command": "os shell shell toggle os.weather"
-  },
-  {
-    "key": "SUPER + CTRL + code:18",
-    "labelKey": "session.menu_tray",
-    "command": "os shell shell toggle os.tray"
   }
 ]

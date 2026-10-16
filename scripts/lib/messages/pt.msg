@@ -546,7 +546,6 @@ session.menu_weather=Meteorologia
 session.menu_notifications=Notificações
 session.menu_media=Multimédia
 session.menu_update=Atualizações
-session.menu_tray=Aplicações da área de notificação
 session.menu_workspaces=Áreas de trabalho
 session.menu_keyboard=Teclado
 session.menu_layout_next=Próxima disposição

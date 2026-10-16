@@ -53,11 +53,6 @@
     "target": "update",
     "icon": ""
   },
-  "controls.tray": {
-    "labelKey": "session.menu_tray",
-    "action": "os shell shell summon os.tray",
-    "icon": "󰀻"
-  },
   "controls.workspaces": {
     "labelKey": "session.menu_workspaces",
     "icon": "󰙀"
