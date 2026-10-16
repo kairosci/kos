@@ -73,13 +73,6 @@ assert_file_contains_literal "invalid GTK palette preserves previous CSS" "$XDG_
 assert_false "invalid Zed palette fails before replacing the theme" "bash '$PROJECT_DIR/modules/conf/zed/theme.sh'"
 assert_true "invalid palette preserves the previous Zed theme" "jq -e '.theme_overrides[\"One Light\"][\"editor.background\"] == \"#f0f0f0\"' '$XDG_CONFIG_HOME/zed/settings.json'"
 unset OS_THEME_NAME OS_THEME_COLORS
-printf '[Desktop Entry]\nType=Application\nName=Sample\nExec=/usr/bin/sample --original %%U\n' > "$SANDBOX/sample.desktop"
-assert_true "Electron integration preserves packaged launcher arguments" "install_user_electron_launcher '$SANDBOX/sample.desktop' '$SANDBOX/result.desktop'"
-assert_file_contains_literal "Electron preserves native backend selection and portals" "$SANDBOX/result.desktop" 'Exec=env GTK_USE_PORTAL=1 /usr/bin/sample --original %U'
-assert_file_not_contains "Electron does not force an invalid Ozone backend" "$SANDBOX/result.desktop" 'ozone-platform=auto'
-if command -v desktop-file-validate >/dev/null; then
-    assert_true "generated launcher is a valid desktop entry" "desktop-file-validate '$SANDBOX/result.desktop'"
-fi
 mkdir -p "$XDG_CONFIG_HOME/omarchy"
 printf '%s\n' '{"bar":{"layout":{"right":[{"id":"omarchy.agents","refreshIntervalSec":120,"providers":{"claude":{"enabled":true},"codex":{"enabled":true},"fireworks":{"enabled":false}}}] }},"idle":{"lock":321}}' > "$XDG_CONFIG_HOME/omarchy/shell.json"
 assert_true "Agents installer disables only the Claude provider" "bash '$PROJECT_DIR/modules/conf/agents/install.sh' && jq -e '.bar.layout.right[0].providers.claude.enabled == false and .bar.layout.right[0].providers.codex.enabled == true and .bar.layout.right[0].providers.fireworks.enabled == false and .bar.layout.right[0].refreshIntervalSec == 120 and .idle.lock == 321' '$XDG_CONFIG_HOME/omarchy/shell.json'"

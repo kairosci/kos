@@ -8,7 +8,7 @@ Each installed application owns its configuration directory. `desktop` owns migr
 
 
 
-Brave Origin owns its native launcher flags in `brave/data/brave-origin-flags.conf`; its existing user profile is retained. Setup automatically executes every `modules/conf/*/install.sh` in each user's environment, so app installers do not require individual stage registrations.
+Brave Origin owns its native launcher flags in `data/component/application/brave/brave-origin-flags.conf`; its existing user profile is retained. Setup applies the Lua application registry before discovering the remaining `modules/conf/*/install.sh` installers in each user's environment.
 
 Zed opens project directories directly through `zed --new /path/to/project` or the terminal. OnlyOffice handles office documents, spreadsheets and presentations through its native INI configuration.
 

@@ -37,6 +37,16 @@ local function source(path, command)
 end
 
 if arg[2] == "json" then
+    suite:test("migration inventory cannot certify retained shell algorithms", function()
+        local Inventory = require("component.migration.inventory")
+        local inventory = Inventory.new(root, process, File.json(root .. "/data/component/migration/policy.json"))
+        local report = inventory:report()
+        assert(not report.complete and #report.remaining > 0 and #report.starters == 4)
+        assert(inventory:classify("module/tool", "#!/usr/bin/env bash\nexit 0\n") == "shell")
+        assert(inventory:classify("module/tool", "#!/bin/sh\nexit 0\n") == "shell")
+        assert(inventory:classify("module/test.rb", "") == "ruby")
+        suite:reject(function() inventory:classify("script/os-lua", "#!/bin/bash\nbash legacy.sh\n") end)
+    end)
     suite:test("JSON round trips arrays false null and Unicode", function()
         local value = Json.decode([[{"values":[false,null,"\uD83D\uDE00",1.25e2]}]])
         assert(value.values[1] == false and value.values[2] == Json.null and value.values[3] == "😀" and value.values[4] == 125)
@@ -91,6 +101,45 @@ elseif arg[2] == "applications" then
         end)
         end
     end
+    local Files = require("component.application.files")
+    local Paths = require("core.paths")
+    local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
+    local paths = Paths.new(File.json(root .. "/data/core/paths.json"), function(key) if key == "HOME" then return directory end end)
+    local publisher = Publisher.new(process)
+    suite:test("Lua installs native browser flags with a backup of existing preferences", function()
+        local destination = paths:resolve("config", registry.brave.destination)
+        publisher:publish(destination, "--personal\n", "644")
+        Files.new(root, paths, publisher, process, registry):apply("brave")
+        assert(File.read(destination) == File.read(root .. "/" .. registry.brave.source))
+        assert(File.read(destination .. ".bak") == "--personal\n")
+        assert(os.remove(destination)); assert(os.remove(destination .. ".bak"))
+    end)
+    suite:test("Lua Electron integration preserves every packaged action and argument", function()
+        local source = directory .. "/fixture.desktop"
+        local native = "[Desktop Entry]\nType=Application\nExec=/usr/bin/sample --original %U\n[Desktop Action New]\nExec=/usr/bin/sample --new %F\n"
+        publisher:publish(source, native, "644")
+        local definition = Json.decode(Json.encode(registry.slack))
+        definition.source = source
+        local refreshed = 0
+        local backend = {run=function(_, command, arguments)
+            assert(command == "desktopDatabase" and arguments[1] == paths:resolve("data", "applications"))
+            refreshed = refreshed + 1
+        end}
+        local files = Files.new(root, paths, publisher, backend, {fixture=definition})
+        files:apply("fixture")
+        local destination = paths:resolve("data", definition.destination)
+        local content = File.read(destination)
+        assert(content:find("Exec=env GTK_USE_PORTAL=1 /usr/bin/sample --original %U", 1, true))
+        assert(content:find("Exec=env GTK_USE_PORTAL=1 /usr/bin/sample --new %F", 1, true))
+        assert(not content:find("ozone-platform", 1, true))
+        files:apply("fixture")
+        assert(File.read(destination) == content and refreshed == 2)
+        assert(os.remove(destination)); assert(os.remove(source))
+    end)
+    assert(os.remove(paths:resolve("data", "applications")))
+    assert(os.remove(paths:resolve("data", ""):gsub("/$", "")))
+    assert(os.remove(paths:resolve("config", ""):gsub("/$", "")))
+    assert(os.remove(directory .. "/.local")); assert(os.remove(directory))
     suite:test("unknown application cannot call a native backend", function()
         local backend = {run=function() error("backend_called") end}
         suite:reject(function() Settings.new(root, backend, registry):apply("missing") end)

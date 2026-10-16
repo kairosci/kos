@@ -154,27 +154,6 @@ apply_user_gsettings() {
     done < "$src"
 }
 
-install_user_electron_launcher() {
-    local src="$1" dest="$2" staged
-    [[ -r "$src" ]] || return 1
-    staged=$(mktemp) || return 1
-    if ! awk '
-        /^Exec=/ {
-            sub(/^Exec=/, "Exec=env GTK_USE_PORTAL=1 ")
-        }
-        { print }
-    ' "$src" > "$staged"; then
-        rm -f "$staged"
-        return 1
-    fi
-    if install_user_content "$dest" < "$staged"; then
-        rm -f "$staged"
-    else
-        rm -f "$staged"
-        return 1
-    fi
-}
-
 remove_shell_block() {
     local rc="$1" begin="$2" end="$3" staged
     [[ -f "$rc" ]] || return 0

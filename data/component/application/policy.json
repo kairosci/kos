@@ -1,1 +1,77 @@
-{"baobab":{"display":"baobab","kind":"settings","settings":"data/component/application/baobab/settings.tsv"},"celluloid":{"display":"celluloid","kind":"settings","settings":"data/component/application/celluloid/settings.tsv"},"file-roller":{"display":"file-roller","kind":"settings","settings":"data/component/application/file-roller/settings.tsv"},"loupe":{"display":"loupe","kind":"settings","settings":"data/component/application/loupe/settings.tsv"},"nautilus":{"display":"Nautilus","kind":"settings","settings":"data/component/application/nautilus/settings.tsv"},"onlyoffice":{"destination":"onlyoffice/DesktopEditors.conf","display":"OnlyOffice","kind":"ini","mode":"600","root":"config","source":"data/component/application/onlyoffice/DesktopEditors.conf"},"papers":{"display":"papers","kind":"settings","settings":"data/component/application/papers/settings.tsv"}}
+{
+  "baobab": {
+    "display": "baobab",
+    "kind": "settings",
+    "settings": "data/component/application/baobab/settings.tsv"
+  },
+  "celluloid": {
+    "display": "celluloid",
+    "kind": "settings",
+    "settings": "data/component/application/celluloid/settings.tsv"
+  },
+  "file-roller": {
+    "display": "file-roller",
+    "kind": "settings",
+    "settings": "data/component/application/file-roller/settings.tsv"
+  },
+  "loupe": {
+    "display": "loupe",
+    "kind": "settings",
+    "settings": "data/component/application/loupe/settings.tsv"
+  },
+  "nautilus": {
+    "display": "Nautilus",
+    "kind": "settings",
+    "settings": "data/component/application/nautilus/settings.tsv"
+  },
+  "onlyoffice": {
+    "destination": "onlyoffice/DesktopEditors.conf",
+    "display": "OnlyOffice",
+    "kind": "ini",
+    "mode": "600",
+    "root": "config",
+    "source": "data/component/application/onlyoffice/DesktopEditors.conf"
+  },
+  "papers": {
+    "display": "papers",
+    "kind": "settings",
+    "settings": "data/component/application/papers/settings.tsv"
+  },
+  "brave": {
+    "kind": "file",
+    "display": "Brave Origin",
+    "sourceRoot": "project",
+    "source": "data/component/application/brave/brave-origin-flags.conf",
+    "root": "config",
+    "destination": "brave-origin-flags.conf",
+    "mode": "644"
+  },
+  "slack": {
+    "kind": "desktop",
+    "display": "slack",
+    "sourceRoot": "system",
+    "source": "/usr/share/applications/slack.desktop",
+    "root": "data",
+    "destination": "applications/slack.desktop",
+    "mode": "644",
+    "execPrefix": "env GTK_USE_PORTAL=1 ",
+    "refresh": {
+      "command": "desktopDatabase",
+      "directory": "applications"
+    }
+  },
+  "discord": {
+    "kind": "desktop",
+    "display": "discord",
+    "sourceRoot": "system",
+    "source": "/usr/share/applications/discord.desktop",
+    "root": "data",
+    "destination": "applications/discord.desktop",
+    "mode": "644",
+    "execPrefix": "env GTK_USE_PORTAL=1 ",
+    "refresh": {
+      "command": "desktopDatabase",
+      "directory": "applications"
+    }
+  }
+}
