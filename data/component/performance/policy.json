@@ -54,5 +54,18 @@
       ],
       "value": "cache"
     }
-  ]
+  ],
+  "environment": {
+    "values": {
+      "CARGO_BUILD_JOBS": "workers"
+    },
+    "exportPrefix": "export ",
+    "root": "config",
+    "file": "environment.d/90-os-build.conf",
+    "mode": "644",
+    "shellRoot": "home",
+    "shellFile": ".bashrc",
+    "first": "# >>> os build resources >>>",
+    "last": "# <<< os build resources <<<"
+  }
 }

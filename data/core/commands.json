@@ -20,5 +20,6 @@
   "repositoryFiles": ["/usr/bin/git"],
   "validateLua": ["/usr/bin/luac", "-p"],
   "removeDirectory": ["/usr/bin/rm", "-r", "--"],
-  "processorCount": ["/usr/bin/getconf", "_NPROCESSORS_ONLN"]
+  "processorCount": ["/usr/bin/getconf", "_NPROCESSORS_ONLN"],
+  "userEnvironment": ["/usr/bin/systemctl", "--user", "set-environment"]
 }

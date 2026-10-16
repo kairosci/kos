@@ -31,7 +31,9 @@ for _home in /home/*; do
     _uid=$(id -u "$_user") || err "performance.user_failed" "$_user"
     if [[ -S "/run/user/$_uid/bus" ]]; then
         user_as "$_user" systemctl --user daemon-reload || err "performance.user_failed" "$_user"
+        user_as "$_user" "$PROJECT_ROOT/script/os-lua" apply-build-environment || err "performance.user_failed" "$_user"
     else
+        user_as "$_user" "$PROJECT_ROOT/script/os-lua" apply-build-environment --defer || err "performance.user_failed" "$_user"
         log "performance.session_deferred" "$_user"
     fi
 done
