@@ -21,6 +21,11 @@ assert_file_contains "wallpaper hook publishes through the native override direc
 assert_file_contains "wallpaper hook updates the current background link" "$HOOK" "current/background"
 assert_file_contains "desktop installer stages the krepo logo" "$INSTALLER" "wallpapers/krepo.png"
 assert_file_contains "desktop installer applies the wallpaper hook" "$INSTALLER" "theme-set.d/wallpaper"
+if ! command -v magick >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+    assert_warn "wallpaper generation requires ImageMagick" "command -v magick"
+    test_summary
+    exit 0
+fi
 mkdir -p "$WORK_DIR/home/.local/state/omarchy/current" "$WORK_DIR/home/.config/omarchy/themes/fixture" "$WORK_DIR/data/os/desktop/wallpapers" "$WORK_DIR/fakebin"
 printf 'fixture\n' > "$WORK_DIR/home/.local/state/omarchy/current/theme.name"
 printf 'background = "#112233"\nforeground = "#ffffff"\n' > "$WORK_DIR/home/.config/omarchy/themes/fixture/colors.toml"
