@@ -24,7 +24,7 @@ function Renderer:palette(theme, active)
         source .. "/" .. self.policy.themes .. "/" .. theme .. "/" .. self.policy.colors,
         self.paths:resolve("config", self.policy.overlay .. "/" .. theme .. "/" .. self.policy.colors)
     }
-    if active == theme then candidates[#candidates + 1] = self.paths:resolve("state", self.policy.current .. "/theme/" .. self.policy.colors) end
+    if active == theme then candidates[#candidates + 1] = self.paths:resolve("state", self.policy.current .. "/" .. self.policy.files.activePalette) end
     for _, path in ipairs(candidates) do content = self:optional(path) or content end
     assert(content, "palette_missing")
     local colors = {}
@@ -80,7 +80,7 @@ end
 function Renderer:render(theme)
     local policy = self.policy
     local current = self.paths:resolve("state", policy.current)
-    local active = self:optional(current .. "/theme.name")
+    local active = self:optional(current .. "/" .. policy.files.themeName)
     if active then active = active:gsub("%s+$", "") end
     theme = theme or assert(active, "theme_required")
     assert(theme:match("^[a-z0-9][a-z0-9._-]*$") and not theme:find("..", 1, true), "invalid_theme")
@@ -119,12 +119,12 @@ function Renderer:render(theme)
     local archive = self.paths:resolve("data", policy.archive .. "/" .. theme)
     Catalog.run(self.root, output, self.paths:resolve("config", policy.chooser .. "/" .. theme), archive, self.root .. "/" .. policy.policyFile)
     if active == theme then
-        local stock = current .. "/theme/backgrounds"
+        local stock = current .. "/" .. policy.files.stockBackgrounds
         local mode = tonumber(self.process:run("fileMode", {stock}), 16)
         assert(mode and mode & 0xF000 == 0x4000, "non_directory_stock")
         local retired = Catalog.new(self.process, archive)
         for _, path in ipairs(retired:entries(stock)) do retired:retire(path) end
-        self:link(image, current .. "/background")
+        self:link(image, current .. "/" .. policy.files.activeBackground)
     end
     return image
 end

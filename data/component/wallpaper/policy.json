@@ -61,5 +61,11 @@
     "-density",
     "72",
     "{destination}"
-  ]
+  ],
+  "files": {
+    "themeName": "theme.name",
+    "activePalette": "theme/colors.toml",
+    "stockBackgrounds": "theme/backgrounds",
+    "activeBackground": "background"
+  }
 }
