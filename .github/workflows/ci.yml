@@ -114,8 +114,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Install Test Dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq lua5.4
 
       - name: Run Debloat & Theming Tests
         run: bash tests/test_debloat_theming.sh
@@ -138,7 +138,7 @@ jobs:
     steps:
       - name: Setup Arch Environment
         run: |
-          pacman -Syu --noconfirm base-devel git sudo jq python python-yaml lua quickshell imagemagick ripgrep ruby ruby-openssl
+          pacman -Syu --noconfirm base-devel git sudo jq python python-yaml lua quickshell imagemagick ripgrep
           useradd -m -G wheel testuser
           echo "testuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
@@ -146,6 +146,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+
+      - name: Validate Lua Sources
+        run: |
+          while IFS= read -r -d '' source; do
+            luac -p "$source"
+          done < <(find src tests/lua -type f -name '*.lua' -print0)
 
       - name: Run Full Test Suite
         run: bash tests/run-all.sh

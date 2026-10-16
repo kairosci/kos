@@ -7,6 +7,8 @@ if [[ $EUID -eq 0 ]]; then
     OS_I18N_BOOT=/usr/local/lib/os/i18n.sh
     if [[ -f "$OS_I18N_BOOT" ]]; then
         export OS_I18N_DIR=/usr/local/lib/os/messages
+    elif [[ -d "$SCRIPT_DIR/../../data/catalog" ]]; then
+        export OS_I18N_DIR="$SCRIPT_DIR/../../data/catalog"
     else
         export OS_I18N_DIR="$SCRIPT_DIR/messages"
     fi

@@ -18,5 +18,4 @@ for user_home in /home/*; do
         ' bash "$_legacy" || err "defaults.app_failed" "osmp"
     fi
     omarchy_as "$_user" shell shell rescanPlugins || err "defaults.app_failed" "osmp"
-    omarchy_as "$_user" plugin enable os.media || err "defaults.app_failed" "osmp"
 done

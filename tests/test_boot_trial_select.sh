@@ -6,7 +6,7 @@ source "$SCRIPT_DIR/test_lib.sh"
 source "$PROJECT_DIR/scripts/lib/boot-trial-select.sh"
 WORK_DIR=$(mktemp -d)
 trap 'rm -rf -- "$WORK_DIR"' EXIT
-POLICY="$PROJECT_DIR/modules/platform/arch/data/boot.json"
+POLICY="$PROJECT_DIR/data/component/boot/policy.json"
 log() { printf '%s\n' "$*" >> "$WORK_DIR/log"; }
 efibootmgr() {
     if [[ "$1" == --bootnext ]]; then

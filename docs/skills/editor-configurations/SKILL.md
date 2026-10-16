@@ -10,7 +10,7 @@ description: >-
 
 ## OnlyOffice
 
-OnlyOffice handles word processing, spreadsheets and presentations. Merge its native INI preferences through `userconf.sh`, preserve account data and unrelated preferences, and register office MIME types through `desktop-workflow.sh`. Papers remains the default PDF viewer.
+OnlyOffice handles word processing, spreadsheets and presentations. Its migrated policy lives in `data/component/application/onlyoffice/` and the application registry. Merge native INI preferences through `src/core/ini.lua` and publish through `src/core/publisher.lua`, preserving account data, unrelated preferences and private backups. Register office MIME types through `desktop-workflow.sh`. Papers remains the default PDF viewer.
 
 ## Zed
 
@@ -18,4 +18,4 @@ Zed is the desktop editor for plain text, source files and projects. Nautilus ke
 
 Apply configurations through setup. `make theme` synchronizes folder icons and Zed colors from the active OS palette.
 
-The setup stage discovers every `modules/conf/*/install.sh` automatically and executes it inside each real user session before theme hooks. A new app config directory must provide an installer using `userconf.sh`; never edit browser profile databases or overwrite active browser preferences. Brave Origin's launcher reads its native flags file, while its existing profiles remain in the standard user config directory.
+The setup stage applies the Lua application registry and then discovers remaining `modules/conf/*/install.sh` installers inside each real user session before theme hooks. Add new application policy to `data/component/application/` and implement new algorithms in `src/component/application/`; do not restore retired Bash installers. Never edit browser profile databases or overwrite active browser preferences. Brave Origin's launcher reads its native flags file, while its existing profiles remain in the standard user config directory.

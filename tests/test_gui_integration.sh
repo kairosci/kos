@@ -34,7 +34,7 @@ assert_file_contains_literal "GTK portal file picker stays centered within the m
 assert_true "Zed native configuration installs" "bash '$PROJECT_DIR/modules/conf/zed/install.sh'"
 assert_true "Zed uses native project preferences" "jq -e '.restore_on_startup == \"last_workspace\" and .project_panel.git_status == true and .terminal.shell == \"system\"' '$XDG_CONFIG_HOME/zed/settings.json'"
 assert_true "Zed settings installation is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/zed/settings.json'); bash '$PROJECT_DIR/modules/conf/zed/install.sh'; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/zed/settings.json')\" ]]"
-assert_true "Nautilus native settings install" "bash '$PROJECT_DIR/modules/conf/nautilus/install.sh'"
+assert_true "Nautilus native settings install" "lua '$PROJECT_DIR/tests/lua/apply_settings.lua' '$PROJECT_DIR' nautilus"
 mkdir -p "$XDG_CONFIG_HOME/hypr" "$XDG_CONFIG_HOME/gtk-4.0"
 printf 'custom_setting = true\n' > "$XDG_CONFIG_HOME/hypr/hyprland.lua"
 printf '.personal { color: red; }\n' > "$XDG_CONFIG_HOME/gtk-4.0/gtk.css"

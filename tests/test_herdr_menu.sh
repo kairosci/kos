@@ -6,7 +6,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 HERDR_MENU="$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu"
 HERDR_INSTALLER="$PROJECT_DIR/modules/conf/herdr/install.sh"
-MSG_DIR="$PROJECT_DIR/scripts/lib/messages"
+MSG_DIR="$PROJECT_DIR/data/catalog"
 
 source "$SCRIPT_DIR/test_lib.sh"
 

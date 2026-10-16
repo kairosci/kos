@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "${BASH_SOURCE[0]%/*}/.." && pwd -P)
+interpreter=
+while IFS='=' read -r key value; do
+    case "$key" in
+        COMMAND_PATH) export PATH="$value" ;;
+        INTERPRETER) interpreter="$value" ;;
+        *) exit 1 ;;
+    esac
+done < "$root/data/core/bootstrap.env"
+[[ "$interpreter" == /* && -x "$interpreter" ]]
+exec "$interpreter" -E "$root/src/main.lua" "$root" "$@"

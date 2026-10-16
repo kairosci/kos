@@ -11,6 +11,9 @@ RESOLVER_FAILOVER_PROBE_HOSTS=(archlinux.org github.com herdr.dev)
 RESOLVER_FAILOVER_LIB_DIR="$(dirname "${BASH_SOURCE[0]}")"
 if [[ -r "$RESOLVER_FAILOVER_LIB_DIR/i18n.sh" ]]; then
     export OS_I18N_DIR="$RESOLVER_FAILOVER_LIB_DIR/messages"
+    if [[ -d "$RESOLVER_FAILOVER_LIB_DIR/../../data/catalog" ]]; then
+        export OS_I18N_DIR="$RESOLVER_FAILOVER_LIB_DIR/../../data/catalog"
+    fi
     source "$RESOLVER_FAILOVER_LIB_DIR/i18n.sh"
 elif [[ -r /usr/local/lib/os/i18n.sh ]]; then
     export OS_I18N_DIR=/usr/local/lib/os/messages

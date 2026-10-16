@@ -3,7 +3,7 @@ set -euo pipefail
 
 install -d -m 755 -o root -g root /usr/local/lib/os/messages
 install -m 644 -o root -g root "$PROJECT_ROOT/scripts/lib/i18n.sh" /usr/local/lib/os/
-install -m 644 -o root -g root "$PROJECT_ROOT"/scripts/lib/messages/*.msg /usr/local/lib/os/messages/
+install -m 644 -o root -g root "$PROJECT_ROOT"/data/catalog/*.msg /usr/local/lib/os/messages/
 
 log "power.keyboard"
 install -Dm755 "$PROJECT_ROOT/scripts/lib/keyboard-backlight.sh" /usr/local/libexec/os-keyboard-backlight

@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 LIB_DIR="$PROJECT_DIR/scripts/lib"
-MSG_DIR="$LIB_DIR/messages"
+MSG_DIR="$PROJECT_DIR/data/catalog"
 
 source "$SCRIPT_DIR/test_lib.sh"
 

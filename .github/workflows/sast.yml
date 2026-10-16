@@ -46,7 +46,7 @@ jobs:
             scripts hooks modules/conf tests modules/clean/scripts modules/clean/scripts/lib/modules \
             modules/obscure/scripts modules/obscure/scripts/lib/modules modules/slop/scripts modules/slop/scripts/lib/modules \
             modules/performance/scripts modules/performance/scripts/lib/modules modules/iso/scripts \
-            modules/theme-previews/scripts modules/theme-previews/scripts/lib modules/core modules/platform/arch
+            modules/theme-previews/scripts modules/theme-previews/scripts/lib src
 
       - name: Upload SARIF results
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

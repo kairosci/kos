@@ -43,7 +43,7 @@ assert_true "failed installation leaves the previous executable intact" "[[ \$(c
 mkdir -p "$WORK_DIR/project/scripts/lib/modules"
 sed 's/\$EUID/0/g' "$ROOT_DIR/scripts/setup.sh" > "$WORK_DIR/project/scripts/setup.sh"
 cp "$ROOT_DIR/scripts/lib/i18n.sh" "$ROOT_DIR/scripts/lib/target-user.sh" "$WORK_DIR/project/scripts/lib/"
-cp -r "$ROOT_DIR/scripts/lib/messages" "$WORK_DIR/project/scripts/lib/"
+cp -r "$ROOT_DIR/data/catalog" "$WORK_DIR/project/scripts/lib/messages"
 printf 'root_setup_persistent() { return 0; }\n' > "$WORK_DIR/project/scripts/lib/root-recovery.sh"
 printf '[[ "${1:-}" == --functions-only ]] || exit 81\nprintf "helpers\\n" >> "$CLI_TEST_TRACE"\n' > "$WORK_DIR/project/scripts/lib/modules/00-env.sh"
 printf 'printf "cli\\n" >> "$CLI_TEST_TRACE"\n' > "$WORK_DIR/project/scripts/lib/modules/36-os-cli.sh"

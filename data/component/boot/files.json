@@ -1,0 +1,6 @@
+{
+  "inventory": "limine.conf",
+  "directory": "grub",
+  "menu": "grub/grub.cfg",
+  "mode": "600"
+}
