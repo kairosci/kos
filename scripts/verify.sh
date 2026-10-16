@@ -313,8 +313,8 @@ tcheck "check.retained_updateable" "package_pins_retained_updateable"
 tcheck "check.ignorepkg" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 tcheck "check.icon_theme"      "gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | grep -q 'Qogir'"
 tcheck "check.cursor_theme"  "gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | grep -q 'capitaine-cursors'"
-tcheck "check.no_tela"         "! grep -rq 'Tela' $HOME/.config/omarchy/themes/ 2>/dev/null"
-tcheck "check.folder_color_hook"        "[[ -x $HOME/.config/omarchy/hooks/theme-set.d/folder-color ]]"
+tcheck "check.no_tela"         "! grep -rq 'Tela' $HOME/.config/os/themes/ 2>/dev/null"
+tcheck "check.folder_color_hook"        "[[ -x $HOME/.config/os/hooks/theme-set.d/folder-color ]]"
 
 section verify.sec_desktop
 tcheck "check.desktop_no_foot" "pacman -Q foot &>/dev/null || [[ ! -f \"/usr/share/omarchy/applications/foot.desktop\" ]]"

@@ -74,9 +74,9 @@ MOCK
 cp "$UPDATE_SANDBOX/hooks/lib/theme-preview.sh" "$UPDATE_SANDBOX/trusted/"
 printf 'printf "untrusted\\n" >> "$UPDATE_COMMANDS"\nexit 97\n' > "$UPDATE_SANDBOX/untrusted.sh"
 for update_home in "$UPDATE_SANDBOX/own home" "$UPDATE_SANDBOX/homes/otheruser"; do
-    mkdir -p "$update_home/.config/omarchy/hooks/theme-set.d"
+    mkdir -p "$update_home/.config/os/hooks/theme-set.d"
     for update_hook in folder-color gtk-theme shell-icons; do
-        cat > "$update_home/.config/omarchy/hooks/theme-set.d/$update_hook" <<'MOCK'
+        cat > "$update_home/.config/os/hooks/theme-set.d/$update_hook" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
 printf 'theme %s %s %s\n' "$HOME" "$XDG_RUNTIME_DIR" "$DBUS_SESSION_BUS_ADDRESS" >> "$UPDATE_COMMANDS"

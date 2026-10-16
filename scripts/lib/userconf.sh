@@ -74,6 +74,37 @@ install_user_line() {
     fi
 }
 
+migrate_user_config_dir() {
+    local home="${1:-$HOME}" user="${2:-}" old new entry
+    old="$home/.config/omarchy"
+    new="$home/.config/os"
+    [[ ! -L "$new" ]] || return 1
+    [[ ! -e "$new" || -d "$new" ]] || return 1
+    if [[ -L "$old" ]]; then
+        [[ "$(readlink "$old")" == os && -d "$new" ]] || return 1
+    else
+        [[ ! -e "$old" || -d "$old" ]] || return 1
+        if [[ -d "$old" ]]; then
+            while IFS= read -r -d '' entry; do
+                [[ ! -e "$new/${entry##*/}" && ! -L "$new/${entry##*/}" ]] || return 1
+            done < <(find "$old" -mindepth 1 -maxdepth 1 -print0)
+        fi
+        mkdir -p "$new" || return 1
+        if [[ -d "$old" ]]; then
+            while IFS= read -r -d '' entry; do
+                mv -n -- "$entry" "$new/" || return 1
+                [[ ! -e "$entry" && ! -L "$entry" ]] || return 1
+            done < <(find "$old" -mindepth 1 -maxdepth 1 -print0)
+            rmdir "$old" || return 1
+        fi
+        ln -s os "$old" || return 1
+    fi
+    if [[ -n "$user" ]]; then
+        chown -h "$user:$user" "$old" || return 1
+        chown -R "$user:$user" "$new" || return 1
+    fi
+}
+
 merge_user_ini() {
     local src="$1" dest="$2" mode="${3:-644}" staged current=/dev/null
     [[ -r "$src" ]] || return 1

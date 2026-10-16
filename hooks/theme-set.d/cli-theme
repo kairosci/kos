@@ -17,7 +17,7 @@ else
 fi
 [[ -n "$CURRENT_THEME" ]] || CURRENT_THEME="default"
 
-OS_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy"
+OS_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/os"
 LAZYGIT_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/lazygit"
 
 mkdir -p "$OS_CONFIG" "$LAZYGIT_CONFIG"

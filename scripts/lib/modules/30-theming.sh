@@ -121,9 +121,10 @@ log "theming.hooks"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
-    _hook_dir="$user_home/.config/omarchy/hooks/theme-set.d"
-    _i18n_dir="$user_home/.config/omarchy/hooks/i18n"
-    _lib_dir="$user_home/.config/omarchy/hooks/lib"
+    _hook_dir="$user_home/.config/os/hooks/theme-set.d"
+    _i18n_dir="$user_home/.config/os/hooks/i18n"
+    _lib_dir="$user_home/.config/os/hooks/lib"
+    migrate_user_config_dir "$user_home" "$_user" || err "theming.migration_failed" "$_user"
     mkdir -p "$_hook_dir" "$_i18n_dir/messages" "$_lib_dir"
     rm -f "$_hook_dir/yazi-theme" "$user_home/.local/share/applications/yazi-terminal.desktop"
     cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/i18n-boot.sh" "$_i18n_dir/"
@@ -133,7 +134,7 @@ for user_home in /home/*; do
     cp "$PROJECT_DIR/modules/conf/xdg-desktop-portal/data/portals.conf" "$_lib_dir/"
     cp "$PROJECT_DIR/modules/conf/desktop/data/mpv.desktop" "$_lib_dir/"
     chmod 644 "$_i18n_dir/i18n.sh" "$_i18n_dir"/messages/*.msg "$_lib_dir/theme-preview.sh"
-    chown "$_user":"$_user" "$user_home/.config/omarchy" "$user_home/.config/omarchy/hooks"
+    chown "$_user":"$_user" "$user_home/.config/os" "$user_home/.config/os/hooks"
     chown -R "$_user":"$_user" "$_hook_dir" "$_i18n_dir" "$_lib_dir"
     for hook_file in "$PROJECT_DIR"/hooks/theme-set.d/*; do
         [[ -f "$hook_file" ]] || continue

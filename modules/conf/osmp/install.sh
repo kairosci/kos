@@ -8,7 +8,8 @@ source "$PROJECT_DIR/scripts/lib/userconf.sh"
 i18n_init
 
 SOURCE="$PROJECT_DIR/modules/plugins/osmp"
-TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/plugins/os.osmp"
+TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/os/plugins/os.osmp"
+migrate_user_config_dir "$HOME"
 [[ ! -L "$TARGET" ]] || err "defaults.app_failed" "osmp"
 omarchy plugin validate "$SOURCE"
 for file in "$SOURCE"/src/* "$SOURCE/manifest.json" "$SOURCE/LICENSE"; do

@@ -40,7 +40,7 @@ for theme_name in "${themes[@]}"; do
     src="$theme_dir/preview.png"
     [[ -f "$src" ]] || continue
 
-    user_dir="$TARGET_HOME/.config/omarchy/themes/$theme_name"
+    user_dir="$TARGET_HOME/.config/os/themes/$theme_name"
     install -d -m 700 -o "$TARGET_USER" -g "$TARGET_USER" "$user_dir"
     if [[ -f "$user_dir/preview.png" ]]; then
         [[ -f "$user_dir/preview.bak.png" ]] || cp "$user_dir/preview.png" "$user_dir/preview.bak.png"

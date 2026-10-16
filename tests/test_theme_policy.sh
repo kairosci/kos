@@ -8,10 +8,10 @@ trap 'rm -rf "$SANDBOX"' EXIT
 export THEME_POLICY_FILE="$PROJECT_DIR/modules/conf/themes/data/excluded.list"
 export THEME_POLICY_ROOT="$SANDBOX/themes" THEME_POLICY_HOMES="$SANDBOX/homes" THEME_POLICY_ARCHIVE="$SANDBOX/archive"
 source "$PROJECT_DIR/scripts/lib/theme-policy.sh"
-mkdir -p "$THEME_POLICY_ROOT"/{matte-black,solitude,allowed} "$THEME_POLICY_HOMES/user/.config/omarchy/themes/matte-black"
-printf 'personal palette\n' > "$THEME_POLICY_HOMES/user/.config/omarchy/themes/matte-black/colors.toml"
+mkdir -p "$THEME_POLICY_ROOT"/{matte-black,solitude,allowed} "$THEME_POLICY_HOMES/user/.config/os/themes/matte-black"
+printf 'personal palette\n' > "$THEME_POLICY_HOMES/user/.config/os/themes/matte-black/colors.toml"
 test_section "Theme exclusions"
-assert_true "excluded stock and user themes are archived" 'theme_policy_apply && [[ ! -e "$THEME_POLICY_ROOT/matte-black" && ! -e "$THEME_POLICY_ROOT/solitude" && ! -e "$THEME_POLICY_HOMES/user/.config/omarchy/themes/matte-black" ]] && grep -qx "personal palette" "$THEME_POLICY_ARCHIVE"/users/user/matte-black.*/theme/colors.toml'
+assert_true "excluded stock and user themes are archived" 'theme_policy_apply && [[ ! -e "$THEME_POLICY_ROOT/matte-black" && ! -e "$THEME_POLICY_ROOT/solitude" && ! -e "$THEME_POLICY_HOMES/user/.config/os/themes/matte-black" ]] && grep -qx "personal palette" "$THEME_POLICY_ARCHIVE"/users/user/matte-black.*/theme/colors.toml'
 assert_true "remaining themes are preserved" '[[ -d "$THEME_POLICY_ROOT/allowed" ]]'
 assert_true "repeated cleanup preserves the original archives" 'theme_policy_apply && [[ $(find "$THEME_POLICY_ARCHIVE/system" -mindepth 1 -maxdepth 1 -type d | wc -l) == 2 ]]'
 assert_true "an updated stock theme is removed again" 'mkdir "$THEME_POLICY_ROOT/solitude" && theme_policy_apply && [[ ! -e "$THEME_POLICY_ROOT/solitude" ]]'

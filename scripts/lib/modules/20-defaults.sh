@@ -77,6 +77,10 @@ if ! pacman -Q trash-cli &>/dev/null; then
     pacman -S --noconfirm --needed trash-cli
 fi
 
+log "defaults.system_settings"
+source "$PROJECT_DIR/scripts/lib/hyprmod.sh"
+source "$PROJECT_DIR/scripts/lib/wallpaper.sh"
+
 log "defaults.filemanager"
 for pkg in nautilus gvfs gvfs-mtp file-roller; do
     pacman -S --noconfirm --needed "$pkg" || err "defaults.app_failed" "$pkg"
@@ -135,11 +139,24 @@ o.bind("SUPER + CTRL + T", "Activity", "resources")
 LUAEOF
         chown "$_user:$_user" "$_bindings"
     fi
+    if [[ -f "$_bindings" ]] && grep -qF 'o.window("^(dev.zed.Zed|' "$_bindings" && ! grep -q 'io.github.bluemancz.hyprmod' "$_bindings"; then
+        sed -i -e 's/org.gnome.Loupe|io.github.celluloid_player.Celluloid/org.gnome.Loupe|io.github.bluemancz.hyprmod|io.github.celluloid_player.Celluloid/' "$_bindings"
+        chown "$_user:$_user" "$_bindings"
+    fi
     if [[ -f "$_bindings" ]] && ! grep -qF 'o.window("^(dev.zed.Zed|' "$_bindings"; then
         cat >> "$_bindings" << 'LUAEOF'
-o.window("^(dev.zed.Zed|org.gnome.Nautilus|org.gnome.Papers|org.gnome.Loupe|io.github.celluloid_player.Celluloid|net.nokyan.Resources|org.gnome.Resources|org.gnome.baobab|xdg-desktop-portal-gtk)$", { tag = "-default-opacity", opacity = "1 1" })
+o.window("^(dev.zed.Zed|org.gnome.Nautilus|org.gnome.Papers|org.gnome.Loupe|io.github.bluemancz.hyprmod|io.github.celluloid_player.Celluloid|net.nokyan.Resources|org.gnome.Resources|org.gnome.baobab|xdg-desktop-portal-gtk)$", { tag = "-default-opacity", opacity = "1 1" })
 LUAEOF
         chown "$_user:$_user" "$_bindings"
+    fi
+    if [[ -f "$_bindings" ]] && ! grep -q 'os-system-settings' "$_bindings"; then
+        cat >> "$_bindings" << 'LUAEOF'
+
+-- os-system-settings
+hl.unbind("SUPER + comma")
+o.bind("SUPER + comma", "Settings", "hyprmod")
+LUAEOF
+        chown "$_user":"$_user" "$_bindings" 2>/dev/null || warn "defaults.bindings_chown" "$_user"
     fi
     if [[ -f "$_bindings" ]] && grep -q 'brave --incognito' "$_bindings"; then
         sed -i 's/brave --incognito/brave-origin --incognito/g' "$_bindings"

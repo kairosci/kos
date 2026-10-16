@@ -4,55 +4,7 @@
     "name": "OS menu",
     "width": 400
   },
-  "controls": {
-    "id": "os.controls",
-    "name": "Session controls"
-  },
-  "panels": [
-    {
-      "source": "audio",
-      "id": "os.audio"
-    },
-    {
-      "source": "network",
-      "id": "os.network"
-    },
-    {
-      "source": "bluetooth",
-      "id": "os.bluetooth"
-    },
-    {
-      "source": "monitor",
-      "id": "os.monitor"
-    },
-    {
-      "source": "power",
-      "id": "os.power"
-    },
-    {
-      "source": "clock",
-      "id": "os.clock"
-    },
-    {
-      "source": "weather",
-      "id": "os.weather"
-    },
-    {
-      "source": "tray",
-      "id": "os.tray",
-      "mode": "tray",
-      "directory": "bar/widgets",
-      "entry": "Tray.qml",
-      "manifest": "Tray.manifest.json"
-    },
-    {
-      "source": "media",
-      "id": "os.media",
-      "mode": "media",
-      "directory": "os.osmp/src",
-      "entry": "BarWidget.qml"
-    }
-  ],
+  "panels": [],
   "removeMenus": [
     "learn",
     "bar",

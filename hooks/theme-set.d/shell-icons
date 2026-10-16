@@ -19,7 +19,7 @@ fi
 
 ICON_THEME="OS-Qogir"
 
-USER_THEME="$HOME/.config/omarchy/themes/$CURRENT_THEME"
+USER_THEME="$HOME/.config/os/themes/$CURRENT_THEME"
 mkdir -p "$USER_THEME"
 printf '%s\n' "$ICON_THEME" > "$USER_THEME/icons.theme" || warn "hooks.icons_overlay_failed"
 printf '%s\n' "$ICON_THEME" > "$HOME/.local/state/omarchy/current/theme/icons.theme" || warn "hooks.icons_apply_failed"

@@ -25,7 +25,7 @@ theme_policy_apply() {
     theme_policy_prune "$root" "$THEME_POLICY_ARCHIVE/system" || return 1
     for home in "${THEME_POLICY_HOMES:-/home}"/*; do
         [[ -d "$home" && ! -L "$home" ]] || continue
-        [[ ! -L "$home/.config" && ! -L "$home/.config/omarchy" ]] || return 1
-        theme_policy_prune "$home/.config/omarchy/themes" "$THEME_POLICY_ARCHIVE/users/${home##*/}" || return 1
+        [[ ! -L "$home/.config" && ! -L "$home/.config/os" ]] || return 1
+        theme_policy_prune "$home/.config/os/themes" "$THEME_POLICY_ARCHIVE/users/${home##*/}" || return 1
     done
 }

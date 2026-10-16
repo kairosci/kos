@@ -143,11 +143,11 @@ for u_home in /home/*; do
     [[ -d "$u_home" ]] || continue
     _u=$(basename "$u_home")
     for hook_kind in pre-refresh-pacman.d post-update.d; do
-        mkdir -p "$u_home/.config/omarchy/hooks/$hook_kind"
+        mkdir -p "$u_home/.config/os/hooks/$hook_kind"
         if [[ -f "$PROJECT_DIR/hooks/$hook_kind/99-os-persist" ]]; then
-            cp "$PROJECT_DIR/hooks/$hook_kind/99-os-persist" "$u_home/.config/omarchy/hooks/$hook_kind/99-os-persist"
-            chmod +x "$u_home/.config/omarchy/hooks/$hook_kind/99-os-persist"
-            chown "$_u":"$_u" "$u_home/.config/omarchy/hooks/$hook_kind/99-os-persist" 2>/dev/null || warn "debloat.hook_chown_failed" "$_u"
+            cp "$PROJECT_DIR/hooks/$hook_kind/99-os-persist" "$u_home/.config/os/hooks/$hook_kind/99-os-persist"
+            chmod +x "$u_home/.config/os/hooks/$hook_kind/99-os-persist"
+            chown "$_u":"$_u" "$u_home/.config/os/hooks/$hook_kind/99-os-persist" 2>/dev/null || warn "debloat.hook_chown_failed" "$_u"
         fi
     done
 done

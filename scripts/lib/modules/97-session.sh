@@ -23,11 +23,11 @@ for user_home in /home/*; do
     [[ "${SETUP_SCOPE:-full}" != session ]] || _session_require_engine=1
     user_as "$_session_user" env "OMARCHY_PATH=${OMARCHY_PATH:-/usr/share/omarchy}" "OS_SESSION_REQUIRE_ENGINE=$_session_require_engine" \
         bash "$_SESSION_MODULE/install.sh" || err "session.validation_failed" "$_session_user"
-    if [[ -f "$user_home/.config/omarchy/hooks/post-update.d/99-os-persist" ]]; then
+    if [[ -f "$user_home/.config/os/hooks/post-update.d/99-os-persist" ]]; then
         user_as "$_session_user" bash -c '
             set -euo pipefail
             source "$1"
-            install_user_file "$2" "$HOME/.config/omarchy/hooks/post-update.d/99-os-persist" 755
+            install_user_file "$2" "$HOME/.config/os/hooks/post-update.d/99-os-persist" 755
         ' bash "$PROJECT_DIR/scripts/lib/userconf.sh" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" || err "session.validation_failed" "post-update hook"
     fi
     if [[ "${SETUP_SCOPE:-full}" == session ]]; then
@@ -54,8 +54,6 @@ for user_home in /home/*; do
             sleep 0.1
         done
         [[ "$_session_menu_ready" == 1 ]] || { printf '%s\n' "$_session_menu_status"; err "session.validation_failed" "OS menu Apps"; }
-        _session_controls=$(omarchy_as "$_session_user" shell os.controls status) || err "session.validation_failed" "OS controls"
-        jq -e '.barSurface == false and .barSize == 0' <<< "$_session_controls" > /dev/null || err "session.validation_failed" "bar surface"
         while IFS= read -r _session_panel; do
             _session_panel_state=$(omarchy_as "$_session_user" shell shell call "$_session_panel" status '{}') || err "session.validation_failed" "$_session_panel"
             jq -e --arg id "$_session_panel" '.ready and .id == $id' <<< "$_session_panel_state" > /dev/null || err "session.validation_failed" "$_session_panel"
