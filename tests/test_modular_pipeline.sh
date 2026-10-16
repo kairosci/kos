@@ -40,6 +40,7 @@ EXPECTED_MODULES=(
     "92-responsiveness.sh"
     "94-security-audit.sh"
     "95-maintenance.sh"
+    "97-session.sh"
 )
 
 for m in "${EXPECTED_MODULES[@]}"; do

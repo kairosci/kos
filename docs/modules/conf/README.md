@@ -17,3 +17,5 @@ Nautilus, Celluloid, Papers, Loupe, Baobab, Resources and File Roller receive na
 `easyeffects` owns the `OS-Subwoofer` output preset, its native activation and desktop autostart. The preset uses conservative bass harmonics, input headroom and a final limiter; see [the audio guide](easyeffects/README.md).
 
 `menubar` owns the native bar dimensions and widget grouping; see [the bar guide](menubar/README.md).
+
+`session` owns clean user Hyprland Lua files, the wider local menu and the hidden bar policy; see [session configuration](session/README.md). Apply it through `make setup SCOPE=session` after staging changes in the repository.

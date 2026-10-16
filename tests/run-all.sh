@@ -41,4 +41,5 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_update_hooks.sh" \
     "$SCRIPT_DIR/test_keyboard_backlight.sh" \
     "$SCRIPT_DIR/test_iso_verify.sh" \
-    "$SCRIPT_DIR/test_iso_download.sh"
+    "$SCRIPT_DIR/test_iso_download.sh" \
+    "$SCRIPT_DIR/test_session.sh"

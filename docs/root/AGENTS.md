@@ -93,6 +93,8 @@ The canonical GitHub ruleset is `.github/main-ruleset.json`: no bypass actors, n
 
 ## Graphical Theme Integration
 
+`modules/conf/session/` owns commentless user Hyprland Lua normalization, the external OS runtime adapter, the wider local menu clone and the hidden bar policy. `97-session.sh` reconciles it after other configuration producers and `make setup SCOPE=session` validates staged Lua and QML, reloads and checks Hyprland, then restarts and checks the shell. Keep native runtime files read only and retain theme, monitor, idle and input behavior. The root post-update hook regenerates the installed local menu from the current packaged source.
+
 `24-user-configurations.sh` discovers all `modules/conf/*/install.sh` after package provisioning and applies them through `user_as`. Brave Origin uses its native flags config and existing profile directory. Never replace active browser profile databases or preferences with static repository files.
 
 The GTK hook owns GTK and libadwaita palette propagation and supersedes upstream Adwaita settings after each theme switch. Materia supplies the GTK base; the generated Qogir overlay uses the exact theme accent. Dark mode is the first setup default, while later explicit theme choices remain authoritative. Yazi is retired; preserve its personal configuration but remove managed launchers, hooks and shell helpers. Preview regeneration applies each actual system theme and captures the complete monitor with shell, wallpaper and sample apps, then restores the original theme, background and workspace on every exit path.

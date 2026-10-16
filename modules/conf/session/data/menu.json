@@ -1,0 +1,7 @@
+{
+  "bar": {"label": "Bar", "description": "Status bar controls"},
+  "bar.show": {"label": "Show bar", "action": "os toggle bar off"},
+  "bar.hide": {"label": "Hide bar", "action": "os toggle bar on"},
+  "bar.settings": {"label": "Bar settings", "target": "style.bar"},
+  "bar.position": {"label": "Position", "target": "style.bar.position"}
+}
