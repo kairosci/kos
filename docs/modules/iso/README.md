@@ -14,11 +14,11 @@ Temporary downloads are stored in a private directory inside the output director
 curl -fsSL https://github.com/kairosci/os/releases/latest/download/download-release.sh | bash
 ```
 
-Choose an output directory by downloading and running the helper directly:
+The ISO and checksum are always saved in the current working directory, even when the helper script is stored elsewhere. To choose a destination, change directory before running it:
 
 ```bash
-curl -fsSLo download-release.sh https://github.com/kairosci/os/releases/latest/download/download-release.sh
-bash download-release.sh v1.4 /path/to/output
+cd /path/to/output
+curl -fsSL https://github.com/kairosci/os/releases/latest/download/download-release.sh | bash -s -- v1.6
 ```
 
 Omit the tag to select the latest release. The optional tag is useful for reproducible downloads.
@@ -32,7 +32,7 @@ Invoke-WebRequest -Uri https://github.com/kairosci/os/releases/latest/download/d
 powershell -NoProfile -ExecutionPolicy Bypass -File .\download-release.ps1
 ```
 
-Pass `-Tag v1.4` to select a specific release or `-OutputDirectory "$HOME\Downloads"` to choose where the verified ISO and checksum are saved. The helper refuses to overwrite an ISO or checksum already present in the output directory.
+Pass `-Tag v1.6` to select a specific release. The verified ISO, checksum and temporary downloads are saved in the current working directory; change directory before running the helper to choose a destination. The helper refuses to overwrite an ISO or checksum already present in that directory.
 
 ## Verify image contents in CI
 

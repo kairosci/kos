@@ -4,6 +4,12 @@ This file is the single narrative source for what changed in every release. It i
 
 ## Unreleased
 
+## Release v1.6
+
+ISO downloads now save the verified image and their temporary files in the directory where the helper is invoked, avoiding RAM backed temporary storage. The Bash helper assembles and removes each part in turn to reduce peak disk usage. Release publication waits for a dedicated CI job to compare the bundled configuration and commit marker with the tagged repository, and publishing permissions are restricted to the release job.
+
+## Release v1.5
+
 The upcoming release introduces the os command dispatcher as a new module that mirrors the complete Omarchy command surface while hardening the root handling around it. Session bus resolution and runtime directory detection now happen before delegation so that graphical commands keep working when they are invoked through privilege boundaries. Failure handling follows the fail fast discipline with visible diagnostics instead of silent degradation. Installation ships both the dispatcher and this changelog to the system paths through the privileged pipeline so that repeated setup runs converge on the same result.
 
 ## Release v1.4

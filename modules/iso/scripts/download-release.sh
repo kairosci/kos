@@ -2,9 +2,8 @@
 set -euo pipefail
 
 REPOSITORY="${GITHUB_REPOSITORY:-kairosci/os}"
-OUTPUT_DIR="${2:-$PWD}"
-[[ -d "$OUTPUT_DIR" ]] || mkdir -p -- "$OUTPUT_DIR"
-OUTPUT_DIR="$(cd "$OUTPUT_DIR" && pwd -P)"
+OUTPUT_DIR="$(pwd -P)"
+(( $# <= 1 ))
 
 for dependency in curl jq sha256sum; do
     command -v "$dependency" >/dev/null 2>&1

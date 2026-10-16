@@ -12,7 +12,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -105,16 +105,20 @@ jobs:
           path: ${{ runner.temp }}/os-iso
 
       - name: Verify bundled configuration without installing
+        env:
+          EXPECTED_COMMIT: ${{ needs.build.outputs.build-sha }}
         run: |
           set -euo pipefail
           bash modules/iso/scripts/verify-iso.sh \
             --iso "${{ runner.temp }}/os-iso/os-base.iso" \
             --ref "$RELEASE_TAG" \
-            --expected-commit "${{ needs.build.outputs.build-sha }}"
+            --expected-commit "$EXPECTED_COMMIT"
 
   release:
     name: Publish OS ISO
     needs: [build, verify]
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

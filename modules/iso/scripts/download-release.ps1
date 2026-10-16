@@ -1,6 +1,5 @@
 param(
-    [string]$Tag,
-    [string]$OutputDirectory = (Get-Location).Path
+    [string]$Tag
 )
 
 $ErrorActionPreference = 'Stop'
@@ -50,15 +49,14 @@ if ($checksumAssets.Count -ne 1) {
     throw "Release $releaseTag must contain exactly one $checksumName asset."
 }
 
-New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
-$outputPath = (Resolve-Path -LiteralPath $OutputDirectory).Path
+$outputPath = (Get-Location).Path
 $isoPath = Join-Path $outputPath $isoName
 $outputChecksumPath = Join-Path $outputPath $checksumName
 if ((Test-Path -LiteralPath $isoPath) -or (Test-Path -LiteralPath $outputChecksumPath)) {
     throw "Refusing to overwrite an existing versioned artifact in $outputPath."
 }
 
-$workDirectory = Join-Path ([IO.Path]::GetTempPath()) ("os-iso-download-" + [guid]::NewGuid().ToString('N'))
+$workDirectory = Join-Path $outputPath (".os-iso-download-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $workDirectory | Out-Null
 
 function Save-ReleaseAsset {
