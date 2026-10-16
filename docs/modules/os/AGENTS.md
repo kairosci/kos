@@ -10,7 +10,7 @@ The dispatcher source lives in `modules/os/bin/os`. The setup stage module `scri
 
 ## Ownership Details
 
-The dispatcher owns argument routing and session preparation and changelog extraction. It never reimplements upstream group behavior and never writes service or desktop state. The setup stage owns installation paths and permissions and ownership repair. The changelog file owns release narratives in prose without list markers.
+The dispatcher owns argument routing and session preparation and changelog extraction. The independent `os app` route resolves application roles through XDG preferences and launches desktop entries through UWSM without loading Omarchy. Its policy lives under `modules/os/data/` and its library under `modules/os/scripts/lib/`. All remaining group behavior stays delegated. It never writes service or desktop configuration state. The setup stage owns installation paths and permissions and ownership repair. The changelog file owns release narratives in prose without list markers.
 
 ## Boundaries and Safety
 

@@ -11,7 +11,7 @@ source "$SCRIPT_DIR/test_lib.sh"
 
 test_section "os Dispatcher Behavior"
 
-assert_file_contains_literal "dispatcher forwards every group to omarchy" "$OS_BIN" 'exec omarchy "$@"'
+assert_file_contains_literal "dispatcher forwards remaining groups to omarchy" "$OS_BIN" 'exec omarchy "$@"'
 assert_file_contains_literal "dispatcher resolves the runtime path" "$OS_BIN" 'OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}"'
 assert_file_contains_literal "dispatcher restores the runtime directory" "$OS_BIN" 'XDG_RUNTIME_DIR="/run/user/$uid"'
 assert_file_contains_literal "dispatcher restores the session bus" "$OS_BIN" 'DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus"'

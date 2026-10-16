@@ -17,7 +17,7 @@
     {"id":"audio","packages":["pipewire","wireplumber"]},
     {"id":"network","packages":["networkmanager"]},
     {"id":"bluetooth","packages":["bluez"]},
-    {"id":"applications-and-defaults","packages":[]},
+    {"id":"applications-and-defaults","packages":[],"implementation":{"status":"partial","entrypoint":"os app","roles":["browser","editor","files","settings"],"verification":"modules/os/tests/test_app_launch.sh"}},
     {"id":"power-and-resume","packages":[]},
     {"id":"security-and-audits","packages":[]},
     {"id":"updates-and-recovery","packages":["pacman","archlinux-keyring"]}

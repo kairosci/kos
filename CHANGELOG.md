@@ -4,6 +4,8 @@ This file is the single narrative source for what changed in every release. It i
 
 ## Unreleased
 
+The OS command can launch the default browser, graphical editor, file manager and HyprMod without loading the Omarchy runtime. Role policy remains separate from Bash, private browsing requires an explicit desktop action, and read-only launch resolution exposes the chosen desktop entry without opening an application. The dedicated CLI setup scope installs the dispatcher and its catalogs without restarting the desktop.
+
 The Controls menu and its popup panels are retired in favor of HyprMod as a regular tiling window with a dedicated shortcut, keeping the application launcher as the only menu. OS owned configuration migrates from the native directory to `~/.config/os` with a compatibility link preserving native behavior, and the desktop ships the krepo logo wallpaper generated from the active theme palette instead of the stock logo background. Release publication covers stable signed tags only, and image verification compares the full bundled tree against the tagged commit without a marker file.
 
 ## Release v1.7
