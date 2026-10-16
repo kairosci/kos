@@ -4,6 +4,8 @@ This file is the single narrative source for what changed in every release. It i
 
 ## Unreleased
 
+Session menus and Quickshell components now follow the resolved desktop language across the six supported locales, with source indexed catalogues under the session data directory and a singleton that resolves messages, case folded variants and dynamic patterns while keeping application, media and user content untouched. Controls and every submenu entry carry an icon glyph, the menu stays wide, and shell startup uses a markerless line with legacy block cleanup. Release publication now distinguishes signed prerelease candidates from stable releases built from the same bytes, and image verification compares the full bundled tree against the tagged commit without a marker file.
+
 ## Release v1.6
 
 ISO downloads now save the verified image and their temporary files in the directory where the helper is invoked, avoiding RAM backed temporary storage. The Bash helper assembles and removes each part in turn to reduce peak disk usage. Release publication waits for a dedicated CI job to compare the bundled configuration and commit marker with the tagged repository, and publishing permissions are restricted to the release job.

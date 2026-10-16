@@ -102,6 +102,16 @@ for _, key in ipairs(order) do
   end)
 end
 source = normalize(source) .. "\n"
+if arg[4] and arg[4] ~= "" and arg[5] and arg[5] ~= "" then
+  local key = arg[4]
+  local file = assert(io.open(arg[5], "r"))
+  local body = normalize(file:read("*a"))
+  file:close()
+  if previous[key] and previous[key] ~= "" then source = source:gsub(previous[key]:gsub("(%W)", "%%%1"), "") end
+  if body ~= "" then source = source:gsub(body:gsub("(%W)", "%%%1"), "") end
+  source = normalize(source .. "\n" .. body) .. "\n"
+  blocks[key] = body
+end
 assert(not source:lower():find("omarchy", 1, true), "Unmapped runtime reference in " .. arg[1])
 assert(load(source, "@" .. arg[1]))
 if arg[3] and arg[3] ~= "" then

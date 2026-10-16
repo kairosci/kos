@@ -552,3 +552,5 @@ session.menu_keyboard=Tastatur
 session.menu_layout_next=Nächstes Tastaturlayout
 session.menu_keyboard_settings=Tastatureinstellungen
 session.engine_deferred=Keine aktive Wayland Sitzung die QML Engine Prüfung wird bis zur nächsten Sitzungseinrichtung verschoben
+iso.release_exists=Die Version %s existiert bereits und kann nicht geändert werden
+iso.candidate_missing=Kein signierter veröffentlichter Kandidat entspricht dem Quellstand von %s

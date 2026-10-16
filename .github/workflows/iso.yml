@@ -14,60 +14,64 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: iso-${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
-  build:
-    name: Build OS ISO
+  resolve:
+    name: Validate immutable release provenance
     runs-on: ubuntu-latest
-    timeout-minutes: 90
-    permissions:
-      contents: read
+    timeout-minutes: 5
     outputs:
-      iso-name: ${{ steps.build.outputs.iso_name }}
-      build-sha: ${{ steps.stage.outputs.build_sha }}
+      tag: ${{ steps.release.outputs.tag }}
+      candidate: ${{ steps.release.outputs.candidate }}
+      build-sha: ${{ steps.release.outputs.build_sha }}
+      iso-name: ${{ steps.release.outputs.iso_name }}
     steps:
-      - name: Check out tagged configuration
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
           persist-credentials: false
-
-      - name: Validate release tag
+      - name: Resolve signed source and matching prerelease
+        id: release
         env:
+          GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
-          [[ "$RELEASE_TAG" =~ ^v([0-9]+\.[0-9]+)$ ]]
+          bash modules/iso/scripts/resolve-release.sh "$RELEASE_TAG" >> "$GITHUB_OUTPUT"
 
+  build:
+    name: Build OS candidate ISO
+    needs: resolve
+    if: needs.resolve.outputs.candidate == ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ needs.resolve.outputs.build-sha }}
+          persist-credentials: false
       - name: Install ISO tooling
         run: |
           sudo apt-get update
           sudo apt-get install --yes curl jq xorriso
-
-      - name: Stage complete OS configuration in the ISO overlay
-        id: stage
+      - name: Stage complete configuration
         run: |
           set -euo pipefail
           overlay="$RUNNER_TEMP/os-overlay"
           source_tree="$RUNNER_TEMP/os-source"
           mkdir -p "$overlay/opt/os" "$source_tree"
-          build_sha="$(git rev-parse HEAD)"
-          echo "build_sha=$build_sha" >> "$GITHUB_OUTPUT"
-          git archive "$build_sha" | tar -x -C "$source_tree"
+          git archive HEAD | tar -x -C "$source_tree"
           cp -aL "$source_tree/." "$overlay/opt/os/"
           cp -aL "$source_tree/modules/iso/overlay/." "$overlay/"
-          printf 'commit=%s\n' "$build_sha" > "$overlay/opt/os-release.txt"
-
       - name: Build customized ISO
-        id: build
-        env:
-          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
           bash modules/iso/scripts/customize.sh \
             --overlay "$RUNNER_TEMP/os-overlay" \
             --output "$RUNNER_TEMP/os-base.iso"
-          echo "iso_name=os-${RELEASE_TAG}.iso" >> "$GITHUB_OUTPUT"
-
       - name: Upload ISO artifact for verification
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -77,68 +81,86 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
-  verify:
-    name: Verify ISO contents
-    needs: build
+  candidate:
+    name: Download published candidate without rebuilding
+    needs: resolve
+    if: needs.resolve.outputs.candidate != ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    permissions:
-      contents: read
-    env:
-      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
     steps:
-      - name: Check out tagged configuration
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
+          ref: ${{ needs.resolve.outputs.build-sha }}
           persist-credentials: false
+      - name: Reassemble candidate and verify checksum
+        env:
+          CANDIDATE: ${{ needs.resolve.outputs.candidate }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          bash "$GITHUB_WORKSPACE/modules/iso/scripts/download-release.sh" "$CANDIDATE"
+          mv "os-$CANDIDATE.iso" os-base.iso
+      - name: Upload published candidate for content verification
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: os-iso
+          path: ${{ runner.temp }}/os-base.iso
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
 
+  verify:
+    name: Verify finished ISO contents
+    needs: [resolve, build, candidate]
+    if: ${{ always() && needs.resolve.result == 'success' && (needs.build.result == 'success' || needs.candidate.result == 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ needs.resolve.outputs.tag }}
+          persist-credentials: false
       - name: Install ISO inspection tooling
         run: |
           sudo apt-get update
           sudo apt-get install --yes xorriso
-
-      - name: Download ISO artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: os-iso
           path: ${{ runner.temp }}/os-iso
-
-      - name: Verify bundled configuration without installing
+      - name: Verify configuration extracted from the ISO
         env:
-          EXPECTED_COMMIT: ${{ needs.build.outputs.build-sha }}
+          EXPECTED_COMMIT: ${{ needs.resolve.outputs.build-sha }}
+          RELEASE_TAG: ${{ needs.resolve.outputs.tag }}
         run: |
           set -euo pipefail
           bash modules/iso/scripts/verify-iso.sh \
-            --iso "${{ runner.temp }}/os-iso/os-base.iso" \
+            --iso "$RUNNER_TEMP/os-iso/os-base.iso" \
             --ref "$RELEASE_TAG" \
             --expected-commit "$EXPECTED_COMMIT"
 
   release:
-    name: Publish OS ISO
-    needs: [build, verify]
+    name: Publish verified ISO
+    needs: [resolve, verify]
+    if: ${{ always() && needs.resolve.result == 'success' && needs.verify.result == 'success' }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Check out tagged configuration
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
+          ref: ${{ needs.resolve.outputs.build-sha }}
           persist-credentials: false
-
-      - name: Download verified ISO artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: os-iso
           path: ${{ runner.temp }}/os-iso
-
-      - name: Publish ISO and checksum
+      - name: Publish immutable prerelease or stable release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
-          ISO_NAME: ${{ needs.build.outputs.iso-name }}
+          RELEASE_TAG: ${{ needs.resolve.outputs.tag }}
+          ISO_NAME: ${{ needs.resolve.outputs.iso-name }}
         run: |
           set -euo pipefail
           final_iso="$RUNNER_TEMP/os-iso-publish/$ISO_NAME"
@@ -146,13 +168,11 @@ jobs:
           mv "$RUNNER_TEMP/os-iso/os-base.iso" "$final_iso"
           iso_dir="$(dirname "$final_iso")"
           (cd "$iso_dir" && sha256sum "$ISO_NAME" > "$ISO_NAME.sha256")
-          split --bytes=1900M --numeric-suffixes=0 --suffix-length=2 \
-            "$final_iso" "$final_iso.part-"
+          split --bytes=1900M --numeric-suffixes=0 --suffix-length=2 "$final_iso" "$final_iso.part-"
           mapfile -t iso_parts < <(find "$iso_dir" -maxdepth 1 -type f -name "$ISO_NAME.part-*" -print | LC_ALL=C sort)
           ((${#iso_parts[@]} > 0))
-          release_assets=("${iso_parts[@]}" "$iso_dir/$ISO_NAME.sha256" modules/iso/scripts/download-release.sh modules/iso/scripts/download-release.ps1)
-          gh release create "$RELEASE_TAG" \
-            "${release_assets[@]}" \
-            --verify-tag \
-            --title "$RELEASE_TAG" \
-            --notes-file /dev/null
+          release_options=()
+          if [[ "$RELEASE_TAG" == *-rc.* ]]; then release_options+=(--prerelease); fi
+          gh release create "$RELEASE_TAG" "${iso_parts[@]}" "$iso_dir/$ISO_NAME.sha256" \
+            modules/iso/scripts/download-release.sh modules/iso/scripts/download-release.ps1 \
+            --verify-tag --title "$RELEASE_TAG" --notes-file /dev/null "${release_options[@]}"

@@ -39,8 +39,7 @@ while IFS=$'\t' read -r key label command; do
     jq -nr --arg key "$key" --arg label "$label" --arg command "$command" \
         '"hl.unbind(" + ($key|@json) + ")\no.bind(" + ($key|@json) + ", " + ($label|@json) + ", " + ($command|@json) + ")"' >> "$STAGE/session-bindings.lua"
 done < <(jq -r '.[] | [.key,.labelKey,.command] | @tsv' "$SCRIPT_DIR/data/bindings.json")
-install_shell_block "$STAGE/config/hypr/bindings.lua" '-- os session controls (managed)' '-- end os session controls (managed)' < "$STAGE/session-bindings.lua"
-bash "$SCRIPT_DIR/scripts/clean-hypr.sh" "$STAGE/config/hypr/bindings.lua" "$STAGE/blocks/bindings.lua.json" "$STAGE/blocks/bindings-next.lua.json" > "$STAGE/bindings.lua"
+bash "$SCRIPT_DIR/scripts/clean-hypr.sh" "$STAGE/config/hypr/bindings.lua" "$STAGE/blocks/bindings.lua.json" "$STAGE/blocks/bindings-next.lua.json" 'os session controls' "$STAGE/session-bindings.lua" > "$STAGE/bindings.lua"
 mv "$STAGE/bindings.lua" "$STAGE/config/hypr/bindings.lua"
 mv "$STAGE/blocks/bindings-next.lua.json" "$STAGE/blocks/bindings.lua.json"
 
@@ -55,6 +54,8 @@ CONTROLS_ID=$(jq -r '.controls.id' "$POLICY")
 mkdir -p "$STAGE/plugins/$CONTROLS_ID"
 cp "$SCRIPT_DIR/qml/NoBar.qml" "$STAGE/plugins/$CONTROLS_ID/"
 cp "$SCRIPT_DIR/qml/ControlContext.qml" "$SCRIPT_DIR/qml/ControlPopup.qml" "$STAGE/plugins/$CONTROLS_ID/"
+cp "$SCRIPT_DIR/qml/SessionI18n.qml" "$SCRIPT_DIR/qml/qmldir" "$STAGE/plugins/$CONTROLS_ID/"
+{ printf 'import qs.Ui\n'; cat "$NATIVE/shell/Ui/ConfirmDialog.qml"; } > "$STAGE/plugins/$CONTROLS_ID/ControlConfirmDialog.qml"
 jq '{schemaVersion:1,id:.controls.id,name:.controls.name,version:"1.0.0",kinds:["bar"],entryPoints:{bar:"NoBar.qml"}}' "$POLICY" > "$STAGE/plugins/$CONTROLS_ID/manifest.json"
 while IFS=$'\t' read -r panel id mode directory entry manifest; do
     if [[ "$mode" == media ]]; then
@@ -98,6 +99,26 @@ while IFS=$'\t' read -r id key; do
 done < <(jq -r 'to_entries[] | select(.value.labelKey != null) | [.key,.value.labelKey] | @tsv' "$SCRIPT_DIR/data/menu.json")
 jq -s '.[0] * .[1]' "$STAGE/personal-menu.json" "$STAGE/managed-menu.json" > "$STAGE/extension.json"
 cp "$NATIVE/default/omarchy/launcher.hides" "$STAGE/data/os/session/data/launcher.hides"
+jq -n --arg language "$I18N_LANG" --slurpfile catalogue "$SCRIPT_DIR/data/locales/$I18N_LANG.json" \
+    '{language:$language,messages:$catalogue[0].messages,patterns:$catalogue[0].patterns,folded:($catalogue[0].messages | to_entries | map({key:(.key|ascii_downcase),value:.value}) | from_entries)}' \
+    > "$STAGE/data/os/session/data/translations.json"
+for file in "$STAGE/data/os/session/data/menu.json" "$STAGE/extension.json"; do
+    jq --slurpfile catalogue "$SCRIPT_DIR/data/locales/$I18N_LANG.json" \
+        'with_entries(.value |= (if type == "object" then (.label = ($catalogue[0].messages[.label] // .label) | if .title then .title = ($catalogue[0].messages[.title] // .title) else . end) else . end))' \
+        "$file" > "$STAGE/localized-menu.json"
+    mv "$STAGE/localized-menu.json" "$file"
+done
+while IFS= read -r -d '' file; do
+    case "$file" in
+        */SessionI18n.qml) mode=clean ;;
+        *.qml) mode=localize ;;
+        *) mode=clean ;;
+    esac
+    import_path="../$CONTROLS_ID"
+    [[ "${file%/*}" != "$STAGE/plugins/$CONTROLS_ID" ]] || import_path=.
+    lua "$SCRIPT_DIR/scripts/prepare-qml.lua" "$file" "$mode" "$import_path" > "$STAGE/component.next"
+    mv "$STAGE/component.next" "$file"
+done < <(find "$STAGE/plugins" -type f \( -name '*.qml' -o -name '*.js' \) -print0)
 [[ -x /usr/lib/qt6/bin/qmlformat ]] || err "session.validation_failed" qmlformat
 while IFS= read -r -d '' file; do
     /usr/lib/qt6/bin/qmlformat -n "$file" > /dev/null || err "session.validation_failed" "$file"
@@ -167,7 +188,8 @@ install_user_file "$STAGE/shell.json" "$CONFIG_HOME/omarchy/shell.json" 600
 install_user_file "$SCRIPT_DIR/scripts/environment.sh" "$DATA_HOME/os/session/scripts/environment.sh" 600
 for file in "$HOME/.bashrc" "$HOME/.zshrc"; do
     [[ -f "$file" ]] || continue
-    install_shell_block "$file" '# os quickshell default (managed)' '# end os quickshell default (managed)' <<'SHELL'
+    remove_shell_block "$file" '# os quickshell default (managed)' '# end os quickshell default (managed)'
+    install_user_line "$file" <<'SHELL'
 source "${XDG_DATA_HOME:-$HOME/.local/share}/os/session/scripts/environment.sh"
 SHELL
 done

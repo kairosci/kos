@@ -552,3 +552,5 @@ session.menu_keyboard=Clavier
 session.menu_layout_next=Disposition suivante
 session.menu_keyboard_settings=Paramètres du clavier
 session.engine_deferred=Aucune session Wayland active la vérification du moteur QML est reportée à la prochaine configuration de session
+iso.release_exists=La version %s existe déjà et ne peut pas être modifiée
+iso.candidate_missing=Aucun candidat signé et publié ne correspond au source de %s

@@ -1,6 +1,6 @@
 # ISO
 
-The `iso` component builds a bootable image from the latest stable upstream base image. Each published image contains the complete tracked repository at `/opt/os`, a release commit marker at `/opt/os-release.txt`, and the cyan KMono icon at `/usr/share/pixmaps/os.png`. The same icon source is kept in `modules/iso/assets/kmono-cyan.png`.
+The `iso` component builds a bootable image from the latest stable upstream base image. Each published image contains the complete tracked repository at `/opt/os` and the cyan KMono icon at `/usr/share/pixmaps/os.png`. The same icon source is kept in `modules/iso/assets/kmono-cyan.png`.
 
 The image name is `os-vX.Y.iso`. Releases use the version alone as the release heading, for example `v1.4`. GitHub Releases stores the ISO as numbered parts to stay within the per-file upload limit, alongside `os-vX.Y.iso.sha256`, `download-release.sh`, and `download-release.ps1`. Published versions are immutable; changes to a release asset require a new version.
 
@@ -36,9 +36,9 @@ Pass `-Tag v1.6` to select a specific release. The verified ISO, checksum and te
 
 ## Verify image contents in CI
 
-The ISO workflow verifies the configuration in a dedicated job before publishing. The verify job downloads the built image artifact and runs `modules/iso/scripts/verify-iso.sh`, which extracts `/opt/os` and `/opt/os-release.txt` from the finished image and compares every file with the materialized repository tree at the tagged commit. The expected commit marker defaults to the given ref and the build job passes its exact commit explicitly, so a verification failure blocks the release. This verifies the bundled configuration without booting or installing the image.
+The ISO workflow verifies the configuration in a dedicated job before publishing. The verify job downloads the built image artifact and runs `modules/iso/scripts/verify-iso.sh`, which extracts `/opt/os` from the finished image and compares every file with the materialized repository tree at the tagged commit. The expected commit must match the tagged commit, so a verification failure blocks the release. This verifies the bundled configuration without booting or installing the image.
 
-Image content verification runs only in the dedicated CI job. A passing run means the repository tree in the image matches the tagged source and the marker at `/opt/os-release.txt` records the commit passed by the build job. Local setup and download commands do not inspect the bundled configuration; download helpers retain SHA-256 integrity verification.
+Image content verification runs only in the dedicated CI job. A passing run means the repository tree in the image matches the tagged source. Local setup and download commands do not inspect the bundled configuration; download helpers retain SHA-256 integrity verification.
 
 ## Apply the configuration
 
@@ -48,22 +48,22 @@ The image is rebuilt from an upstream installer image. Its upstream checksum is 
 
 ## Publish a release
 
-Create and push a signed `vX.Y` tag from a reviewed, merged commit. GitHub Actions builds the image and publishes assets to the release with that exact heading:
+Create and push a signed `vX.Y-rc.N` tag from a reviewed, merged commit for a prerelease candidate. GitHub Actions builds the image and publishes assets to the prerelease with that exact heading. Create and push a signed `vX.Y` tag on the same commit for a stable release; the workflow reuses the newest signed prerelease candidate on that commit without rebuilding and publishes it under the new stable heading:
 
 ```bash
 git switch main
 git pull --rebase origin main
-git tag -s v1.0
-git push origin v1.0
+git tag -s v1.7-rc.1
+git push origin v1.7-rc.1
 ```
 
 If a tagged build fails before publishing a release, rerun the `ISO` workflow from `main` with the existing signed tag:
 
 ```bash
-gh workflow run iso.yml --ref main -f release_tag=v1.4
+gh workflow run iso.yml --ref main -f release_tag=v1.7-rc.1
 ```
 
-The workflow refuses to replace a published release. Publish a corrected image or helper under a new version.
+The workflow refuses to replace a published release. Publish a corrected image or helper under a new version. Download helpers accept both stable and prerelease tags.
 
 ## Build locally
 
