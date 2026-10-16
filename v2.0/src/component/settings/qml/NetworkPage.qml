@@ -58,6 +58,7 @@ Pane {
     }
     Dialog {
         id: passwordDialog
+        parent: Overlay.overlay
         anchors.centerIn: parent
         modal: true
         title: root.app ? root.app.text("password") : ""
@@ -70,6 +71,7 @@ Pane {
     }
     Dialog {
         id: forgetDialog
+        parent: Overlay.overlay
         anchors.centerIn: parent
         modal: true
         title: root.app ? root.app.text("forget") : ""

@@ -22,11 +22,11 @@
   "removeDirectory": ["/usr/bin/rm", "-r", "--"],
   "processorCount": ["/usr/bin/getconf", "_NPROCESSORS_ONLN"],
   "userEnvironment": ["/usr/bin/systemctl", "--user", "set-environment"],
-  "settingsDescriptions": ["hyprctl", "descriptions", "-j"],
+  "settingsDescriptions": ["/usr/bin/timeout", "10", "hyprctl", "descriptions", "-j"],
   "copyTree": ["/usr/bin/cp", "-a", "--"],
-  "settingsValidate": ["/usr/bin/env"],
-  "settingsReload": ["hyprctl", "reload", "config-only"],
-  "settingsErrors": ["hyprctl", "configerrors"],
+  "settingsValidate": ["/usr/bin/timeout", "20", "/usr/bin/env"],
+  "settingsReload": ["/usr/bin/timeout", "10", "hyprctl", "reload", "config-only"],
+  "settingsErrors": ["/usr/bin/timeout", "10", "hyprctl", "configerrors"],
   "settingsSerialized": ["/usr/bin/flock", "--exclusive", "--wait", "10"],
   "settingsQml": ["/usr/bin/env"]
 }
