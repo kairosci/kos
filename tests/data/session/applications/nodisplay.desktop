@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=No display fixture
+Exec=fixture-command
+NoDisplay=true

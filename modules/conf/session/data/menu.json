@@ -1,0 +1,103 @@
+{
+  "controls": {
+    "labelKey": "session.menu_controls"
+  },
+  "controls.audio": {
+    "labelKey": "session.menu_audio",
+    "action": "os shell shell summon os.audio"
+  },
+  "controls.network": {
+    "labelKey": "session.menu_network",
+    "action": "os shell shell summon os.network"
+  },
+  "controls.bluetooth": {
+    "labelKey": "session.menu_bluetooth",
+    "action": "os shell shell summon os.bluetooth"
+  },
+  "controls.monitor": {
+    "labelKey": "session.menu_monitor",
+    "action": "os shell shell summon os.monitor"
+  },
+  "controls.power": {
+    "labelKey": "session.menu_power",
+    "action": "os shell shell summon os.power"
+  },
+  "controls.clock": {
+    "labelKey": "session.menu_clock",
+    "action": "os shell shell summon os.clock"
+  },
+  "controls.weather": {
+    "labelKey": "session.menu_weather",
+    "action": "os shell shell summon os.weather"
+  },
+  "controls.notifications": {
+    "labelKey": "session.menu_notifications",
+    "action": "os shell notifications showHistory"
+  },
+  "controls.media": {
+    "labelKey": "session.menu_media",
+    "action": "os shell shell summon os.media"
+  },
+  "controls.update": {
+    "labelKey": "session.menu_update",
+    "target": "update"
+  },
+  "controls.tray": {
+    "labelKey": "session.menu_tray",
+    "action": "os shell shell summon os.tray"
+  },
+  "controls.workspaces": {
+    "labelKey": "session.menu_workspaces"
+  },
+  "controls.keyboard": {
+    "labelKey": "session.menu_keyboard"
+  },
+  "controls.keyboard.next": {
+    "labelKey": "session.menu_layout_next",
+    "action": "hyprctl switchxkblayout all next"
+  },
+  "controls.keyboard.settings": {
+    "labelKey": "session.menu_keyboard_settings",
+    "action": "os launch config editor \"$HOME/.config/hypr/input.lua\""
+  },
+  "controls.workspaces.1": {
+    "label": "1",
+    "action": "hyprctl dispatch workspace 1"
+  },
+  "controls.workspaces.2": {
+    "label": "2",
+    "action": "hyprctl dispatch workspace 2"
+  },
+  "controls.workspaces.3": {
+    "label": "3",
+    "action": "hyprctl dispatch workspace 3"
+  },
+  "controls.workspaces.4": {
+    "label": "4",
+    "action": "hyprctl dispatch workspace 4"
+  },
+  "controls.workspaces.5": {
+    "label": "5",
+    "action": "hyprctl dispatch workspace 5"
+  },
+  "controls.workspaces.6": {
+    "label": "6",
+    "action": "hyprctl dispatch workspace 6"
+  },
+  "controls.workspaces.7": {
+    "label": "7",
+    "action": "hyprctl dispatch workspace 7"
+  },
+  "controls.workspaces.8": {
+    "label": "8",
+    "action": "hyprctl dispatch workspace 8"
+  },
+  "controls.workspaces.9": {
+    "label": "9",
+    "action": "hyprctl dispatch workspace 9"
+  },
+  "controls.workspaces.10": {
+    "label": "10",
+    "action": "hyprctl dispatch workspace 10"
+  }
+}

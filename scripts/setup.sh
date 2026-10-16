@@ -48,7 +48,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$SETUP_SCOPE" == full || "${OS_REBUILD_PREVIEWS:-0}" != 1 ]] || err "setup.invalid_args"
@@ -92,6 +92,14 @@ if [[ "$SETUP_SCOPE" == keyboard ]]; then
     # shellcheck source=lib/keyboard-backlight-policy.sh
     source "$SCRIPT_DIR/lib/keyboard-backlight-policy.sh"
     log "setup.keyboard_done"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == session ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    source "$MODULES_DIR/36-os-cli.sh"
+    source "$MODULES_DIR/97-session.sh"
     exit 0
 fi
 
@@ -161,6 +169,7 @@ MODULE_FILES=(
     "$MODULES_DIR/92-responsiveness.sh"
     "$MODULES_DIR/94-security-audit.sh"
     "$MODULES_DIR/95-maintenance.sh"
+    "$MODULES_DIR/97-session.sh"
 )
 
 for mod in "${MODULE_FILES[@]}"; do

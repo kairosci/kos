@@ -1,0 +1,19 @@
+local function read(path)
+  local file = assert(io.open(path, "r"))
+  local text = file:read("*a")
+  file:close()
+  return text
+end
+local text = read(assert(arg[1]))
+local function replace(source, target)
+  local first, last = text:find(source, 1, true)
+  assert(first and not text:find(source, last + 1, true), "Unsupported menu structure: " .. source)
+  text = text:sub(1, first - 1) .. target .. text:sub(last + 1)
+end
+replace('readonly property var appLibrary: root.shell ? root.shell.appLibrary : null', 'readonly property var appLibrary: appCatalog')
+replace('property string defaultMenuPath: omarchyPath + "/default/omarchy/omarchy-menu.jsonc"', 'property string defaultMenuPath: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/os/session/data/menu.json"')
+replace('property string userMenuPath: Quickshell.env("HOME") + "/.config/omarchy/extensions/omarchy-menu.jsonc"', 'property string userMenuPath: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/omarchy/extensions/os-menu.json"')
+replace('Style.space(300)), panel.width', 'Style.space(root.sessionPolicy ? root.sessionPolicy.menu.width : 0)), panel.width')
+local ending = assert(text:find("}%s*$"))
+text = text:sub(1, ending - 1) .. read(assert(arg[2])) .. '\n  AppCatalog { id: appCatalog; policy: root.sessionPolicy }\n' .. text:sub(ending)
+io.write(text)

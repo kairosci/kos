@@ -11,7 +11,7 @@ OS_CHANGELOG_SRC="$PROJECT_DIR/CHANGELOG.md"
 install -m 755 "$OS_DISPATCHER" /usr/local/bin/os || err "os.dispatch_failed" "/usr/local/bin/os"
 log "os.cli_installed" "/usr/local/bin/os"
 
-mkdir -p /usr/share/os || err "os.dispatch_failed" "/usr/share/os"
+install -d -m 755 /usr/share/os || err "os.dispatch_failed" "/usr/share/os"
 install -m 644 "$OS_CHANGELOG_SRC" /usr/share/os/CHANGELOG.md || err "os.changelog_missing" "/usr/share/os/CHANGELOG.md"
 log "os.changelog_installed" "/usr/share/os/CHANGELOG.md"
 
