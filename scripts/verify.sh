@@ -349,8 +349,8 @@ tcheck "verify.locale_profile" "[[ -f /etc/profile.d/os-locale.sh ]]"
 tcheck "verify.locale_hyprland" "grep -rq 'kb_layout' /home/*/.config/hypr/input.lua 2>/dev/null"
 catalog_check() {
     local lang
-    for lang in en it fr de es pt; do
-        [[ -f "$SCRIPT_DIR/lib/messages/$lang.msg" ]] || return 1
+    for lang in "${I18N_SUPPORTED[@]}"; do
+        [[ -f "$I18N_DIR/$lang.msg" ]] || return 1
     done
     return 0
 }
