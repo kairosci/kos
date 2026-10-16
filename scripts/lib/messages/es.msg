@@ -517,6 +517,13 @@ iso.repacking=Aplicando el overlay y reconstruyendo la ISO arrancable
 iso.repack_failed=No se pudo reconstruir la ISO arrancable
 iso.output_ready=ISO de OS creada: %s
 iso.signature_note=La firma upstream no cubre esta imagen personalizada; la suma SHA-256 se escribió junto a ella
+iso.verify_usage=Uso: verify-iso.sh --iso ARCHIVO --ref REF [--expected-commit SHA]
+iso.verify_iso_missing=La imagen ISO no existe: %s
+iso.verify_ref_invalid=Referencia git no válida: %s
+iso.verify_extract_failed=No se pudo extraer la configuración incluida de %s
+iso.verify_content_mismatch=La configuración de la ISO no coincide con el árbol del repositorio
+iso.verify_marker_mismatch=El marcador de release de la ISO no coincide con el commit esperado
+iso.verify_ok=Verificación ISO correcta: %s
 fontconfig.match_failed=Fontconfig seleccionó una fuente web para %s
 
 bootloader.install=Instalando el gestor de arranque textual GRUB

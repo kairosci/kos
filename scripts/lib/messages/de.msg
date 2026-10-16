@@ -517,6 +517,13 @@ iso.repacking=Overlay wird angewendet und bootfähige ISO neu erstellt
 iso.repack_failed=Bootfähige ISO konnte nicht neu erstellt werden
 iso.output_ready=OS-ISO erstellt: %s
 iso.signature_note=Die upstream-Signatur gilt nicht für dieses angepasste Abbild; die SHA-256-Prüfsumme wurde daneben gespeichert
+iso.verify_usage=Verwendung: verify-iso.sh --iso DATEI --ref REF [--expected-commit SHA]
+iso.verify_iso_missing=ISO-Abbild existiert nicht: %s
+iso.verify_ref_invalid=Ungültige Git-Referenz: %s
+iso.verify_extract_failed=Die mitgelieferte Konfiguration konnte nicht aus %s extrahiert werden
+iso.verify_content_mismatch=Die ISO-Konfiguration stimmt nicht mit dem Repository-Baum überein
+iso.verify_marker_mismatch=Die ISO-Release-Markierung stimmt nicht mit dem erwarteten Commit überein
+iso.verify_ok=ISO-Prüfung bestanden: %s
 fontconfig.match_failed=Fontconfig hat für %s eine Webschrift ausgewählt
 
 bootloader.install=GRUB Text Bootloader wird installiert

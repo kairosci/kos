@@ -2,9 +2,8 @@
 set -euo pipefail
 
 REPOSITORY="${GITHUB_REPOSITORY:-kairosci/os}"
-OUTPUT_DIR="${2:-$PWD}"
-[[ -d "$OUTPUT_DIR" ]] || mkdir -p -- "$OUTPUT_DIR"
-OUTPUT_DIR="$(cd "$OUTPUT_DIR" && pwd -P)"
+OUTPUT_DIR="$(pwd -P)"
+(( $# <= 1 ))
 
 for dependency in curl jq sha256sum; do
     command -v "$dependency" >/dev/null 2>&1
@@ -19,7 +18,7 @@ fi
 
 ISO_NAME="os-${TAG}.iso"
 CHECKSUM_NAME="$ISO_NAME.sha256"
-WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/os-iso-download.XXXXXXXX")"
+WORK_DIR="$(mktemp -d "$OUTPUT_DIR/.os-iso-download.XXXXXXXX")"
 cleanup() {
     rm -rf -- "$WORK_DIR"
 }
@@ -44,11 +43,12 @@ for part_name in "${PART_NAMES[@]}"; do
     part_url="$(jq -er --arg name "$part_name" \
         '.assets[] | select(.name == $name) | .browser_download_url' "$WORK_DIR/release.json")"
     curl -fL --retry 3 --progress-bar --show-error "$part_url" --output "$WORK_DIR/$part_name"
+    cat -- "$WORK_DIR/$part_name" >> "$WORK_DIR/$ISO_NAME"
+    rm -- "$WORK_DIR/$part_name"
     ((expected_part += 1))
 done
 
 curl -fL --retry 3 --progress-bar --show-error "$CHECKSUM_URL" --output "$WORK_DIR/$CHECKSUM_NAME"
-cat "${PART_NAMES[@]/#/$WORK_DIR/}" > "$WORK_DIR/$ISO_NAME"
 (cd "$WORK_DIR" && sha256sum -c "$CHECKSUM_NAME")
 mv -f -- "$WORK_DIR/$ISO_NAME" "$OUTPUT_DIR/$ISO_NAME"
 mv -f -- "$WORK_DIR/$CHECKSUM_NAME" "$OUTPUT_DIR/$CHECKSUM_NAME"

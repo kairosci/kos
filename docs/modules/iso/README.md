@@ -8,15 +8,17 @@ The image name is `os-vX.Y.iso`. Releases use the version alone as the release h
 
 The helper is a small Bash script. It discovers the latest release, downloads all parts and the checksum, assembles the ISO, and verifies it before writing the image and checksum to the current directory. It requires `curl`, `jq`, and `sha256sum`.
 
+Temporary downloads are stored in a private directory inside the output directory, avoiding RAM-backed `/tmp`. Parts are appended to the staged ISO and removed one at a time, so allow free space for the complete ISO plus one release part. Temporary files are removed when the helper exits.
+
 ```bash
 curl -fsSL https://github.com/kairosci/os/releases/latest/download/download-release.sh | bash
 ```
 
-Choose an output directory by downloading and running the helper directly:
+The ISO and checksum are always saved in the current working directory, even when the helper script is stored elsewhere. To choose a destination, change directory before running it:
 
 ```bash
-curl -fsSLo download-release.sh https://github.com/kairosci/os/releases/latest/download/download-release.sh
-bash download-release.sh v1.4 /path/to/output
+cd /path/to/output
+curl -fsSL https://github.com/kairosci/os/releases/latest/download/download-release.sh | bash -s -- v1.6
 ```
 
 Omit the tag to select the latest release. The optional tag is useful for reproducible downloads.
@@ -30,29 +32,17 @@ Invoke-WebRequest -Uri https://github.com/kairosci/os/releases/latest/download/d
 powershell -NoProfile -ExecutionPolicy Bypass -File .\download-release.ps1
 ```
 
-Pass `-Tag v1.4` to select a specific release or `-OutputDirectory "$HOME\Downloads"` to choose where the verified ISO and checksum are saved. The helper refuses to overwrite an ISO or checksum already present in the output directory.
+Pass `-Tag v1.6` to select a specific release. The verified ISO, checksum and temporary downloads are saved in the current working directory; change directory before running the helper to choose a destination. The helper refuses to overwrite an ISO or checksum already present in that directory.
 
-## Verify image contents without installing
+## Verify image contents in CI
 
-The ISO workflow verifies the configuration before publishing. It extracts `/opt/os` from the finished image and compares every file with the materialized repository tree at the tagged commit. It also checks the release commit marker. This verifies the bundled configuration without booting or installing the image.
+The ISO workflow verifies the configuration in a dedicated job before publishing. The verify job downloads the built image artifact and runs `modules/iso/scripts/verify-iso.sh`, which extracts `/opt/os` and `/opt/os-release.txt` from the finished image and compares every file with the materialized repository tree at the tagged commit. The expected commit marker defaults to the given ref and the build job passes its exact commit explicitly, so a verification failure blocks the release. This verifies the bundled configuration without booting or installing the image.
 
-You can inspect a downloaded image locally with `xorriso`. The comparison below uses the signed release tag as the source, follows repository symlinks in the same way as the ISO build, extracts the bundled configuration into a temporary directory, and compares file contents:
-
-```bash
-tag=v1.4
-temporary_directory="$(mktemp -d)"
-mkdir -p "$temporary_directory/source" "$temporary_directory/materialized" "$temporary_directory/image"
-git archive "$tag" | tar -x -C "$temporary_directory/source"
-cp -aL "$temporary_directory/source/." "$temporary_directory/materialized/"
-xorriso -osirrox on -indev "os-${tag}.iso" -extract /opt/os "$temporary_directory/image/os"
-diff -qr "$temporary_directory/materialized" "$temporary_directory/image/os"
-```
-
-An empty `diff` result means the repository tree in the image matches the tagged source. The workflow also compares the marker at `/opt/os-release.txt` with the commit used to build that release.
+Image content verification runs only in the dedicated CI job. A passing run means the repository tree in the image matches the tagged source and the marker at `/opt/os-release.txt` records the commit passed by the build job. Local setup and download commands do not inspect the bundled configuration; download helpers retain SHA-256 integrity verification.
 
 ## Apply the configuration
 
-The complete tracked repository is available on the live image at `/opt/os`. The image does not silently provision or overwrite an installed system. After installation, copy `/opt/os` to persistent storage and run `make setup` from that copy. The setup pipeline applies the repository configuration and preserves the supported base desktop runtime.
+The complete tracked repository is stored at `/opt/os` in the ISO filesystem. The current build adds files to that filesystem; it does not rebuild the compressed live root or arrange for the installer to copy the configuration into the installed system. Mount the ISO or installation medium, copy its `opt/os` directory to persistent storage, and run `make setup` from that copy after installation. The setup pipeline applies the repository configuration and preserves the supported base desktop runtime.
 
 The image is rebuilt from an upstream installer image. Its upstream checksum is verified before modification, but the upstream signature does not cover the rebuilt image. Verify downloaded release files with the included SHA-256 checksum.
 
@@ -83,7 +73,7 @@ Run `make iso` to rebuild the latest stable upstream image using `modules/iso/ov
 bash modules/iso/scripts/customize.sh --overlay /path/to/overlay --output /path/to/os-v1.4.iso
 ```
 
-The original upstream image is cached under `${XDG_CACHE_HOME:-$HOME/.cache}/os/iso/`. Upstream source names remain in the build script only where required to locate and verify the base image.
+The original upstream image and temporary build downloads are stored under `${XDG_CACHE_HOME:-$HOME/.cache}/os/iso/`. Upstream source names remain in the build script only where required to locate and verify the base image.
 
 ## Boot menu
 

@@ -42,7 +42,7 @@ OVERLAY_ENTRIES="$(find "$OVERLAY_DIR" -mindepth 1 \! -type d \! -type f -print 
 
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/os/iso"
 mkdir -p "$CACHE_DIR"
-WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/os-iso.XXXXXXXX")"
+WORK_DIR="$(mktemp -d "$CACHE_DIR/.os-iso.XXXXXXXX")"
 OUTPUT_TEMP=""
 cleanup() {
     [[ -z "$OUTPUT_TEMP" ]] || rm -f -- "$OUTPUT_TEMP" "$OUTPUT_TEMP.sha256"

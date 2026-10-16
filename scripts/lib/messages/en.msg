@@ -517,6 +517,13 @@ iso.repacking=Applying overlay and rebuilding the bootable ISO
 iso.repack_failed=Could not rebuild the bootable ISO
 iso.output_ready=OS ISO created: %s
 iso.signature_note=The upstream signature does not cover this customized image; its SHA-256 checksum was written beside it
+iso.verify_usage=Usage: verify-iso.sh --iso FILE --ref REF [--expected-commit SHA]
+iso.verify_iso_missing=ISO image does not exist: %s
+iso.verify_ref_invalid=Git reference is invalid: %s
+iso.verify_extract_failed=Could not extract the bundled configuration from %s
+iso.verify_content_mismatch=ISO configuration does not match the repository tree
+iso.verify_marker_mismatch=ISO release marker does not match the expected commit
+iso.verify_ok=ISO verification passed: %s
 fontconfig.match_failed=Fontconfig selected a web font for %s
 
 bootloader.install=Installing the GRUB text bootloader
