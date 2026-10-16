@@ -6,7 +6,6 @@ import Quickshell.Networking
 Pane {
     id: root
     property var app
-    property var selectedNetwork: null
     padding: app ? app.snapshot.policy.window.margin : 0
     ColumnLayout {
         width: parent.width
@@ -41,12 +40,16 @@ Pane {
                             enabled: !networkRow.modelData.stateChanging
                             onClicked: networkRow.modelData.connected ? networkRow.modelData.disconnect() : networkRow.modelData.connect()
                         }
-                        Button { visible: networkRow.modelData.known; text: root.app ? root.app.text("forget") : ""; onClicked: { root.selectedNetwork = networkRow.modelData; forgetDialog.open() } }
+                        Button { visible: networkRow.modelData.known; text: root.app ? root.app.text("forget") : ""; onClicked: { forgetDialog.network = networkRow.modelData; forgetDialog.open() } }
                         Connections {
                             target: networkRow.modelData
                             function onConnectionFailed(reason) {
                                 if (reason === ConnectionFailReason.NoSecrets && [WifiSecurityType.WpaPsk, WifiSecurityType.Wpa2Psk, WifiSecurityType.Sae].includes(networkRow.modelData.security)) {
-                                    root.selectedNetwork = networkRow.modelData
+                                    if (passwordDialog.visible || forgetDialog.visible) {
+                                        root.app.failure = root.app.text("connectionFailed") + ": " + networkRow.modelData.name
+                                        return
+                                    }
+                                    passwordDialog.network = networkRow.modelData
                                     passwordDialog.open()
                                 } else if (root.app) root.app.failure = root.app.text("connectionFailed") + ": " + ConnectionFailReason.toString(reason)
                             }
@@ -58,22 +61,24 @@ Pane {
     }
     Dialog {
         id: passwordDialog
+        property var network: null
         parent: Overlay.overlay
         anchors.centerIn: parent
         modal: true
-        title: root.app ? root.app.text("password") : ""
+        title: root.app ? root.app.text("password") + ": " + (network ? network.name : "") : ""
         footer: DialogButtonBox {
             Button { text: root.app ? root.app.text("connect") : ""; DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole }
             Button { text: root.app ? root.app.text("cancel") : ""; DialogButtonBox.buttonRole: DialogButtonBox.RejectRole }
         }
         TextField { id: password; echoMode: TextInput.Password; selectByMouse: true; onAccepted: passwordDialog.accept() }
         onOpened: password.forceActiveFocus()
-        onAccepted: { if (root.selectedNetwork) root.selectedNetwork.connectWithPsk(password.text); password.clear() }
+        onAccepted: { if (network) network.connectWithPsk(password.text); password.clear() }
         onRejected: password.clear()
         onClosed: password.clear()
     }
     Dialog {
         id: forgetDialog
+        property var network: null
         parent: Overlay.overlay
         anchors.centerIn: parent
         modal: true
@@ -82,7 +87,7 @@ Pane {
             Button { text: root.app ? root.app.text("forget") : ""; DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole }
             Button { text: root.app ? root.app.text("cancel") : ""; DialogButtonBox.buttonRole: DialogButtonBox.RejectRole }
         }
-        Label { text: root.selectedNetwork ? root.selectedNetwork.name : "" }
-        onAccepted: { if (root.selectedNetwork) root.selectedNetwork.forget() }
+        Label { text: forgetDialog.network ? forgetDialog.network.name : "" }
+        onAccepted: { if (network) network.forget() }
     }
 }
