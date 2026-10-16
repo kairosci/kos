@@ -78,7 +78,7 @@ if ! pacman -Q trash-cli &>/dev/null; then
 fi
 
 log "defaults.system_settings"
-pacman -S --noconfirm --needed gnome-control-center || err "defaults.app_failed" "GNOME Settings"
+source "$PROJECT_DIR/scripts/lib/hyprmod.sh"
 
 log "defaults.filemanager"
 for pkg in nautilus gvfs gvfs-mtp file-roller; do
@@ -138,13 +138,13 @@ o.bind("SUPER + CTRL + T", "Activity", "resources")
 LUAEOF
         chown "$_user:$_user" "$_bindings"
     fi
-    if [[ -f "$_bindings" ]] && grep -qF 'o.window("^(dev.zed.Zed|' "$_bindings" && ! grep -q 'org.gnome.Settings' "$_bindings"; then
-        sed -i -e 's/org.gnome.Loupe|io.github.celluloid_player.Celluloid/org.gnome.Loupe|org.gnome.Settings|io.github.celluloid_player.Celluloid/' "$_bindings"
+    if [[ -f "$_bindings" ]] && grep -qF 'o.window("^(dev.zed.Zed|' "$_bindings" && ! grep -q 'io.github.bluemancz.hyprmod' "$_bindings"; then
+        sed -i -e 's/org.gnome.Loupe|io.github.celluloid_player.Celluloid/org.gnome.Loupe|io.github.bluemancz.hyprmod|io.github.celluloid_player.Celluloid/' "$_bindings"
         chown "$_user:$_user" "$_bindings"
     fi
     if [[ -f "$_bindings" ]] && ! grep -qF 'o.window("^(dev.zed.Zed|' "$_bindings"; then
         cat >> "$_bindings" << 'LUAEOF'
-o.window("^(dev.zed.Zed|org.gnome.Nautilus|org.gnome.Papers|org.gnome.Loupe|org.gnome.Settings|io.github.celluloid_player.Celluloid|net.nokyan.Resources|org.gnome.Resources|org.gnome.baobab|xdg-desktop-portal-gtk)$", { tag = "-default-opacity", opacity = "1 1" })
+o.window("^(dev.zed.Zed|org.gnome.Nautilus|org.gnome.Papers|org.gnome.Loupe|io.github.bluemancz.hyprmod|io.github.celluloid_player.Celluloid|net.nokyan.Resources|org.gnome.Resources|org.gnome.baobab|xdg-desktop-portal-gtk)$", { tag = "-default-opacity", opacity = "1 1" })
 LUAEOF
         chown "$_user:$_user" "$_bindings"
     fi
@@ -153,7 +153,7 @@ LUAEOF
 
 -- os-system-settings
 hl.unbind("SUPER + comma")
-o.bind("SUPER + comma", "Settings", "gnome-control-center")
+o.bind("SUPER + comma", "Settings", "hyprmod")
 LUAEOF
         chown "$_user":"$_user" "$_bindings" 2>/dev/null || warn "defaults.bindings_chown" "$_user"
     fi

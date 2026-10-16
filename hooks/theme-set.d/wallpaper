@@ -1,29 +1,15 @@
 #!/usr/bin/env bash
-set -euo pipefail
-THEME="${1:-}"
-if [[ -z "$THEME" ]]; then
-    THEME="$(cat "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current/theme.name")"
-fi
-DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-LOGO="$DATA_HOME/os/desktop/wallpapers/krepo.png"
-COLORS=""
-for dir in "$HOME/.config/omarchy/themes/$THEME" "/usr/share/omarchy/themes/$THEME"; do
-    if [[ -f "$dir/colors.toml" ]]; then
-        COLORS="$dir/colors.toml"
-        break
-    fi
-done
-BG="$(sed -n 's/^background *= *"\(#[0-9a-fA-F]\{6\}\)".*/\1/p' "$COLORS" | head -n 1)"
-[[ "$BG" =~ ^#[0-9a-fA-F]{6}$ ]]
-SIZE="$(hyprctl monitors -j 2>/dev/null | jq -r '"\([.[].width] | max // 1920)x\([.[].height] | max // 1080)"' 2>/dev/null)" || SIZE=""
-[[ "$SIZE" =~ ^[0-9]+x[0-9]+$ ]] || SIZE="1920x1080"
-[[ "$SIZE" =~ ^[0-9]+x[0-9]+$ ]] || SIZE="1920x1080"
-WIDTH="${SIZE%x*}"
-HEIGHT="${SIZE#*x}"
-SIDE=$(( (WIDTH < HEIGHT ? WIDTH : HEIGHT) / 2 ))
-OUT="$HOME/.config/os/backgrounds/$THEME/krepo.png"
-mkdir -p "${OUT%/*}"
-if [[ ! -f "$OUT" || "$LOGO" -nt "$OUT" || "$COLORS" -nt "$OUT" ]]; then
-    magick -size "${WIDTH}x${HEIGHT}" "canvas:$BG" \( "$LOGO" -resize "${SIDE}x${SIDE}" \) -gravity center -composite "$OUT"
-fi
-ln -nsf "$OUT" "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current/background"
+
+wallpaper_hook() {
+    set -euo pipefail
+    SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+    OS_I18N_BOOT="$SCRIPT_DIR/../i18n/i18n-boot.sh"
+    [[ -f "$OS_I18N_BOOT" ]] || OS_I18N_BOOT="$SCRIPT_DIR/../../scripts/lib/i18n-boot.sh"
+    source "$OS_I18N_BOOT"
+    local library="${XDG_DATA_HOME:-$HOME/.local/share}/os/desktop/scripts/wallpaper.sh"
+    [[ -r "$library" ]] || library="$SCRIPT_DIR/../../modules/conf/desktop/scripts/wallpaper.sh"
+    source "$library"
+    render_wallpapers "$@"
+}
+
+wallpaper_hook "$@"

@@ -28,6 +28,16 @@ assert_true "migration handles an empty legacy directory" "migrate_user_config_d
 HOME_D=$(make_home home-d)
 ln -s elsewhere "$HOME_D/.config/omarchy"
 assert_true "migration refuses a foreign link" "! migrate_user_config_dir '$HOME_D'"
+HOME_E=$(make_home home-e)
+mkdir -p "$HOME_E/.config/"{omarchy,os}
+printf 'legacy\n' > "$HOME_E/.config/omarchy/conflict"
+printf 'personal\n' > "$HOME_E/.config/os/conflict"
+printf 'keep\n' > "$HOME_E/.config/omarchy/unrelated"
+assert_true "migration detects all collisions before moving any file" "! migrate_user_config_dir '$HOME_E' && grep -qx legacy '$HOME_E/.config/omarchy/conflict' && grep -qx personal '$HOME_E/.config/os/conflict' && [[ -f '$HOME_E/.config/omarchy/unrelated' && ! -e '$HOME_E/.config/os/unrelated' ]]"
+HOME_F=$(make_home home-f)
+mkdir -p "$HOME_F/elsewhere" "$HOME_F/.config/omarchy"
+ln -s "$HOME_F/elsewhere" "$HOME_F/.config/os"
+assert_true "migration refuses a linked destination" "! migrate_user_config_dir '$HOME_F' && [[ -d '$HOME_F/.config/omarchy' && ! -L '$HOME_F/.config/omarchy' ]]"
 assert_true "session installer migrates before reading" "grep -q 'migrate_user_config_dir' '$PROJECT_DIR/modules/conf/session/install.sh'"
 assert_true "menu model reads the renamed user menu" "grep -q '/os/extensions/os-menu.json' '$PROJECT_DIR/modules/conf/session/scripts/prepare-menu.lua'"
 assert_true "theming installs hooks under the os directory" "grep -q '.config/os/hooks/theme-set.d' '$PROJECT_DIR/scripts/lib/modules/30-theming.sh'"

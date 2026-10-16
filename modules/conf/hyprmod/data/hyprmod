@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+launch_hyprmod() {
+    set -euo pipefail
+    exec "${XDG_DATA_HOME:-$HOME/.local/share}/os/hyprmod/current/bin/hyprmod" "$@"
+}
+
+launch_hyprmod "$@"

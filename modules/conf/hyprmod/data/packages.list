@@ -1,0 +1,6 @@
+uv
+python-gobject
+python-cairo
+python-hatchling
+gtk4
+libadwaita
