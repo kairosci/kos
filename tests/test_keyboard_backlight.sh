@@ -84,7 +84,7 @@ set -euo pipefail
 printf 'udev %s\n' "$*" >> "$KEYBOARD_COMMANDS"
 MOCK
 chmod 755 "$KEYBOARD_SANDBOX/bin/udevadm"
-printf '%s\n' '#!/bin/bash' 'set -euo pipefail' 'source "$OS_I18N_BOOT"' 'i18n_init' > "$KEYBOARD_SANDBOX/provision.sh"
+printf '%s\n' '#!/bin/bash' 'set -euo pipefail' 'source "$OS_I18N_BOOT"' 'locale_init' > "$KEYBOARD_SANDBOX/provision.sh"
 sed '1,2d' "$PROJECT_DIR/scripts/lib/keyboard-backlight-policy.sh" | \
     sed -e "s|/usr/local/libexec/|$KEYBOARD_SANDBOX/root/usr/local/libexec/|g" \
         -e "s|/usr/local/lib/os/|$KEYBOARD_SANDBOX/root/usr/local/lib/os/|g" \
@@ -105,7 +105,7 @@ assert_true "scoped policy installs its trusted message runtime" "cmp '$PROJECT_
 sed -e "s|/usr/local/lib/os|$keyboard_runtime|g" -e 's/\$EUID/0/g' \
     "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/root/usr/local/libexec/os-keyboard-backlight"
 assert_true "device activation restores a level overwritten by native boot restore" "command=\$(sed -n 's/^ExecStart=//p' '$DEVICE_UNIT'); command=\${command/\/usr\/local\/libexec\/os-keyboard-backlight/\$KEYBOARD_SANDBOX\/root\/usr\/local\/libexec\/os-keyboard-backlight}; bash -c \"\$command\" && [[ \"\$(cat '$OS_KEYBOARD_LEDS_ROOT/vendor::kbd_backlight/brightness')\" == 3 ]]"
-sed 's/\$EUID/${KEYBOARD_TEST_EUID}/g' "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/keyboard-root.sh"
+sed -e 's/\$EUID/${KEYBOARD_TEST_EUID}/g' -e "s|/usr/local/lib/os|$keyboard_runtime|g" "$KEYBOARD_HELPER" > "$KEYBOARD_SANDBOX/keyboard-root.sh"
 cp "$PROJECT_DIR/scripts/lib/i18n.sh" "$KEYBOARD_SANDBOX/"
 cp -r "$PROJECT_DIR/scripts/lib/messages" "$KEYBOARD_SANDBOX/"
 printf 'touch "%s"\nexit 93\n' "$KEYBOARD_SANDBOX/untrusted-ran" > "$KEYBOARD_SANDBOX/untrusted.sh"

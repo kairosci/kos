@@ -7,7 +7,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/lib/i18n.sh"
 source "$SCRIPT_DIR/lib/target-user.sh"
 
-i18n_init
+locale_init
 
 TARGET_USER=""
 TARGET_UID=""

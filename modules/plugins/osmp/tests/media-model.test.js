@@ -447,7 +447,3 @@ describe("MediaModel.parseNativeTrackList artist", () => {
     assert.equal(result[1].artist, "C, D");
   });
 });
-
-
-
-

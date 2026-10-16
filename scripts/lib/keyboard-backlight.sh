@@ -14,10 +14,10 @@ fi
 if [[ -f "$OS_I18N_BOOT" ]]; then
     # shellcheck source=i18n.sh
     source "$OS_I18N_BOOT"
-    i18n_init
+    locale_init
 else
     source "$SCRIPT_DIR/i18n.sh"
-    i18n_init
+    locale_init
 fi
 
 mode="${1:-apply}"

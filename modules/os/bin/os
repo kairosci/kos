@@ -48,8 +48,8 @@ os_lib_init() {
         if [[ -f "$lib" ]]; then
             # shellcheck source=/dev/null
             source "$lib" 2>/dev/null || return 1
-            if command -v i18n_init >/dev/null 2>&1; then
-                i18n_init 2>/dev/null || return 1
+            if command -v locale_init >/dev/null 2>&1; then
+                locale_init 2>/dev/null || return 1
             fi
             return 0
         fi

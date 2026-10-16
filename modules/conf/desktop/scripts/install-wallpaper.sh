@@ -7,7 +7,7 @@ install_wallpapers() {
     project="$(dirname "$(dirname "$(dirname "$module")")")"
     source "$project/scripts/lib/i18n.sh"
     source "$project/scripts/lib/userconf.sh"
-    i18n_init
+    locale_init
     data="${XDG_DATA_HOME:-$HOME/.local/share}"
     install_user_file "$module/data/wallpapers/krepo.png" "$data/os/desktop/wallpapers/krepo.png"
     install_user_file "$module/data/wallpapers/policy.json" "$data/os/desktop/wallpapers/policy.json"

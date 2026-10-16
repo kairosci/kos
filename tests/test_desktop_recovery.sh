@@ -6,7 +6,7 @@ source "$SCRIPT_DIR/test_lib.sh"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/snapshot-baseline.sh"
 source "$PROJECT_DIR/scripts/lib/omarchy-restore.sh"
-i18n_init
+locale_init
 SANDBOX=$(mktemp -d)
 trap 'rm -rf "$SANDBOX"' EXIT
 export OS_SNAPSHOT_BASELINE_STATE="$SANDBOX/state"

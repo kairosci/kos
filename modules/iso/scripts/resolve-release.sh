@@ -3,7 +3,7 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
-i18n_init
+locale_init
 TAG="${1:-}"
 [[ "$TAG" =~ ^v[0-9]+\.[0-9]+$ ]] || err iso.verify_ref_invalid "$TAG"
 REPOSITORY="${GITHUB_REPOSITORY:-kairosci/os}"

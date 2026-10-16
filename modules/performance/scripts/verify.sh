@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_ROOT="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_ROOT/scripts/lib/i18n.sh"
-i18n_init
+locale_init
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

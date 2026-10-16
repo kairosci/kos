@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "os.clockwidget",
+  "name": "Clock",
+  "version": "1.0.0",
+  "author": "OS",
+  "kinds": ["service"],
+  "entryPoints": {"service": "ClockWidget.qml"}
+}

@@ -22,4 +22,3 @@ systemctl daemon-reload
 systemctl enable os-keyboard-backlight.service
 systemctl restart os-keyboard-backlight.service
 systemctl enable --now os-keyboard-backlight.timer
-

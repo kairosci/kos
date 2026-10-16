@@ -67,10 +67,10 @@ render() {
 
 MSG_COUNT_IT=$(OS_LANG=it bash "$LIB_DIR/i18n.sh" 2>/dev/null | sed -n 's/^messages=//p')
 FALLBACK_LANG=$(OS_LANG=zz bash "$LIB_DIR/i18n.sh" 2>/dev/null | sed -n 's/^language=//p')
-WARNING_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; i18n_init >/dev/null 2>&1; t "__warning"' _ "$LIB_DIR")
-ERROR_DE=$(OS_LANG=de bash -c 'source "$1/i18n.sh"; i18n_init >/dev/null 2>&1; t "__error"' _ "$LIB_DIR")
-UNKNOWN_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; i18n_init >/dev/null 2>&1; t "totally.unknown.key"' _ "$LIB_DIR")
-PKG_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; i18n_init >/dev/null 2>&1; t "check.pkg_installed" "thunar"' _ "$LIB_DIR")
+WARNING_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&1; t "__warning"' _ "$LIB_DIR")
+ERROR_DE=$(OS_LANG=de bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&1; t "__error"' _ "$LIB_DIR")
+UNKNOWN_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&1; t "totally.unknown.key"' _ "$LIB_DIR")
+PKG_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&1; t "check.pkg_installed" "thunar"' _ "$LIB_DIR")
 HELP_IT=$(OS_LANG=it bash "$LIB_DIR/help.sh" 2>/dev/null | sed -n 's/^  setup *//p')
 
 eq() { [[ "$1" == "$2" ]]; }
@@ -116,7 +116,7 @@ assert_true "boot shim keeps working under strict mode" "bash -c 'set -euo pipef
 assert_true "make help is localized"                  "eq \"\$HELP_IT\" 'Esegui la configurazione completa (root)'"
 
 assert_file_contains "setup.sh sources the i18n library" "$PROJECT_DIR/scripts/setup.sh" "lib/i18n.sh"
-assert_file_contains "setup.sh calls i18n_init" "$PROJECT_DIR/scripts/setup.sh" "i18n_init"
+assert_file_contains "setup.sh calls locale_init" "$PROJECT_DIR/scripts/setup.sh" "locale_init"
 assert_file_contains "verify.sh sources the i18n library" "$PROJECT_DIR/scripts/verify.sh" "lib/i18n.sh"
 assert_file_contains "verify.sh has a locale section" "$PROJECT_DIR/scripts/verify.sh" "section verify.sec_locale"
 assert_file_contains "run-setup.sh sources the i18n library" "$PROJECT_DIR/scripts/run-setup.sh" "lib/i18n.sh"

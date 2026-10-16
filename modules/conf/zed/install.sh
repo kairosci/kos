@@ -11,7 +11,7 @@ source "$I18N_LIB/i18n.sh"
 # shellcheck source=/dev/null
 source "$I18N_LIB/userconf.sh"
 
-i18n_init
+locale_init
 
 command -v jq >/dev/null || err "defaults.app_failed" Zed
 existing=/dev/null

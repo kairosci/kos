@@ -2,7 +2,7 @@
 set -euo pipefail
 
 source /usr/local/lib/os/i18n.sh
-i18n_init
+locale_init
 [[ $EUID -eq 0 ]] || err "__root_required"
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin
 THEME_POLICY_FILE=/usr/local/lib/os/excluded-themes.list

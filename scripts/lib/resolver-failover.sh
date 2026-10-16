@@ -16,7 +16,7 @@ elif [[ -r /usr/local/lib/os/i18n.sh ]]; then
     export OS_I18N_DIR=/usr/local/lib/os/messages
     source /usr/local/lib/os/i18n.sh
 fi
-i18n_init
+locale_init
 unset RESOLVER_FAILOVER_LIB_DIR
 
 resolver_failover_state_write() {

@@ -5,7 +5,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 app=${SCRIPT_DIR##*/}
 install_user_electron_launcher "/usr/share/applications/$app.desktop" "${XDG_DATA_HOME:-$HOME/.local/share}/applications/$app.desktop"
 update-desktop-database "${XDG_DATA_HOME:-$HOME/.local/share}/applications"

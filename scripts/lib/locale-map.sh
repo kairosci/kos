@@ -145,4 +145,3 @@ resolve_target_xkb() {
         *)                                          printf 'us\n' ;;
     esac
 }
-

@@ -15,7 +15,7 @@ if [[ $EUID -eq 0 ]]; then
     export OS_I18N_DIR=/usr/local/lib/os/messages
     OS_I18N_BOOT=/usr/local/lib/os/i18n.sh
     source "$OS_I18N_BOOT"
-    i18n_init
+    locale_init
     # shellcheck source=scripts/lib/theme-policy.sh
     source /usr/local/lib/os/theme-policy.sh
     theme_policy_apply || err "theming.policy_failed"

@@ -6,7 +6,7 @@ install_hyprmod() {
     PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
     source "$PROJECT_DIR/scripts/lib/i18n.sh"
     source "$PROJECT_DIR/scripts/lib/userconf.sh"
-    i18n_init
+    locale_init
     local data="${XDG_DATA_HOME:-$HOME/.local/share}" config="${XDG_CONFIG_HOME:-$HOME/.config}" version environment stage icon
     [[ -f "$config/hypr/hyprland.lua" ]] || return 0
     local file

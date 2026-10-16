@@ -4,7 +4,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 migrate_user_config_dir "$HOME"
 BACKUP="${XDG_STATE_HOME:-$HOME/.local/state}/os/desktop-defaults"

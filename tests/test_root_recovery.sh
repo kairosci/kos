@@ -5,7 +5,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/test_lib.sh"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/root-recovery.sh"
-i18n_init
+locale_init
 SANDBOX=$(mktemp -d)
 trap 'rm -rf "$SANDBOX"' EXIT
 export OS_BOOT_CMDLINE="$SANDBOX/cmdline" OS_RESTORE_BACKUP_ROOT="$SANDBOX/backups"

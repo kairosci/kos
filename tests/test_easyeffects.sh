@@ -63,7 +63,7 @@ export MOCK_EASYEFFECTS_COMMANDS="$SANDBOX/native-commands" MOCK_EASYEFFECTS_LOA
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
 source "$PROJECT_DIR/modules/conf/easyeffects/apply.sh"
-i18n_init
+locale_init
 PRESET=OS-Subwoofer
 STATE="$SANDBOX/activation"
 assert_false "load failures propagate" "(MOCK_LOAD_FAIL=1 easyeffects_apply_preset)"

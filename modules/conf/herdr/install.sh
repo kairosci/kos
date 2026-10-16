@@ -16,7 +16,7 @@ source "$I18N_LIB/i18n.sh"
 # shellcheck source=/dev/null
 source "$I18N_LIB/userconf.sh"
 
-i18n_init
+locale_init
 
 install_user_file "$MENU_SRC" "$MENU_PATH" 755
 

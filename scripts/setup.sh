@@ -16,7 +16,7 @@ set -euo pipefail
 source "$SCRIPT_DIR/lib/i18n.sh"
 source "$SCRIPT_DIR/lib/target-user.sh"
 
-i18n_init
+locale_init
 
 SETUP_SCOPE=full
 scope_specified=0

@@ -4,7 +4,7 @@ set -euo pipefail
 
 script_dir=$(dirname "$(readlink -f "$0")")
 source "$script_dir/lib/i18n.sh"
-i18n_init
+locale_init
 
 backend=${1:-gnome-keyring}
 case "$backend" in

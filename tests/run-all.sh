@@ -9,6 +9,7 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_desktop_services.sh" \
     "$SCRIPT_DIR/test_lockscreen_regression.sh" \
     "$SCRIPT_DIR/test_kernel_hardening.sh" \
+    "$SCRIPT_DIR/test_arch_migration.sh" \
     "$SCRIPT_DIR/test_auth_pam_access.sh" \
     "$SCRIPT_DIR/test_firewall_network.sh" \
     "$SCRIPT_DIR/test_resolver_failover.sh" \

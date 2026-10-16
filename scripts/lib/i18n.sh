@@ -7,7 +7,7 @@ I18N_LANG=""
 
 declare -gA OS_I18N=()
 
-i18n_normalize() {
+locale_normalize() {
     local raw="${1,,}"
     raw="${raw%%.*}"
     raw="${raw%%_*}"
@@ -15,19 +15,19 @@ i18n_normalize() {
     printf '%s\n' "$raw"
 }
 
-i18n_detect_language() {
+locale_detect_language() {
     local candidate=""
     local lang=""
 
     for candidate in "${OS_LANG:-}" "${LANGUAGE:-}" "${LC_ALL:-}" "${LC_MESSAGES:-}" "${LANG:-}"; do
         if [[ -n "$candidate" && "$candidate" != "C" && "$candidate" != "POSIX" ]]; then
-            lang="$(i18n_normalize "$candidate")"
+            lang="$(locale_normalize "$candidate")"
             break
         fi
     done
 
     if [[ -z "$lang" ]] && [[ -r /etc/locale.conf ]]; then
-        lang="$(i18n_normalize "$(sed -n 's/^LANG=//p' /etc/locale.conf | head -1)")"
+        lang="$(locale_normalize "$(sed -n 's/^LANG=//p' /etc/locale.conf | head -1)")"
     fi
 
     if [[ -z "$lang" || "$lang" == "c" || "$lang" == "posix" ]]; then
@@ -37,7 +37,7 @@ i18n_detect_language() {
     printf '%s\n' "$lang"
 }
 
-i18n_supported() {
+locale_supported() {
     local want="$1" supported
     for supported in "${I18N_SUPPORTED[@]}"; do
         [[ "$supported" == "$want" ]] && return 0
@@ -45,7 +45,7 @@ i18n_supported() {
     return 1
 }
 
-i18n_catalog_load() {
+locale_catalog_load() {
     local catalog="$1"
     local line key value
 
@@ -61,17 +61,17 @@ i18n_catalog_load() {
     done < "$catalog"
 }
 
-i18n_init() {
+locale_init() {
     local lang
-    lang="$(i18n_detect_language)"
+    lang="$(locale_detect_language)"
 
-    if ! i18n_supported "$lang"; then
+    if ! locale_supported "$lang"; then
         lang="en"
     fi
 
-    i18n_catalog_load "$I18N_DIR/en.msg" || return 1
+    locale_catalog_load "$I18N_DIR/en.msg" || return 1
     if [[ "$lang" != "en" ]]; then
-        i18n_catalog_load "$I18N_DIR/$lang.msg" || warn "translation catalog missing for $lang, using English"
+        locale_catalog_load "$I18N_DIR/$lang.msg" || warn "translation catalog missing for $lang, using English"
     fi
 
     I18N_LANG="$lang"
@@ -113,11 +113,11 @@ err() {
     exit 1
 }
 
-i18n_status() {
+locale_status() {
     printf 'language=%s\ncatalog=%s\nmessages=%s\n' "$I18N_LANG" "$I18N_DIR" "${#OS_I18N[@]}"
 }
 
-i18n_list() {
+locale_list() {
     local lang
 
     printf '%s\n' "$(t 'i18n.available')"
@@ -131,7 +131,7 @@ i18n_list() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    i18n_init
+    locale_init
     case "${1:-}" in
         --render)
             shift
@@ -139,10 +139,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             printf '\n'
             ;;
         --list)
-            i18n_list
+            locale_list
             ;;
         *)
-            i18n_status
+            locale_status
             ;;
     esac
 fi

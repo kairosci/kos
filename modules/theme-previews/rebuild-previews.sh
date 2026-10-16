@@ -6,7 +6,7 @@ PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 source "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 [[ "${OS_APPLY_PIPELINE:-0}" == 1 ]] || err "preview.pipeline"
 (($#)) || err "preview.usage" "${0##*/}"
 themes=("$@")

@@ -75,6 +75,8 @@ Operational runbooks are stored in `docs/skills/` and exposed through `.skills/`
 All commit messages must follow the Conventional Commits standard formatted strictly as `<type>: <description>` or `<type>(<scope>): <description>`. The colon `:` following the target type is the only allowed punctuation or symbol. Titles must never contain emojis, exclamation marks, or extra punctuation.
 
 ## Scripting Rules and Constraints
+Function names use descriptive words without digits. Do not wrap existing entrypoints in cosmetic classes or namespaces.
+
 Scripts must use strict execution modes `set -euo pipefail` in pure native Bash without Python dependencies. Never use `|| true` to suppress failures; use `|| warn "message"` for non-critical steps that can fail gracefully. Do not add comments to Makefile or hook scripts. Do not hardcode user paths; derive directories from `$HOME` or `/home/*`. All operations must run in the foreground without `systemd-run`. All modifications to `scripts/setup.sh` and `scripts/verify.sh` must remain strictly idempotent.
 
 ## Mandatory Skill Loading and Pull Requests
@@ -98,5 +100,9 @@ The canonical GitHub ruleset is `.github/main-ruleset.json`: no bypass actors, n
 `24-user-configurations.sh` discovers all `modules/conf/*/install.sh` after package provisioning and applies them through `user_as`. Brave Origin uses its native flags config and existing profile directory. Never replace active browser profile databases or preferences with static repository files.
 
 The GTK hook owns GTK and libadwaita palette propagation and supersedes upstream Adwaita settings after each theme switch. Materia supplies the GTK base; the generated Qogir overlay uses the exact theme accent. Dark mode is the first setup default, while later explicit theme choices remain authoritative. Yazi is retired; preserve its personal configuration but remove managed launchers, hooks and shell helpers. Preview regeneration applies each actual system theme and captures the complete monitor with shell, wallpaper and sample apps, then restores the original theme, background and workspace on every exit path.
+
+## Arch independence transition
+
+The requested target is Arch Linux without the Omarchy runtime, with equivalent desktop and system functionality. The current implementation still requires Omarchy. `modules/platform/arch/data/parity.json` owns the capability inventory and official repository policy; `scripts/lib/arch-migration.sh` provides a read-only assessment. Never interpret installed package names or green legacy tests as replacement parity. Preserve the existing runtime, repositories, keys, kernel fallback and recovery entries until independent replacements, trial session, cold boot, suspend and recovery are verified. Removing Omarchy is not yet implemented by setup.
 
 HyprMod is the graphical Hyprland settings application. Its stable application source and pure library wheels are pinned by hash in `modules/conf/hyprmod/data/requirements.lock`; system GTK bindings stay managed by pacman. The Bash installer preserves its generated `hyprland-gui.lua`, validates the staged compositor configuration and adds its include after managed defaults. User initiated GUI changes are stored automatically by HyprMod; agents still apply provisioning through setup. `make setup SCOPE=settings` installs and reconciles this integration without provisioning a GNOME desktop. Wallpaper generation belongs to `modules/conf/desktop/scripts/wallpaper.sh` with palette and layout policy separate from code. Stock wallpapers leave the active chooser catalog and are archived outside it; packaged originals and personal backgrounds are preserved.

@@ -13,7 +13,7 @@ source "$I18N_LIB/i18n.sh"
 # shellcheck source=/dev/null
 source "$I18N_LIB/userconf.sh"
 
-i18n_init
+locale_init
 
 migrate_user_config_dir "$HOME"
 
