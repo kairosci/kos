@@ -9,3 +9,13 @@ rules:
       - pattern: curl ... | bash
       - pattern: wget ... | sh
       - pattern: wget ... | bash
+  - id: ruby.security.executable-configuration
+    message: Configuration must remain data and must never be evaluated as Ruby code.
+    severity: ERROR
+    languages:
+      - ruby
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: $OBJECT.instance_eval($CODE)
+      - pattern: $OBJECT.class_eval($CODE)
+      - pattern: $OBJECT.module_eval($CODE)

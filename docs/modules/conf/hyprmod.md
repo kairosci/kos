@@ -9,3 +9,5 @@ Run `make setup SCOPE=settings` to provision the package dependencies, install t
 HyprMod configures the compositor. Wi-Fi, Bluetooth, audio, printing and other system services remain separate applications or native system controls; it is not a replacement for those backends. GTK and libadwaita styling follow the system palette through the existing theme integration.
 
 Sources: [HyprMod](https://github.com/BlueManCZ/hyprmod), [pinned release](https://github.com/BlueManCZ/hyprmod/tree/e148d221cc62edaa8d1b8ffac0f0a57edcb8e3c1).
+
+Interface dimensions and spacing are managed as JSON, separate from the exact patch applied to the pinned app source. Symbolic icons use the installed Adwaita family and the system palette. Setup preserves explicit auto-save preferences. See [desktop interface](../../desktop-interface.md).

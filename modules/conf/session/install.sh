@@ -58,7 +58,7 @@ cp "$SCRIPT_DIR/qml/AppCatalog.qml" "$SCRIPT_DIR/qml/SessionI18n.qml" "$SCRIPT_D
 { printf 'import qs.Ui\n'; cat "$NATIVE/shell/Ui/ConfirmDialog.qml"; } > "$STAGE/plugins/$MENU_ID/ControlConfirmDialog.qml"
 jq --slurpfile policy "$POLICY" '.id = $policy[0].menu.id | .name = $policy[0].menu.name | .author = "OS" | .kinds = ["menu"] | .entryPoints = {menu: .entryPoints.menu} | .omarchy = {clonedFrom: .id} | .omarchy.clonedFrom = "omarchy.menu" | del(.barWidget)' \
     "$NATIVE/shell/plugins/menu/manifest.json" > "$STAGE/plugins/$MENU_ID/manifest.json"
-for retired in os.controls os.audio os.network os.bluetooth os.monitor os.power os.clock os.weather os.media os.tray; do
+for retired in os.clockwidget os.controls os.audio os.network os.bluetooth os.monitor os.power os.clock os.weather os.media os.tray; do
     rm -rf "$CONFIG_HOME/os/plugins/$retired"
 done
 jq --slurpfile policy "$POLICY" --slurpfile defaults "$SCRIPT_DIR/data/shell.json" -f "$SCRIPT_DIR/scripts/shell.jq" \
@@ -76,7 +76,7 @@ if [[ -f "$CONFIG_HOME/os/extensions/os-menu.json" ]]; then
     jq -s '.[0] * .[1]' "$STAGE/personal-menu.json" "$STAGE/previous-menu.json" > "$STAGE/personal-next.json"
     jq 'with_entries(select(.key | startswith("controls") | not))' "$STAGE/personal-next.json" > "$STAGE/personal-menu.json"
 fi
-cp "$STAGE/personal-menu.json" "$STAGE/extension.json"
+jq --slurpfile tools "$SCRIPT_DIR/data/desktop-apps.json" '. * $tools[0]' "$STAGE/personal-menu.json" > "$STAGE/extension.json"
 cp "$NATIVE/default/omarchy/launcher.hides" "$STAGE/data/os/session/data/launcher.hides"
 jq -n --arg language "$I18N_LANG" --slurpfile catalogue "$SCRIPT_DIR/data/locales/$I18N_LANG.json" \
     '{language:$language,messages:$catalogue[0].messages,patterns:$catalogue[0].patterns,folded:($catalogue[0].messages | to_entries | map({key:(.key|ascii_downcase),value:.value}) | from_entries)}' \

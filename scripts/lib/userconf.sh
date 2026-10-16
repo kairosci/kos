@@ -3,16 +3,7 @@
 install_user_file() {
     local src="$1" dest="$2" mode="${3:-644}"
     [[ -f "$src" ]] || return 1
-    mkdir -p "$(dirname "$dest")" || return 1
-    if [[ -f "$dest" ]]; then
-        if cmp -s "$src" "$dest"; then
-            chmod "$mode" "$dest" || return 1
-            return 0
-        fi
-        [[ ! -L "$dest.bak" ]] || return 1
-        cp -T "$dest" "$dest.bak" || return 1
-    fi
-    install -m "$mode" "$src" "$dest"
+    install_user_content "$dest" "$mode" < "$src"
 }
 
 install_user_content() {

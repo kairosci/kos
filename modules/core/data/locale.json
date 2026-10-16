@@ -1,0 +1,6 @@
+{
+  "languages": ["en", "it", "fr", "de", "es", "pt"],
+  "default": "en",
+  "environment": ["OS_LANG", "LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"],
+  "systemFile": "/etc/locale.conf"
+}

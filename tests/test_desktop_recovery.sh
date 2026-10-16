@@ -34,7 +34,7 @@ snapper() {
         *) return 1 ;;
     esac
 }
-grub-mkconfig() { printf 'grub\n' >> "$SNAPSHOT_TEST_COMMANDS"; }
+os-grub-menu() { printf 'grub\n' >> "$SNAPSHOT_TEST_COMMANDS"; }
 test_section "Omarchy restore and Snapper baseline"
 assert_true "baseline is created and earlier removable snapshots are deleted" 'snapshot_baseline_reset && ! grep -qE "^(1|4)," "$SNAPSHOT_TEST_ROWS" && grep -q "^5," "$SNAPSHOT_TEST_ROWS"'
 assert_true "active and default snapshots survive" 'grep -q "^0," "$SNAPSHOT_TEST_ROWS" && grep -q "^2," "$SNAPSHOT_TEST_ROWS" && grep -q "^3," "$SNAPSHOT_TEST_ROWS"'

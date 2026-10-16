@@ -19,6 +19,7 @@ if [[ "$1" == venv ]]; then
     directory="${@: -1}"
     mkdir -p "$directory/bin" "$directory/lib/site-packages/hyprmod/data/icons/hicolor/scalable/apps"
     printf '#!/usr/bin/env bash\nexit 0\n' > "$directory/bin/python"
+    touch "$directory/lib/site-packages/hyprmod/window.py" "$directory/lib/site-packages/hyprmod/style.css"
     printf '<svg/>\n' > "$directory/lib/site-packages/hyprmod/data/icons/hicolor/scalable/apps/io.github.bluemancz.hyprmod.svg"
     chmod 755 "$directory/bin/python"
 else
@@ -55,6 +56,7 @@ set -euo pipefail
 [[ -f "$OS_HYPR_CONFIG_ROOT/hyprland-gui.lua" ]] || exit 1
 printf 'config ok\n'
 SH
+    printf '#!/usr/bin/env bash\nset -euo pipefail\ncat >/dev/null\n' > "$WORK_DIR/bin/patch"
     chmod 755 "$WORK_DIR/bin/"*
     install_gui() {
         env -i PATH="$WORK_DIR/bin:/usr/bin:/bin" HOME="$WORK_DIR/home" HYPRMOD_TEST_OLD="${HYPRMOD_TEST_OLD:-0}" HYPRMOD_TEST_INVALID="${HYPRMOD_TEST_INVALID:-0}" \
@@ -68,6 +70,8 @@ SH
     assert_false "invalid staged compositor configuration prevents installation" "HYPRMOD_TEST_INVALID=1 install_gui"
     assert_true "failed validation leaves the active entrypoint unchanged" "cmp '$WORK_DIR/before.lua' '$WORK_DIR/home/.config/hypr/hyprland.lua'"
     assert_false "an incompatible system GTK runtime is rejected" "HYPRMOD_TEST_OLD=1 install_gui"
+    assert_true "interface policy is installed separately from application code" "cmp '$PROJECT_DIR/modules/conf/hyprmod/data/interface.json' '$WORK_DIR/home/.config/hyprmod/interface.json'"
+    assert_true "repeated setup never appends duplicate application styles" "[[ \$(grep -c 'window.os-hyprmod .navigation-sidebar row {' '$WORK_DIR/home/.local/share/os/hyprmod/current/lib/site-packages/hyprmod/style.css') == 1 ]]"
     test_summary
 }
 

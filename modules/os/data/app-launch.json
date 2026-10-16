@@ -1,6 +1,51 @@
 {
-  "browser": {"selector":"browser","fallbackMime":"x-scheme-handler/https","privateAction":"new-private-window"},
-  "editor": {"selector":"mime","mime":"text/plain"},
-  "files": {"selector":"mime","mime":"inode/directory"},
-  "settings": {"selector":"desktop","desktop":"io.github.bluemancz.hyprmod.desktop"}
+  "browser": {
+    "selector": "browser",
+    "fallbackMime": "x-scheme-handler/https",
+    "privateAction": "new-private-window"
+  },
+  "editor": {
+    "selector": "mime",
+    "mime": "text/plain"
+  },
+  "files": {
+    "selector": "mime",
+    "mime": "inode/directory"
+  },
+  "settings": {
+    "selector": "desktop",
+    "desktop": "io.github.bluemancz.hyprmod.desktop"
+  },
+  "calendar": {
+    "selector": "desktop",
+    "desktop": "org.gnome.Calendar.desktop"
+  },
+  "weather": {
+    "selector": "desktop",
+    "desktop": "org.gnome.Weather.desktop"
+  },
+  "clock": {
+    "selector": "desktop",
+    "desktop": "org.gnome.clocks.desktop"
+  },
+  "audio": {
+    "selector": "desktop",
+    "desktop": "org.pulseaudio.pavucontrol.desktop"
+  },
+  "network": {
+    "selector": "desktop",
+    "desktop": "nm-connection-editor.desktop"
+  },
+  "bluetooth": {
+    "selector": "desktop",
+    "desktop": "blueman-manager.desktop"
+  },
+  "resources": {
+    "selector": "desktop",
+    "desktop": "net.nokyan.Resources.desktop"
+  },
+  "media": {
+    "selector": "desktop",
+    "desktop": "io.github.celluloid_player.Celluloid.desktop"
+  }
 }

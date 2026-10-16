@@ -1,0 +1,97 @@
+diff --git a/hyprmod/ui/__init__.py b/hyprmod/ui/__init__.py
+index 42d8749..7e43a38 100644
+--- a/hyprmod/ui/__init__.py
++++ b/hyprmod/ui/__init__.py
+@@ -1,6 +1,9 @@
+ """UI components — widgets, utilities, and layout helpers."""
+ 
+ import functools
++import json
++import os
++from pathlib import Path
+ from collections.abc import Callable
+ from typing import Protocol, cast
+ 
+@@ -99,15 +102,17 @@ def make_page_layout(
+     scrolled.set_vexpand(True)
+ 
+     clamp = Adw.Clamp()
+-    clamp.set_maximum_size(800)
+-    clamp.set_tightening_threshold(600)
++    config_root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
++    interface = json.loads((config_root / "hyprmod/interface.json").read_text())["content"]
++    clamp.set_maximum_size(interface["maximum"])
++    clamp.set_tightening_threshold(interface["tightenBelow"])
+ 
+     content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+-    content_box.set_margin_top(24)
+-    content_box.set_margin_bottom(24)
++    content_box.set_margin_top(interface["margin"])
++    content_box.set_margin_bottom(interface["margin"])
+     content_box.set_margin_start(12)
+     content_box.set_margin_end(12)
+-    content_box.set_spacing(spacing)
++    content_box.set_spacing(min(spacing, interface["spacing"]))
+ 
+     clamp.set_child(content_box)
+     scrolled.set_child(clamp)
+diff --git a/hyprmod/window.py b/hyprmod/window.py
+index 26769a0..c2a2996 100644
+--- a/hyprmod/window.py
++++ b/hyprmod/window.py
+@@ -1,5 +1,8 @@
+ """Main application window with sidebar navigation."""
+ 
++import json
++import os
++
+ from collections import Counter
+ from collections.abc import Callable
+ from pathlib import Path
+@@ -69,7 +72,12 @@ class HyprModWindow(Adw.ApplicationWindow):
+         super().__init__(**kwargs)
+ 
+         self.set_title("HyprMod")
+-        self.set_default_size(900, 650)
++        self.add_css_class("os-hyprmod")
++        config_root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
++        self._interface = json.loads((config_root / "hyprmod/interface.json").read_text())
++        window = self._interface["window"]
++        self.set_default_size(window["width"], window["height"])
++        self.set_size_request(window["minimumWidth"], window["minimumHeight"])
+ 
+         self._settings = open_settings()
+         apply_saved_config_path(self._settings)
+@@ -283,6 +291,14 @@ class HyprModWindow(Adw.ApplicationWindow):
+ 
+         # Navigation split view
+         self._split_view = Adw.NavigationSplitView()
++        sidebar = self._interface["sidebar"]
++        self._split_view.set_min_sidebar_width(sidebar["minimum"])
++        self._split_view.set_max_sidebar_width(sidebar["maximum"])
++        self._split_view.set_sidebar_width_fraction(sidebar["fraction"])
++        breakpoint = Adw.Breakpoint.new(Adw.BreakpointCondition.parse(
++            f'max-width: {sidebar["collapseBelow"]}sp'))
++        breakpoint.add_setter(self._split_view, "collapsed", True)
++        self.add_breakpoint(breakpoint)
+         self._split_view.set_vexpand(True)
+         self._main_box.append(self._split_view)
+ 
+@@ -331,7 +347,8 @@ class HyprModWindow(Adw.ApplicationWindow):
+         if groups:
+             first_id = groups[0]["id"]
+             self.show_page(first_id)
+-            self._sidebar.select_first()
++            self._sidebar.select_row(first_id)
++            self._split_view.set_show_content(False)
+ 
+     def _build_content_pane(self):
+         """Build the content pane with page stack and banner."""
+@@ -953,6 +970,7 @@ class HyprModWindow(Adw.ApplicationWindow):
+ 
+     def _on_sidebar_selected(self, group_id: str):
+         self.show_page(group_id)
++        self._split_view.set_show_content(True)
+ 
+     # -- Option changes --
+ 

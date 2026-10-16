@@ -4,3 +4,6 @@ python-cairo
 python-hatchling
 gtk4
 libadwaita
+patch
+adwaita-icon-theme
+dconf
