@@ -9,5 +9,8 @@
   "directory": ["/usr/bin/install", "-d", "-m", "755"],
   "identity": ["/usr/bin/id", "-u"],
   "fileMode": ["/usr/bin/stat", "--format=%f", "--"],
-  "gsettings": ["/usr/bin/gsettings"]
+  "gsettings": ["/usr/bin/gsettings"],
+  "wallpaperEntries": ["/usr/bin/find", "-L"],
+  "move": ["/usr/bin/mv", "--"],
+  "symbolicLink": ["/usr/bin/ln", "-s", "--"]
 }

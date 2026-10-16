@@ -6,7 +6,7 @@ provision_wallpaper_dependencies() {
     while IFS= read -r package; do
         [[ "$package" =~ ^[a-z0-9][a-z0-9-]*$ ]] || err "env.aur_invalid" "$package"
         packages+=("$package")
-    done < "$PROJECT_DIR/modules/conf/desktop/data/wallpapers/packages.list"
+    done < "$PROJECT_DIR/data/component/wallpaper/packages.list"
     pacman -S --noconfirm --needed "${packages[@]}" || err "defaults.app_failed" "wallpaper"
 }
 
