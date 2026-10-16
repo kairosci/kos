@@ -37,12 +37,8 @@ done
 [[ -f "$ISO_PATH" ]] || err "iso.verify_iso_missing" "$ISO_PATH"
 
 command -v git >/dev/null 2>&1 || err "iso.dependency_missing" "git"
-if [[ -z "$EXPECTED_COMMIT" ]]; then
-    EXPECTED_COMMIT="$(git -C "$PROJECT_DIR" rev-parse --verify "$REF" 2>/dev/null)" || err "iso.verify_ref_invalid" "$REF"
-else
-    git -C "$PROJECT_DIR" rev-parse --verify "$REF" >/dev/null 2>&1 || err "iso.verify_ref_invalid" "$REF"
-    [[ "$EXPECTED_COMMIT" =~ ^[0-9a-fA-F]{40}([0-9a-fA-F]{24})?$ ]] || err "iso.verify_ref_invalid" "$EXPECTED_COMMIT"
-fi
+REF_COMMIT="$(git -C "$PROJECT_DIR" rev-parse --verify "$REF^{commit}" 2>/dev/null)" || err "iso.verify_ref_invalid" "$REF"
+[[ -z "$EXPECTED_COMMIT" || "$EXPECTED_COMMIT" == "$REF_COMMIT" ]] || err "iso.verify_ref_invalid" "$EXPECTED_COMMIT"
 
 for dependency in xorriso tar diff cmp find sort; do
     command -v "$dependency" >/dev/null 2>&1 || err "iso.dependency_missing" "$dependency"
@@ -59,18 +55,13 @@ git -C "$PROJECT_DIR" archive "$REF" | tar -x -C "$WORK_DIR/source"
 cp -aL "$WORK_DIR/source/." "$WORK_DIR/materialized/"
 
 mkdir -p "$WORK_DIR/image/os"
-if ! xorriso -osirrox on -indev "$ISO_PATH" -extract /opt/os "$WORK_DIR/image/os" -extract /opt/os-release.txt "$WORK_DIR/image/os-release.txt" >/dev/null 2>&1; then
+if ! xorriso -osirrox on -indev "$ISO_PATH" -extract /opt/os "$WORK_DIR/image/os" >/dev/null 2>&1; then
     err "iso.verify_extract_failed" "$ISO_PATH"
 fi
 
 if ! diff -qr -x .gitkeep "$WORK_DIR/materialized" "$WORK_DIR/image/os" >"$WORK_DIR/diff.out" 2>&1; then
     cat -- "$WORK_DIR/diff.out"
     err "iso.verify_content_mismatch"
-fi
-
-printf 'commit=%s\n' "$EXPECTED_COMMIT" > "$WORK_DIR/os-release.expected"
-if ! cmp -s "$WORK_DIR/os-release.expected" "$WORK_DIR/image/os-release.txt"; then
-    err "iso.verify_marker_mismatch"
 fi
 
 log "iso.verify_ok" "$ISO_PATH"

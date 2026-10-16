@@ -14,7 +14,7 @@ if (($# == 0)); then
 else
     TAG="$1"
 fi
-[[ "$TAG" =~ ^v[0-9]+\.[0-9]+$ ]]
+[[ "$TAG" =~ ^v[0-9]+\.[0-9]+(-rc\.[1-9][0-9]*)?$ ]]
 
 ISO_NAME="os-${TAG}.iso"
 CHECKSUM_NAME="$ISO_NAME.sha256"

@@ -20,15 +20,15 @@ $headers = @{
 if ([string]::IsNullOrWhiteSpace($Tag)) {
     $releaseUri = "$apiBase/latest"
 } else {
-    if ($Tag -notmatch '^v[0-9]+\.[0-9]+$') {
-        throw 'Tag must use the vX.Y format.'
+    if ($Tag -notmatch '^v[0-9]+\.[0-9]+(-rc\.[1-9][0-9]*)?$') {
+        throw 'Tag must use the vX.Y or vX.Y-rc.N format.'
     }
     $releaseUri = "$apiBase/tags/$Tag"
 }
 
 $release = Invoke-RestMethod -Uri $releaseUri -Headers $headers -Method Get
 $releaseTag = [string]$release.tag_name
-if ($releaseTag -notmatch '^v[0-9]+\.[0-9]+$') {
+if ($releaseTag -notmatch '^v[0-9]+\.[0-9]+(-rc\.[1-9][0-9]*)?$') {
     throw "Release has an unsupported tag: $releaseTag"
 }
 

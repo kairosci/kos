@@ -3,10 +3,12 @@ set -euo pipefail
 
 _SESSION_MODULE="$PROJECT_DIR/modules/conf/session"
 _SESSION_POLICY="$_SESSION_MODULE/data/policy.json"
-install -d -m 755 /usr/local/lib/os/session/{data,scripts,qml} /usr/local/lib/os/messages
+install -d -m 755 /usr/local/lib/os/session/{data/locales,scripts,qml} /usr/local/lib/os/messages
 install -m 755 "$_SESSION_MODULE/install.sh" /usr/local/lib/os/session/install.sh
 for _session_directory in data scripts qml; do
-    install -m 644 "$_SESSION_MODULE/$_session_directory/"* "/usr/local/lib/os/session/$_session_directory/"
+    while IFS= read -r -d '' _session_file; do
+        install -m 644 "$_session_file" "/usr/local/lib/os/session/$_session_directory/${_session_file#"$_SESSION_MODULE/$_session_directory/"}"
+    done < <(find "$_SESSION_MODULE/$_session_directory" -type f -print0)
 done
 rm -f /usr/local/lib/os/session/data/clean.lua /usr/local/lib/os/session/data/runtime.lua /usr/local/lib/os/session/data/shell.jq
 install -m 644 "$PROJECT_DIR/scripts/lib/i18n.sh" "$PROJECT_DIR/scripts/lib/userconf.sh" /usr/local/lib/os/

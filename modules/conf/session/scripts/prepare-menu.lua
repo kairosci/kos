@@ -14,6 +14,8 @@ replace('readonly property var appLibrary: root.shell ? root.shell.appLibrary : 
 replace('property string defaultMenuPath: omarchyPath + "/default/omarchy/omarchy-menu.jsonc"', 'property string defaultMenuPath: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/os/session/data/menu.json"')
 replace('property string userMenuPath: Quickshell.env("HOME") + "/.config/omarchy/extensions/omarchy-menu.jsonc"', 'property string userMenuPath: (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/omarchy/extensions/os-menu.json"')
 replace('Style.space(300)), panel.width', 'Style.space(root.sessionPolicy ? root.sessionPolicy.menu.width : 0)), panel.width')
+replace('ConfirmDialog {', 'ControlConfirmDialog {')
+replace('text: row.label', 'text: row.kind === "app" ? row.label : SessionI18n.text(row.label)')
 local ending = assert(text:find("}%s*$"))
 text = text:sub(1, ending - 1) .. read(assert(arg[2])) .. '\n  AppCatalog { id: appCatalog; policy: root.sessionPolicy }\n' .. text:sub(ending)
 io.write(text)

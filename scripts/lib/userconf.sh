@@ -56,6 +56,24 @@ install_user_content() {
     fi
 }
 
+install_user_line() {
+    local dest="$1" line staged
+    [[ -f "$dest" ]] || return 0
+    line=$(cat) || return 1
+    [[ -n "$line" && "$line" != *$'\n'* ]] || return 1
+    staged=$(mktemp) || return 1
+    if ! awk -v line="$line" '$0 != line { print } END { print line }' "$dest" > "$staged"; then
+        rm -f "$staged"
+        return 1
+    fi
+    if install_user_content "$dest" "$(stat -c %a "$dest")" < "$staged"; then
+        rm -f "$staged"
+    else
+        rm -f "$staged"
+        return 1
+    fi
+}
+
 merge_user_ini() {
     local src="$1" dest="$2" mode="${3:-644}" staged current=/dev/null
     [[ -r "$src" ]] || return 1
