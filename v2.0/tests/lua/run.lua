@@ -51,7 +51,7 @@ if arg[2] == "json" then
     suite:test("versioned entry points preserve the entire repository migration inventory", function()
         local Inventory = require("component.migration.inventory")
         local policy = File.json(root .. "/data/component/migration/policy.json")
-        local repository = process:run("repositoryFiles", {"-C", root, "rev-parse", "--show-toplevel"}):gsub("\n$", "")
+        local repository = Inventory.new(root, process, policy).root
         local canonical = Inventory.new(repository .. "/v2.0", process, policy):report()
         local legacy = Inventory.new(repository, process, policy):report()
         assert(Json.encode(canonical) == Json.encode(legacy))
