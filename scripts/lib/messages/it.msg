@@ -553,4 +553,3 @@ session.menu_layout_next=Layout tastiera successivo
 session.menu_keyboard_settings=Impostazioni tastiera
 session.engine_deferred=Nessuna sessione Wayland attiva verifica del motore QML rinviata alla prossima configurazione della sessione
 iso.release_exists=La release %s esiste già e non può essere modificata
-iso.candidate_missing=Nessun candidato firmato e pubblicato corrisponde al sorgente di %s
