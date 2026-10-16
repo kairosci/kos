@@ -7,7 +7,7 @@ Il linguaggio obiettivo è esclusivamente Lua. Ruby viene ritirato. La struttura
 | Conservazione | Backup Bash verificabile in `v1.0`, escluso da installazione e discovery | Completato |
 | Fondazioni Lua | Processi, JSON, lettura file, cataloghi e pubblicazione atomica senza Ruby | Applicato e verificato con test automatici e controllo live |
 | Avvio Lua | Parser EFI, BLAKE2b, parametri cifratura e resume, generazione e pubblicazione GRUB | Applicato come candidato; collaudo hardware al prossimo riavvio |
-| Componenti desktop | Riscrittura dei produttori di configurazione e degli hook in `src/component/`, dati centralizzati | Dieci applicazioni e componente sfondi con rendering e installer migrati; altri produttori da sostituire |
+| Componenti desktop | Riscrittura dei produttori di configurazione e degli hook in `src/component/`, dati centralizzati | Dieci applicazioni, componente sfondi e pianificazione risorse editor migrati; altri produttori da sostituire |
 | Provisioning Lua | Pacchetti, sicurezza, alimentazione, manutenzione e verifica tramite componenti Lua | Da implementare |
 | Consolidamento struttura | Eliminazione di `modules/` e degli algoritmi Bash attivi, soli ingressi necessari in `script/` | Da completare dopo le sostituzioni |
 | Parità Arch | Runtime indipendente, prova avvio, sospensione, recupero e inventario delle funzioni | Verifica hardware aperta |

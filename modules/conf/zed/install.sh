@@ -16,7 +16,8 @@ locale_init
 command -v jq >/dev/null || err "defaults.app_failed" Zed
 existing=/dev/null
 [[ ! -f "$CONFIG_DIR/settings.json" ]] || existing="$CONFIG_DIR/settings.json"
-jq -s 'reduce .[] as $settings ({}; . * $settings)' "$existing" "$SCRIPT_DIR/data/settings.json" "$SCRIPT_DIR/data/linux/settings.json" | install_user_content "$CONFIG_DIR/settings.json" 644 preserve-inode
+SETTINGS=$("$PROJECT_DIR/script/os-lua" render-zed-settings "$existing") || err "defaults.app_failed" Zed
+install_user_content "$CONFIG_DIR/settings.json" 644 preserve-inode <<< "$SETTINGS"
 
 install_user_file "$SCRIPT_DIR/data/keybindings.json" "$CONFIG_DIR/keymap.json"
 install_user_file "$SCRIPT_DIR/theme.sh" "${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/zed-theme.sh" 755

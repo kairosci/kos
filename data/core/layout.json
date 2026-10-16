@@ -8,5 +8,6 @@
   "applications": "data/component/application/policy.json",
   "paths": "data/core/paths.json",
   "wallpaper": "data/component/wallpaper/policy.json",
-  "migration": "data/component/migration/policy.json"
+  "migration": "data/component/migration/policy.json",
+  "performance": "data/component/performance/policy.json"
 }

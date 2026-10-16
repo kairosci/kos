@@ -1,0 +1,58 @@
+{
+  "memoryInfo": "/proc/meminfo",
+  "memoryFraction": 0.5,
+  "workerMemoryKiB": 2097152,
+  "reservedProcessors": 2,
+  "maximumWorkers": 4,
+  "primingWorkers": 2,
+  "syntaxCacheCapacity": 64,
+  "defaults": [
+    "modules/conf/zed/data/settings.json",
+    "modules/conf/zed/data/linux/settings.json"
+  ],
+  "optionsPath": [
+    "lsp",
+    "rust-analyzer",
+    "initialization_options"
+  ],
+  "calculated": [
+    {
+      "path": [
+        "numThreads"
+      ],
+      "value": "workers"
+    },
+    {
+      "path": [
+        "cachePriming",
+        "numThreads"
+      ],
+      "value": "priming"
+    },
+    {
+      "path": [
+        "cargo",
+        "extraEnv",
+        "CARGO_BUILD_JOBS"
+      ],
+      "value": "workers",
+      "string": true
+    },
+    {
+      "path": [
+        "check",
+        "extraEnv",
+        "CARGO_BUILD_JOBS"
+      ],
+      "value": "workers",
+      "string": true
+    },
+    {
+      "path": [
+        "lru",
+        "capacity"
+      ],
+      "value": "cache"
+    }
+  ]
+}

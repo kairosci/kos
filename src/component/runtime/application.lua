@@ -54,6 +54,11 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
+    if mode == "render-zed-settings" then
+        local performance = require("component.performance.editor").new(self.root, self.process, File.json(self.root .. "/" .. self.layout.performance))
+        io.write(Json.encode(performance:render(config)), "\n")
+        return
+    end
     if mode == "migration-report" or mode == "verify-full-lua" then
         local inventory = require("component.migration.inventory").new(self.root, self.process, File.json(self.root .. "/" .. self.layout.migration))
         local report = inventory:report()

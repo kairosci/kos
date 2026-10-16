@@ -1,0 +1,11 @@
+# Reattività del desktop
+
+La diagnosi del 16 ottobre ha rilevato circa 15 GiB di RAM fisica, swap su disco e zram già attive e un rust-analyzer di Zed con circa 3,8 GiB residenti e 1 GiB in swap. Il log di systemd-oomd riportava una precedente terminazione di un terminale dopo pressione di memoria sostenuta. Questi sono dati osservati, non un benchmark comparativo.
+
+`src/component/performance/editor.lua` calcola la concorrenza dal totale fisico letto in `/proc/meminfo` e dai processori online. La policy in `data/component/performance/policy.json` riserva metà RAM e due processori al resto del sistema, usa un budget prudenziale per worker e limita il parallelismo massimo. Il risultato attuale è tre worker e due worker per il preriscaldamento delle cache. Sono limiti di concorrenza, non limiti rigidi alla memoria utilizzata da ogni processo.
+
+Zed riceve `numThreads`, `cachePriming.numThreads`, `cargo.extraEnv.CARGO_BUILD_JOBS`, `check.extraEnv.CARGO_BUILD_JOBS` e `lru.capacity` nelle opzioni native di rust-analyzer. Rimangono attivi diagnostica, macro e controlli dei target secondo le preferenze personali. Gli altri parametri LSP e le variabili di ambiente personali sono conservati. La generazione deve riuscire prima della scrittura delle impostazioni; il writer esistente conserva l'inode osservato da Zed.
+
+Le opzioni sono documentate nel [manuale di rust-analyzer](https://rust-analyzer.github.io/book/configuration) e nella [documentazione Rust di Zed](https://zed.dev/docs/languages/rust). Zed può riavviare automaticamente il language server quando cambiano le sue opzioni; la fase iniziale di indicizzazione non costituisce una misura stabile del consumo finale.
+
+`make setup SCOPE=performance` applica la policy OOM esistente esclusivamente alle slice delle applicazioni e dei processi in background, protegge gli antenati della sessione e riconcilia l'editor. Swap e ibernazione sono preservate. Non vengono riavviati compositor, audio o rete. L'esaurimento delle risorse rimane possibile con carichi arbitrari: systemd-oomd può terminare un'applicazione per preservare la sessione. Un minor parallelismo può allungare le compilazioni pesanti a favore della reattività interattiva. I comandi Cargo avviati manualmente fuori dal language server mantengono le proprie impostazioni.

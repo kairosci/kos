@@ -19,5 +19,6 @@
   "desktopDatabase": ["/usr/bin/update-desktop-database"],
   "repositoryFiles": ["/usr/bin/git"],
   "validateLua": ["/usr/bin/luac", "-p"],
-  "removeDirectory": ["/usr/bin/rm", "-r", "--"]
+  "removeDirectory": ["/usr/bin/rm", "-r", "--"],
+  "processorCount": ["/usr/bin/getconf", "_NPROCESSORS_ONLN"]
 }
