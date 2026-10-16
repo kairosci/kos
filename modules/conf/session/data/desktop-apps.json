@@ -18,23 +18,8 @@
     "action": "os app clock",
     "icon": "󰥔"
   },
-  "desktop-tools.audio": {
-    "label": "Audio",
-    "action": "os app audio",
-    "icon": "󰕾"
-  },
-  "desktop-tools.network": {
-    "label": "Network",
-    "action": "os app network",
-    "icon": "󰖩"
-  },
-  "desktop-tools.bluetooth": {
-    "label": "Bluetooth",
-    "action": "os app bluetooth",
-    "icon": "󰂯"
-  },
   "desktop-tools.settings": {
-    "label": "Hyprland settings",
+    "label": "Settings",
     "action": "os app settings",
     "icon": "󰒓"
   },

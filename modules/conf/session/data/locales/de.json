@@ -274,7 +274,8 @@
     "Bluetooth": "Bluetooth",
     "Hyprland settings": "Hyprland Einstellungen",
     "Resources": "Ressourcen",
-    "Media player": "Medienspieler"
+    "Media player": "Medienspieler",
+    "Settings": "Einstellungen"
   },
   "patterns": [
     {

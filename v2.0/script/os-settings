@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec /usr/bin/quickshell --no-duplicate --path "${XDG_DATA_HOME:-$HOME/.local/share}/os/settings/runtime/current/src/component/settings/qml/shell.qml" "$@"

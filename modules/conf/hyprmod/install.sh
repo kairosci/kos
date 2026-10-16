@@ -43,7 +43,7 @@ LUA
     sed -i 's/"gnome-control-center"/"hyprmod"/g' "$stage/config/hypr/bindings.lua"
     install_shell_block "$stage/config/hypr/bindings.lua" '-- os hyprmod (managed)' '-- end os hyprmod (managed)' <<'LUA'
 hl.unbind("SUPER + comma")
-o.bind("SUPER + comma", "HyprMod", "hyprmod")
+o.bind("SUPER + comma", "Settings", "os app settings")
 LUA
     XDG_CONFIG_HOME="$stage/config" XDG_DATA_HOME="$data" OS_HYPR_CONFIG_ROOT="$stage/config/hypr" \
         Hyprland --verify-config --config "$stage/config/hypr/hyprland.lua" > "$stage/validation.log" 2>&1 || {

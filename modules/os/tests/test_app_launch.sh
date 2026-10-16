@@ -41,7 +41,7 @@ touch "$APP_TEST_NATIVE"
 exit 46
 SH
 chmod 755 "$WORK_DIR/bin/"*
-for desktop in browser fallback editor files io.github.bluemancz.hyprmod; do
+for desktop in browser fallback editor files os.settings; do
     printf '[Desktop Entry]\nType=Application\nName=Fixture\nExec=fixture %%U\n' > "$WORK_DIR/system/applications/$desktop.desktop"
 done
 cat >> "$WORK_DIR/system/applications/browser.desktop" <<'DESKTOP'
@@ -68,7 +68,7 @@ assert_false "unknown arguments are rejected before an application starts" "run_
 assert_false "unknown application roles are rejected" "run_app missing"
 assert_true "graphical editor uses the MIME preference" "run_app --resolve editor '/tmp/file with spaces' | jq -e '.desktop==\"editor.desktop\" and .argv[3]==\"/tmp/file with spaces\"'"
 assert_true "file manager uses the directory MIME preference" "run_app --resolve files | jq -e '.desktop==\"files.desktop\"'"
-assert_true "settings resolves HyprMod without the native desktop runtime" "run_app --resolve settings | jq -e '.desktop==\"io.github.bluemancz.hyprmod.desktop\"'"
+assert_true "settings resolves the unified application without the native desktop runtime" "run_app --resolve settings | jq -e '.desktop==\"os.settings.desktop\"'"
 printf '[Desktop Entry]\nType=Application\nHidden=true\nExec=fixture\n' > "$WORK_DIR/data/applications/browser.desktop"
 assert_false "a hidden user override prevents launching the system entry" "run_app browser"
 printf '[Desktop Entry]\nType=Application\nExec=fixture-user\n' > "$WORK_DIR/data/applications/browser.desktop"

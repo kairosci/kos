@@ -61,20 +61,7 @@ function Renderer:dimensions()
 end
 
 function Renderer:link(target, destination)
-    local parent = assert(destination:match("^(.*)/[^/]+$"))
-    self.process:run("directory", {parent})
-    local staging = self.process:run("temporary", {"-d", parent .. "/.publish.XXXXXXXX"}):gsub("\n$", "")
-    local temporary = staging .. "/link"
-    local ok, failure = pcall(function()
-        self.process:run("symbolicLink", {target, temporary})
-        assert(os.rename(temporary, destination))
-    end)
-    if not ok then
-        local handle = io.open(temporary, "rb")
-        if handle then assert(handle:close()); assert(os.remove(temporary)) end
-    end
-    assert(os.remove(staging))
-    assert(ok, failure)
+    return require("core.bundle").link(self, target, destination)
 end
 
 function Renderer:render(theme)
