@@ -547,3 +547,4 @@ os.app_default_missing=No hay aplicación predeterminada utilizable para %s
 os.app_private_missing=El navegador no declara la acción de ventana privada: %s
 bootloader.configured=Imagen GRUB de prueba preparada conservando el orden de arranque actual
 boot.validation_failed=Error de validación del arranque: %s
+bootloader.trial_selected=Entrada GRUB %s seleccionada solo para el próximo arranque

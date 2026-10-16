@@ -547,3 +547,4 @@ os.app_default_missing=Keine verwendbare Standardanwendung für %s
 os.app_private_missing=Der Browser deklariert keine Aktion für ein privates Fenster: %s
 bootloader.configured=GRUB Testabbild unter Beibehaltung der aktuellen Startreihenfolge vorbereitet
 boot.validation_failed=Startprüfung fehlgeschlagen: %s
+bootloader.trial_selected=GRUB Eintrag %s nur für den nächsten Start ausgewählt

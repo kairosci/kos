@@ -58,9 +58,6 @@ cp "$SCRIPT_DIR/qml/AppCatalog.qml" "$SCRIPT_DIR/qml/SessionI18n.qml" "$SCRIPT_D
 { printf 'import qs.Ui\n'; cat "$NATIVE/shell/Ui/ConfirmDialog.qml"; } > "$STAGE/plugins/$MENU_ID/ControlConfirmDialog.qml"
 jq --slurpfile policy "$POLICY" '.id = $policy[0].menu.id | .name = $policy[0].menu.name | .author = "OS" | .kinds = ["menu"] | .entryPoints = {menu: .entryPoints.menu} | .omarchy = {clonedFrom: .id} | .omarchy.clonedFrom = "omarchy.menu" | del(.barWidget)' \
     "$NATIVE/shell/plugins/menu/manifest.json" > "$STAGE/plugins/$MENU_ID/manifest.json"
-for retired in os.clockwidget os.controls os.audio os.network os.bluetooth os.monitor os.power os.clock os.weather os.media os.tray; do
-    rm -rf "$CONFIG_HOME/os/plugins/$retired"
-done
 jq --slurpfile policy "$POLICY" --slurpfile defaults "$SCRIPT_DIR/data/shell.json" -f "$SCRIPT_DIR/scripts/shell.jq" \
     "$CONFIG_HOME/os/shell.json" > "$STAGE/shell.json"
 lua "$SCRIPT_DIR/scripts/jsonc.lua" "$NATIVE/default/omarchy/omarchy-menu.jsonc" \
@@ -162,6 +159,9 @@ while IFS= read -r -d '' file; do
 done < <(find "$STAGE/plugins" -name manifest.json -print0)
 install_user_file "$STAGE/extension.json" "$CONFIG_HOME/os/extensions/os-menu.json" 600
 install_user_file "$STAGE/shell.json" "$CONFIG_HOME/os/shell.json" 600
+for retired in os.clockwidget os.controls os.audio os.network os.bluetooth os.monitor os.power os.clock os.weather os.media os.tray; do
+    rm -rf "$CONFIG_HOME/os/plugins/$retired"
+done
 install_user_file "$SCRIPT_DIR/scripts/environment.sh" "$DATA_HOME/os/session/scripts/environment.sh" 600
 for file in "$HOME/.bashrc" "$HOME/.zshrc"; do
     [[ -f "$file" ]] || continue

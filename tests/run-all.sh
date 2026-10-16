@@ -19,6 +19,7 @@ bash "$SCRIPT_DIR/run-suite-list.sh" \
     "$SCRIPT_DIR/test_security_tooling.sh" \
     "$SCRIPT_DIR/test_bootloader.sh" \
     "$SCRIPT_DIR/test_boot_menu.sh" \
+    "$SCRIPT_DIR/test_boot_trial_select.sh" \
     "$SCRIPT_DIR/test_ruby_catalog.sh" \
     "$SCRIPT_DIR/test_configuration_publication.sh" \
     "$SCRIPT_DIR/test_hardware_power.sh" \

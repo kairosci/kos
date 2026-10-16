@@ -547,3 +547,4 @@ os.app_default_missing=No usable default application for %s
 os.app_private_missing=Browser does not declare the private window action: %s
 bootloader.configured=GRUB trial image prepared while preserving the current boot order
 boot.validation_failed=Boot validation failed: %s
+bootloader.trial_selected=GRUB entry %s selected for the next boot only

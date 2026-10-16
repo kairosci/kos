@@ -547,3 +547,4 @@ os.app_default_missing=Nessuna applicazione predefinita utilizzabile per %s
 os.app_private_missing=Il browser non dichiara l'azione per la finestra privata: %s
 bootloader.configured=Immagine GRUB di prova preparata preservando l'ordine di avvio corrente
 boot.validation_failed=Validazione dell avvio fallita: %s
+bootloader.trial_selected=Voce GRUB %s selezionata soltanto per il prossimo avvio

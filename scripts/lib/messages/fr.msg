@@ -547,3 +547,4 @@ os.app_default_missing=Aucune application par défaut utilisable pour %s
 os.app_private_missing=Le navigateur ne déclare pas l'action de fenêtre privée : %s
 bootloader.configured=Image GRUB de test préparée en conservant l'ordre de démarrage actuel
 boot.validation_failed=Échec de la validation du démarrage : %s
+bootloader.trial_selected=Entrée GRUB %s sélectionnée uniquement pour le prochain démarrage

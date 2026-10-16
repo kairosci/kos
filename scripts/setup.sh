@@ -53,7 +53,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|desktop-tools|grub-trial) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|desktop-tools|grub-trial|boot-trial-select) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$OS_INTERFACE_PREVIEW" == 0 || "$SETUP_SCOPE" == interface ]] || err "setup.invalid_args"
@@ -138,6 +138,15 @@ if [[ "$SETUP_SCOPE" == desktop-tools ]]; then
     OMARCHY_ALLOW_DIRECT_PACMAN=1 pacman -Syu --noconfirm --needed "${_tools_packages[@]}" || err "defaults.app_failed" "desktop tools"
     source "$MODULES_DIR/36-os-cli.sh"
     source "$MODULES_DIR/97-session.sh"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == boot-trial-select ]]; then
+    source "$SCRIPT_DIR/lib/boot-assessment.sh"
+    boot_assessment /var/lib/os/boot-assessment
+    grub-script-check /boot/grub/grub.cfg || err "bootloader.config_failed"
+    source "$SCRIPT_DIR/lib/boot-trial-select.sh"
+    boot_trial_select "$PROJECT_DIR/modules/platform/arch/data/boot.json" || err "bootloader.install_failed"
     exit 0
 fi
 

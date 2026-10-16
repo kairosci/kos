@@ -120,3 +120,5 @@ The user authorized a staged migration to Ruby and Lua. Ruby owns new pure boot 
 `v1.0/source.tar.gz` preserves the complete source before this migration revision. It is an inert archive with `SHA256SUMS` and `base-commit`, excluded from executable discovery. Roadmap status lives only in `docs/roadmap.md`. New behavior must be implemented and verified, with no cosmetic class wrappers or fabricated defaults. Real hardware verification remains pending until exercised.
 
 `modules/core/` owns reusable Ruby foundations. `scripts/catalog.rb` resolves localization from the external `data/locale.json` policy and the canonical message catalogs; missing keys fail explicitly. Boot validation uses this catalog. Core tests also verify continuous readers see complete Hyprland files during repeated atomic publication.
+
+`SCOPE=boot-trial-select` is separate from candidate installation and is used only after the user chooses a one-time trial. It validates the exact firmware label and EFI path, rejects ambiguity, sets BootNext and verifies unchanged BootOrder. The user chose a trial at the next restart on 2026-10-16; do not reboot the active session.
