@@ -1,6 +1,6 @@
 # Migrazione integrale a Lua
 
-Il linguaggio obiettivo è esclusivamente Lua. Ruby viene ritirato. La struttura definitiva separa algoritmi in `src/`, componenti in `src/component/`, dati in `data/` e ingressi essenziali in `script/`. Le applicazioni native mantengono i formati di interfaccia richiesti dalla piattaforma.
+Il linguaggio obiettivo è esclusivamente Lua. Ruby viene ritirato. La versione in sviluppo è contenuta in `v2.0/`, con algoritmi in `src/`, componenti in `src/component/`, dati in `data/`, ingressi essenziali in `script/` e test in `tests/lua/`. I percorsi successivi sono relativi a questa radice, salvo quelli legacy. Le applicazioni native mantengono i formati di interfaccia richiesti dalla piattaforma.
 
 | Sprint | Risultato richiesto | Stato |
 | --- | --- | --- |
@@ -19,3 +19,5 @@ La pipeline `make setup` resta l'unico percorso di applicazione al sistema. La m
 Il catalogo sfondi espone una sola immagine con il logo e la palette del tema. La policy vive in `data/component/wallpaper/`; il componente Lua archivia le varianti precedenti e gli sfondi personali aggiuntivi fuori dal selettore nativo. Rendering, geometria, cache e installazione del runtime sfondi sono implementati in Lua; gli ingressi shell residui inoltrano soltanto al runtime.
 
 Il criterio di completamento è eseguibile: `script/os-lua migration-report` elenca algoritmi shell residui e file nella struttura legacy; `script/os-lua verify-full-lua` fallisce finché rimangono. I quattro starter ammessi sono verificati per contenuto tramite digest BLAKE2b. Il report include anche file nuovi e script senza estensione; non usa una percentuale dedotta dal numero di file.
+
+La parità completa con la versione Bash non è raggiunta. Rimangono da riscrivere provisioning dei pacchetti, sicurezza, alimentazione, manutenzione, verifica, integrazioni di sessione e produttori di configurazione residui. I collegamenti in radice mantengono gli ingressi attuali senza duplicare i sorgenti. Gli inventari eseguiti dalla radice e da `v2.0/` devono coincidere e includere il provisioning Bash; `verify-full-lua` deve continuare a fallire finché questi algoritmi sono attivi.

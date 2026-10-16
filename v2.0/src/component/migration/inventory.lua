@@ -4,7 +4,11 @@ local Inventory = {}
 Inventory.__index = Inventory
 
 function Inventory.new(root, process, policy)
-    return setmetatable({root=root, process=process, policy=policy}, Inventory)
+    local candidate = root
+    if root:match("([^/]+)$") == policy.versionDirectory then candidate = assert(root:match("^(.*)/[^/]+$")) end
+    local repository = process:run("repositoryFiles", {"-c", "safe.directory=" .. candidate, "-C", candidate, "rev-parse", "--show-toplevel"}):gsub("\n$", "")
+    assert(repository:sub(1, 1) == "/", "repository_root_required")
+    return setmetatable({root=repository, process=process, policy=policy}, Inventory)
 end
 
 function Inventory:classify(path, content)
