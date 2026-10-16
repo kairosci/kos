@@ -75,6 +75,8 @@ Operational runbooks are stored in `docs/skills/` and exposed through `.skills/`
 All commit messages must follow the Conventional Commits standard formatted strictly as `<type>: <description>` or `<type>(<scope>): <description>`. The colon `:` following the target type is the only allowed punctuation or symbol. Titles must never contain emojis, exclamation marks, or extra punctuation.
 
 ## Scripting Rules and Constraints
+Function names use descriptive words without digits. Do not wrap existing entrypoints in cosmetic classes or namespaces.
+
 Scripts must use strict execution modes `set -euo pipefail` in pure native Bash without Python dependencies. Never use `|| true` to suppress failures; use `|| warn "message"` for non-critical steps that can fail gracefully. Do not add comments to Makefile or hook scripts. Do not hardcode user paths; derive directories from `$HOME` or `/home/*`. All operations must run in the foreground without `systemd-run`. All modifications to `scripts/setup.sh` and `scripts/verify.sh` must remain strictly idempotent.
 
 ## Mandatory Skill Loading and Pull Requests
