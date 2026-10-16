@@ -16,7 +16,7 @@ locale_init
 command -v jq >/dev/null || err "defaults.app_failed" Zed
 existing=/dev/null
 [[ ! -f "$CONFIG_DIR/settings.json" ]] || existing="$CONFIG_DIR/settings.json"
-SETTINGS=$("$PROJECT_DIR/script/os-lua" render-zed-settings "$existing") || err "defaults.app_failed" Zed
+SETTINGS=$("$PROJECT_DIR/script/os-lua" render-zed-settings "$existing" | jq -S .) || err "defaults.app_failed" Zed
 install_user_content "$CONFIG_DIR/settings.json" 644 preserve-inode <<< "$SETTINGS"
 
 install_user_file "$SCRIPT_DIR/data/keybindings.json" "$CONFIG_DIR/keymap.json"

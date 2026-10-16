@@ -34,6 +34,7 @@ assert_file_contains_literal "GTK portal file picker stays centered within the m
 assert_true "Zed native configuration installs" "bash '$PROJECT_DIR/modules/conf/zed/install.sh'"
 assert_true "Zed uses native project preferences" "jq -e '.restore_on_startup == \"last_workspace\" and .project_panel.git_status == true and .terminal.shell == \"system\"' '$XDG_CONFIG_HOME/zed/settings.json'"
 assert_true "Zed settings installation is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/zed/settings.json'); bash '$PROJECT_DIR/modules/conf/zed/install.sh'; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/zed/settings.json')\" ]]"
+assert_true "unchanged editor settings do not retrigger watched file updates" "before=\$(stat -c %y '$XDG_CONFIG_HOME/zed/settings.json'); bash '$PROJECT_DIR/modules/conf/zed/install.sh'; [[ \"\$before\" == \"\$(stat -c %y '$XDG_CONFIG_HOME/zed/settings.json')\" ]]"
 mkdir -p "$SANDBOX/invalid-zed"
 printf '{invalid\n' > "$SANDBOX/invalid-zed/settings.json"
 assert_false "invalid settings stop the producer before publishing Zed configuration" "OS_ZED_CONFIG_DIR='$SANDBOX/invalid-zed' bash '$PROJECT_DIR/modules/conf/zed/install.sh'"
