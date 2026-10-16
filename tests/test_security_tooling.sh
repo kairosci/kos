@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_security_tooling_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -104,7 +102,3 @@ if [[ -f /etc/shadow ]]; then
 fi
 
 test_summary
-
-}
-
-Os::tests::test_security_tooling_sh::run "$@"

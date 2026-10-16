@@ -1,5 +1,3 @@
-local Os_modules_conf_session_scripts_prepare_qml_lua = {}
-function Os_modules_conf_session_scripts_prepare_qml_lua.run()
 local qml = dofile(arg[0]:match("^(.*[/])") .. "qml.lua")
 local input = assert(io.open(assert(arg[1]), "r"))
 local source = input:read("*a")
@@ -11,6 +9,3 @@ else
   source = qml.clean(source)
 end
 io.write(source)
-
-end
-return Os_modules_conf_session_scripts_prepare_qml_lua.run()

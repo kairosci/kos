@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_config_validity_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -116,7 +114,3 @@ BLOCK
 fi
 
 test_summary
-
-}
-
-Os::tests::test_config_validity_sh::run "$@"

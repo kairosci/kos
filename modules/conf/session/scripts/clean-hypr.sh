@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::session::scripts::clean_hypr_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 STATE=$(mktemp)
@@ -10,7 +8,3 @@ if [[ -f "${2:-}" ]]; then
     jq -j 'to_entries[] | .key,"\u0000",.value,"\u0000"' "$2" > "$STATE"
 fi
 lua "$SCRIPT_DIR/clean.lua" "$1" "$STATE" "${3:-}" "${4:-}" "${5:-}"
-
-}
-
-Os::modules::conf::session::scripts::clean_hypr_sh::run "$@"

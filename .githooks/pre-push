@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
-
-Os::_githooks::pre_push::run() {
 set -euo pipefail
 
 PROJECT_DIR="$(git rev-parse --show-toplevel)"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
-i18n_init
+locale_init
 while read -r local_ref local_sha remote_ref remote_sha; do
     if [[ "$remote_ref" == refs/heads/main ]]; then
         err "git.main_push_forbidden"
     fi
 done
-
-}
-
-Os::_githooks::pre_push::run "$@"

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::tests::test_bootloader_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -27,7 +25,3 @@ assert_file_contains "GRUB defaults preserve unrelated settings" "$PROJECT_DIR/s
 assert_file_not_contains "Limine theme files are retired" "$PROJECT_DIR/scripts/setup.sh" '27-limine-theme.sh'
 
 test_summary
-
-}
-
-Os::tests::test_bootloader_sh::run "$@"

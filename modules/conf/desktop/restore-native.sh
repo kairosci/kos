@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::desktop::restore_native_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 migrate_user_config_dir "$HOME"
 BACKUP="${XDG_STATE_HOME:-$HOME/.local/state}/os/desktop-defaults"
@@ -34,7 +32,3 @@ done
 install_user_file "$SCRIPT_DIR/data/fastfetch/config.jsonc" "$CONFIG_HOME/fastfetch/config.jsonc"
 rm -f "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/toggles/screensaver-off"
 log "recovery.terminals_ready" "$BACKUP"
-
-}
-
-Os::modules::conf::desktop::restore_native_sh::run "$@"

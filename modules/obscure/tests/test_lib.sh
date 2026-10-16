@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::modules::obscure::tests::test_lib_sh::run() {
-
 set -uo pipefail
 
 TESTS_RUN=0
@@ -78,7 +76,3 @@ test_summary() {
     fi
     return 0
 }
-
-}
-
-Os::modules::obscure::tests::test_lib_sh::run "$@"

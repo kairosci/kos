@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::modules::os::bin::os::run() {
 set -euo pipefail
 
 OS_BIN_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -50,8 +48,8 @@ os_lib_init() {
         if [[ -f "$lib" ]]; then
             # shellcheck source=/dev/null
             source "$lib" 2>/dev/null || return 1
-            if command -v i18n_init >/dev/null 2>&1; then
-                i18n_init 2>/dev/null || return 1
+            if command -v locale_init >/dev/null 2>&1; then
+                locale_init 2>/dev/null || return 1
             fi
             return 0
         fi
@@ -161,7 +159,3 @@ os_main() {
 }
 
 os_main "$@"
-
-}
-
-Os::modules::os::bin::os::run "$@"

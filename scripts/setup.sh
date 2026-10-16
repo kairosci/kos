@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::setup_sh::run() {
-
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$PROJECT_DIR"
@@ -18,7 +16,7 @@ set -euo pipefail
 source "$SCRIPT_DIR/lib/i18n.sh"
 source "$SCRIPT_DIR/lib/target-user.sh"
 
-i18n_init
+locale_init
 
 SETUP_SCOPE=full
 scope_specified=0
@@ -192,7 +190,3 @@ if [[ "${OS_RESET_SNAPSHOTS:-0}" == 1 ]]; then
 fi
 
 log "__complete"
-
-}
-
-Os::scripts::setup_sh::run "$@"

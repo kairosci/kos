@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_herdr_menu_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -147,7 +145,7 @@ printf '[{"address":"%s","pid":424242,"class":"kitty","title":"host: work","init
 
 menu_lib() (
     grep -qF 'if [[ "$print_only" == "true" ]]; then' "$HERDR_MENU" || return 1
-    cp "$HERDR_MENU" "$SB/menu-lib.sh"
+    sed -n '1,/^if \[\[ "\${BASH_SOURCE\[0\]:-}" == "\$0" \]\]; then$/p' "$HERDR_MENU" | head -n -1 > "$SB/menu-lib.sh"
     bash -n "$SB/menu-lib.sh"
 )
 
@@ -179,7 +177,7 @@ assert_true "herdr menu has no raw failure suppression" \
 assert_true "herdr installer has no raw failure suppression" \
     "! grep -qE '\\|\\|[[:space:]]*true\\b' '$HERDR_INSTALLER'"
 assert_file_contains "herdr installer sources the i18n library" "$HERDR_INSTALLER" "i18n.sh"
-assert_file_contains "herdr installer calls i18n_init" "$HERDR_INSTALLER" "i18n_init"
+assert_file_contains "herdr installer calls locale_init" "$HERDR_INSTALLER" "locale_init"
 assert_file_contains "herdr installer sources the user config library" "$HERDR_INSTALLER" "userconf.sh"
 assert_file_contains "herdr installer deploys through the shared helper" "$HERDR_INSTALLER" 'install_user_file.*755'
 assert_file_contains "herdr installer manages the hyprland binding block" "$HERDR_INSTALLER" "bindings.lua"
@@ -260,7 +258,7 @@ assert_true "punctuation maps to xkb names" \
 
 test_section "Process Gating & End-to-End"
 
-e2e_run() (
+integration_run() (
     fake_env
     rm -f "$SB/hyprctl.log" "$SB/wtype.log"
     export HERDR_FAKE_RUNNING=1 HERDR_FAKE_NAME_MATCH=1 HERDR_FAKE_EMPTY=0 HERDR_FAKE_PIDS="" HERDR_FAKE_CPID="424242"
@@ -300,15 +298,15 @@ e2e_run() (
 )
 
 assert_true "cancelled menu exits cleanly without side effects" \
-    "e2e_run cancel && ! grep -q 'focus' '$SB/hyprctl.log' 2>/dev/null && [[ ! -s '$SB/wtype.log' ]]"
+    "integration_run cancel && ! grep -q 'focus' '$SB/hyprctl.log' 2>/dev/null && [[ ! -s '$SB/wtype.log' ]]"
 assert_true "server down performs no dispatch" \
-    "e2e_run down && ! grep -q 'focus' '$SB/hyprctl.log' 2>/dev/null && [[ ! -s '$SB/wtype.log' ]]"
+    "integration_run down && ! grep -q 'focus' '$SB/hyprctl.log' 2>/dev/null && [[ ! -s '$SB/wtype.log' ]]"
 assert_true "named herdr window is focused and fed" \
-    "e2e_run named && grep -q '$FAKE_ADDR' '$SB/hyprctl.log' && grep -q '<-k><t>' '$SB/wtype.log'"
+    "integration_run named && grep -q '$FAKE_ADDR' '$SB/hyprctl.log' && grep -q '<-k><t>' '$SB/wtype.log'"
 assert_true "pid fallback finds the hosting terminal" \
-    "e2e_run pids && grep -q '$FAKE_ADDR' '$SB/hyprctl.log' && grep -q '<-k><w>' '$SB/wtype.log'"
+    "integration_run pids && grep -q '$FAKE_ADDR' '$SB/hyprctl.log' && grep -q '<-k><w>' '$SB/wtype.log'"
 assert_true "empty listing exits silently" \
-    "e2e_run empty && [[ ! -s '$SB/hyprctl.log' ]]"
+    "integration_run empty && [[ ! -s '$SB/hyprctl.log' ]]"
 assert_true "print mode needs no running server" \
     "HERDR_FAKE_RUNNING=0 HERDR_FAKE_PIDS='' PATH='$SB/fakebin:$PATH' HERDR_CONFIG_PATH='$SB/user.toml' bash '$HERDR_MENU' --print 2>/dev/null | grep -q '^PREFIX'"
 
@@ -378,7 +376,3 @@ else
 fi
 
 test_summary
-
-}
-
-Os::tests::test_herdr_menu_sh::run "$@"

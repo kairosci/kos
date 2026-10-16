@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-
-Os::modules::theme_previews::scripts::update_previews_sh::run() {
 set -euo pipefail
 
 source /usr/local/lib/os/i18n.sh
-i18n_init
+locale_init
 [[ $EUID -eq 0 ]] || err "__root_required"
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin
 THEME_POLICY_FILE=/usr/local/lib/os/excluded-themes.list
@@ -18,7 +16,3 @@ source /usr/local/lib/os/theme-policy.sh
 theme_policy_apply || err "theming.policy_failed"
 source /usr/local/lib/os/theme-preview.sh
 theme_preview_normalize
-
-}
-
-Os::modules::theme_previews::scripts::update_previews_sh::run "$@"

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_desktop_cleanup_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -167,7 +165,3 @@ assert_false "legacy Resources launcher stays canonical on older versions" 'OS_S
 rm -rf "$DC_SANDBOX"
 
 test_summary
-
-}
-
-Os::tests::test_desktop_cleanup_sh::run "$@"

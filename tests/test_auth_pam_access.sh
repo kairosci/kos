@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_auth_pam_access_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -63,7 +61,3 @@ assert_false "unsupported PAM stacks are rejected" 'pam_policy_reconcile "$PAM_T
 assert_true "rejected stacks are preserved" 'cmp -s "$PAM_TARGET" "$PAM_SANDBOX/unsupported"'
 
 test_summary
-
-}
-
-Os::tests::test_auth_pam_access_sh::run "$@"

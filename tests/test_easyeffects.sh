@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_easyeffects_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -65,7 +63,7 @@ export MOCK_EASYEFFECTS_COMMANDS="$SANDBOX/native-commands" MOCK_EASYEFFECTS_LOA
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
 source "$PROJECT_DIR/modules/conf/easyeffects/apply.sh"
-i18n_init
+locale_init
 PRESET=OS-Subwoofer
 STATE="$SANDBOX/activation"
 assert_false "load failures propagate" "(MOCK_LOAD_FAIL=1 easyeffects_apply_preset)"
@@ -80,7 +78,3 @@ rm "$MOCK_EASYEFFECTS_LOADED"
 assert_true "subsequent explicit personal preset is retained" "MOCK_PREVIOUS_PRESET=Personal easyeffects_apply_preset"
 assert_file_not_contains "personal preset prevents reloading the managed preset" "$MOCK_EASYEFFECTS_COMMANDS" '--load-preset'
 test_summary
-
-}
-
-Os::tests::test_easyeffects_sh::run "$@"

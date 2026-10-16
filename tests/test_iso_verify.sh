@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_iso_verify_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -15,7 +13,7 @@ assert_file_executable "verification script is executable" "$VERIFY_SCRIPT"
 assert_true "verification script passes syntax check" "bash -n '$VERIFY_SCRIPT'"
 assert_file_contains "verification script uses strict mode" "$VERIFY_SCRIPT" "set -euo pipefail"
 assert_file_contains "verification script sources the i18n library" "$VERIFY_SCRIPT" "lib/i18n.sh"
-assert_file_contains "verification script initializes i18n" "$VERIFY_SCRIPT" "i18n_init"
+assert_file_contains "verification script initializes i18n" "$VERIFY_SCRIPT" "locale_init"
 assert_true "verification script shows usage" "bash '$VERIFY_SCRIPT' --help"
 assert_true "verification script rejects missing arguments" "! bash '$VERIFY_SCRIPT' --iso /nonexistent.iso"
 assert_true "verification script rejects a missing image" "! bash '$VERIFY_SCRIPT' --iso /nonexistent.iso --ref HEAD"
@@ -101,7 +99,3 @@ else
     assert_warn "ISO content fixture requires xorriso" "command -v xorriso"
 fi
 test_summary
-
-}
-
-Os::tests::test_iso_verify_sh::run "$@"

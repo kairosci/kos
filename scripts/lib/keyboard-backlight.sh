@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::scripts::lib::keyboard_backlight_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -16,10 +14,10 @@ fi
 if [[ -f "$OS_I18N_BOOT" ]]; then
     # shellcheck source=i18n.sh
     source "$OS_I18N_BOOT"
-    i18n_init
+    locale_init
 else
     source "$SCRIPT_DIR/i18n.sh"
-    i18n_init
+    locale_init
 fi
 
 mode="${1:-apply}"
@@ -52,7 +50,3 @@ for led in "${OS_KEYBOARD_LEDS_ROOT:-/sys/class/leds}"/*kbd_backlight*; do
     fi
 done
 [[ $found -eq 1 ]] || log "power.keyboard_unsupported"
-
-}
-
-Os::scripts::lib::keyboard_backlight_sh::run "$@"

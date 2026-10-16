@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Commons
 import qs.Ui
-import "MediaModel.js" as MediaLibrary
+import "MediaModel.js" as MediaModel
 
 Row {
   id: root
@@ -23,7 +23,7 @@ Row {
   Text {
     id: elapsedLabel
     textFormat: Text.PlainText
-    text: MediaLibrary.MediaModel.formatTime(root.liveValue)
+    text: MediaModel.formatTime(root.liveValue)
     color: Util.alpha(root.bar ? root.bar.foreground : Color.foreground, 0.65)
     font.family: root.bar ? root.bar.fontFamily : Style.font.family
     font.pixelSize: Style.font.caption
@@ -59,7 +59,7 @@ Row {
   Text {
     id: durationLabel
     textFormat: Text.PlainText
-    text: root.trackLength > 0 ? MediaLibrary.MediaModel.formatTime(root.trackLength) : "--:--"
+    text: root.trackLength > 0 ? MediaModel.formatTime(root.trackLength) : "--:--"
     color: Util.alpha(root.bar ? root.bar.foreground : Color.foreground, 0.65)
     font.family: root.bar ? root.bar.fontFamily : Style.font.family
     font.pixelSize: Style.font.caption

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::35_shell_plugins_sh::run() {
-
 set -euo pipefail
 
 log "shell_plugins.install"
@@ -22,7 +20,3 @@ for user_home in /home/*; do
     omarchy_as "$_user" shell shell rescanPlugins || err "defaults.app_failed" "osmp"
     omarchy_as "$_user" plugin enable os.media || err "defaults.app_failed" "osmp"
 done
-
-}
-
-Os::scripts::lib::modules::35_shell_plugins_sh::run "$@"

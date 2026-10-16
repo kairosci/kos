@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::gtk::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 install_user_file "$SCRIPT_DIR/data/tiling.lua" "$CONFIG_HOME/hypr/os-gtk.lua"
 if [[ -f "$CONFIG_HOME/hypr/hyprland.lua" ]]; then
@@ -35,7 +33,3 @@ if [[ -f "$legacy_hook" ]] && grep -qF 'exec /usr/bin/python "$HOME/.config/omar
 fi
 apply_user_gsettings "$SCRIPT_DIR/data/settings.tsv"
 log "gui.install_done" "GTK"
-
-}
-
-Os::modules::conf::gtk::install_sh::run "$@"

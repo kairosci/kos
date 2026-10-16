@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_wallpaper_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -51,7 +49,3 @@ touch "$WORK_DIR/data/os/desktop/wallpapers/krepo.png"
 assert_true "wallpaper regenerates after the logo changes" "run_hook && [[ \"\$(sha256sum '$WORK_DIR/home/.config/os/backgrounds/fixture/krepo.png' | cut -d' ' -f1)\" != '$SHA_BEFORE' ]]"
 assert_true "wallpaper hook fails loudly on an unknown theme" "! env -i PATH='$WORK_DIR/fakebin:/usr/bin:/bin' HOME='$WORK_DIR/home' XDG_DATA_HOME='$WORK_DIR/data' XDG_STATE_HOME='$WORK_DIR/home/.local/state' bash '$HOOK' nonexistent-theme"
 test_summary
-
-}
-
-Os::tests::test_wallpaper_sh::run "$@"

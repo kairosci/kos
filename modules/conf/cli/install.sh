@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::modules::conf::cli::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -15,7 +13,7 @@ source "$I18N_LIB/i18n.sh"
 # shellcheck source=/dev/null
 source "$I18N_LIB/userconf.sh"
 
-i18n_init
+locale_init
 
 migrate_user_config_dir "$HOME"
 
@@ -32,7 +30,3 @@ SHELLBLOCK
 
 log "install.cli_done"
 log "install.cli_hint"
-
-}
-
-Os::modules::conf::cli::install_sh::run "$@"

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::40_firewall_sh::run() {
-
 set -euo pipefail
 
 log "firewall.configure"
@@ -18,7 +16,3 @@ for _ufw_rules in /etc/ufw/{user,before,after}{,6}.rules; do
 done
 ufw --force enable || warn "firewall.already_active"
 systemctl enable ufw.service || warn "firewall.service_enabled"
-
-}
-
-Os::scripts::lib::modules::40_firewall_sh::run "$@"

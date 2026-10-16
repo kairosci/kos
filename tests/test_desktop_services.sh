@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_desktop_services_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -29,7 +27,3 @@ assert_false "avahi-daemon disabled" "systemctl is-enabled avahi-daemon.service 
 assert_false "cups disabled" "systemctl is-enabled cups.service 2>/dev/null | grep -q '^enabled$'"
 
 test_summary
-
-}
-
-Os::tests::test_desktop_services_sh::run "$@"

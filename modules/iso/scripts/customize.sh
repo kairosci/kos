@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-
-Os::modules::iso::scripts::customize_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODULE_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_DIR="$(dirname "$(dirname "$MODULE_DIR")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
-i18n_init
+locale_init
 
 OVERLAY_DIR="$MODULE_DIR/overlay"
 OUTPUT_PATH=""
@@ -125,7 +123,3 @@ mv -f -- "$OUTPUT_TEMP.sha256" "$OUTPUT_PATH.sha256"
 OUTPUT_TEMP=""
 log "iso.output_ready" "$OUTPUT_PATH"
 log "iso.signature_note"
-
-}
-
-Os::modules::iso::scripts::customize_sh::run "$@"

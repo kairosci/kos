@@ -1,5 +1,3 @@
-local Os_tests_animation_policy_lua = {}
-function Os_tests_animation_policy_lua.run()
 local animations = {}
 local config = {}
 local windows = {}
@@ -37,6 +35,3 @@ for _, leaf in ipairs({ "fadeIn", "fadeOut", "fadeLayersIn", "fadeLayersOut", "f
   assert(animations[leaf].enabled, leaf)
   assert(animations[leaf].speed >= 1 and animations[leaf].speed <= 1.4, leaf)
 end
-
-end
-return Os_tests_animation_policy_lua.run()

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::scripts::protect_repo_sh::run() {
 set -euo pipefail
 
 BRANCH="main"
@@ -66,6 +64,3 @@ else
 fi
 
 echo "Done."
-}
-
-Os::scripts::protect_repo_sh::run "$@"

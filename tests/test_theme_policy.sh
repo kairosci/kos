@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_theme_policy_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -25,7 +23,3 @@ assert_file_contains_literal "capture verifies monitor dimensions before export"
 assert_file_contains_literal "capture validates window ownership" "$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh" 'index($pid) != null'
 assert_file_contains_literal "capture restores notification state" "$PROJECT_DIR/modules/theme-previews/rebuild-previews.sh" 'setDnd "$ORIGINAL_DND"'
 test_summary
-
-}
-
-Os::tests::test_theme_policy_sh::run "$@"

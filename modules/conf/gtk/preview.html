@@ -58,8 +58,6 @@ footer{display:flex;justify-content:space-between;gap:12px;align-items:center;pa
 <p>Disabling right click is a prototype demonstration; it does not imply that GTK provides this setting. Native changes will be evaluated in sprints U03–U06.</p>
 </main>
 <script>
-class GtkPreview {
-static run() {
 const frame=document.querySelector('.frame'),files=document.querySelector('.files'),menu=document.querySelector('#menu'),trigger=document.querySelector('#show-menu');
 function closeMenu(){menu.hidden=true;trigger.setAttribute('aria-expanded','false');}
 function openMenu(x=180,y=64){menu.hidden=false;menu.style.left=Math.max(0,Math.min(x,frame.clientWidth-menu.offsetWidth))+'px';menu.style.top=Math.max(0,Math.min(y,frame.clientHeight-menu.offsetHeight))+'px';trigger.setAttribute('aria-expanded','true');menu.querySelector('input').focus();}
@@ -74,8 +72,5 @@ document.addEventListener('pointerdown',event=>{if(!menu.hidden&&!menu.contains(
 document.querySelector('#show-hidden').addEventListener('change',event=>{document.querySelector('#hidden-file').hidden=!event.target.checked;});
 document.querySelectorAll('nav button').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(item=>item.removeAttribute('aria-current'));button.setAttribute('aria-current','page');document.querySelector('#location').textContent=button.textContent.trim();closeMenu();}));
 document.querySelector('nav').addEventListener('keydown',event=>{if(!['ArrowUp','ArrowDown','Home','End'].includes(event.key))return;const buttons=[...document.querySelectorAll('nav button')],index=buttons.indexOf(document.activeElement);if(index<0)return;event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length;buttons[next].focus();buttons[next].click();});
-}
-}
-GtkPreview.run();
 </script>
 </html>

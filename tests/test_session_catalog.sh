@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_session_catalog_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -40,7 +38,3 @@ printf '%s\0' -- gtk-launch visible.desktop > "$WORK_DIR/expected.log"
 assert_true "application launch preserves desktop entry resolution through uwsm" "cmp '$WORK_DIR/expected.log' '$WORK_DIR/launch.log'"
 if [[ "$TESTS_FAILED" -gt 0 ]]; then cat "$WORK_DIR/qml.log"; fi
 test_summary
-
-}
-
-Os::tests::test_session_catalog_sh::run "$@"

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::30_theming_sh::run() {
-
 set -euo pipefail
 
 install -d -m 755 -o root -g root /usr/local/lib/os/messages /etc/pacman.d/hooks
@@ -168,7 +166,3 @@ if [[ -f "$_browser_palette" && -x /usr/bin/omarchy-theme-set-browser-policy ]];
         user_as "$PRIMARY_USER" brave-origin --refresh-platform-policy --no-startup-window
     fi
 fi
-
-}
-
-Os::scripts::lib::modules::30_theming_sh::run "$@"

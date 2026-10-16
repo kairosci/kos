@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::session::scripts::fingerprint_sh::run() {
 set -euo pipefail
 CONFIG="$1/.config"
 DATA="$1/.local/share/os/session/data"
@@ -16,7 +14,3 @@ done < <(jq -r '.menu.id,.panels[].id,(.clockWidget | select(.enabled) | .id)' "
 find "$DATA" -type f ! -name '*.bak' -print0 >> "$FILES"
 printf '%s\0' "$CONFIG/os/extensions/os-menu.json" "$CONFIG/os/shell.json" >> "$FILES"
 LC_ALL=C sort -z "$FILES" | xargs -0 sha256sum
-
-}
-
-Os::modules::conf::session::scripts::fingerprint_sh::run "$@"

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_power_state_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/test_lib.sh"
@@ -36,7 +34,3 @@ printf 'function chargeThresholdActive() { return false }\n' > "$source_dir/Mode
 assert_false "unsupported upstream fails before installation" 'bash "$installer"'
 assert_true "failed migration preserves previous state" '[[ "$first_hash" == "$(sha256sum "$plugin/Model.js" "$XDG_CONFIG_HOME/omarchy/shell.json")" ]]'
 test_summary
-
-}
-
-Os::tests::test_power_state_sh::run "$@"

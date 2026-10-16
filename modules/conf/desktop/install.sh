@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::desktop::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 migrate_user_config_dir "$HOME"
 
@@ -32,7 +30,3 @@ if [[ -n "$WALLPAPER_THEME" ]]; then
 fi
 rm -f "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/toggles/screensaver-off"
 log "gui.install_done" "desktop"
-
-}
-
-Os::modules::conf::desktop::install_sh::run "$@"

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::80_services_sh::run() {
-
 set -euo pipefail
 
 log "services.journald_harden"
@@ -37,7 +35,3 @@ for svc in avahi-daemon cups cups-browsed; do
         systemctl disable --now "$svc.socket" 2>/dev/null || warn "services.socket_missing" "$svc"
     fi
 done
-
-}
-
-Os::scripts::lib::modules::80_services_sh::run "$@"

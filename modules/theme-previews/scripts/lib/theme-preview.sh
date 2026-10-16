@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::modules::theme_previews::scripts::lib::theme_preview_sh::run() {
-
 THEME_PREVIEW_CANVAS="${THEME_PREVIEW_CANVAS:-1800x1012}"
 THEME_PREVIEW_BACKUP_DIR="${THEME_PREVIEW_BACKUP_DIR:-/var/cache/os/theme-preview-stock}"
 THEME_PREVIEW_OVERLAY_STORE="${THEME_PREVIEW_OVERLAY_STORE:-/var/lib/os/theme-preview-overlay}"
@@ -116,7 +114,3 @@ theme_preview_normalize() {
     done
     theme_preview_restore_overlays "$themes_root"
 }
-
-}
-
-Os::modules::theme_previews::scripts::lib::theme_preview_sh::run "$@"

@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SessionInstaller::run() {
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 LIB_DIR="$PROJECT_DIR/scripts/lib"
 [[ -f "$LIB_DIR/i18n.sh" ]] || LIB_DIR="$(dirname "$SCRIPT_DIR")"
 source "$LIB_DIR/i18n.sh"
 source "$LIB_DIR/userconf.sh"
-i18n_init
+locale_init
 
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
@@ -27,7 +26,7 @@ jq -e '.menu.width >= 320 and .menu.width <= 1000' "$SCRIPT_DIR/data/policy.json
 jq --arg runtime "$NATIVE" '.runtime = $runtime' "$SCRIPT_DIR/data/policy.json" > "$STAGE/data/os/session/data/policy.json"
 POLICY="$STAGE/data/os/session/data/policy.json"
 source "$SCRIPT_DIR/scripts/clock.sh"
-local -A clock_widget=()
+declare -A clock_widget=()
 ClockWidget::new clock_widget "$SCRIPT_DIR" "$STAGE" "$POLICY"
 ClockWidget::stage clock_widget
 cp "$SCRIPT_DIR/scripts/runtime.lua" "$STAGE/data/os/hypr/runtime.lua"
@@ -179,6 +178,3 @@ fi
 mkdir -p "$STATE_HOME/omarchy/toggles"
 install_user_content "$STATE_HOME/omarchy/toggles/bar-off" 600 < /dev/null
 log "session.configured"
-}
-
-SessionInstaller::run "$@"

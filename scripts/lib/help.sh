@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::help_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$SCRIPT_DIR/i18n.sh"
 
-i18n_init
+locale_init
 
 row() { printf '  %-12s %s\n' "$1" "$(t "$2")"; }
 
@@ -27,13 +25,9 @@ row os "make.os"
 row changelog "make.changelog"
 row editors "make.editors"
 row lang "make.lang"
-row i18n-status "make.i18n_status"
+row i18n-status "make.locale_status"
 row clean "make.clean"
 row iso "make.iso"
 printf '\n'
 log "locale.supported" "${I18N_SUPPORTED[*]}"
 log "locale.language_active" "$I18N_LANG"
-
-}
-
-Os::scripts::lib::help_sh::run "$@"

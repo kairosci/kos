@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::36_os_cli_sh::run() {
-
 set -euo pipefail
 
 OS_DISPATCHER="$PROJECT_DIR/modules/os/bin/os"
@@ -28,7 +26,3 @@ for user_home in /home/*; do
         install -m 644 /usr/share/os/CHANGELOG.md "$HOME/.local/share/os/CHANGELOG.md"
     ' || warn "os.cli_skipped" "$_user"
 done
-
-}
-
-Os::scripts::lib::modules::36_os_cli_sh::run "$@"

@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::modules::obscure::bin::obscure_view::run() {
 set -euo pipefail
 
 log() { printf '%s\n' "$1"; }
@@ -82,7 +80,3 @@ for target in "$@"; do
         xdg-open "$target" 2>/dev/null || warn "open skipped for $target"
     fi
 done
-
-}
-
-Os::modules::obscure::bin::obscure_view::run "$@"

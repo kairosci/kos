@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_graphical_workflow_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -189,7 +187,3 @@ assert_true "legacy Resources retains its detailed sidebar preference" 'PATH="$W
 assert_false "missing Resources schema stops configuration visibly" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=missing RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-missing" bash "$PROJECT_DIR/modules/conf/resources/install.sh"'
 
 test_summary
-
-}
-
-Os::tests::test_graphical_workflow_sh::run "$@"

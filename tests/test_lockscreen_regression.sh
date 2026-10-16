@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_lockscreen_regression_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -41,7 +39,3 @@ assert_false "No duplicate swayidle lock commands in active environment" \
     "pgrep -fa swayidle 2>/dev/null | grep -E 'hyprlock.*swaylock|swaylock.*hyprlock' | grep -v grep"
 
 test_summary
-
-}
-
-Os::tests::test_lockscreen_regression_sh::run "$@"

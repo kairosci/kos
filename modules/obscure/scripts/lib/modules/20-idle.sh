@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::modules::obscure::scripts::lib::modules::20_idle_sh::run() {
 set -euo pipefail
 
 log "Enforcing idle obscure through the native OS chain"
@@ -10,7 +8,3 @@ for u_home in /home/*; do
     rm -f "$u_home/.local/state/omarchy/indicators/stay-awake" 2>/dev/null || warn "stay-awake removal skipped for $_u"
     rm -f "$u_home/.local/state/omarchy/toggles/screensaver-off" 2>/dev/null || warn "screensaver toggle removal skipped for $_u"
 done
-
-}
-
-Os::modules::obscure::scripts::lib::modules::20_idle_sh::run "$@"

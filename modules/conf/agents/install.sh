@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::agents::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 
 config="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/shell.json"
 [[ -f "$config" ]] || exit 0
@@ -26,7 +24,3 @@ jq '
 ' "$config" > "$staged" || err "defaults.app_failed" "agents"
 install_user_content "$config" 600 < "$staged"
 log "gui.install_done" "agents"
-
-}
-
-Os::modules::conf::agents::install_sh::run "$@"

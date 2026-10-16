@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-
-Os::hooks::theme_set_d::zed_theme::run() {
 set -euo pipefail
 
 exec bash "${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/zed-theme.sh"
-
-}
-
-Os::hooks::theme_set_d::zed_theme::run "$@"

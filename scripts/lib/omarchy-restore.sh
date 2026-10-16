@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::omarchy_restore_sh::run() {
-
 omarchy_restore_user() {
     local user="$1" home="$2" upstream="${OMARCHY_PATH:-/usr/share/omarchy}"
     local bashrc="${OS_RESTORE_BASHRC:-/etc/skel/.bashrc}"
@@ -39,7 +37,3 @@ omarchy_restore_user() {
     install -m 600 /dev/null "$backup/done" || return 1
     log "restore.done" "$backup"
 }
-
-}
-
-Os::scripts::lib::omarchy_restore_sh::run "$@"

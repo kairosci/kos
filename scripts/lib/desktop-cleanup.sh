@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::desktop_cleanup_sh::run() {
-
 OS_DESKTOP_APPS_DIR="${OS_DESKTOP_APPS_DIR:-/usr/share/omarchy/applications}"
 OS_HOMES_ROOT="${OS_HOMES_ROOT:-/home}"
 OS_SYSTEM_APPS_DIRS="${OS_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
@@ -448,14 +446,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     if [[ -f "$SCRIPT_LIB_DIR/i18n.sh" ]]; then
         # shellcheck source=/dev/null
         source "$SCRIPT_LIB_DIR/i18n.sh"
-        i18n_init >/dev/null 2>&1 || warn "desktop.refresh_skipped"
+        locale_init >/dev/null 2>&1 || warn "desktop.refresh_skipped"
     else
         log() { printf '%s\n' "$2"; }
         warn() { printf 'Warning: %s\n' "$1" >&2; }
     fi
     desktop_cleanup_sweep
 fi
-
-}
-
-Os::scripts::lib::desktop_cleanup_sh::run "$@"

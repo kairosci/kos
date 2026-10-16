@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::verify_sh::run() {
-
 set -uo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -9,7 +7,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/lib/i18n.sh"
 source "$SCRIPT_DIR/lib/target-user.sh"
 
-i18n_init
+locale_init
 
 TARGET_USER=""
 TARGET_UID=""
@@ -363,7 +361,3 @@ printf '\n'
 printf '%s\n' "$(t verify.tests_executed "$((PASS + FAIL))")"
 printf '%b\n' "${BOLD}$(t verify.passed_summary "$PASS" "$FAIL")${NC}"
 [[ $FAIL -eq 0 ]] || exit 1
-
-}
-
-Os::scripts::verify_sh::run "$@"

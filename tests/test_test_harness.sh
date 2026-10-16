@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_test_harness_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -54,7 +52,3 @@ assert_false "bare Arch container does not require installed desktop packages" "
 assert_true "installed Omarchy retains strict desktop runtime checks" "PATH='$HARNESS_SANDBOX/bin' desktop_runtime_available '$HARNESS_SANDBOX/os'"
 assert_false "desktop runtime requires the native package manager" "PATH='$HARNESS_SANDBOX/empty' desktop_runtime_available '$HARNESS_SANDBOX/os'"
 test_summary
-
-}
-
-Os::tests::test_test_harness_sh::run "$@"

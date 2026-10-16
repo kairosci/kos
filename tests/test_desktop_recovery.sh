@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_desktop_recovery_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -8,7 +6,7 @@ source "$SCRIPT_DIR/test_lib.sh"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/snapshot-baseline.sh"
 source "$PROJECT_DIR/scripts/lib/omarchy-restore.sh"
-i18n_init
+locale_init
 SANDBOX=$(mktemp -d)
 trap 'rm -rf "$SANDBOX"' EXIT
 export OS_SNAPSHOT_BASELINE_STATE="$SANDBOX/state"
@@ -117,7 +115,3 @@ printf 'Description=Earlier security audit\nExecStart=/etc/cron.weekly/security-
 printf '[Timer]\nOnCalendar=weekly\n' > "$OS_NAMESPACE_ROOT/etc/systemd/system/earlier-security-audit.timer"
 assert_true "canonical previous audit units are retired without an i18n library" 'namespace_cleanup && grep -qx "disable --now earlier-security-audit.timer" "$NAMESPACE_TEST_COMMANDS" && [[ ! -e "$OS_NAMESPACE_ROOT/etc/systemd/system/earlier-security-audit.service" ]]'
 test_summary
-
-}
-
-Os::tests::test_desktop_recovery_sh::run "$@"

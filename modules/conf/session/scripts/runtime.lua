@@ -1,5 +1,3 @@
-local Os_modules_conf_session_scripts_runtime_lua = {}
-function Os_modules_conf_session_scripts_runtime_lua.run()
 local runtime = os.getenv("OMARCHY_PATH") or "/usr/share/omarchy"
 dofile(runtime .. "/default/hypr/bootstrap.lua")
 hl.env("QS_CONFIG_PATH", runtime .. "/shell")
@@ -9,6 +7,3 @@ return {
   defaults = function() require("default.hypr.omarchy") end,
   toggles = function() require("default.hypr.toggles") end,
 }
-
-end
-return Os_modules_conf_session_scripts_runtime_lua.run()

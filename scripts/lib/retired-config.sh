@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::retired_config_sh::run() {
-
 retire_user_config() {
     local user="$1" home="$2" app="$3" source target directory
     [[ "$app" =~ ^[a-z][a-z0-9_-]*$ ]] || return 1
@@ -18,7 +16,3 @@ retire_user_config() {
     mv "$source" "$target/config" || return 1
     chown -R --no-dereference "$user:$user" "$target" || return 1
 }
-
-}
-
-Os::scripts::lib::retired_config_sh::run "$@"

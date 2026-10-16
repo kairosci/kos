@@ -4,7 +4,7 @@ import Quickshell.Io
 import Quickshell.Services.Mpris
 import qs.Ui as Ui
 import qs.Commons
-import "MediaModel.js" as MediaLibrary
+import "MediaModel.js" as MediaModel
 
 Ui.BarWidget {
   id: root
@@ -23,7 +23,7 @@ Ui.BarWidget {
   }
 
   function touch(p) {
-    var key = MediaLibrary.MediaModel.keyFor(p)
+    var key = MediaModel.keyFor(p)
     if (!key) return
     serial += 1
     var next = {}
@@ -32,13 +32,13 @@ Ui.BarWidget {
     lastActiveAt = next
   }
 
-  readonly property var activePlayer: MediaLibrary.MediaModel.selectActivePlayer(players, lastActiveAt, preferredPlayerKey)
-  readonly property var sourcePlayers: MediaLibrary.MediaModel.filterSourcePlayers(players)
-  readonly property bool hasMedia: MediaLibrary.MediaModel.hasMetadata(activePlayer)
+  readonly property var activePlayer: MediaModel.selectActivePlayer(players, lastActiveAt, preferredPlayerKey)
+  readonly property var sourcePlayers: MediaModel.filterSourcePlayers(players)
+  readonly property bool hasMedia: MediaModel.hasMetadata(activePlayer)
   readonly property bool isPlaying: !!(activePlayer && activePlayer.isPlaying)
   readonly property string artUrl: activePlayer && activePlayer.trackArtUrl ? activePlayer.trackArtUrl : ""
-  readonly property string title: activePlayer ? MediaLibrary.MediaModel.cleanTitle(activePlayer.trackTitle || "") : ""
-  readonly property string artist: activePlayer ? MediaLibrary.MediaModel.normalizeArtist(activePlayer.trackArtist) : ""
+  readonly property string title: activePlayer ? MediaModel.cleanTitle(activePlayer.trackTitle || "") : ""
+  readonly property string artist: activePlayer ? MediaModel.normalizeArtist(activePlayer.trackArtist) : ""
   readonly property string album: activePlayer && activePlayer.trackAlbum ? String(activePlayer.trackAlbum).replace(/\s+/g, " ").trim() : ""
   readonly property string trackId: activePlayer && activePlayer.trackId ? String(activePlayer.trackId) : ""
   readonly property string identity: activePlayer ? (activePlayer.identity || activePlayer.desktopEntry || "") : ""
@@ -56,7 +56,7 @@ Ui.BarWidget {
   property string queueBusName: ""
 
   function updateUpcomingQueue() {
-    upcomingQueue = MediaLibrary.MediaModel.extractUpcomingTracks(root.nativeQueue, root.trackId, root.title)
+    upcomingQueue = MediaModel.extractUpcomingTracks(root.nativeQueue, root.trackId, root.title)
   }
 
   Timer {
@@ -111,10 +111,10 @@ Ui.BarWidget {
       album: root.album,
       artUrl: root.artUrl,
       length: root.trackLength,
-      playerKey: MediaLibrary.MediaModel.keyFor(root.activePlayer),
+      playerKey: MediaModel.keyFor(root.activePlayer),
       isPlaying: root.isPlaying
     }
-    trackHistory = MediaLibrary.MediaModel.updateTrackHistory(root.trackHistory, item, 25)
+    trackHistory = MediaModel.updateTrackHistory(root.trackHistory, item, 25)
   }
 
   onNativeQueueChanged: updateUpcomingQueue()
@@ -227,8 +227,8 @@ Ui.BarWidget {
         if (!str || !root.activePlayer) return
         if (!root.queueBusName || root.activePlayer.dbusName !== root.queueBusName) return
         var currentId = root.activePlayer.trackId || ""
-        var pKey = MediaLibrary.MediaModel.keyFor(root.activePlayer)
-        var parsedList = MediaLibrary.MediaModel.parseBusctlTracksMetadata(str, currentId, pKey, root.title)
+        var pKey = MediaModel.keyFor(root.activePlayer)
+        var parsedList = MediaModel.parseBusctlTracksMetadata(str, currentId, pKey, root.title)
         root.nativeQueue = parsedList
       }
     }

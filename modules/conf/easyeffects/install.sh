@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::easyeffects::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 
 PRESET=OS-Subwoofer
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -33,7 +31,3 @@ if [[ -S "${XDG_RUNTIME_DIR:-/nonexistent}/bus" ]]; then
     easyeffects_apply_preset
 fi
 log "gui.install_done" "EasyEffects"
-
-}
-
-Os::modules::conf::easyeffects::install_sh::run "$@"

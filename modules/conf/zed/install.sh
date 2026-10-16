@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::modules::conf::zed::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -13,7 +11,7 @@ source "$I18N_LIB/i18n.sh"
 # shellcheck source=/dev/null
 source "$I18N_LIB/userconf.sh"
 
-i18n_init
+locale_init
 
 command -v jq >/dev/null || err "defaults.app_failed" Zed
 existing=/dev/null
@@ -31,7 +29,3 @@ if [[ -d "$SCRIPT_DIR/data/snippets" ]] && [[ -n "$(ls -A "$SCRIPT_DIR/data/snip
 fi
 
 log "install.zed_done"
-
-}
-
-Os::modules::conf::zed::install_sh::run "$@"

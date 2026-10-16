@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::micro::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 
 MICRO_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/micro"
 MICRO_PLUGINS="$MICRO_CONFIG/plug"
@@ -26,7 +24,3 @@ if [[ -f "$MICRO_SETTINGS" ]]; then
     install_user_content "$MICRO_SETTINGS" 600 < "$staged" || err "defaults.app_failed" "micro settings"
 fi
 log "gui.install_done" "micro"
-
-}
-
-Os::modules::conf::micro::install_sh::run "$@"

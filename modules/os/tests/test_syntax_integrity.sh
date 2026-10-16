@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::modules::os::tests::test_syntax_integrity_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -29,7 +27,3 @@ for helper in "$PROJECT_DIR"/bin/*; do
 done
 
 test_summary
-
-}
-
-Os::modules::os::tests::test_syntax_integrity_sh::run "$@"

@@ -1,13 +1,11 @@
 #!/bin/bash
 
-Os::modules::performance::scripts::verify_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_ROOT="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_ROOT/scripts/lib/i18n.sh"
-i18n_init
+locale_init
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -66,7 +64,3 @@ check "no yay fallback"   "! grep -q 'yay -S' '$SCRIPT_DIR/setup.sh'"
 printf '\n'
 printf '%b\n' "${BOLD}Passed: $PASS  Failed: $FAIL${NC}"
 [[ $FAIL -eq 0 ]] || exit 1
-
-}
-
-Os::modules::performance::scripts::verify_sh::run "$@"

@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::modules::obscure::scripts::lib::modules::10_yazi_sh::run() {
 set -euo pipefail
 
 command -v yazi >/dev/null || return 0
@@ -125,7 +123,3 @@ for u_home in /home/*; do
 
     chown -R "$_u":"$_u" "$_yazi" "$_obscure" 2>/dev/null || warn "chown skipped for $_u"
 done
-
-}
-
-Os::modules::obscure::scripts::lib::modules::10_yazi_sh::run "$@"

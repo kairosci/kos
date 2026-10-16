@@ -1,5 +1,3 @@
-local Os_modules_conf_session_scripts_json_lua = {}
-function Os_modules_conf_session_scripts_json_lua.run()
 local function quote(value)
   return '"' .. value:gsub('[%z\1-\31\\"]', function(char)
     if char == '"' then return '\\"' end
@@ -17,6 +15,3 @@ return function(values)
   for _, key in ipairs(keys) do result[#result + 1] = quote(key) .. ":" .. quote(values[key]) end
   return "{" .. table.concat(result, ",") .. "}\n"
 end
-
-end
-return Os_modules_conf_session_scripts_json_lua.run()

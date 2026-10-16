@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::bluetooth::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -9,7 +7,7 @@ PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 # shellcheck source=/dev/null
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 
 SOURCE_DIR="${OMARCHY_PATH:-/usr/share/omarchy}/shell/plugins/panels/bluetooth"
 DEST_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/plugins/omaconf.bluetooth"
@@ -33,7 +31,3 @@ install_user_content "$DEST_DIR/Panel.qml" <<< "$panel"
 install_user_file "$SOURCE_DIR/Model.js" "$DEST_DIR/Model.js"
 install_user_content "$DEST_DIR/manifest.json" <<< "$manifest"
 install_user_content "$SHELL_CONFIG" <<< "$config"
-
-}
-
-Os::modules::conf::bluetooth::install_sh::run "$@"

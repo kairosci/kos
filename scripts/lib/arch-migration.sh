@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ArchMigration::report() {
+arch_migration_report() {
     local project="$1" policy="$1/modules/platform/arch/data/parity.json" packages repositories references ownership status official_names official_packages runtime_package runtime_pattern
     local -a official_repositories=()
     packages=$(pacman -Qq) || return 1
@@ -35,18 +35,18 @@ ArchMigration::report() {
            requiresTrialBoot:true}'
 }
 
-ArchMigration::main() {
+arch_migration_main() {
     local project
     [[ $# -le 1 ]] || return 2
     project="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
     case "${1:---report}" in
-        --report) ArchMigration::report "$project" ;;
-        --check) ArchMigration::report "$project" | jq -e '.readyToRemoveRuntime and .readyToRemoveRepository and all(.capabilities[]; .parity == "verified")' ;;
+        --report) arch_migration_report "$project" ;;
+        --check) arch_migration_report "$project" | jq -e '.readyToRemoveRuntime and .readyToRemoveRepository and all(.capabilities[]; .parity == "verified")' ;;
         *) return 2 ;;
     esac
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     set -euo pipefail
-    ArchMigration::main "$@"
+    arch_migration_main "$@"
 fi

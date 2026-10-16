@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::modules::clean::tests::run_all_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -13,7 +11,3 @@ bash "$PROJECT_ROOT/tests/run-suite-list.sh" \
     "$SCRIPT_DIR/test_home_cleanup.sh" \
     "$SCRIPT_DIR/test_modular_pipeline.sh" \
     "$SCRIPT_DIR/test_idempotency_safety.sh"
-
-}
-
-Os::modules::clean::tests::run_all_sh::run "$@"

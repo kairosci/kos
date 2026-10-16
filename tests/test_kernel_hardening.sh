@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_kernel_hardening_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -62,7 +60,3 @@ elif [[ -f /etc/sysctl.d/99-security.conf ]]; then
 fi
 
 test_summary
-
-}
-
-Os::tests::test_kernel_hardening_sh::run "$@"

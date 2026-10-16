@@ -1,5 +1,3 @@
-local Os_modules_conf_session_scripts_jsonc_lua = {}
-function Os_modules_conf_session_scripts_jsonc_lua.run()
 local file = assert(io.open(assert(arg[1]), "r"))
 local text = file:read("*a")
 file:close()
@@ -48,6 +46,3 @@ while i <= #text do
   end
 end
 io.write(table.concat(result))
-
-end
-return Os_modules_conf_session_scripts_jsonc_lua.run()

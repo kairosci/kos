@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::modules::clean::scripts::lib::modules::10_system_sh::run() {
 set -euo pipefail
 
 log "Trimming pacman package cache"
@@ -41,7 +39,3 @@ fi
 
 log "Refreshing thumbnail and font caches"
 fc-cache -f 2>/dev/null || warn "fc-cache refresh skipped"
-
-}
-
-Os::modules::clean::scripts::lib::modules::10_system_sh::run "$@"

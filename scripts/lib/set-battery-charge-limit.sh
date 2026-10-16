@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::scripts::lib::set_battery_charge_limit_sh::run() {
 set -euo pipefail
 
 STATE_DIR="${OS_BATTERY_STATE_DIR:-/run/os}"
@@ -224,7 +222,3 @@ case "$mode" in
         exit 2
         ;;
 esac
-
-}
-
-Os::scripts::lib::set_battery_charge_limit_sh::run "$@"

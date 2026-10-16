@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::test_os_compat_sh::run() {
-
 set -uo pipefail
 
 RED='\033[0;31m'
@@ -41,7 +39,7 @@ section() { printf '%b\n' "\n${BOLD}$1${NC}"; }
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/lib/i18n.sh"
-i18n_init || exit 1
+locale_init || exit 1
 
 section "Script Syntax & Code Integrity"
 for sh_file in "$PROJECT_DIR"/scripts/*.sh "$PROJECT_DIR"/hooks/theme-set.d/* "$PROJECT_DIR"/modules/conf/*/*.sh; do
@@ -130,7 +128,3 @@ printf '\n'
 printf '%s\n' "$(t verify.tests_executed "$((PASS + FAIL + WARN))")"
 printf '%b\n' "${BOLD}Passed: $PASS  Failed: $FAIL  Warnings: $WARN${NC}"
 [[ $FAIL -eq 0 ]] || exit 1
-
-}
-
-Os::scripts::test_os_compat_sh::run "$@"

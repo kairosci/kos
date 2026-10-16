@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::run_suite_list_sh::run() {
-
 set -euo pipefail
 
 TOTAL_SUITES=0
@@ -49,7 +47,3 @@ done
 
 printf 'Tests Executed: %s | Suites: %s | Passed: %s | Failed: %s\n' "$TOTAL_ASSERTIONS" "$TOTAL_SUITES" "$PASSED_SUITES" "$FAILED_SUITES"
 [[ $FAILED_SUITES -eq 0 ]]
-
-}
-
-Os::tests::run_suite_list_sh::run "$@"

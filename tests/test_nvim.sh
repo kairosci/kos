@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_nvim_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -30,7 +28,3 @@ mv "$SANDBOX/plugins" "$XDG_CONFIG_HOME/nvim/lua/plugins"
 rm "$XDG_CONFIG_HOME/nvim/lua/config/lazy.lua"
 assert_false "Neovim refuses incompatible personal configurations" "bash '$PROJECT_DIR/modules/conf/nvim/install.sh'"
 test_summary
-
-}
-
-Os::tests::test_nvim_sh::run "$@"

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_hardware_power_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -191,7 +189,3 @@ check_samsung_recovery() (
 assert_true "Samsung recovery restores events and leaves a recovered driver alone" "check_samsung_recovery"
 
 test_summary
-
-}
-
-Os::tests::test_hardware_power_sh::run "$@"

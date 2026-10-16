@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_debloat_theming_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -188,7 +186,3 @@ assert_file_contains "portals module stops only the stale gnome backend" "$PROJE
 assert_file_contains "portals module reloads portal after routing" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "systemctl --user restart xdg-desktop-portal-gtk.service xdg-desktop-portal.service"
 
 test_summary
-
-}
-
-Os::tests::test_debloat_theming_sh::run "$@"

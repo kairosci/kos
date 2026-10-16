@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-
-Os::modules::conf::cli::data::helpers_sh::run() {
 function helper() {
 	case "${1:-}" in
 	"" | list | ls)
@@ -82,7 +79,3 @@ HELP
 		;;
 	esac
 }
-
-}
-
-Os::modules::conf::cli::data::helpers_sh::run "$@"

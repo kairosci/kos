@@ -4,16 +4,13 @@ import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 
-class media_model_test_js {
-static run() {
-
 function loadMediaModel() {
   const filePath = path.resolve(process.cwd(), "src/MediaModel.js");
   const content = fs.readFileSync(filePath, "utf8").replace(".pragma library", "");
   const context = {};
   vm.createContext(context);
   vm.runInContext(content, context);
-  return context.MediaModel;
+  return context;
 }
 
 const MediaModel = loadMediaModel();
@@ -450,11 +447,3 @@ describe("MediaModel.parseNativeTrackList artist", () => {
     assert.equal(result[1].artist, "C, D");
   });
 });
-
-
-
-
-
-}
-}
-media_model_test_js.run();

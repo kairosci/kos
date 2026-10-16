@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::94_security_audit_sh::run() {
-
 set -euo pipefail
 
 log "maint.weekly"
@@ -82,7 +80,3 @@ if systemctl is-enabled --quiet cronie.service || systemctl is-active --quiet cr
 else
     systemctl enable --now os-security-audit.timer
 fi
-
-}
-
-Os::scripts::lib::modules::94_security_audit_sh::run "$@"

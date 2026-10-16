@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ArchMigrationTest::run() {
+test_arch_migration() {
     set -euo pipefail
     SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
     PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -35,4 +35,4 @@ SH
     test_summary
 }
 
-ArchMigrationTest::run "$@"
+test_arch_migration "$@"

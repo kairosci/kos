@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::namespace_cleanup_sh::run() {
-
 namespace_archive_file() {
     local file="$1" namespace="$2" root="${OS_NAMESPACE_ROOT:-}" backup="${OS_NAMESPACE_BACKUP:-${OS_NAMESPACE_ROOT:-}/var/lib/os/previous-namespace}"
     [[ -e "$file" || -L "$file" ]] || return 0
@@ -80,7 +78,3 @@ namespace_cleanup() {
     done
     systemctl daemon-reload
 }
-
-}
-
-Os::scripts::lib::namespace_cleanup_sh::run "$@"

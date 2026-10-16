@@ -1,6 +1,4 @@
 #!/bin/bash
-
-Os::modules::clean::scripts::lib::modules::20_home_sh::run() {
 set -euo pipefail
 
 STALE_BINS=(
@@ -107,7 +105,3 @@ for u_home in /home/*; do
         find "$u_home/.local/share/Trash/info" -mindepth 1 -atime +30 -delete 2>/dev/null || warn "trash info prune skipped for $u_home"
     fi
 done
-
-}
-
-Os::modules::clean::scripts::lib::modules::20_home_sh::run "$@"

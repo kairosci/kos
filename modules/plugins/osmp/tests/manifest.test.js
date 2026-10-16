@@ -3,9 +3,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 
-class manifest_test_js {
-static run() {
-
 describe("manifest.json validation", () => {
   test("package and manifest versions match the OSMP release", () => {
     const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
@@ -39,7 +36,3 @@ describe("manifest.json validation", () => {
     assert.equal(fs.existsSync(entryPath), true, `Entry point ${json.entryPoints.barWidget} does not exist`);
   });
 });
-
-}
-}
-manifest_test_js.run();

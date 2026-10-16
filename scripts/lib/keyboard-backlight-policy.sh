@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::scripts::lib::keyboard_backlight_policy_sh::run() {
 set -euo pipefail
 
 install -d -m 755 -o root -g root /usr/local/lib/os/messages
@@ -24,8 +22,3 @@ systemctl daemon-reload
 systemctl enable os-keyboard-backlight.service
 systemctl restart os-keyboard-backlight.service
 systemctl enable --now os-keyboard-backlight.timer
-
-
-}
-
-Os::scripts::lib::keyboard_backlight_policy_sh::run "$@"

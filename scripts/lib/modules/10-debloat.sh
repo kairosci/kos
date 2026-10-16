@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::10_debloat_sh::run() {
-
 set -euo pipefail
 
 DEBLOAT=(
@@ -160,7 +158,3 @@ if [[ -f "$PROJECT_DIR/scripts/lib/desktop-cleanup.sh" ]]; then
     source "$PROJECT_DIR/scripts/lib/desktop-cleanup.sh"
     desktop_cleanup_sweep || warn "desktop.refresh_skipped"
 fi
-
-}
-
-Os::scripts::lib::modules::10_debloat_sh::run "$@"

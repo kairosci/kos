@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_session_i18n_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -94,7 +92,3 @@ else
     assert_warn "SessionI18n runtime check requires Quickshell" "command -v qs"
 fi
 test_summary
-
-}
-
-Os::tests::test_session_i18n_sh::run "$@"

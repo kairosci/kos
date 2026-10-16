@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::05_locale_sh::run() {
-
 set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/../locale-map.sh"
@@ -153,7 +151,3 @@ locale_main() {
 if [[ "${OS_LOCALE_LIB_ONLY:-0}" != "1" ]]; then
     locale_main
 fi
-
-}
-
-Os::scripts::lib::modules::05_locale_sh::run "$@"

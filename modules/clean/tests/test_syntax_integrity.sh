@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::modules::clean::tests::test_syntax_integrity_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -35,7 +33,3 @@ assert_file_contains "launch.sh uses strict mode" "$PROJECT_DIR/scripts/launch.s
 assert_file_contains "run-setup.sh uses strict mode" "$PROJECT_DIR/scripts/run-setup.sh" "set -euo pipefail"
 
 test_summary
-
-}
-
-Os::modules::clean::tests::test_syntax_integrity_sh::run "$@"

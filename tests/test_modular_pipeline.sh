@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::tests::test_modular_pipeline_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -93,7 +91,3 @@ if command -v pacman >/dev/null; then
 fi
 
 test_summary
-
-}
-
-Os::tests::test_modular_pipeline_sh::run "$@"

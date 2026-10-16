@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::modules::os::tests::test_os_cli_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -48,7 +46,3 @@ assert_true "dispatcher delegates groups with the prepared environment" "PATH='$
 assert_true "dispatcher exposes discovery through the stub" "PATH='$STUB_DIR:$PATH' '$OS_BIN' commands --check | grep -q 'stub omarchy commands --check'"
 
 test_summary
-
-}
-
-Os::modules::os::tests::test_os_cli_sh::run "$@"

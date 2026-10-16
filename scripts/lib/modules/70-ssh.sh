@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::70_ssh_sh::run() {
-
 set -euo pipefail
 
 log "ssh.secure"
@@ -59,7 +57,3 @@ if systemctl is-active --quiet sshd.service; then
     sshd -t
     systemctl restart sshd.service || warn "ssh.restart_failed"
 fi
-
-}
-
-Os::scripts::lib::modules::70_ssh_sh::run "$@"

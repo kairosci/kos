@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::89_battery_charge_sh::run() {
-
 set -euo pipefail
 
 log "power.charge"
@@ -112,7 +110,3 @@ case "$(battery_query enforced)" in
         fi
         ;;
 esac
-
-}
-
-Os::scripts::lib::modules::89_battery_charge_sh::run "$@"

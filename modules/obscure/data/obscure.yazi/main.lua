@@ -1,5 +1,3 @@
-local Os_modules_obscure_data_obscure_yazi_main_lua = {}
-function Os_modules_obscure_data_obscure_yazi_main_lua.run()
 --- @since 25.2.26
 
 local M = {}
@@ -27,6 +25,3 @@ function M:seek(job)
 end
 
 return M
-
-end
-return Os_modules_obscure_data_obscure_yazi_main_lua.run()

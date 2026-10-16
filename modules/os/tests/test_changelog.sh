@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Os::modules::os::tests::test_changelog_sh::run() {
-
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -25,7 +23,3 @@ assert_true "changelog uses prose instead of lists" "! grep -qE '^[[:space:]]*([
 assert_true "dispatcher section matches the changelog file" "OS_CHANGELOG='$CHANGELOG' '$PROJECT_DIR/bin/os' changelog v1.0 | grep -q 'Release v1.0'"
 
 test_summary
-
-}
-
-Os::modules::os::tests::test_changelog_sh::run "$@"

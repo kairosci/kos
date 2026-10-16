@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-
-Os::modules::conf::osmp::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 
 SOURCE="$PROJECT_DIR/modules/plugins/osmp"
 TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/os/plugins/os.osmp"
@@ -20,7 +18,3 @@ for file in "$SOURCE"/src/* "$SOURCE/manifest.json" "$SOURCE/LICENSE"; do
     install_user_file "$file" "$TARGET/$relative"
 done
 log "gui.install_done" "osmp"
-
-}
-
-Os::modules::conf::osmp::install_sh::run "$@"

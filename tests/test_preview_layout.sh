@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::tests::test_preview_layout_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/test_lib.sh"
@@ -25,7 +23,3 @@ if command -v magick >/dev/null; then
     assert_false "live color checks reject invalid coordinates" 'theme_preview_pixel_rgb "$SANDBOX/rgba.png" invalid 1'
 fi
 test_summary
-
-}
-
-Os::tests::test_preview_layout_sh::run "$@"

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-Os::modules::theme_previews::rebuild_previews_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -8,7 +6,7 @@ PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 source "$PROJECT_DIR/modules/theme-previews/scripts/lib/theme-preview.sh"
 source "$PROJECT_DIR/scripts/lib/i18n.sh"
 source "$PROJECT_DIR/scripts/lib/userconf.sh"
-i18n_init
+locale_init
 [[ "${OS_APPLY_PIPELINE:-0}" == 1 ]] || err "preview.pipeline"
 (($#)) || err "preview.usage" "${0##*/}"
 themes=("$@")
@@ -212,7 +210,3 @@ stop_capture_process "$ZED_PID"
 ZED_PID=""
 for theme in "${themes[@]}"; do theme_preview_normalize_file "$SCRIPT_DIR/$theme/preview.png"; done
 log "preview.done" "${#themes[@]}"
-
-}
-
-Os::modules::theme_previews::rebuild_previews_sh::run "$@"

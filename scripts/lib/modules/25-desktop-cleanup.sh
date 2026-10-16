@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-Os::scripts::lib::modules::25_desktop_cleanup_sh::run() {
-
 set -euo pipefail
 
 log "desktop.hook_install"
@@ -27,7 +25,3 @@ if [[ -f "$PROJECT_ROOT/scripts/lib/desktop-cleanup.sh" ]]; then
     source "$PROJECT_ROOT/scripts/lib/desktop-cleanup.sh"
     desktop_cleanup_sweep || warn "desktop.refresh_skipped"
 fi
-
-}
-
-Os::scripts::lib::modules::25_desktop_cleanup_sh::run "$@"
