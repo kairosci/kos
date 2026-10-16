@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::slop::scripts::debloat_slop_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -45,3 +47,7 @@ export OS_SLOP_DEBLOAT=1
 source "$MODULES_DIR/40-slop.sh"
 
 log "AI debloat applied on explicit request."
+
+}
+
+Os::modules::slop::scripts::debloat_slop_sh::run "$@"

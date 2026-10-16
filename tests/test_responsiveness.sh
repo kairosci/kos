@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_responsiveness_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -89,3 +91,7 @@ runuser() {
 assert_true "root verifier inspects the target account with its session environment" 'responsiveness_runtime "$PROJECT_ROOT"'
 assert_false "root verifier propagates failure to enter the target account" 'TEST_RUNUSER_FAIL=1 responsiveness_runtime "$PROJECT_ROOT"'
 test_summary
+
+}
+
+Os::tests::test_responsiveness_sh::run "$@"

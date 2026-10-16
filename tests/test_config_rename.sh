@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_config_rename_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -33,3 +35,7 @@ assert_true "menu model reads the renamed user menu" "grep -q '/os/extensions/os
 assert_true "theming installs hooks under the os directory" "grep -q '.config/os/hooks/theme-set.d' '$PROJECT_DIR/scripts/lib/modules/30-theming.sh'"
 assert_true "theme policy prunes user themes under the os directory" "grep -q '.config/os/themes' '$PROJECT_DIR/scripts/lib/theme-policy.sh'"
 test_summary
+
+}
+
+Os::tests::test_config_rename_sh::run "$@"

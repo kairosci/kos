@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::32_omaqt_sh::run() {
+
 set -euo pipefail
 
 OMAQT_URL="${OMAQT_URL:-}"
@@ -24,3 +26,7 @@ if [[ -x "$OMAQT_DIR/install.sh" ]]; then
 else
     warn "omaqt.install_missing"
 fi
+
+}
+
+Os::scripts::lib::modules::32_omaqt_sh::run "$@"

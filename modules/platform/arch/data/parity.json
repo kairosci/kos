@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "target": "arch-without-omarchy",
+  "runtimePackage": "omarchy",
+  "runtimeReferencePattern": "/usr/share/omarchy|omarchy_as|exec omarchy|omarchy-",
+  "officialRepositories": ["core","extra","multilib"],
+  "requiredCapabilities": [
+    {"id":"boot","packages":["linux","linux-firmware","limine","limine-mkinitcpio-hook","limine-snapper-sync","snapper"]},
+    {"id":"login","packages":["sddm","uwsm","polkit","gnome-keyring"]},
+    {"id":"compositor","packages":["hyprland"]},
+    {"id":"shell","packages":["quickshell"]},
+    {"id":"locking-and-idle","packages":[]},
+    {"id":"notifications-and-osd","packages":[]},
+    {"id":"menus-and-shortcuts","packages":["herdr","gum"]},
+    {"id":"theme-and-wallpaper","packages":[]},
+    {"id":"capture-and-screen-sharing","packages":["xdg-desktop-portal-hyprland","xdg-desktop-portal-gtk"]},
+    {"id":"audio","packages":["pipewire","wireplumber"]},
+    {"id":"network","packages":["networkmanager"]},
+    {"id":"bluetooth","packages":["bluez"]},
+    {"id":"applications-and-defaults","packages":[]},
+    {"id":"power-and-resume","packages":[]},
+    {"id":"security-and-audits","packages":[]},
+    {"id":"updates-and-recovery","packages":["pacman","archlinux-keyring"]}
+  ],
+  "externalPackages":["omarchy","omarchy-settings","omarchy-keyring","linux-omarchy","linux-omarchy-headers","omarchy-nvim"]
+}

@@ -1,3 +1,5 @@
+local Os_modules_conf_gtk_data_tiling_lua = {}
+function Os_modules_conf_gtk_data_tiling_lua.run()
 hl.config({
   general = { gaps_in = 0, gaps_out = 0, border_size = 1, layout = "dwindle", allow_tearing = false },
   decoration = {
@@ -36,3 +38,6 @@ o.window(".*", {
 o.window({ float = true }, { max_size = { "monitor_w-2", "monitor_h-2" } })
 o.window("xdg-desktop-portal-gtk", { center = true, max_size = { "monitor_w-2", "monitor_h-2" } })
 o.window({ modal = false, tag = "negative:floating-window" }, { tile = true })
+
+end
+return Os_modules_conf_gtk_data_tiling_lua.run()

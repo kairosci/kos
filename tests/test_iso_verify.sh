@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_iso_verify_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -99,3 +101,7 @@ else
     assert_warn "ISO content fixture requires xorriso" "command -v xorriso"
 fi
 test_summary
+
+}
+
+Os::tests::test_iso_verify_sh::run "$@"

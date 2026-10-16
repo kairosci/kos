@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::gtk::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -33,3 +35,7 @@ if [[ -f "$legacy_hook" ]] && grep -qF 'exec /usr/bin/python "$HOME/.config/omar
 fi
 apply_user_gsettings "$SCRIPT_DIR/data/settings.tsv"
 log "gui.install_done" "GTK"
+
+}
+
+Os::modules::conf::gtk::install_sh::run "$@"

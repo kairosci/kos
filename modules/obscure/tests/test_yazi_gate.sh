@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::obscure::tests::test_yazi_gate_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -62,3 +64,7 @@ merge_simulation() {
 assert_true "generated previewer block is valid TOML" "merge_simulation"
 
 test_summary
+
+}
+
+Os::modules::obscure::tests::test_yazi_gate_sh::run "$@"

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::resolver_failover_sh::run() {
 set -euo pipefail
 
 RESOLVER_FAILOVER_STATE_DIR="${RESOLVER_FAILOVER_STATE_DIR:-/run/os-resolver-failover}"
@@ -141,3 +143,7 @@ resolver_failover_daemon() {
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     resolver_failover_daemon
 fi
+
+}
+
+Os::scripts::lib::resolver_failover_sh::run "$@"

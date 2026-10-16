@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::setup_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -15,3 +17,7 @@ i18n_init
 log "app.title"
 log "setup.entrypoint"
 exec bash "$PIPELINE"
+
+}
+
+Os::setup_sh::run "$@"

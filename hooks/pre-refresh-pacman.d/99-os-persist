@@ -1,3 +1,9 @@
 #!/bin/bash
+
+Os::hooks::pre_refresh_pacman_d::99_os_persist::run() {
 set -euo pipefail
 exit 0
+
+}
+
+Os::hooks::pre_refresh_pacman_d::99_os_persist::run "$@"

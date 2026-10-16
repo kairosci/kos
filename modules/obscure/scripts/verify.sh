@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::obscure::scripts::verify_sh::run() {
+
 set -uo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -76,3 +78,7 @@ check "no yay fallback"   "! grep -q 'yay -S' '$SCRIPT_DIR/setup.sh'"
 printf '\n'
 printf '%b\n' "${BOLD}Passed: $PASS  Failed: $FAIL${NC}"
 [[ $FAIL -eq 0 ]] || exit 1
+
+}
+
+Os::modules::obscure::scripts::verify_sh::run "$@"

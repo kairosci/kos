@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::nvim::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -45,3 +47,7 @@ export EDITOR=nvim
 export VISUAL=nvim
 SHELLBLOCK
 log "gui.install_done" "Neovim"
+
+}
+
+Os::modules::conf::nvim::install_sh::run "$@"

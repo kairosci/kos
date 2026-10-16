@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::power::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -25,3 +27,7 @@ install_user_file "$SOURCE_DIR/Panel.qml" "$DEST_DIR/Panel.qml"
 install_user_content "$DEST_DIR/Model.js" <<< "$model"
 install_user_content "$DEST_DIR/manifest.json" <<< "$manifest"
 install_user_content "$SHELL_CONFIG" <<< "$config"
+
+}
+
+Os::modules::conf::power::install_sh::run "$@"

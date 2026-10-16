@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::modules::06_omarchy_migrations_sh::run() {
 set -euo pipefail
 
 [[ "${OS_RUN_MIGRATIONS:-0}" == 1 ]] || return 0
@@ -11,3 +13,7 @@ for _migration_home in /home/*; do
     fi
     omarchy_as "$_migration_user" migrate || err "restore.failed" "$_migration_user"
 done
+
+}
+
+Os::scripts::lib::modules::06_omarchy_migrations_sh::run "$@"

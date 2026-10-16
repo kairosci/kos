@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_root_recovery_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -76,3 +78,7 @@ assert_true "repeated desktop recovery preserves the first terminal backup" 'SET
 assert_true "desktop recovery installs the KMono ASCII logo for screensaver and About" 'cmp "$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt" "$RECOVERY_HOME/.config/os/branding/screensaver.txt" && cmp "$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt" "$RECOVERY_HOME/.config/os/branding/about.txt"'
 assert_true "desktop recovery installs the native Fastfetch layout with the KMono logo" 'cmp "$PROJECT_DIR/modules/conf/desktop/data/fastfetch/config.jsonc" "$RECOVERY_HOME/.config/fastfetch/config.jsonc" && grep -q "source.*os/branding/about.txt" "$RECOVERY_HOME/.config/fastfetch/config.jsonc" && grep -q "Hardware" "$RECOVERY_HOME/.config/fastfetch/config.jsonc" && grep -q "Software" "$RECOVERY_HOME/.config/fastfetch/config.jsonc"'
 test_summary
+
+}
+
+Os::tests::test_root_recovery_sh::run "$@"

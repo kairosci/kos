@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_iso_download_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,3 +56,7 @@ assert_true "download rejects an invalid checksum" "! (cd '$OUTPUT_DIR' && bash 
 assert_true "failed download preserves the existing image" "cmp '$WORK_DIR/assets/os-v1.4.iso' '$OUTPUT_DIR/os-v1.4.iso'"
 assert_true "failed download removes temporary staging directories" "[[ -z \$(find '$OUTPUT_DIR' -mindepth 1 -type d -print -quit) ]]"
 test_summary
+
+}
+
+Os::tests::test_iso_download_sh::run "$@"

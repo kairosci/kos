@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::clean::tests::test_lib_sh::run() {
+
 set -uo pipefail
 
 TESTS_RUN=0
@@ -76,3 +78,7 @@ test_summary() {
     fi
     return 0
 }
+
+}
+
+Os::modules::clean::tests::test_lib_sh::run "$@"

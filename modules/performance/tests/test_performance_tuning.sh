@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::performance::tests::test_performance_tuning_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -26,3 +28,7 @@ if [[ -f /etc/sysctl.d/99-perf.conf ]] && [[ -f /proc/sys/kernel/nmi_watchdog ]]
 fi
 
 test_summary
+
+}
+
+Os::modules::performance::tests::test_performance_tuning_sh::run "$@"

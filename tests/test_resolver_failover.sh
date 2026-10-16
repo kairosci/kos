@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_resolver_failover_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -177,3 +179,7 @@ assert_file_contains_literal "daemon uses native Omarchy DNS provider command" "
 assert_file_not_contains "daemon does not rewrite NetworkManager configuration directly" "$PROJECT_DIR/scripts/lib/resolver-failover.sh" '/etc/NetworkManager'
 
 test_summary
+
+}
+
+Os::tests::test_resolver_failover_sh::run "$@"

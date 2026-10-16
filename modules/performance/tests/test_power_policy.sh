@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::performance::tests::test_power_policy_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -58,3 +60,7 @@ if [[ -x "$BATTERY_HELPER" && -r /etc/os/power.conf ]]; then
 fi
 
 test_summary
+
+}
+
+Os::modules::performance::tests::test_power_policy_sh::run "$@"

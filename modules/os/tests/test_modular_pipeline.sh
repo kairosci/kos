@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::os::tests::test_modular_pipeline_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -30,3 +32,7 @@ for lang in en it fr de es pt; do
 done
 
 test_summary
+
+}
+
+Os::modules::os::tests::test_modular_pipeline_sh::run "$@"

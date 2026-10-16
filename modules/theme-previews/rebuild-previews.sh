@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::theme_previews::rebuild_previews_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -210,3 +212,7 @@ stop_capture_process "$ZED_PID"
 ZED_PID=""
 for theme in "${themes[@]}"; do theme_preview_normalize_file "$SCRIPT_DIR/$theme/preview.png"; done
 log "preview.done" "${#themes[@]}"
+
+}
+
+Os::modules::theme_previews::rebuild_previews_sh::run "$@"

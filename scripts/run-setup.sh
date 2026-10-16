@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::run_setup_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -14,3 +16,7 @@ log "__log_in_progress" "$LOG"
 log ""
 
 pkexec bash "$SCRIPT_DIR/setup.sh"
+
+}
+
+Os::scripts::run_setup_sh::run "$@"

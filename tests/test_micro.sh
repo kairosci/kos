@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_micro_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -28,3 +30,7 @@ ln -s "$SANDBOX/settings.json" "$XDG_CONFIG_HOME/micro/settings.json"
 assert_false "Micro installer rejects settings symlinks" "bash '$PROJECT_DIR/modules/conf/micro/install.sh'"
 
 test_summary
+
+}
+
+Os::tests::test_micro_sh::run "$@"

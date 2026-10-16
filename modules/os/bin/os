@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::os::bin::os::run() {
 set -euo pipefail
 
 OS_BIN_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -159,3 +161,7 @@ os_main() {
 }
 
 os_main "$@"
+
+}
+
+Os::modules::os::bin::os::run "$@"

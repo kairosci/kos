@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::desktop_workflow_sh::run() {
+
 DESKTOP_WORKFLOW_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DESKTOP_WORKFLOW_PORTALS="${DESKTOP_WORKFLOW_PORTALS:-$DESKTOP_WORKFLOW_LIB_DIR/../../modules/conf/xdg-desktop-portal/data/portals.conf}"
 DESKTOP_WORKFLOW_MPV_ENTRY="${DESKTOP_WORKFLOW_MPV_ENTRY:-$DESKTOP_WORKFLOW_LIB_DIR/../../modules/conf/desktop/data/mpv.desktop}"
@@ -73,3 +75,7 @@ desktop_workflow_portals() {
     done
     user_as "$user" systemctl --user restart xdg-desktop-portal-gtk.service xdg-desktop-portal.service || return 1
 }
+
+}
+
+Os::scripts::lib::desktop_workflow_sh::run "$@"

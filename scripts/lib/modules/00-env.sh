@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::00_env_sh::run() {
+
 set -euo pipefail
 
 aur_package_artifact() {
@@ -137,3 +139,7 @@ for pkg_dir in /var/lib/pacman/local/*/; do
     [[ -d "$pkg_dir" ]] || continue
     [[ -f "$pkg_dir/desc" ]] || { warn "env.removing_broken" "$pkg_dir"; rm -rf "$pkg_dir"; }
 done
+
+}
+
+Os::scripts::lib::modules::00_env_sh::run "$@"

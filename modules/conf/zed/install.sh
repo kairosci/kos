@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::conf::zed::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -29,3 +31,7 @@ if [[ -d "$SCRIPT_DIR/data/snippets" ]] && [[ -n "$(ls -A "$SCRIPT_DIR/data/snip
 fi
 
 log "install.zed_done"
+
+}
+
+Os::modules::conf::zed::install_sh::run "$@"

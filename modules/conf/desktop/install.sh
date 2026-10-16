@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::desktop::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -30,3 +32,7 @@ if [[ -n "$WALLPAPER_THEME" ]]; then
 fi
 rm -f "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/toggles/screensaver-off"
 log "gui.install_done" "desktop"
+
+}
+
+Os::modules::conf::desktop::install_sh::run "$@"

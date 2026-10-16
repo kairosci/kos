@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::i18n_boot_sh::run() {
+
 _os_i18n_stub() {
     t() { printf -- '%s' "$1"; }
     log() { printf '%s\n' "$1"; }
@@ -46,3 +48,7 @@ else
 fi
 
 unset -f _os_i18n_resolve _os_i18n_stub
+
+}
+
+Os::scripts::lib::i18n_boot_sh::run "$@"

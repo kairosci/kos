@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::resources::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -16,3 +18,7 @@ if [[ "$schema" == net.nokyan.Resources ]]; then
     apply_user_gsettings "$SCRIPT_DIR/data/legacy-settings.tsv"
 fi
 log "gui.install_done" "${SCRIPT_DIR##*/}"
+
+}
+
+Os::modules::conf::resources::install_sh::run "$@"

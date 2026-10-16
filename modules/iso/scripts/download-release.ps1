@@ -2,10 +2,12 @@ param(
     [string]$Tag
 )
 
+class IsoReleaseDownloader {
+    static [string] Run([string]$Tag) {
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-if ($PSVersionTable.PSVersion.Major -lt 6) {
+if ($global:PSVersionTable.PSVersion.Major -lt 6) {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 }
 
@@ -126,9 +128,14 @@ try {
 
     Move-Item -LiteralPath $assembledPath -Destination $isoPath
     Move-Item -LiteralPath $checksumPath -Destination $outputChecksumPath
-    Write-Output "Verified $isoName in $outputPath"
+    return "Verified $isoName in $outputPath"
 } finally {
     if (Test-Path -LiteralPath $workDirectory) {
         Remove-Item -LiteralPath $workDirectory -Recurse -Force
     }
 }
+
+    }
+}
+
+[IsoReleaseDownloader]::Run($Tag)

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::91_suspend_resume_sh::run() {
+
 set -euo pipefail
 
 log "power.suspend_resume"
@@ -51,3 +53,7 @@ NVIDIA_CONF
 fi
 
 systemctl daemon-reload 2>/dev/null || warn "power.daemon_reload_skipped"
+
+}
+
+Os::scripts::lib::modules::91_suspend_resume_sh::run "$@"

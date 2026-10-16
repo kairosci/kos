@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_update_hooks_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -150,3 +152,7 @@ install_hooks_with_dependencies() (
 assert_true "fresh hook installation stages all dependencies before invoking hooks" "install_hooks_with_dependencies"
 
 test_summary
+
+}
+
+Os::tests::test_update_hooks_sh::run "$@"

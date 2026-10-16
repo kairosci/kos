@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::_githooks::pre_push::run() {
 set -euo pipefail
 
 PROJECT_DIR="$(git rev-parse --show-toplevel)"
@@ -9,3 +11,7 @@ while read -r local_ref local_sha remote_ref remote_sha; do
         err "git.main_push_forbidden"
     fi
 done
+
+}
+
+Os::_githooks::pre_push::run "$@"

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::iso::scripts::customize_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -123,3 +125,7 @@ mv -f -- "$OUTPUT_TEMP.sha256" "$OUTPUT_PATH.sha256"
 OUTPUT_TEMP=""
 log "iso.output_ready" "$OUTPUT_PATH"
 log "iso.signature_note"
+
+}
+
+Os::modules::iso::scripts::customize_sh::run "$@"

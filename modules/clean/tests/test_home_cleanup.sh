@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::clean::tests::test_home_cleanup_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -31,3 +33,7 @@ assert_file_contains "verify checks debloated leftovers" "$PROJECT_DIR/scripts/v
 assert_file_contains "verify checks stale launchers" "$PROJECT_DIR/scripts/verify.sh" "webapp"
 
 test_summary
+
+}
+
+Os::modules::clean::tests::test_home_cleanup_sh::run "$@"

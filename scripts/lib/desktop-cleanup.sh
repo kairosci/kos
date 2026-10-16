@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::desktop_cleanup_sh::run() {
+
 OS_DESKTOP_APPS_DIR="${OS_DESKTOP_APPS_DIR:-/usr/share/omarchy/applications}"
 OS_HOMES_ROOT="${OS_HOMES_ROOT:-/home}"
 OS_SYSTEM_APPS_DIRS="${OS_SYSTEM_APPS_DIRS:-/usr/share/applications:/usr/local/share/applications}"
@@ -453,3 +455,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     fi
     desktop_cleanup_sweep
 fi
+
+}
+
+Os::scripts::lib::desktop_cleanup_sh::run "$@"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::responsiveness_sh::run() {
+
 responsiveness_user_systemctl() {
     local uid
     if [[ $EUID -eq 0 && -n ${TARGET_USER:-} ]]; then
@@ -61,3 +63,7 @@ responsiveness_runtime() {
     value=$(responsiveness_user_systemctl show session.slice -p ManagedOOMSwap --value) || return 1
     [[ "$value" == auto ]] || return 1
 }
+
+}
+
+Os::scripts::lib::responsiveness_sh::run "$@"

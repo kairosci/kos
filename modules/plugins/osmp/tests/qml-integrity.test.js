@@ -4,6 +4,9 @@ import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 
+class qml_integrity_test_js {
+static run() {
+
 describe("QML Components Integrity", () => {
   const srcDir = path.resolve(process.cwd(), "src");
   const qmlFiles = fs.readdirSync(srcDir).filter((f) => f.endsWith(".qml"));
@@ -43,6 +46,13 @@ describe("QML Components Integrity", () => {
       }
       assert.equal(openBraces, closeBraces, `Unbalanced braces in ${file}: { ${openBraces} vs } ${closeBraces}`);
       assert.ok(content.includes("import QtQuick"), `${file} should import QtQuick`);
+      for (const match of content.matchAll(/^import "([^"]+\.js)" as \w+/gm)) {
+        assert.ok(fs.existsSync(path.resolve(srcDir, match[1])), `${file} imports a missing script: ${match[1]}`);
+      }
     });
   }
 });
+
+}
+}
+qml_integrity_test_js.run();

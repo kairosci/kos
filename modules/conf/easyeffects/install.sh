@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::easyeffects::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -31,3 +33,7 @@ if [[ -S "${XDG_RUNTIME_DIR:-/nonexistent}/bus" ]]; then
     easyeffects_apply_preset
 fi
 log "gui.install_done" "EasyEffects"
+
+}
+
+Os::modules::conf::easyeffects::install_sh::run "$@"

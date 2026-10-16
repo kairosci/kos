@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::conf::herdr::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -30,3 +32,7 @@ else
 fi
 
 log "install.herdr_done"
+
+}
+
+Os::modules::conf::herdr::install_sh::run "$@"

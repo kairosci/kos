@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::60_auth_sh::run() {
+
 set -euo pipefail
 
 log "auth.pam"
@@ -42,3 +44,7 @@ cat > /etc/security/access.conf << 'ACCESS'
 -:ALL:ALL
 ACCESS
 chmod 644 /etc/security/access.conf
+
+}
+
+Os::scripts::lib::modules::60_auth_sh::run "$@"

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::micro::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -24,3 +26,7 @@ if [[ -f "$MICRO_SETTINGS" ]]; then
     install_user_content "$MICRO_SETTINGS" 600 < "$staged" || err "defaults.app_failed" "micro settings"
 fi
 log "gui.install_done" "micro"
+
+}
+
+Os::modules::conf::micro::install_sh::run "$@"

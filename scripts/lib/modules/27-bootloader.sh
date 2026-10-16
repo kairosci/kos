@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::27_bootloader_sh::run() {
+
 set -euo pipefail
 
 log "bootloader.install"
@@ -35,3 +37,7 @@ set -euo pipefail
 grub-mkconfig -o /boot/grub/grub.cfg
 HOOK
 chmod 755 /etc/boot/hooks/post.d/85-os-grub-config
+
+}
+
+Os::scripts::lib::modules::27_bootloader_sh::run "$@"

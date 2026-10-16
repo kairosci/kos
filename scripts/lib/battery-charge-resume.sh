@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::scripts::lib::battery_charge_resume_sh::run() {
 set -euo pipefail
 
 [[ "${1:-}" == post ]] || exit 0
@@ -8,3 +10,7 @@ if battery_driver_needs_recovery; then
     battery_driver_recover
 fi
 /usr/local/libexec/os-set-battery-charge-limit
+
+}
+
+Os::scripts::lib::battery_charge_resume_sh::run "$@"

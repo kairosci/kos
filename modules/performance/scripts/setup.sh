@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::performance::scripts::setup_sh::run() {
+
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$(dirname "$(dirname "$PROJECT_DIR")")"
@@ -34,3 +36,7 @@ for mod in "${MODULE_FILES[@]}"; do
 done
 
 log "Performance tuning complete. Reboot required."
+
+}
+
+Os::modules::performance::scripts::setup_sh::run "$@"

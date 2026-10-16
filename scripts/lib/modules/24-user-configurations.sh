@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::modules::24_user_configurations_sh::run() {
 set -euo pipefail
 
 for user_home in /home/*; do
@@ -9,3 +11,7 @@ for user_home in /home/*; do
         user_as "$_user" bash "$_installer" || err "defaults.app_failed" "$(basename "$(dirname "$_installer")")"
     done
 done
+
+}
+
+Os::scripts::lib::modules::24_user_configurations_sh::run "$@"

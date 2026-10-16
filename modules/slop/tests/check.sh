@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::slop::tests::check_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -35,3 +37,7 @@ if "$PROJECT_DIR/scripts/debloat-slop.sh" 2>/dev/null | grep -q "opt-in"; then o
 
 printf '%s\n' "Tests Executed: $((PASS + FAIL)) | Passed: $PASS | Failed: $FAIL"
 [[ $FAIL -eq 0 ]]
+
+}
+
+Os::modules::slop::tests::check_sh::run "$@"

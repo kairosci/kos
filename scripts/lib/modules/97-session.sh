@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::modules::97_session_sh::run() {
 set -euo pipefail
 
 _SESSION_MODULE="$PROJECT_DIR/modules/conf/session"
@@ -112,3 +114,7 @@ for user_home in /home/*; do
         [[ "$_session_default" == ok ]] || err "session.validation_failed" "Quickshell default"
     fi
 done
+
+}
+
+Os::scripts::lib::modules::97_session_sh::run "$@"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::23_fontconfig_sh::run() {
+
 set -euo pipefail
 
 OS_FONTCONFIG_SOURCE="$PROJECT_DIR/conf/fontconfig/data/99-os-reject-woff2.conf"
@@ -20,3 +22,7 @@ for OS_FONTCONFIG_FAMILY in sans-serif "Noto Sans" "JetBrains Mono"; do
     OS_FONTCONFIG_MATCH=$(fc-match -f '%{file}' "$OS_FONTCONFIG_FAMILY") || err "fontconfig.match_failed" "$OS_FONTCONFIG_FAMILY"
     [[ "$OS_FONTCONFIG_MATCH" != /usr/share/fonts/WOFF2/* ]] || err "fontconfig.match_failed" "$OS_FONTCONFIG_FAMILY"
 done
+
+}
+
+Os::scripts::lib::modules::23_fontconfig_sh::run "$@"

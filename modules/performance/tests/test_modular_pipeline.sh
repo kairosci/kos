@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::performance::tests::test_modular_pipeline_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -30,3 +32,7 @@ assert_file_contains "20-performance defines perf sysctl" "$MODULES_DIR/20-perfo
 assert_file_contains "setup.sh checks EUID root requirement" "$PROJECT_DIR/scripts/setup.sh" "EUID -eq 0"
 
 test_summary
+
+}
+
+Os::modules::performance::tests::test_modular_pipeline_sh::run "$@"

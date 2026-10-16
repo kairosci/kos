@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::theme_previews::apply_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -64,3 +66,7 @@ done
 
 rm -rf "$TARGET_HOME/.cache/omarchy/theme-selector"
 printf '%s\n' "preview applied"
+
+}
+
+Os::modules::theme_previews::apply_sh::run "$@"

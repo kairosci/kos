@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::tests::test_i18n_locale_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -294,3 +296,7 @@ assert_true "migration leaves exactly one managed block" \
 rm -rf "$HOMES_TMP"
 
 test_summary
+
+}
+
+Os::tests::test_i18n_locale_sh::run "$@"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::battery_driver_sh::run() {
+
 battery_driver_needs_recovery() {
     local battery
     for battery in "${OS_POWER_SUPPLY_ROOT:-/sys/class/power_supply}"/*; do
@@ -17,3 +19,7 @@ battery_driver_needs_recovery() {
 battery_driver_recover() {
     modprobe -r samsung_galaxybook && modprobe samsung_galaxybook
 }
+
+}
+
+Os::scripts::lib::battery_driver_sh::run "$@"

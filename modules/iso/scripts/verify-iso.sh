@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::iso::scripts::verify_iso_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -65,3 +67,7 @@ if ! diff -qr -x .gitkeep "$WORK_DIR/materialized" "$WORK_DIR/image/os" >"$WORK_
 fi
 
 log "iso.verify_ok" "$ISO_PATH"
+
+}
+
+Os::modules::iso::scripts::verify_iso_sh::run "$@"

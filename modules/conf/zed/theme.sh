@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::zed::theme_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -61,3 +63,7 @@ for retired_theme in "$CONFIG/themes/os.json" "$CONFIG"/themes/os-*.json; do
         rm -f -- "$retired_theme"
     fi
 done
+
+}
+
+Os::modules::conf::zed::theme_sh::run "$@"

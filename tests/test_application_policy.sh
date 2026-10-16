@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_application_policy_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -65,3 +67,7 @@ assert_false "failed backups stop configuration replacement" "printf 'new\n' | i
 assert_file_contains_literal "failed backups preserve existing settings" "$SANDBOX/blocked-config" 'old'
 
 test_summary
+
+}
+
+Os::tests::test_application_policy_sh::run "$@"

@@ -1,5 +1,6 @@
 .pragma library
 
+function MediaModelClass() {
 function hasMetadata(player) {
   if (!player || player.playbackState === 0) return false
   return !!(player.isPlaying || player.trackTitle || normalizeArtist(player.trackArtist))
@@ -276,3 +277,23 @@ function extractUpcomingTracks(trackList, currentTrackId, currentTitle) {
 
   return []
 }
+
+  this.hasMetadata = hasMetadata
+  this.hasTrackMetadata = hasTrackMetadata
+  this.keyFor = keyFor
+  this.playerDisplayName = playerDisplayName
+  this.selectActivePlayer = selectActivePlayer
+  this.filterSourcePlayers = filterSourcePlayers
+  this.cleanTitle = cleanTitle
+  this.formatTitle = formatTitle
+  this.normalizeArtist = normalizeArtist
+  this.trackIdentity = trackIdentity
+  this.formatTime = formatTime
+  this.updateTrackHistory = updateTrackHistory
+  this.unwrapBusctlValue = unwrapBusctlValue
+  this.parseBusctlTracksMetadata = parseBusctlTracksMetadata
+  this.parseNativeTrackList = parseNativeTrackList
+  this.extractUpcomingTracks = extractUpcomingTracks
+}
+
+var MediaModel = new MediaModelClass()

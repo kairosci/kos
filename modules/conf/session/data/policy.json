@@ -7,7 +7,7 @@
   "clockWidget": {
     "id": "os.clockwidget",
     "enabled": true,
-    "anchor": "bottom-right",
+    "anchor": "top-right",
     "format": "HH:mm"
   },
   "panels": [],

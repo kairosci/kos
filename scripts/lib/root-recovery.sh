@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::root_recovery_sh::run() {
+
 root_recovery_snapshot_id() {
     local cmdline
     cmdline=$(cat "${OS_BOOT_CMDLINE:-/proc/cmdline}") || return 1
@@ -76,3 +78,7 @@ root_recovery_restore() {
     snapper -c root rollback || return 1
     log "recovery.reboot"
 }
+
+}
+
+Os::scripts::lib::root_recovery_sh::run "$@"

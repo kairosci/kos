@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::tests::test_syntax_integrity_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -77,3 +79,7 @@ assert_file_contains "pre-refresh persist hook uses strict mode" "$PROJECT_DIR/h
 assert_file_contains "post-update persist hook uses strict mode" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "set -euo pipefail"
 
 test_summary
+
+}
+
+Os::tests::test_syntax_integrity_sh::run "$@"

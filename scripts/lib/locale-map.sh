@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::locale_map_sh::run() {
+
 detect_system_timezone() {
     local tz="${OS_FORCE_TZ:-}"
 
@@ -146,3 +148,7 @@ resolve_target_xkb() {
     esac
 }
 
+
+}
+
+Os::scripts::lib::locale_map_sh::run "$@"

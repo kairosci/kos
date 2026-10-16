@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::obscure::tests::test_idle_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -19,3 +21,7 @@ assert_false "idle module ships no custom locker" "grep -q 'hyprlock\|swaylock' 
 assert_file_contains "verify checks idle allowed" "$PROJECT_DIR/scripts/verify.sh" "stay-awake"
 
 test_summary
+
+}
+
+Os::modules::obscure::tests::test_idle_sh::run "$@"

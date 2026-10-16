@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::theme_policy_sh::run() {
+
 THEME_POLICY_FILE="${THEME_POLICY_FILE:-/usr/local/lib/os/excluded-themes.list}"
 THEME_POLICY_ARCHIVE="${THEME_POLICY_ARCHIVE:-/var/lib/os/retired-themes}"
 
@@ -29,3 +31,7 @@ theme_policy_apply() {
         theme_policy_prune "$home/.config/os/themes" "$THEME_POLICY_ARCHIVE/users/${home##*/}" || return 1
     done
 }
+
+}
+
+Os::scripts::lib::theme_policy_sh::run "$@"

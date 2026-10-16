@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::90_hardware_power_sh::run() {
+
 set -euo pipefail
 
 log "power.usb_storage"
@@ -91,3 +93,7 @@ systemctl daemon-reexec 2>/dev/null || warn "power.daemon_reexec_skipped"
 
 log "power.networkmanager"
 rm -f /etc/NetworkManager/conf.d/security.conf
+
+}
+
+Os::scripts::lib::modules::90_hardware_power_sh::run "$@"

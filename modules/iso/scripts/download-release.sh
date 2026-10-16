@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::iso::scripts::download_release_sh::run() {
 set -euo pipefail
 
 REPOSITORY="${GITHUB_REPOSITORY:-kairosci/os}"
@@ -52,3 +54,7 @@ curl -fL --retry 3 --progress-bar --show-error "$CHECKSUM_URL" --output "$WORK_D
 (cd "$WORK_DIR" && sha256sum -c "$CHECKSUM_NAME")
 mv -f -- "$WORK_DIR/$ISO_NAME" "$OUTPUT_DIR/$ISO_NAME"
 mv -f -- "$WORK_DIR/$CHECKSUM_NAME" "$OUTPUT_DIR/$CHECKSUM_NAME"
+
+}
+
+Os::modules::iso::scripts::download_release_sh::run "$@"

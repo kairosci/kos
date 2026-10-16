@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::clean::scripts::run_setup_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -9,3 +11,7 @@ printf '%s\n' "Log: $LOG"
 printf '\n'
 
 sudo bash "$SCRIPT_DIR/setup.sh"
+
+}
+
+Os::modules::clean::scripts::run_setup_sh::run "$@"

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::agents::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -24,3 +26,7 @@ jq '
 ' "$config" > "$staged" || err "defaults.app_failed" "agents"
 install_user_content "$config" 600 < "$staged"
 log "gui.install_done" "agents"
+
+}
+
+Os::modules::conf::agents::install_sh::run "$@"

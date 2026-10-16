@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::clean::tests::test_system_cleanup_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -23,3 +25,7 @@ assert_file_contains "verify checks orphans" "$PROJECT_DIR/scripts/verify.sh" "p
 assert_file_contains "verify checks journal size" "$PROJECT_DIR/scripts/verify.sh" "journalctl --disk-usage"
 
 test_summary
+
+}
+
+Os::modules::clean::tests::test_system_cleanup_sh::run "$@"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::userconf_sh::run() {
+
 install_user_file() {
     local src="$1" dest="$2" mode="${3:-644}"
     [[ -f "$src" ]] || return 1
@@ -222,3 +224,7 @@ install_shell_block() {
     fi
     rm -f "$staged"
 }
+
+}
+
+Os::scripts::lib::userconf_sh::run "$@"

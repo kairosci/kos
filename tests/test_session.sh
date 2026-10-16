@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_session_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -163,3 +165,7 @@ ClockWidget::new test_clock "$PROJECT_DIR/modules/conf/session" "$WORK_DIR/clock
 assert_true "clock staging produces a service plugin from separate policy and manifest data" "ClockWidget::stage test_clock && jq -e '.id == \"os.clockwidget\" and .kinds == [\"service\"] and .entryPoints.service == \"ClockWidget.qml\"' '$WORK_DIR/clock/plugins/os.clockwidget/manifest.json' && cmp '$PROJECT_DIR/modules/conf/session/qml/ClockWidget.qml' '$WORK_DIR/clock/plugins/os.clockwidget/ClockWidget.qml'"
 assert_true "disabling the clock removes its plugin without creating a bar" "jq '.clockWidget.enabled = false' '$PROJECT_DIR/modules/conf/session/data/policy.json' > '$WORK_DIR/disabled-policy.json' && jq --slurpfile policy '$WORK_DIR/disabled-policy.json' --slurpfile defaults '$PROJECT_DIR/modules/conf/session/data/shell.json' -f '$PROJECT_DIR/modules/conf/session/scripts/shell.jq' '$WORK_DIR/shell-new.json' | jq -e '([.plugins[] | if type == \"string\" then . else .id end] | index(\"os.clockwidget\") == null) and ([.bar.layout[][]] | length == 0)'"
 test_summary
+
+}
+
+Os::tests::test_session_sh::run "$@"

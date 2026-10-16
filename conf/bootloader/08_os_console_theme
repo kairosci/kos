@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
+
+Os::conf::bootloader::08_os_console_theme::run() {
 set -euo pipefail
 cat <<'GRUB'
 set menu_color_normal='white/black'
 set menu_color_highlight='black/cyan'
 GRUB
+
+}
+
+Os::conf::bootloader::08_os_console_theme::run "$@"

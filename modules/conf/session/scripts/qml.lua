@@ -1,3 +1,5 @@
+local Os_modules_conf_session_scripts_qml_lua = {}
+function Os_modules_conf_session_scripts_qml_lua.run()
 local M = {}
 function M.tokens(source)
   local out, i, previous = {}, 1, nil
@@ -107,3 +109,6 @@ function M.localize(source)
   return source
 end
 return M
+
+end
+return Os_modules_conf_session_scripts_qml_lua.run()

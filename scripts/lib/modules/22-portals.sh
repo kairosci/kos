@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::22_portals_sh::run() {
+
 set -euo pipefail
 
 log "portals.install"
@@ -12,3 +14,7 @@ for user_home in /home/*; do
     _user=$(basename "$user_home")
     desktop_workflow_portals "$_user" "$user_home" || err "portals.configure_failed" "$_user"
 done
+
+}
+
+Os::scripts::lib::modules::22_portals_sh::run "$@"

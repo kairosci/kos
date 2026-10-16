@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::hooks::theme_set_d::wallpaper::run() {
 set -euo pipefail
 THEME="${1:-}"
 if [[ -z "$THEME" ]]; then
@@ -27,3 +29,7 @@ if [[ ! -f "$OUT" || "$LOGO" -nt "$OUT" || "$COLORS" -nt "$OUT" ]]; then
     magick -size "${WIDTH}x${HEIGHT}" "canvas:$BG" \( "$LOGO" -resize "${SIDE}x${SIDE}" \) -gravity center -composite "$OUT"
 fi
 ln -nsf "$OUT" "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current/background"
+
+}
+
+Os::hooks::theme_set_d::wallpaper::run "$@"

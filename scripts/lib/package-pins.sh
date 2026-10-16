@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::package_pins_sh::run() {
+
 package_pins_existing() {
     awk '
         /^[[:space:]]*IgnorePkg[[:space:]]*=/ {
@@ -25,3 +27,7 @@ package_pins_retained_updateable() {
     done <<< "$pins"
     return 0
 }
+
+}
+
+Os::scripts::lib::package_pins_sh::run "$@"

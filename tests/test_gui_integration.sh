@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_gui_integration_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -93,3 +95,7 @@ assert_false "Agents installer rejects malformed configuration" "bash '$PROJECT_
 assert_file_contains_literal "Agents failure preserves the original configuration" "$XDG_CONFIG_HOME/omarchy/shell.json" '{invalid'
 
 test_summary
+
+}
+
+Os::tests::test_gui_integration_sh::run "$@"

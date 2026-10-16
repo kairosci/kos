@@ -1,3 +1,5 @@
+local Os_tests_nvim_ease_lua = {}
+function Os_tests_nvim_ease_lua.run()
 local selected, action, command, help
 vim = {
   opt = {},
@@ -47,3 +49,6 @@ assert(action == nil)
 keys["<F1>"]()
 assert(help.enter and help.wo.wrap and help.keys.q == "close" and help.keys["<Esc>"] == "close")
 assert(help.text:find(":Settings", 1, true))
+
+end
+return Os_tests_nvim_ease_lua.run()

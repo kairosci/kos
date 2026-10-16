@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::tests::test_firewall_network_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -54,3 +56,7 @@ if [[ -r "/etc/systemd/system/sshd.service.d/hardened.conf" ]]; then
 fi
 
 test_summary
+
+}
+
+Os::tests::test_firewall_network_sh::run "$@"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::grub_configure_sh::run() {
+
 set -euo pipefail
 
 [[ $EUID -eq 0 ]] || { printf '%s\n' 'GRUB configuration requires root.' >&2; exit 1; }
@@ -20,3 +22,7 @@ fi
 cat -- "$managed" >> "$temporary"
 chmod 644 "$temporary"
 mv -f -- "$temporary" "$grub_cfg"
+
+}
+
+Os::scripts::lib::grub_configure_sh::run "$@"

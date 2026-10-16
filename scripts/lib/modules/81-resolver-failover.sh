@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::modules::81_resolver_failover_sh::run() {
 set -euo pipefail
 
 log "services.resolver_failover"
@@ -9,3 +11,7 @@ install -D -m 0644 "$PROJECT_DIR/conf/network/data/os-resolver-failover.service"
 systemctl daemon-reload || err "services.resolver_failover_failed"
 systemctl enable --now os-resolver-failover.service || err "services.resolver_failover_failed"
 systemctl try-restart os-resolver-failover.service || err "services.resolver_failover_failed"
+
+}
+
+Os::scripts::lib::modules::81_resolver_failover_sh::run "$@"

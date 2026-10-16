@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::target_user_sh::run() {
+
 target_user_resolve() {
     local candidate=""
 
@@ -40,3 +42,7 @@ target_uid_resolve() {
     fi
     printf '%s\n' "$uid"
 }
+
+}
+
+Os::scripts::lib::target_user_sh::run "$@"

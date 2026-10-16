@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::slop::scripts::lib::modules::40_slop_sh::run() {
 set -euo pipefail
 
 if [[ "${OS_SLOP_DEBLOAT:-0}" != "1" ]]; then
@@ -59,3 +61,7 @@ for pattern in "${AI_LAUNCHERS[@]}"; do
 done
 
 log "AI debloat complete (opt-in)"
+
+}
+
+Os::modules::slop::scripts::lib::modules::40_slop_sh::run "$@"

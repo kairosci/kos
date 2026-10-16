@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::setup_sh::run() {
+
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$PROJECT_DIR"
@@ -190,3 +192,7 @@ if [[ "${OS_RESET_SNAPSHOTS:-0}" == 1 ]]; then
 fi
 
 log "__complete"
+
+}
+
+Os::scripts::setup_sh::run "$@"

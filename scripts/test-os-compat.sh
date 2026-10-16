@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::test_os_compat_sh::run() {
+
 set -uo pipefail
 
 RED='\033[0;31m'
@@ -128,3 +130,7 @@ printf '\n'
 printf '%s\n' "$(t verify.tests_executed "$((PASS + FAIL + WARN))")"
 printf '%b\n' "${BOLD}Passed: $PASS  Failed: $FAIL  Warnings: $WARN${NC}"
 [[ $FAIL -eq 0 ]] || exit 1
+
+}
+
+Os::scripts::test_os_compat_sh::run "$@"

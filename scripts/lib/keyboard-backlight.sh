@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::keyboard_backlight_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -50,3 +52,7 @@ for led in "${OS_KEYBOARD_LEDS_ROOT:-/sys/class/leds}"/*kbd_backlight*; do
     fi
 done
 [[ $found -eq 1 ]] || log "power.keyboard_unsupported"
+
+}
+
+Os::scripts::lib::keyboard_backlight_sh::run "$@"

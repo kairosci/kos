@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::modules::obscure::tests::test_auth_helpers_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -113,3 +115,7 @@ assert_true "wrong system password is rejected" "auth_roundtrip"
 assert_true "system password roundtrip opens gated pdf" "auth_roundtrip_pdf"
 
 test_summary
+
+}
+
+Os::modules::obscure::tests::test_auth_helpers_sh::run "$@"

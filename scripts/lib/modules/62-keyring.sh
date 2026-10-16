@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::modules::62_keyring_sh::run() {
 set -euo pipefail
 
 KEYRING_BACKEND=gnome-keyring
@@ -63,3 +65,7 @@ fi
 install -d -m 755 /etc/os
 printf '%s\n' "$KEYRING_BACKEND" > /etc/os/keyring-backend
 chmod 644 /etc/os/keyring-backend
+
+}
+
+Os::scripts::lib::modules::62_keyring_sh::run "$@"

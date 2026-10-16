@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::85_security_stack_sh::run() {
+
 set -euo pipefail
 
 log "security.install"
@@ -267,3 +269,7 @@ WGET
     aa-enforce /usr/bin/curl 2>/dev/null || warn "security.aa_curl"
     aa-enforce /usr/bin/wget 2>/dev/null || warn "security.aa_wget"
 fi
+
+}
+
+Os::scripts::lib::modules::85_security_stack_sh::run "$@"

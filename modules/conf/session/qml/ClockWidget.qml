@@ -21,8 +21,8 @@ Item {
       required property var modelData
       screen: modelData
       WlrLayershell.namespace: "os-clock"
-      anchors { bottom: true; right: true }
-      margins { bottom: Style.gapsOut; right: Style.gapsOut }
+      anchors { top: root.settings && root.settings.anchor === "top-right"; right: true }
+      margins { top: Style.gapsOut; right: Style.gapsOut }
       implicitWidth: label.implicitWidth + Style.space(24)
       implicitHeight: label.implicitHeight + Style.space(16)
       exclusiveZone: 0

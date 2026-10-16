@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::scripts::lib::modules::92_responsiveness_sh::run() {
 set -euo pipefail
 
 log "performance.install"
@@ -36,3 +38,7 @@ for _home in /home/*; do
     fi
 done
 unset _performance_data _oomd_changed _slice _home _user _uid
+
+}
+
+Os::scripts::lib::modules::92_responsiveness_sh::run "$@"

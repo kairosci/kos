@@ -1,3 +1,5 @@
+local Os_modules_conf_session_scripts_clean_lua = {}
+function Os_modules_conf_session_scripts_clean_lua.run()
 local input = assert(io.open(assert(arg[1]), "r"))
 local source = input:read("*a")
 input:close()
@@ -122,3 +124,6 @@ if arg[3] and arg[3] ~= "" then
   state:close()
 end
 io.write(source)
+
+end
+return Os_modules_conf_session_scripts_clean_lua.run()

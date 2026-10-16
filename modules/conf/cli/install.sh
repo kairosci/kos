@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::conf::cli::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -30,3 +32,7 @@ SHELLBLOCK
 
 log "install.cli_done"
 log "install.cli_hint"
+
+}
+
+Os::modules::conf::cli::install_sh::run "$@"

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::tests::test_idempotency_safety_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -159,3 +161,7 @@ check_no_hardcoded_user_paths() {
 assert_true "No hardcoded specific user home paths in scripts" "check_no_hardcoded_user_paths"
 
 test_summary
+
+}
+
+Os::tests::test_idempotency_safety_sh::run "$@"

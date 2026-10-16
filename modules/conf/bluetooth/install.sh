@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::bluetooth::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -31,3 +33,7 @@ install_user_content "$DEST_DIR/Panel.qml" <<< "$panel"
 install_user_file "$SOURCE_DIR/Model.js" "$DEST_DIR/Model.js"
 install_user_content "$DEST_DIR/manifest.json" <<< "$manifest"
 install_user_content "$SHELL_CONFIG" <<< "$config"
+
+}
+
+Os::modules::conf::bluetooth::install_sh::run "$@"

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::osmp::install_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -18,3 +20,7 @@ for file in "$SOURCE"/src/* "$SOURCE/manifest.json" "$SOURCE/LICENSE"; do
     install_user_file "$file" "$TARGET/$relative"
 done
 log "gui.install_done" "osmp"
+
+}
+
+Os::modules::conf::osmp::install_sh::run "$@"

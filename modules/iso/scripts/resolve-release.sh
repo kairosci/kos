@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::iso::scripts::resolve_release_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
@@ -19,3 +21,7 @@ verify_tag "$TAG" || err iso.verify_ref_invalid "$TAG"
 RELEASES=$(gh api --paginate "repos/$REPOSITORY/releases?per_page=100" | jq -s 'add // []')
 jq -e --arg tag "$TAG" 'all(.[]; .tag_name != $tag)' <<< "$RELEASES" > /dev/null || err iso.release_exists "$TAG"
 printf 'tag=%s\nbuild_sha=%s\niso_name=os-%s.iso\n' "$TAG" "$BUILD_SHA" "$TAG"
+
+}
+
+Os::modules::iso::scripts::resolve_release_sh::run "$@"

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_easyeffects_sh::run() {
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -78,3 +80,7 @@ rm "$MOCK_EASYEFFECTS_LOADED"
 assert_true "subsequent explicit personal preset is retained" "MOCK_PREVIOUS_PRESET=Personal easyeffects_apply_preset"
 assert_file_not_contains "personal preset prevents reloading the managed preset" "$MOCK_EASYEFFECTS_COMMANDS" '--load-preset'
 test_summary
+
+}
+
+Os::tests::test_easyeffects_sh::run "$@"

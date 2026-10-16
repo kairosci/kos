@@ -1,4 +1,6 @@
 #!/bin/bash
+
+Os::modules::performance::scripts::lib::modules::20_performance_sh::run() {
 set -euo pipefail
 
 log "Enabling periodic SSD trim"
@@ -15,3 +17,7 @@ log "Enabling power-profiles-daemon"
 if pacman -Q power-profiles-daemon &>/dev/null; then
     systemctl enable power-profiles-daemon.service 2>/dev/null || warn "power-profiles-daemon enable skipped"
 fi
+
+}
+
+Os::modules::performance::scripts::lib::modules::20_performance_sh::run "$@"

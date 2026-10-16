@@ -1,7 +1,7 @@
 import QtQuick
 import qs.Commons
 import qs.Ui
-import "MediaModel.js" as MediaModel
+import "MediaModel.js" as MediaLibrary
 
 PopupCard {
   id: root
@@ -27,7 +27,7 @@ PopupCard {
   readonly property bool canRaise: activePlayer ? (activePlayer.canRaise === true) : false
   readonly property bool shuffleSupported: activePlayer ? activePlayer.shuffleSupported : false
   readonly property bool loopSupported: activePlayer ? activePlayer.loopSupported : false
-  readonly property string appName: MediaModel.playerDisplayName(activePlayer)
+  readonly property string appName: MediaLibrary.MediaModel.playerDisplayName(activePlayer)
 
   property string activeTab: "queue"
 
@@ -372,7 +372,7 @@ PopupCard {
 
               Text {
                 textFormat: Text.PlainText
-                text: queueRow.item && queueRow.item.length > 0 ? MediaModel.formatTime(queueRow.item.length) : ""
+                text: queueRow.item && queueRow.item.length > 0 ? MediaLibrary.MediaModel.formatTime(queueRow.item.length) : ""
                 color: Util.alpha(root.bar ? root.bar.foreground : Color.foreground, 0.65)
                 font.family: root.bar ? root.bar.fontFamily : Style.font.family
                 font.pixelSize: Style.font.caption
@@ -413,9 +413,9 @@ PopupCard {
 
             readonly property var player: modelData
             readonly property bool selected: root.activePlayer && player
-              && MediaModel.keyFor(root.activePlayer) === MediaModel.keyFor(player)
-            readonly property string sourceTitle: player ? (MediaModel.cleanTitle(player.trackTitle) || player.identity || player.desktopEntry || "Media source") : "Media source"
-            readonly property string sourceDetail: player && player.trackArtist ? MediaModel.normalizeArtist(player.trackArtist) : (player && player.identity ? player.identity : "")
+              && MediaLibrary.MediaModel.keyFor(root.activePlayer) === MediaLibrary.MediaModel.keyFor(player)
+            readonly property string sourceTitle: player ? (MediaLibrary.MediaModel.cleanTitle(player.trackTitle) || player.identity || player.desktopEntry || "Media source") : "Media source"
+            readonly property string sourceDetail: player && player.trackArtist ? MediaLibrary.MediaModel.normalizeArtist(player.trackArtist) : (player && player.identity ? player.identity : "")
 
             width: sourceList.width
             height: sourceInner.implicitHeight + Style.space(8)
@@ -480,7 +480,7 @@ PopupCard {
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-              onClicked: if (root.playerWidget) root.playerWidget.selectPlayer(MediaModel.keyFor(sourceRow.player))
+              onClicked: if (root.playerWidget) root.playerWidget.selectPlayer(MediaLibrary.MediaModel.keyFor(sourceRow.player))
             }
           }
         }

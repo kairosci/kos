@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::tests::test_keyboard_backlight_sh::run() {
 set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -161,3 +163,7 @@ assert_false "full setup rejects a missing native Omarchy package" "SETUP_NATIVE
 assert_true "missing native runtime stops before package provisioning" "[[ \"\$(cat '$SETUP_TRACE')\" == target ]]"
 
 test_summary
+
+}
+
+Os::tests::test_keyboard_backlight_sh::run "$@"

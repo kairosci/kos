@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::easyeffects::apply_sh::run() {
 set -euo pipefail
 
 easyeffects_apply_preset() {
@@ -15,3 +17,7 @@ easyeffects_apply_preset() {
         err "defaults.app_failed" "$PRESET"
     fi
 }
+
+}
+
+Os::modules::conf::easyeffects::apply_sh::run "$@"

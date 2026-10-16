@@ -1,3 +1,5 @@
+local Os_modules_conf_nvim_data_os_ease_lua = {}
+function Os_modules_conf_nvim_data_os_ease_lua.run()
 return {
   {
     "LazyVim/LazyVim",
@@ -48,3 +50,6 @@ return {
     end,
   },
 }
+
+end
+return Os_modules_conf_nvim_data_os_ease_lua.run()

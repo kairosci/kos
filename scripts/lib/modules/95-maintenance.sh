@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::95_maintenance_sh::run() {
+
 set -euo pipefail
 
 log "maint.pacman_security"
@@ -85,3 +87,7 @@ if command -v paccache >/dev/null; then
 else
     warn "maint.cache_skipped"
 fi
+
+}
+
+Os::scripts::lib::modules::95_maintenance_sh::run "$@"

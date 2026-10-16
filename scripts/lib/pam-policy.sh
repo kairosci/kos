@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::pam_policy_sh::run() {
+
 pam_policy_reconcile() {
     local target="$1" staged
     staged=$(mktemp "${target}.XXXXXX")
@@ -48,3 +50,7 @@ pam_policy_reconcile() {
     rm -f "$staged"
     return 1
 }
+
+}
+
+Os::scripts::lib::pam_policy_sh::run "$@"

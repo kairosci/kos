@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::snapshot_baseline_sh::run() {
+
 snapshot_baseline_inventory() {
     local config="$1" rows number default active extra
     rows=$(LC_ALL=C snapper --csvout --no-headers -c "$config" list --columns number,default,active) || return 1
@@ -81,3 +83,7 @@ snapshot_baseline_reset() {
     done
     grub-mkconfig -o /boot/grub/grub.cfg || return 1
 }
+
+}
+
+Os::scripts::lib::snapshot_baseline_sh::run "$@"

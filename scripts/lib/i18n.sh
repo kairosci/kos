@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::i18n_sh::run() {
+
 I18N_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 I18N_DIR="${OS_I18N_DIR:-$I18N_LIB_DIR/messages}"
 I18N_SUPPORTED=(en it fr de es pt)
@@ -146,3 +148,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             ;;
     esac
 fi
+
+}
+
+Os::scripts::lib::i18n_sh::run "$@"

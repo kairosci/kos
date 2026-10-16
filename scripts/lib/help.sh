@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::help_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,3 +33,7 @@ row iso "make.iso"
 printf '\n'
 log "locale.supported" "${I18N_SUPPORTED[*]}"
 log "locale.language_active" "$I18N_LANG"
+
+}
+
+Os::scripts::lib::help_sh::run "$@"

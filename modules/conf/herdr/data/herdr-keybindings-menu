@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+Os::modules::conf::herdr::data::herdr_keybindings_menu::run() {
 set -euo pipefail
 
 print_only=false
@@ -489,3 +491,7 @@ main() {
 if [[ "${BASH_SOURCE[0]:-}" == "$0" ]]; then
     main "$@"
 fi
+
+}
+
+Os::modules::conf::herdr::data::herdr_keybindings_menu::run "$@"

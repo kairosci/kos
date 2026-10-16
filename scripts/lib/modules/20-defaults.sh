@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::20_defaults_sh::run() {
+
 set -euo pipefail
 
 log "defaults.browser_install"
@@ -195,3 +197,7 @@ if [[ -f "$PROJECT_DIR/scripts/lib/desktop-cleanup.sh" ]]; then
     source "$PROJECT_DIR/scripts/lib/desktop-cleanup.sh"
     desktop_cleanup_sweep || warn "desktop.refresh_skipped"
 fi
+
+}
+
+Os::scripts::lib::modules::20_defaults_sh::run "$@"

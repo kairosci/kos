@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::tests::test_desktop_defaults_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -224,3 +226,7 @@ if [[ -f /etc/xdg/xdg-desktop-portal/portals.conf ]]; then
 fi
 
 test_summary
+
+}
+
+Os::tests::test_desktop_defaults_sh::run "$@"

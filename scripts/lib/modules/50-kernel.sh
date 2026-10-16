@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+Os::scripts::lib::modules::50_kernel_sh::run() {
+
 set -euo pipefail
 
 log "kernel.hardening"
@@ -72,3 +74,7 @@ mkdir -p /etc/systemd/system.conf.d
 chmod 755 /etc/systemd/system.conf.d 2>/dev/null || warn "kernel.sysctl_chmod"
 printf '[Manager]\nDefaultLimitCORE=0\n' > /etc/systemd/system.conf.d/99-no-core.conf
 chmod 644 /etc/systemd/system.conf.d/99-no-core.conf 2>/dev/null || warn "kernel.sysctl_nocore_chmod"
+
+}
+
+Os::scripts::lib::modules::50_kernel_sh::run "$@"

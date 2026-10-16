@@ -1,5 +1,7 @@
 #!/bin/bash
 
+Os::tests::test_herdr_menu_sh::run() {
+
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -145,7 +147,7 @@ printf '[{"address":"%s","pid":424242,"class":"kitty","title":"host: work","init
 
 menu_lib() (
     grep -qF 'if [[ "$print_only" == "true" ]]; then' "$HERDR_MENU" || return 1
-    sed -n '1,/^if \[\[ "\${BASH_SOURCE\[0\]:-}" == "\$0" \]\]; then$/p' "$HERDR_MENU" | head -n -1 > "$SB/menu-lib.sh"
+    cp "$HERDR_MENU" "$SB/menu-lib.sh"
     bash -n "$SB/menu-lib.sh"
 )
 
@@ -376,3 +378,7 @@ else
 fi
 
 test_summary
+
+}
+
+Os::tests::test_herdr_menu_sh::run "$@"
