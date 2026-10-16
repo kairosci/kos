@@ -1,5 +1,6 @@
 {
   "homeVariable": "HOME",
+  "homeMaximumMode": "750",
   "roots": {
     "config": {"variable": "XDG_CONFIG_HOME", "relative": ".config"},
     "data": {"variable": "XDG_DATA_HOME", "relative": ".local/share"},

@@ -49,7 +49,7 @@ for _ssh_conf in /etc/ssh/ssh_config /etc/ssh/sshd_config /etc/ssh/sshd_config.d
 done
 for u_home in /home/*; do
     [[ -d "$u_home" ]] || continue
-    chmod 750 "$u_home" 2>/dev/null || warn "power.home_chown" "$u_home"
+    "$PROJECT_ROOT/script/os-lua" secure-home "$u_home" 2>/dev/null || warn "power.home_chown" "$u_home"
     for d in Documents Downloads Desktop; do
         [[ -d "$u_home/$d" ]] && (chmod 750 "$u_home/$d" 2>/dev/null || warn "power.user_dir_chown" "$u_home" "$d")
     done

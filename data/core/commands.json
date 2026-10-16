@@ -6,7 +6,7 @@
   "temporary": ["/usr/bin/mktemp"],
   "permissions": ["/usr/bin/chmod"],
   "copy": ["/usr/bin/cp", "--"],
-  "directory": ["/usr/bin/install", "-d", "-m", "755"],
+  "directory": ["/usr/bin/mkdir", "-p", "--"],
   "identity": ["/usr/bin/id", "-u"],
   "fileMode": ["/usr/bin/stat", "--format=%f", "--"],
   "gsettings": ["/usr/bin/gsettings"],

@@ -10,6 +10,8 @@ end
 
 function Environment:apply(deferred)
     local policy = self.policy
+    local home = self.paths:resolve("home", ""):gsub("/$", "")
+    self.paths:protectHome(self.process, home)
     local plan = Editor.plan(File.read(policy.memoryInfo), tonumber(self.process:run("processorCount")), policy)
     local entries, exports = {}, {}
     for name, field in pairs(policy.environment.values) do

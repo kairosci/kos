@@ -16,4 +16,17 @@ function Paths:resolve(name, relative)
     return directory:gsub("/+$", "") .. "/" .. relative
 end
 
+function Paths:protectHome(process, home)
+    assert(type(home) == "string" and home:sub(1, 1) == "/", "invalid_home_path")
+    local target = process:run("realpath", {home}):gsub("\n$", "")
+    local metadata = assert(tonumber(process:run("fileMode", {target}), 16))
+    assert(metadata & 0xF000 == 0x4000, "non_directory_home")
+    local definition = assert(self.policy.homeMaximumMode, "home_mode_required")
+    assert(definition:match("^7[0-7][0-7]$"), "invalid_home_mode")
+    local maximum = assert(tonumber(definition, 8))
+    local current = metadata & 0xFFF
+    local secured = (current & 0xE00) | (current & maximum & 0x1FF)
+    if secured ~= current then process:run("permissions", {("%o"):format(secured), target}) end
+end
+
 return Paths

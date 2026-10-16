@@ -54,6 +54,10 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
+    if mode == "secure-home" then
+        assert(config and esp == nil, "invalid_home_arguments")
+        return require("core.paths").new(File.json(self.root .. "/" .. self.layout.paths)):protectHome(self.process, config)
+    end
     if mode == "apply-build-environment" then
         assert((config == nil or config == "--defer") and esp == nil, "invalid_environment_arguments")
         local Paths = require("core.paths")
