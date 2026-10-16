@@ -9,8 +9,12 @@ install_wallpapers() {
     source "$project/scripts/lib/userconf.sh"
     locale_init
     data="${XDG_DATA_HOME:-$HOME/.local/share}"
-    install_user_file "$module/data/wallpapers/krepo.png" "$data/os/desktop/wallpapers/krepo.png"
-    install_user_file "$module/data/wallpapers/policy.json" "$data/os/desktop/wallpapers/policy.json"
+    install_user_file "$project/data/component/wallpaper/krepo.png" "$data/os/desktop/wallpapers/krepo.png"
+    install_user_file "$project/data/component/wallpaper/policy.json" "$data/os/desktop/wallpapers/policy.json"
+    local runtime="$data/os/desktop/runtime" file
+    for file in src/core/file.lua src/core/json.lua src/core/process.lua src/component/wallpaper/catalog.lua data/core/commands.json; do
+        install_user_file "$project/$file" "$runtime/$file"
+    done
     install_user_file "$module/scripts/wallpaper.sh" "$data/os/desktop/scripts/wallpaper.sh"
     for directory in "${OMARCHY_PATH:-/usr/share/omarchy}/themes/"* "${XDG_CONFIG_HOME:-$HOME/.config}/os/themes/"*; do
         [[ -f "$directory/colors.toml" ]] || continue

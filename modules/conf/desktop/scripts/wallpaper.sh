@@ -7,12 +7,10 @@ wallpaper_palette() {
 render_wallpapers() {
     set -euo pipefail
     local theme="${1:-}" data="${XDG_DATA_HOME:-$HOME/.local/share}" config="${XDG_CONFIG_HOME:-$HOME/.config}"
-    local current="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current" source_dir policy logo palette_dir
-    source_dir="$(dirname "$(dirname "${BASH_SOURCE[0]}")")"
+    local current="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current" policy logo palette_dir
     [[ -n "$theme" ]] || theme=$(cat "$current/theme.name")
     [[ "$theme" =~ ^[a-z0-9][a-z0-9._-]*$ ]] || err "wallpaper.failed" "$theme"
     policy="$data/os/desktop/wallpapers/policy.json"
-    [[ -r "$policy" ]] || policy="$source_dir/data/wallpapers/policy.json"
     logo="$data/os/desktop/wallpapers/krepo.png"
     [[ -r "$logo" && -r "$policy" ]] || err "wallpaper.failed" "$theme"
     WALLPAPER_COLORS=''
@@ -66,6 +64,10 @@ render_wallpapers() {
         printf '%s\n' "$digest" > "$WALLPAPER_STAGE/digest"
         mv -Tf -- "$WALLPAPER_STAGE/digest" "$output/.os-wallpaper.sha256"
     fi
+    lua -E - "$data/os/desktop/runtime" "$output" "$config/omarchy/backgrounds/$theme" "$data/os/retired-backgrounds/$theme" "$policy" <<'LUA'
+package.path = arg[1] .. "/src/?.lua;" .. package.path
+require("component.wallpaper.catalog").run(arg[1], arg[2], arg[3], arg[4], arg[5])
+LUA
     if [[ -r "$current/theme.name" && "$(cat "$current/theme.name")" == "$theme" ]]; then
         local stock="$current/theme/backgrounds" archive fingerprint
         if [[ -d "$stock" && ! -L "$stock" ]] && [[ -n "$(find "$stock" -mindepth 1 -maxdepth 1 -print -quit)" ]]; then

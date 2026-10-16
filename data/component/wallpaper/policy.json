@@ -1,0 +1,12 @@
+{
+  "defaultGeometry": "1920x1080",
+  "variants": [
+    {
+      "id": "krepo",
+      "role": "accent",
+      "size": 0.42,
+      "opacity": 1,
+      "gravity": "center"
+    }
+  ]
+}
