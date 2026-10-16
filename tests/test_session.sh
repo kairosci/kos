@@ -81,7 +81,7 @@ done
 while IFS= read -r id; do
     mkdir -p "$WORK_DIR/homes/tester/.config/os/plugins/$id"
     touch "$WORK_DIR/homes/tester/.config/os/plugins/$id/fixture"
-done < <(jq -r '.menu.id,.panels[].id' "$PROJECT_DIR/modules/conf/session/data/policy.json")
+done < <(jq -r '.menu.id,.panels[].id,(.clockWidget | select(.enabled) | .id)' "$PROJECT_DIR/modules/conf/session/data/policy.json")
 mkdir -p "$WORK_DIR/homes/tester/.local/share/os/session/data"
 printf '{}\n' > "$WORK_DIR/homes/tester/.local/share/os/session/data/policy.json"
 printf '{}\n' > "$WORK_DIR/homes/tester/.config/os/extensions/os-menu.json"
@@ -112,7 +112,7 @@ user_as() {
                 if [[ $(awk '$4 == "summon" || $4 == "hide" { action=$4 } END { print action }' "$SESSION_TEST_ROOT/commands.log") == summon ]]; then
                     printf '{"monitor":{"levels":{"2":[{"namespace":"os-control"}]}}}\n'
                 else
-                    printf '{}\n'
+                    printf '{"monitor":{"levels":{"0":[{"namespace":"os-clock"}]}}}\n'
                 fi
             fi
             ;;
@@ -157,4 +157,9 @@ assert_true "installer retires previously installed control copies" "grep -q 'os
 printf '%s\n' '{"plugins":[{"id":"os.audio"},{"id":"personal.plugin"}],"bar":{"layout":[]}}' > "$WORK_DIR/stale-shell.json"
 assert_true "retired os panels are dropped from the migrated shell" "jq --slurpfile policy '$PROJECT_DIR/modules/conf/session/data/policy.json' --slurpfile defaults '$PROJECT_DIR/modules/conf/session/data/shell.json' -f '$PROJECT_DIR/modules/conf/session/scripts/shell.jq' '$WORK_DIR/stale-shell.json' | jq -e '[.plugins[] | if type == \"string\" then . else .id end] | index(\"os.audio\") == null'"
 assert_true "an empty Apps catalogue fails runtime verification" "! SESSION_TEST_APPS_EMPTY=1 bash '$WORK_DIR/harness.sh' '$PROJECT_DIR'"
+source "$PROJECT_DIR/modules/conf/session/scripts/clock.sh"
+declare -A test_clock=()
+ClockWidget::new test_clock "$PROJECT_DIR/modules/conf/session" "$WORK_DIR/clock" "$PROJECT_DIR/modules/conf/session/data/policy.json"
+assert_true "clock staging produces a service plugin from separate policy and manifest data" "ClockWidget::stage test_clock && jq -e '.id == \"os.clockwidget\" and .kinds == [\"service\"] and .entryPoints.service == \"ClockWidget.qml\"' '$WORK_DIR/clock/plugins/os.clockwidget/manifest.json' && cmp '$PROJECT_DIR/modules/conf/session/qml/ClockWidget.qml' '$WORK_DIR/clock/plugins/os.clockwidget/ClockWidget.qml'"
+assert_true "disabling the clock removes its plugin without creating a bar" "jq '.clockWidget.enabled = false' '$PROJECT_DIR/modules/conf/session/data/policy.json' > '$WORK_DIR/disabled-policy.json' && jq --slurpfile policy '$WORK_DIR/disabled-policy.json' --slurpfile defaults '$PROJECT_DIR/modules/conf/session/data/shell.json' -f '$PROJECT_DIR/modules/conf/session/scripts/shell.jq' '$WORK_DIR/shell-new.json' | jq -e '([.plugins[] | if type == \"string\" then . else .id end] | index(\"os.clockwidget\") == null) and ([.bar.layout[][]] | length == 0)'"
 test_summary

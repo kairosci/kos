@@ -4,6 +4,7 @@ def entry_id: if type == "string" then . else .id end;
 | ([$p.menu.id] + [$p.panels[].id]) as $managed
 | .plugins = ([ (.plugins // [])[] | select(entry_id as $id | ($managed | index($id)) == null and ($id | startswith("os.") | not)) ]
     + [{id: $p.menu.id}]
+    + (if $p.clockWidget.enabled then [{id: $p.clockWidget.id}] else [] end)
     + [$p.panels[] as $panel
        | ([$existing[] | select(entry_id == $panel.id or entry_id == ("omarchy." + $panel.source))] | last // {})
        | (if type == "object" then . else {} end) + {id: $panel.id}])

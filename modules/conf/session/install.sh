@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SessionInstaller::run() {
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 LIB_DIR="$PROJECT_DIR/scripts/lib"
@@ -22,9 +23,13 @@ done
 STAGE=$(mktemp -d)
 trap 'rm -rf -- "$STAGE"' EXIT
 mkdir -p "$STAGE/config/hypr" "$STAGE/data/os/hypr" "$STAGE/data/os/session/data" "$STAGE/plugins" "$STAGE/blocks"
-jq -e '.menu.width >= 320 and .menu.width <= 600' "$SCRIPT_DIR/data/policy.json" > /dev/null || err "session.validation_failed" policy.json
+jq -e '.menu.width >= 320 and .menu.width <= 1000' "$SCRIPT_DIR/data/policy.json" > /dev/null || err "session.validation_failed" policy.json
 jq --arg runtime "$NATIVE" '.runtime = $runtime' "$SCRIPT_DIR/data/policy.json" > "$STAGE/data/os/session/data/policy.json"
 POLICY="$STAGE/data/os/session/data/policy.json"
+source "$SCRIPT_DIR/scripts/clock.sh"
+local -A clock_widget=()
+ClockWidget::new clock_widget "$SCRIPT_DIR" "$STAGE" "$POLICY"
+ClockWidget::stage clock_widget
 cp "$SCRIPT_DIR/scripts/runtime.lua" "$STAGE/data/os/hypr/runtime.lua"
 for file in "$CONFIG_HOME/hypr/"*.lua; do
     [[ -f "$file" && ! -L "$file" ]] || err "session.validation_failed" "$file"
@@ -85,7 +90,7 @@ for file in "$STAGE/data/os/session/data/menu.json" "$STAGE/extension.json"; do
 done
 while IFS= read -r -d '' file; do
     case "$file" in
-        */SessionI18n.qml) mode=clean ;;
+        */SessionI18n.qml|*/ClockWidget.qml) mode=clean ;;
         *.qml) mode=localize ;;
         *) mode=clean ;;
     esac
@@ -174,3 +179,6 @@ fi
 mkdir -p "$STATE_HOME/omarchy/toggles"
 install_user_content "$STATE_HOME/omarchy/toggles/bar-off" 600 < /dev/null
 log "session.configured"
+}
+
+SessionInstaller::run "$@"

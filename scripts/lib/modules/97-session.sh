@@ -44,6 +44,18 @@ for user_home in /home/*; do
             omarchy_as "$_session_user" restart shell || err "session.validation_failed" Quickshell
         fi
         omarchy_as "$_session_user" shell shell ping || err "session.validation_failed" Quickshell
+        if jq -e '.clockWidget.enabled' "$_SESSION_POLICY" > /dev/null; then
+            _session_clock_ready=0
+            for _session_attempt in {1..50}; do
+                _session_layers=$(user_as "$_session_user" hyprctl layers -j) || err "session.validation_failed" layers
+                if jq -e '[.[] | .levels[][]? | select(.namespace == "os-clock")] | length > 0' <<< "$_session_layers" > /dev/null; then
+                    _session_clock_ready=1
+                    break
+                fi
+                sleep 0.1
+            done
+            [[ "$_session_clock_ready" == 1 ]] || err "session.validation_failed" clockWidget
+        fi
         _session_menu_ready=0
         for _session_attempt in {1..50}; do
             if _session_menu_status=$(omarchy_as "$_session_user" shell shell call "$_session_menu_id" status '{}') \
