@@ -101,10 +101,10 @@
     "audio"
   ],
   "icons": {
-    "desktop": "preferences-desktop-display",
-    "network": "network-wireless",
-    "bluetooth": "bluetooth",
-    "audio": "audio-volume-high"
+    "desktop": "preferences-desktop-display-symbolic",
+    "network": "network-wireless-symbolic",
+    "bluetooth": "bluetooth-symbolic",
+    "audio": "audio-volume-high-symbolic"
   },
   "runtimeCurrent": "current",
   "runtimeManifest": "manifest.json",

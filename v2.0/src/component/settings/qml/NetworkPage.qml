@@ -62,7 +62,10 @@ Pane {
         anchors.centerIn: parent
         modal: true
         title: root.app ? root.app.text("password") : ""
-        standardButtons: Dialog.Ok | Dialog.Cancel
+        footer: DialogButtonBox {
+            Button { text: root.app ? root.app.text("connect") : ""; DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole }
+            Button { text: root.app ? root.app.text("cancel") : ""; DialogButtonBox.buttonRole: DialogButtonBox.RejectRole }
+        }
         TextField { id: password; echoMode: TextInput.Password; selectByMouse: true; onAccepted: passwordDialog.accept() }
         onOpened: password.forceActiveFocus()
         onAccepted: { if (root.selectedNetwork) root.selectedNetwork.connectWithPsk(password.text); password.clear() }
@@ -75,7 +78,10 @@ Pane {
         anchors.centerIn: parent
         modal: true
         title: root.app ? root.app.text("forget") : ""
-        standardButtons: Dialog.Ok | Dialog.Cancel
+        footer: DialogButtonBox {
+            Button { text: root.app ? root.app.text("forget") : ""; DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole }
+            Button { text: root.app ? root.app.text("cancel") : ""; DialogButtonBox.buttonRole: DialogButtonBox.RejectRole }
+        }
         Label { text: root.selectedNetwork ? root.selectedNetwork.name : "" }
         onAccepted: { if (root.selectedNetwork) root.selectedNetwork.forget() }
     }
