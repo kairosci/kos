@@ -7,8 +7,8 @@
   "primingWorkers": 2,
   "syntaxCacheCapacity": 64,
   "defaults": [
-    "modules/conf/zed/data/settings.json",
-    "modules/conf/zed/data/linux/settings.json"
+    "data/component/application/zed/settings.json",
+    "data/component/application/zed/linux.json"
   ],
   "optionsPath": [
     "lsp",
