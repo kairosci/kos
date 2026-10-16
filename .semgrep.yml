@@ -16,7 +16,7 @@ rules:
       - generic
     paths:
       include:
-        - src/**/*.lua
+        - v2.0/src/**/*.lua
     pattern-regex: '\b(loadstring|loadfile|dofile)\s*\('
   - id: lua.security.unowned-process-execution
     message: Native processes must use the shared argument quoting implementation.
@@ -25,7 +25,7 @@ rules:
       - generic
     paths:
       include:
-        - src/**/*.lua
+        - v2.0/src/**/*.lua
       exclude:
-        - src/core/process.lua
+        - v2.0/src/core/process.lua
     pattern-regex: '\b(os\.execute|io\.popen)\s*\('

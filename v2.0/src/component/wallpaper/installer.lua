@@ -14,7 +14,7 @@ function Installer:publish()
     local runtime = renderer.paths:resolve("data", policy.runtime)
     local active = runtime .. "/" .. policy.runtimeCurrent
     local publisher = Publisher.new(process)
-    local listing = process:run("runtimeFiles", {renderer.root .. "/src", renderer.root .. "/data", renderer.root .. "/script", "-type", "f", "-print0"})
+    local listing = process:run("runtimeFiles", {"-L", renderer.root .. "/src", renderer.root .. "/data", renderer.root .. "/script", "-type", "f", "-print0"})
     local files, present, unchanged = {}, {}, true
     for source in listing:gmatch("([^%z]+)%z") do
         local relative = source:sub(#renderer.root + 2)

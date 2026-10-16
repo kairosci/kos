@@ -46,7 +46,22 @@ if arg[2] == "json" then
         assert(inventory:classify("module/tool", "#!/bin/sh\nexit 0\n") == "shell")
         assert(inventory:classify("module/test.rb", "") == "ruby")
         assert(inventory:classify("data/hidden.sh", "") == "shell")
-        suite:reject(function() inventory:classify("script/os-lua", "#!/bin/bash\nbash legacy.sh\n") end)
+        suite:reject(function() inventory:classify("v2.0/script/os-lua", "#!/bin/bash\nbash legacy.sh\n") end)
+    end)
+    suite:test("versioned entry points preserve the entire repository migration inventory", function()
+        local Inventory = require("component.migration.inventory")
+        local policy = File.json(root .. "/data/component/migration/policy.json")
+        local repository = Inventory.new(root, process, policy).root
+        local canonical = Inventory.new(repository .. "/v2.0", process, policy):report()
+        local legacy = Inventory.new(repository, process, policy):report()
+        assert(Json.encode(canonical) == Json.encode(legacy))
+        local found = false
+        for _, item in ipairs(canonical.remaining) do
+            if item.path == "scripts/setup.sh" then found = true end
+        end
+        assert(found and not canonical.complete)
+        assert(File.read(repository .. "/src/main.lua") == File.read(repository .. "/v2.0/src/main.lua"))
+        assert(File.read(repository .. "/tests/lua/run.lua") == File.read(repository .. "/v2.0/tests/lua/run.lua"))
     end)
     suite:test("performance planning bounds work by both RAM and processors", function()
         local Editor = require("component.performance.editor")

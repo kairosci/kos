@@ -25,7 +25,7 @@ jobs:
 
       - name: Validate Shell Syntax
         run: |
-          for sh_file in scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* modules/conf/*/*.sh tests/*.sh modules/*/scripts/*.sh modules/*/scripts/lib/*.sh modules/*/scripts/lib/modules/*.sh modules/*/hooks/theme-set.d/* modules/*/hooks/pre-refresh-pacman.d/* modules/*/hooks/post-update.d/* modules/*/tests/*.sh; do
+          for sh_file in v2.0/script/* scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* modules/conf/*/*.sh tests/*.sh modules/*/scripts/*.sh modules/*/scripts/lib/*.sh modules/*/scripts/lib/modules/*.sh modules/*/hooks/theme-set.d/* modules/*/hooks/pre-refresh-pacman.d/* modules/*/hooks/post-update.d/* modules/*/tests/*.sh; do
             [ -f "$sh_file" ] || continue
             bash -n "$sh_file"
           done
@@ -59,7 +59,7 @@ jobs:
       - name: Run ShellCheck
         run: |
           shellcheck --severity=style \
-            scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh \
+            v2.0/script/* scripts/*.sh scripts/lib/*.sh scripts/lib/modules/*.sh \
             hooks/theme-set.d/* hooks/pre-refresh-pacman.d/* hooks/post-update.d/* \
             modules/conf/*/*.sh \
             modules/conf/*/scripts/*.sh \
@@ -151,7 +151,7 @@ jobs:
         run: |
           while IFS= read -r -d '' source; do
             luac -p "$source"
-          done < <(find src tests/lua -type f -name '*.lua' -print0)
+          done < <(find v2.0/src v2.0/tests/lua -type f -name '*.lua' -print0)
 
       - name: Run Full Test Suite
         run: bash tests/run-all.sh

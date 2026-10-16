@@ -17,7 +17,7 @@ install -d -m 755 /usr/share/os/lib/messages
 install -m 644 "$PROJECT_DIR"/data/catalog/*.msg /usr/share/os/lib/messages/
 while IFS= read -r -d '' _trial_file; do
     install -Dm644 "$_trial_file" "/usr/share/os/${_trial_file#"$PROJECT_DIR/"}"
-done < <(find "$PROJECT_DIR/src" "$PROJECT_DIR/data" -type f -print0)
+done < <(find -L "$PROJECT_DIR/src" "$PROJECT_DIR/data" -type f -print0)
 install -Dm755 "$PROJECT_DIR/script/os-lua" /usr/share/os/script/os-lua
 install -Dm644 "$_trial_policy" /usr/share/os/boot-policy.json
 install -Dm755 "$PROJECT_DIR/scripts/lib/grub-menu.sh" /usr/local/libexec/os-grub-menu
