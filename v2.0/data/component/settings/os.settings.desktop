@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Settings
+Name[it]=Impostazioni
+Name[fr]=Paramètres
+Name[de]=Einstellungen
+Name[es]=Ajustes
+Name[pt]=Definições
+Exec=os-settings
+Icon=preferences-system
+Terminal=false
+Categories=Settings;
+StartupWMClass=os.settings

@@ -17,6 +17,9 @@
     "style.bar",
     "trigger.toggle.top-bar",
     "setup",
-    "update.config"
+    "update.config",
+    "desktop-tools.audio",
+    "desktop-tools.network",
+    "desktop-tools.bluetooth"
   ]
 }

@@ -21,5 +21,12 @@
   "validateLua": ["/usr/bin/luac", "-p"],
   "removeDirectory": ["/usr/bin/rm", "-r", "--"],
   "processorCount": ["/usr/bin/getconf", "_NPROCESSORS_ONLN"],
-  "userEnvironment": ["/usr/bin/systemctl", "--user", "set-environment"]
+  "userEnvironment": ["/usr/bin/systemctl", "--user", "set-environment"],
+  "settingsDescriptions": ["hyprctl", "descriptions", "-j"],
+  "copyTree": ["/usr/bin/cp", "-a", "--"],
+  "settingsValidate": ["/usr/bin/env"],
+  "settingsReload": ["hyprctl", "reload", "config-only"],
+  "settingsErrors": ["hyprctl", "configerrors"],
+  "settingsSerialized": ["/usr/bin/flock", "--exclusive", "--wait", "10"],
+  "settingsQml": ["/usr/bin/env"]
 }

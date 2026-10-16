@@ -13,4 +13,7 @@ for user_home in /home/*; do
         [[ -f "$_installer" ]] || continue
         user_as "$_user" bash "$_installer" || err "defaults.app_failed" "$(basename "$(dirname "$_installer")")"
     done
+    if [[ -f "$user_home/.config/hypr/hyprland.lua" ]]; then
+        user_as "$_user" "$PROJECT_DIR/script/os-lua" install-settings || err "defaults.app_failed" "Settings"
+    fi
 done

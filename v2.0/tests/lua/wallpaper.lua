@@ -194,7 +194,8 @@ suite:test("failed runtime validation preserves the active bundle and removes st
         return Renderer.optional(self, path)
     end
     local entries = suite.process:run("runtimeFiles", {runtime, "-mindepth", "1", "-maxdepth", "1", "-print0"})
-    local installer = require("component.wallpaper.installer").new(instance)
+    local installer = require("core.bundle").new(root, failed, paths, policy)
+    function installer:optional(path) return instance:optional(path) end
     assert(not pcall(installer.publish, installer))
     assert(suite.process:run("realpath", {active}) == before)
     assert(suite.process:run("runtimeFiles", {runtime, "-mindepth", "1", "-maxdepth", "1", "-print0"}) == entries)

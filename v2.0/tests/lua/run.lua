@@ -37,11 +37,13 @@ local function source(path, command)
 end
 
 if arg[2] == "json" then
+    local settingsTests = assert(loadfile(root .. "/tests/lua/settings.lua"))()
+    settingsTests(suite, root, process)
     suite:test("migration inventory cannot certify retained shell algorithms", function()
         local Inventory = require("component.migration.inventory")
         local inventory = Inventory.new(root, process, File.json(root .. "/data/component/migration/policy.json"))
         local report = inventory:report()
-        assert(not report.complete and #report.remaining > 0 and #report.starters == 4)
+        assert(not report.complete and #report.remaining > 0 and #report.starters == 5)
         assert(inventory:classify("module/tool", "#!/usr/bin/env bash\nexit 0\n") == "shell")
         assert(inventory:classify("module/tool", "#!/bin/sh\nexit 0\n") == "shell")
         assert(inventory:classify("module/test.rb", "") == "ruby")

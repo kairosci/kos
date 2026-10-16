@@ -54,6 +54,27 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
+    if mode == "settings-snapshot" or mode == "settings-set" or mode == "settings-write" or mode == "install-settings" then
+        local Paths = require("core.paths")
+        local paths = Paths.new(File.json(self.root .. "/" .. self.layout.paths))
+        local policy = File.json(self.root .. "/" .. self.layout.settings)
+        local model = require("component.settings.model").new(self.root, self.process, paths, Publisher.new(self.process), policy, self.catalog)
+        if mode == "install-settings" then return require("component.settings.installer").new(model):apply() end
+        if mode == "settings-set" then
+            assert(config and esp and uuid == nil, "invalid_settings_arguments")
+            local lock = paths:resolve("state", policy.lock)
+            self.process:run("directory", {assert(lock:match("^(.*)/[^/]+$"))})
+            io.write(self.process:run("settingsSerialized", {lock, self.root .. "/script/os-lua", "settings-write", config, esp}))
+            return
+        end
+        local result
+        if mode == "settings-write" then
+            assert(config and esp and uuid == nil, "invalid_settings_arguments")
+            result = model:write(config, Json.decode(esp))
+        else result = model:snapshot() end
+        io.write(Json.encode(result), "\n")
+        return
+    end
     if mode == "secure-home" then
         assert(config and esp == nil, "invalid_home_arguments")
         return require("core.paths").new(File.json(self.root .. "/" .. self.layout.paths)):protectHome(self.process, config)

@@ -14,7 +14,7 @@
   },
   "settings": {
     "selector": "desktop",
-    "desktop": "io.github.bluemancz.hyprmod.desktop"
+    "desktop": "os.settings.desktop"
   },
   "calendar": {
     "selector": "desktop",
@@ -30,15 +30,15 @@
   },
   "audio": {
     "selector": "desktop",
-    "desktop": "org.pulseaudio.pavucontrol.desktop"
+    "desktop": "os.settings.desktop"
   },
   "network": {
     "selector": "desktop",
-    "desktop": "nm-connection-editor.desktop"
+    "desktop": "os.settings.desktop"
   },
   "bluetooth": {
     "selector": "desktop",
-    "desktop": "blueman-manager.desktop"
+    "desktop": "os.settings.desktop"
   },
   "resources": {
     "selector": "desktop",

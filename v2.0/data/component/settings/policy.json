@@ -1,0 +1,150 @@
+{
+  "options": [
+    {
+      "key": "general:border_size",
+      "label": "border",
+      "kind": "number",
+      "min": 0,
+      "max": 20,
+      "step": 1
+    },
+    {
+      "key": "decoration:rounding",
+      "label": "rounding",
+      "kind": "number",
+      "min": 0,
+      "max": 20,
+      "step": 1
+    },
+    {
+      "key": "input:sensitivity",
+      "label": "sensitivity",
+      "kind": "number",
+      "min": -1,
+      "max": 1,
+      "step": 0.1
+    },
+    {
+      "key": "input:repeat_rate",
+      "label": "repeat",
+      "kind": "number",
+      "min": 1,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "key": "input:repeat_delay",
+      "label": "delay",
+      "kind": "number",
+      "min": 100,
+      "max": 2000,
+      "step": 1
+    },
+    {
+      "key": "animations:enabled",
+      "label": "animations",
+      "kind": "boolean"
+    },
+    {
+      "key": "decoration:blur:enabled",
+      "label": "blur",
+      "kind": "boolean"
+    },
+    {
+      "key": "decoration:shadow:enabled",
+      "label": "shadow",
+      "kind": "boolean"
+    },
+    {
+      "key": "input:touchpad:natural_scroll",
+      "label": "natural",
+      "kind": "boolean"
+    },
+    {
+      "key": "input:touchpad:tap-to-click",
+      "label": "tap",
+      "kind": "boolean"
+    },
+    {
+      "key": "input:kb_layout",
+      "label": "keyboard",
+      "kind": "string",
+      "pattern": "^[a-z][a-z,]*$",
+      "maximumLength": 64
+    }
+  ],
+  "state": "os/settings/hyprland.json",
+  "generated": "hypr/os-settings.lua",
+  "main": "hypr/hyprland.lua",
+  "include": "require(\"os-settings\")",
+  "runtime": "os/settings/runtime",
+  "qml": "src/component/settings/qml/shell.qml",
+  "desktop": "applications/os.settings.desktop",
+  "mode": "644",
+  "window": {
+    "width": 980,
+    "height": 720,
+    "minimumWidth": 640,
+    "minimumHeight": 480,
+    "sidebar": 190,
+    "spacing": 12,
+    "margin": 20,
+    "titleSize": 18
+  },
+  "luaPrefix": "hl.config(\n",
+  "luaSuffix": "\n)\n",
+  "validationSuccess": "config ok",
+  "pages": [
+    "desktop",
+    "network",
+    "bluetooth",
+    "audio"
+  ],
+  "icons": {
+    "desktop": "preferences-desktop-display",
+    "network": "network-wireless",
+    "bluetooth": "bluetooth",
+    "audio": "audio-volume-high"
+  },
+  "runtimeCurrent": "current",
+  "runtimeManifest": "manifest.json",
+  "runtimeRequired": [
+    "script/os-lua",
+    "src/main.lua",
+    "src/core/bundle.lua",
+    "src/component/settings/model.lua",
+    "src/component/settings/installer.lua",
+    "src/component/settings/qml/shell.qml",
+    "src/component/settings/qml/DesktopPage.qml",
+    "src/component/settings/qml/NetworkPage.qml",
+    "src/component/settings/qml/BluetoothPage.qml",
+    "src/component/settings/qml/AudioPage.qml",
+    "src/component/settings/qml/Validate.qml",
+    "script/os-settings",
+    "data/component/settings/os.settings.desktop"
+  ],
+  "fileMode": "644",
+  "launcher": "bin/os-settings",
+  "lock": "os/settings/write.lock",
+  "launcherSource": "script/os-settings",
+  "privateMode": "600",
+  "palette": {
+    "path": "omarchy/current/theme/colors.toml",
+    "roles": {
+      "window": "background",
+      "windowText": "foreground",
+      "base": "dark_background",
+      "alternateBase": "lighter_background",
+      "text": "foreground",
+      "button": "lighter_background",
+      "buttonText": "foreground",
+      "highlight": "accent",
+      "highlightedText": "background",
+      "brightText": "background"
+    }
+  },
+  "validator": "src/component/settings/qml/Validate.qml",
+  "qmlValidationSuccess": "settings-components-valid",
+  "desktopSource": "data/component/settings/os.settings.desktop",
+  "configDirectory": "hypr"
+}

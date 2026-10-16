@@ -108,6 +108,8 @@ if [[ "$SETUP_SCOPE" == settings || "$SETUP_SCOPE" == wallpaper ]]; then
         source "$SCRIPT_DIR/lib/hyprmod.sh"
         source "$MODULES_DIR/36-os-cli.sh"
         user_as "$PRIMARY_USER" bash "$PROJECT_DIR/modules/conf/hyprmod/install.sh"
+        user_as "$PRIMARY_USER" "$PROJECT_DIR/script/os-lua" install-settings
+        source "$MODULES_DIR/97-session.sh"
         user_as "$PRIMARY_USER" hyprctl reload config-only || err "session.validation_failed" Hyprland
         _settings_errors=$(user_as "$PRIMARY_USER" hyprctl configerrors) || err "session.validation_failed" Hyprland
         [[ -z "${_settings_errors//[[:space:]]/}" ]] || err "session.validation_failed" "$_settings_errors"
