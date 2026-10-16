@@ -15,14 +15,16 @@ function Installer:publish()
     local active = runtime .. "/" .. policy.runtimeCurrent
     local publisher = Publisher.new(process)
     local listing = process:run("runtimeFiles", {renderer.root .. "/src", renderer.root .. "/data", renderer.root .. "/script", "-type", "f", "-print0"})
-    local files, unchanged = {}, true
+    local files, present, unchanged = {}, {}, true
     for source in listing:gmatch("([^%z]+)%z") do
         local relative = source:sub(#renderer.root + 2)
+        present[relative] = true
         local content = File.read(source)
         files[#files + 1] = {relative=relative, content=content, mode=relative:match("^script/") and "755" or policy.mode}
         if renderer:optional(active .. "/" .. relative) ~= content then unchanged = false end
     end
     assert(#files > 0, "empty_runtime")
+    for _, required in ipairs(policy.runtimeRequired) do assert(present[required], "missing_runtime_file_" .. required) end
     table.sort(files, function(left, right) return left.relative < right.relative end)
     local names = Json.array({})
     for _, file in ipairs(files) do names[#names + 1] = file.relative end

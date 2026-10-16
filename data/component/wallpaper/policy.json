@@ -69,5 +69,33 @@
     "activeBackground": "background"
   },
   "runtimeCurrent": "current",
-  "runtimeManifest": "manifest.json"
+  "runtimeManifest": "manifest.json",
+  "runtimeRequired": [
+    "script/os-lua",
+    "src/main.lua",
+    "src/component/runtime/application.lua",
+    "src/component/boot/menu.lua",
+    "src/component/wallpaper/renderer.lua",
+    "src/component/wallpaper/catalog.lua",
+    "src/component/wallpaper/installer.lua",
+    "src/core/file.lua",
+    "src/core/json.lua",
+    "src/core/process.lua",
+    "src/core/catalog.lua",
+    "src/core/paths.lua",
+    "src/core/publisher.lua",
+    "data/core/bootstrap.env",
+    "data/core/layout.json",
+    "data/core/commands.json",
+    "data/core/locale.json",
+    "data/core/paths.json",
+    "data/component/wallpaper/policy.json",
+    "data/component/wallpaper/krepo.png",
+    "data/catalog/en.msg",
+    "data/catalog/it.msg",
+    "data/catalog/fr.msg",
+    "data/catalog/de.msg",
+    "data/catalog/es.msg",
+    "data/catalog/pt.msg"
+  ]
 }

@@ -164,6 +164,7 @@ suite:test("removed source files cannot survive in the active runtime", function
     suite:write(producer .. "/script/start", "#!/bin/sh\nexit 0\n")
     local definition = Json.decode(Json.encode(policy))
     definition.runtime = "fixture/runtime"
+    definition.runtimeRequired = {"src/current.lua", "data/policy.json", "script/start"}
     local instance = Renderer.new(producer, backend, paths, definition, catalog)
     local installer = require("component.wallpaper.installer").new(instance)
     installer:publish()
@@ -174,6 +175,10 @@ suite:test("removed source files cannot survive in the active runtime", function
     assert(suite.process:run("realpath", {active}) ~= before)
     assert(not renderer:optional(active .. "/src/retired.lua"))
     assert(File.read(active .. "/src/current.lua") == "return false\n")
+    local complete = suite.process:run("realpath", {active})
+    assert(os.remove(producer .. "/src/current.lua"))
+    assert(not pcall(installer.publish, installer))
+    assert(suite.process:run("realpath", {active}) == complete)
 end)
 suite:test("failed runtime validation preserves the active bundle and removes staging", function()
     local runtime = paths:resolve("data", policy.runtime)
