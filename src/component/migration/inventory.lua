@@ -20,7 +20,7 @@ function Inventory:classify(path, content)
 end
 
 function Inventory:report()
-    local arguments = {"-C", self.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--"}
+    local arguments = {"-c", "safe.directory=" .. self.root, "-C", self.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--"}
     for _, directory in ipairs(self.policy.roots) do arguments[#arguments + 1] = directory end
     local files = self.process:run("repositoryFiles", arguments)
     local result = {complete=true, remaining=Json.array({}), starters=Json.array({}), legacyLayout=Json.array({})}

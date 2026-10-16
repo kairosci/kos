@@ -101,12 +101,12 @@ assert_file_contains "Makefile exposes the keyring selection target" "$PROJECT_D
 
 BRANDING_HOME=$(mktemp -d)
 trap 'rm -rf "$BRANDING_HOME"' EXIT
-mkdir -p "$BRANDING_HOME/.config/os/branding" "$BRANDING_HOME/.config/fastfetch" "$BRANDING_HOME/.local/state/omarchy/toggles" "$BRANDING_HOME/.local/share/applications"
+mkdir -p "$BRANDING_HOME/platform/themes" "$BRANDING_HOME/.config/os/branding" "$BRANDING_HOME/.config/fastfetch" "$BRANDING_HOME/.local/state/omarchy/toggles" "$BRANDING_HOME/.local/share/applications"
 : > "$BRANDING_HOME/.bashrc"
 printf 'old screensaver logo\n' > "$BRANDING_HOME/.config/os/branding/screensaver.txt"
 printf 'old About logo\n' > "$BRANDING_HOME/.config/os/branding/about.txt"
 touch "$BRANDING_HOME/.local/state/omarchy/toggles/screensaver-off"
-assert_true "desktop installer stages KMono branding in Fastfetch and the screensaver" "HOME='$BRANDING_HOME' XDG_CONFIG_HOME='$BRANDING_HOME/.config' XDG_STATE_HOME='$BRANDING_HOME/.local/state' XDG_DATA_HOME='$BRANDING_HOME/.local/share' bash '$PROJECT_DIR/modules/conf/desktop/install.sh'"
+assert_true "desktop installer stages KMono branding in Fastfetch and the screensaver" "OMARCHY_PATH='$BRANDING_HOME/platform' HOME='$BRANDING_HOME' XDG_CONFIG_HOME='$BRANDING_HOME/.config' XDG_STATE_HOME='$BRANDING_HOME/.local/state' XDG_DATA_HOME='$BRANDING_HOME/.local/share' bash '$PROJECT_DIR/modules/conf/desktop/install.sh'"
 assert_true "screensaver uses the KMono ASCII logo" "cmp -s '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt' '$BRANDING_HOME/.config/os/branding/screensaver.txt'"
 assert_true "Fastfetch uses the KMono ASCII logo" "cmp -s '$PROJECT_DIR/modules/conf/desktop/data/branding/kmono.txt' '$BRANDING_HOME/.config/os/branding/about.txt' && grep -q 'source.*os/branding/about.txt' '$BRANDING_HOME/.config/fastfetch/config.jsonc'"
 assert_true "Fastfetch uses the native cyan logo treatment" "jq -e '[.logo.color, .logo.padding] == [{\"1\":\"cyan\"},{\"top\":2,\"right\":6,\"left\":2}]' '$PROJECT_DIR/modules/conf/desktop/data/fastfetch/config.jsonc'"
