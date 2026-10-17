@@ -36,7 +36,13 @@ local function source(path, command)
     return "/Arch\n //linux\n protocol: efi\n path: boot():" .. path .. "\n cmdline: " .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor") .. "\n"
 end
 
-if arg[2] == "test-runner" then
+if arg[2] == "cli" then
+    assert(loadfile(root .. "/tests/lua/cli_behavior.lua"))()(suite, root, process)
+elseif arg[2] == "cli-scope" then
+    assert(loadfile(root .. "/tests/lua/cli_scope.lua"))()(suite, root, process)
+elseif arg[2] == "cli-install" then
+    assert(loadfile(root .. "/tests/lua/cli_install.lua"))()(suite, root, process)
+elseif arg[2] == "test-runner" then
     assert(loadfile(root .. "/tests/lua/test_runner.lua"))()(suite, root, process)
 elseif arg[2] == "platform" then
     assert(loadfile(root .. "/tests/lua/platform.lua"))()(suite, root)

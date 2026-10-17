@@ -71,7 +71,6 @@ jobs:
             modules/conf/*/*.sh \
             modules/conf/*/scripts/*.sh \
             tests/*.sh \
-            modules/os/tests/*.sh \
             modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
             modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
             modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \

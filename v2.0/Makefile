@@ -51,7 +51,7 @@ lint:
 		modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \
 		modules/performance/scripts/*.sh modules/performance/scripts/lib/modules/*.sh \
 		modules/iso/scripts/*.sh \
-		modules/os/tests/*.sh
+		script/*
 
 help:
 	@cd "$(PROJECT_ROOT)" && bash scripts/lib/help.sh

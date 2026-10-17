@@ -3,8 +3,8 @@ local Json = require("core.json")
 local Cli = {}
 Cli.__index = Cli
 
-function Cli.new(root, process, catalog, policy, environment)
-    return setmetatable({root=root, process=process, catalog=catalog, policy=policy, getenv=environment or os.getenv}, Cli)
+function Cli.new(root, process, catalog, policy, environment, output)
+    return setmetatable({root=root, process=process, catalog=catalog, policy=policy, getenv=environment or os.getenv, output=output or io.stdout}, Cli)
 end
 
 function Cli:message(key, ...)
@@ -85,7 +85,7 @@ function Cli:app(arguments)
     local index, resolve = 1, false
     if arguments[index] == "--resolve" then resolve = true; index = index + 1 end
     local role = arguments[index]
-    if not role or role == "--help" then io.write(self.catalog:text("os.app_usage"), "\n"); return 0 end
+    if not role or role == "--help" then self.output:write(self.catalog:text("os.app_usage"), "\n"); return 0 end
     local roles = File.json(self.root .. "/" .. self.policy.roles)
     local selection = roles[role]
     if not selection then self:message("os.app_invalid", role) end
@@ -129,7 +129,7 @@ function Cli:app(arguments)
     if not self:executable(self.policy.launcher) then self:message("os.app_dependency_missing", self.policy.launcher) end
     for _, value in ipairs(values) do argv[#argv + 1] = value end
     if resolve then
-        io.write(Json.encode({role=role, desktop=desktop, desktopFile=path, private=private, argv=argv}), "\n")
+        self.output:write(Json.encode({role=role, desktop=desktop, desktopFile=path, private=private, argv=argv}), "\n")
         return 0
     end
     local environment = self:session()
@@ -150,7 +150,7 @@ function Cli:changelog(release)
         if content then source = path; break end
     end
     if not source then self:message("os.changelog_missing", candidates[1]) end
-    if not release then io.write(content); return 0 end
+    if not release then self.output:write(content); return 0 end
     local tag
     if release:lower() == "unreleased" then tag = "## Unreleased"
     else tag = "## Release " .. (release:sub(1, 1) == "v" and release or "v" .. release) end
@@ -161,7 +161,7 @@ function Cli:changelog(release)
         if active then output[#output + 1] = line end
     end
     if #output == 0 then self:message("os.changelog_unknown", release) end
-    io.write(table.concat(output, "\n"):gsub("\n*$", ""), "\n")
+    self.output:write(table.concat(output, "\n"):gsub("\n*$", ""), "\n")
     return 0
 end
 
@@ -181,9 +181,9 @@ function Cli:runtime(arguments)
     environment[#environment + 1] = executable
     for _, word in ipairs(arguments) do environment[#environment + 1] = word end
     if arguments[1] == "version" then
-        io.write(self.catalog:text("os.dispatcher_version", policy.version), "\n")
-        io.write(self.process:run("environment", environment))
-        io.write(File.read(runtime .. "/" .. policy.runtimeVersion))
+        self.output:write(self.catalog:text("os.dispatcher_version", policy.version), "\n")
+        self.output:write(self.process:run("environment", environment))
+        self.output:write(File.read(runtime .. "/" .. policy.runtimeVersion))
         return 0
     end
     return self.process:status("environment", environment)
@@ -195,7 +195,7 @@ function Cli:run(arguments)
         io.stderr:write(File.read(self.root .. "/" .. self.policy.help:format(self.catalog.language)))
         self:message("os.dispatch_failed", "")
     end
-    if first == "--help" or first == "-h" or first == "help" then io.write(File.read(self.root .. "/" .. self.policy.help:format(self.catalog.language))); return 0 end
+    if first == "--help" or first == "-h" or first == "help" then self.output:write(File.read(self.root .. "/" .. self.policy.help:format(self.catalog.language))); return 0 end
     if first == "changelog" then return self:changelog(arguments[2]) end
     if first == "--version" then arguments[1] = "version" end
     if first == "app" then
