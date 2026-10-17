@@ -89,5 +89,5 @@ mkdir -p "$WORK_DIR/installed"
 cp -a "$ROOT_DIR/src" "$ROOT_DIR/data" "$ROOT_DIR/script" "$WORK_DIR/installed/"
 assert_true "installed layout loads its Lua runtime and policy without repository paths" "env -i HOME='$WORK_DIR/home' PATH='$WORK_DIR/bin:/usr/bin:/bin' XDG_DATA_DIRS='$WORK_DIR/system' lua -E '$WORK_DIR/installed/src/main.lua' '$WORK_DIR/installed' cli app --resolve settings | jq -e '.role==\"settings\"'"
 assert_true "native app diagnostics are localized" "OS_LANG=it lua -E '$ROOT_DIR/src/main.lua' '$ROOT_DIR' cli app --help | grep -q '^Uso:'"
-assert_false "migration readiness remains blocked after implementing only app launchers" "bash '$ROOT_DIR/scripts/lib/arch-migration.sh' --check"
+assert_false "migration readiness remains blocked after implementing only app launchers" "lua -E '$ROOT_DIR/src/main.lua' '$ROOT_DIR' arch-check"
 test_summary

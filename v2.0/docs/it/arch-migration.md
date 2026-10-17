@@ -8,6 +8,6 @@ La selezione del browser segue XDG e, se vuota, l’associazione HTTPS. Editor e
 
 `os app --resolve browser https://example.org` restituisce JSON senza avviare applicazioni. `make setup SCOPE=cli` installa il dispatcher, la policy e i cataloghi; non aggiorna pacchetti, cambia associazioni o riavvia servizi. Le applicazioni, gli strumenti XDG e UWSM devono essere già disponibili. Il launcher UWSM è descritto nel [manuale nativo](https://github.com/Vladimir-csp/uwsm/blob/master/man/uwsm-app.1.scd).
 
-L’inventario in `modules/platform/arch/data/parity.json` distingue funzioni verificate da pacchetti semplicemente installati. Menu, avvio della sessione, notifiche, sfondo, singolo locker, directory di lavoro del terminale, tutte le opzioni storiche, aggiornamento e recupero richiedono sostituti e prove indipendenti.
+L’inventario in `data/component/platform/parity.json` distingue funzioni verificate da pacchetti semplicemente installati. Menu, avvio della sessione, notifiche, sfondo, singolo locker, directory di lavoro del terminale, tutte le opzioni storiche, aggiornamento e recupero richiedono sostituti e prove indipendenti.
 
 Prima della rimozione servono una sessione di prova isolata, avvio a freddo, sospensione, ripresa e recupero verificati. Occorrono alternative per tutti i pacchetti disponibili soltanto nei repository attuali. Runtime, repository, chiavi, kernel e voci di recupero restano attivi finché queste condizioni non sono soddisfatte. La [transizione EFI](boot-transition.md) separa preparazione delle immagini e prove hardware.

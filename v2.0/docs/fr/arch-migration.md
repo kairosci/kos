@@ -8,6 +8,6 @@ Le navigateur suit la préférence XDG puis l’association HTTPS si elle est vi
 
 `os app --resolve browser https://example.org` produit du JSON sans lancer d’application. `make setup SCOPE=cli` installe dispatcher, politique et catalogues sans mettre à jour les paquets, modifier les associations ou redémarrer des services. Applications, outils XDG et UWSM doivent être disponibles. Voir le [manuel UWSM](https://github.com/Vladimir-csp/uwsm/blob/master/man/uwsm-app.1.scd).
 
-L’inventaire `modules/platform/arch/data/parity.json` distingue fonctions vérifiées et paquets simplement installés. Menu, session, notifications, fond, unique verrouilleur, répertoire de travail du terminal, options historiques, mise à jour et récupération exigent des remplaçants indépendants et testés.
+L’inventaire `data/component/platform/parity.json` distingue fonctions vérifiées et paquets simplement installés. Menu, session, notifications, fond, unique verrouilleur, répertoire de travail du terminal, options historiques, mise à jour et récupération exigent des remplaçants indépendants et testés.
 
 Avant retrait, il faut une session d’essai isolée et des validations du démarrage à froid, de la suspension, de la reprise et de la récupération. Tous les paquets propres aux dépôts actuels exigent une alternative. Runtime, dépôts, clés, noyau et entrées de secours restent actifs tant que ces conditions ne sont pas remplies. La [transition EFI](boot-transition.md) distingue préparation des images et essais matériels.

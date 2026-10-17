@@ -144,6 +144,33 @@
   "permissions": [
     "/usr/bin/chmod"
   ],
+  "platformKernel": [
+    "/usr/bin/uname",
+    "-r"
+  ],
+  "platformOfficialPackages": [
+    "/usr/bin/pacman",
+    "-Slq"
+  ],
+  "platformPackages": [
+    "/usr/bin/pacman",
+    "-Qq"
+  ],
+  "platformReferences": [
+    "/usr/bin/rg"
+  ],
+  "platformRepositories": [
+    "/usr/bin/pacman-conf",
+    "--repo-list"
+  ],
+  "platformRuntimeFiles": [
+    "/usr/bin/pacman",
+    "-Qlq"
+  ],
+  "platformRuntimeInstalled": [
+    "/usr/bin/pacman",
+    "-Q"
+  ],
   "processorCount": [
     "/usr/bin/getconf",
     "_NPROCESSORS_ONLN"

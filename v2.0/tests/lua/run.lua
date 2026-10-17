@@ -36,7 +36,9 @@ local function source(path, command)
     return "/Arch\n //linux\n protocol: efi\n path: boot():" .. path .. "\n cmdline: " .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor") .. "\n"
 end
 
-if arg[2] == "boot-trial" then
+if arg[2] == "platform" then
+    assert(loadfile(root .. "/tests/lua/platform.lua"))()(suite, root)
+elseif arg[2] == "boot-trial" then
     assert(loadfile(root .. "/tests/lua/boot_trial.lua"))()(suite, root, process)
 elseif arg[2] == "json" then
     assert(loadfile(root .. "/tests/lua/documentation.lua"))()(suite, root, process)

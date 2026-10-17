@@ -56,6 +56,14 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
+    if mode == "arch-report" or mode == "arch-check" then
+        assert(config == nil, "invalid_arch_assessment_arguments")
+        local policy = File.json(self.root .. "/data/component/platform/parity.json")
+        local report = require("component.platform.assessment").new(self.root, self.process, policy):report()
+        io.write(Json.encode(report), "\n")
+        if mode == "arch-check" then assert(report.readyToRemoveRuntime and report.readyToRemoveRepository, "arch_parity_unverified") end
+        return
+    end
     if mode == "documentation-report" or mode == "verify-documentation" then
         assert(config == nil, "invalid_documentation_arguments")
         local report = require("component.documentation.catalog").new(self.root, self.process, File.json(self.root .. "/data/component/documentation/policy.json")):report()
