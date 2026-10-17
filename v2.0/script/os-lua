@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-root=$(cd -- "${BASH_SOURCE[0]%/*}/.." && pwd -P)
+entry=$(readlink -f -- "${BASH_SOURCE[0]}")
+root=$(cd -- "${entry%/*}/.." && pwd -P)
+name=${0##*/}
+if [[ "$name" == "os-grub-menu" || "$name" == "99-os-grub-menu" ]]; then
+    set -- publish-grub "$@"
+fi
 interpreter=
 while IFS='=' read -r key value; do
     case "$key" in

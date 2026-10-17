@@ -19,8 +19,9 @@ while IFS= read -r -d '' _trial_file; do
 done < <(find -L "$PROJECT_DIR/src" "$PROJECT_DIR/data" -type f -print0)
 install -Dm755 "$PROJECT_DIR/script/os-lua" /usr/share/os/script/os-lua
 install -Dm644 "$_trial_policy" /usr/share/os/boot-policy.json
-install -Dm755 "$PROJECT_DIR/scripts/lib/grub-menu.sh" /usr/local/libexec/os-grub-menu
-install -Dm755 "$PROJECT_DIR/conf/bootloader/grub-menu-command" /usr/local/bin/os-grub-menu
+install -d -m 755 /usr/local/libexec /usr/local/bin
+ln -sfn /usr/share/os/script/os-lua /usr/local/libexec/os-grub-menu
+ln -sfn /usr/share/os/script/os-lua /usr/local/bin/os-grub-menu
 /usr/local/libexec/os-grub-menu || err "bootloader.config_failed"
 while IFS= read -r _trial_retired; do
     [[ "$_trial_retired" == /usr/share/os/* && "$_trial_retired" != *..* ]] || err "bootloader.install_failed"
@@ -41,5 +42,5 @@ fi
 _trial_after=$(efibootmgr | sed -n 's/^BootOrder: //p') || err "bootloader.install_failed"
 [[ "$_trial_before" == "$_trial_after" ]] || err "bootloader.install_failed"
 install -d -m 755 /etc/boot/hooks/post.d
-install -m 755 "$PROJECT_DIR/conf/bootloader/grub-menu-hook" /etc/boot/hooks/post.d/99-os-grub-menu
+ln -sfn /usr/share/os/script/os-lua /etc/boot/hooks/post.d/99-os-grub-menu
 log "bootloader.configured"
