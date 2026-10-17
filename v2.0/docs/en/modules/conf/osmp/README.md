@@ -1,5 +1,7 @@
 # OSMP installation
 
-The setup pipeline discovers this installer after application provisioning. It stages only the runtime sources, manifest and canonical license from `modules/plugins/osmp`, validates that standalone payload and installs it with the shared user configuration helpers. Documentation symlinks remain outside the runtime payload, while symlinks in executable sources are rejected. Changed files retain backups. The shell plugin stage refreshes the native catalog; media opens Celluloid from the menu instead of enabling the retired popup.
+The application registry selects the Lua plugin installer after package provisioning. Native widget sources live in `src/component/media/osmp/src/`; manifest and package metadata live under `data/component/media/osmp/`. The installer stages regular runtime sources, manifest and canonical license, checks matching versions and validates that standalone payload before publication. Repository metadata and documentation links never enter the payload.
 
-The local repository is the sole source. No remote URL or separate runtime is required. Apply changes with `make setup` from the repository root.
+Configuration namespace migration checks all collisions before moving personal entries and preserves the native compatibility link. Redirected payload files, destination ancestors and backups are refused before publishing runtime files. Changed regular files retain backups. A failed native validation leaves the installed plugin unchanged.
+
+The local repository is the sole source. `make setup SCOPE=lua-applications` reconciles the Lua application registry. Full setup also refreshes the native plugin catalog and archives the retired identity. Celluloid remains the normal media application; the old popup is not enabled. Native widget changes require shell reconciliation through the privileged pipeline.

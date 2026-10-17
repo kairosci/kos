@@ -73,10 +73,11 @@ return function(suite, root, process)
         local source = directory .. "/source"
         process:run("directory", {source})
         for _, name in ipairs({"src", "data", "script"}) do process:run("copyTree", {root .. "/" .. name, source .. "/" .. name}) end
-        write(source .. "/CHANGELOG.md", File.read(root .. "/CHANGELOG.md"))
+        for _, relative in ipairs(policy.runtimeExtraFiles) do write(source .. "/" .. relative, File.read(root .. "/" .. relative)) end
         write(source .. "/src/component/cli/application.lua", "this is not Lua !!!")
         local first = process:run("readLink", {active})
-        suite:reject(function() Installer.new(source, backend, policy, paths):system() end)
+        local ok, failure = pcall(function() Installer.new(source, backend, policy, paths):system() end)
+        assert(not ok and tostring(failure):find("validateLua", 1, true), tostring(failure))
         assert(first == process:run("readLink", {active}))
         assert(File.read(policy.systemExecutable):find("os%-lua"))
     end)

@@ -1,4 +1,0 @@
-# Editor and OS cruft. The plugin itself is plain QML — nothing is built.
-*.swp
-*~
-.DS_Store

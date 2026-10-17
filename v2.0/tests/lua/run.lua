@@ -36,7 +36,9 @@ local function source(path, command)
     return "/Arch\n //linux\n protocol: efi\n path: boot():" .. path .. "\n cmdline: " .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor") .. "\n"
 end
 
-if arg[2] == "project" then
+if arg[2] == "media" then
+    assert(loadfile(root .. "/tests/lua/media_plugin.lua"))()(suite, root, process)
+elseif arg[2] == "project" then
     assert(loadfile(root .. "/tests/lua/project_interface.lua"))()(suite, root, process)
 elseif arg[2] == "cli" then
     assert(loadfile(root .. "/tests/lua/cli_behavior.lua"))()(suite, root, process)

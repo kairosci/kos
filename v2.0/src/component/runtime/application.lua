@@ -33,7 +33,8 @@ function Application:apply(names, single)
     for _, name in ipairs(applications) do
         local policy = assert(registry[name], "unknown_application")
         local application
-        if policy.kind == "settings" then application = settings:apply(name)
+        if policy.kind == "plugin" then application = require("component.media.plugin").new(self.root, paths, publisher, self.process, registry):apply(name)
+        elseif policy.kind == "settings" then application = settings:apply(name)
         elseif policy.kind == "ini" then application = configuration:apply(name)
         elseif policy.kind == "native-panel" then application = require("component.application.panel").new(self.root, paths, publisher, registry):apply(name)
         elseif policy.kind == "retirement" or policy.kind == "json-provider" then application = require("component.application.retirement").new(paths, publisher, self.process, registry):apply(name)

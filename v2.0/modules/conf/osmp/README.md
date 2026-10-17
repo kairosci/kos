@@ -1,1 +1,0 @@
-../../../docs/en/modules/conf/osmp/README.md

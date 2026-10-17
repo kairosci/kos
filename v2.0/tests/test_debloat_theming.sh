@@ -170,8 +170,8 @@ assert_file_contains "post-update hook reapplies color-scheme" "$PROJECT_DIR/hoo
 assert_file_contains "post-update hook stops only the gnome portal backend" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "stop.*xdg-desktop-portal-"
 assert_file_contains "post-update hook reloads portal after routing reapply" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "systemctl --user restart xdg-desktop-portal-gtk.service xdg-desktop-portal.service"
 
-assert_file_exists "plugin index exists" "$PROJECT_DIR/modules/plugins/index.json"
-assert_file_contains "plugin index references osmp" "$PROJECT_DIR/modules/plugins/index.json" "osmp"
+assert_file_exists "plugin index exists" "$PROJECT_DIR/data/component/media/plugins.json"
+assert_file_contains "plugin index references osmp" "$PROJECT_DIR/data/component/media/plugins.json" "osmp"
 
 assert_file_exists "zedconf install script exists" "$PROJECT_DIR/modules/conf/zed/install.sh"
 assert_file_contains "defaults module enforces gio file manager default" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "gio mime inode/directory"

@@ -1,20 +1,20 @@
 ---
-name: omamp-development
+name: osmp-development
 description: >-
-  Expert guide and procedures for developing, maintaining, and testing the omamp
+  Expert guide and procedures for developing, maintaining, and testing the osmp
   media player plugin for the OS desktop shell and Quickshell environment.
-  Use when modifying, debugging, or enhancing omamp or other OS bar widgets.
+  Use when modifying, debugging, or enhancing osmp or other OS bar widgets.
 ---
 
-# omamp Development and Maintenance
+# osmp Development and Maintenance
 
-This skill documents the design patterns, the MPRIS integration rules and the reload workflow for the `omamp` media player plugin in the OS shell.
+This skill documents the design patterns, the MPRIS integration rules and the reload workflow for the `osmp` media player plugin in the OS shell.
 
 ## Local Workflow
 
-The plugin is installed from this repository through the project plugin catalog, which declares the identifier, the upstream source and the bar section it belongs to. During development it is convenient to link the checkout into the user plugin directory instead of reinstalling, pointing the plugin entry at the local path. The identifier must stay identical to the one declared in the catalog entry, because the desktop shell keys its installed plugins by that string.
+The locally owned plugin is installed through the application registry. Native QML and JavaScript interfaces live in `src/component/media/osmp/src/`, manifest and package metadata in `data/component/media/osmp/`, and native interface tests in `tests/media/osmp/`. `src/component/media/plugin.lua` validates a standalone payload and publishes regular runtime files. Never download another copy or link a development checkout directly into the live configuration.
 
-After any code change, reload the OS desktop shell so the widget is rebuilt from the new sources. Pushing goes to the plugin upstream declared in the catalog, on its default branch.
+Apply through `make setup SCOPE=lua-applications`. When native widget sources change, reconcile and reload the shell through the setup pipeline and verify its actual state; never manipulate the live shell directly. Metadata-only relocation does not establish a hardware or playback test. Run native interface tests with `npm test --prefix src/component/media/osmp` from `v2.0/`, and Lua installer tests through the testing policy. Publish only through the root repository with signed pull requests.
 
 ## Design Principles
 
