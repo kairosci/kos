@@ -18,6 +18,11 @@
     "directory": "omarchy/toggles",
     "names": ["screensaver-off"]
   },
+  "retiredBranding": {
+    "root": "config",
+    "directory": "os/branding",
+    "names": ["about.txt"]
+  },
   "launcher": {
     "source": "data/component/application/desktop/mpv.desktop",
     "root": "data",
@@ -25,8 +30,7 @@
     "mode": "644"
   },
   "files": [
-    {"source": "data/component/application/desktop/kmono.txt", "root": "config", "destination": "os/branding/screensaver.txt", "mode": "644"},
-    {"source": "data/component/application/desktop/kmono.txt", "root": "config", "destination": "os/branding/about.txt", "mode": "644"},
+    {"source": "data/component/application/desktop/screensaver.txt", "root": "config", "destination": "os/branding/screensaver.txt", "mode": "644"},
     {"source": "data/component/application/desktop/fastfetch.jsonc", "root": "config", "destination": "fastfetch/config.jsonc", "mode": "644"}
   ],
   "restore": {
@@ -36,8 +40,8 @@
     "backupDirectory": "os/desktop-defaults",
     "backupMode": "700",
     "terminalFiles": ["kitty/kitty.conf", "alacritty/alacritty.toml", "ghostty/config", "foot/foot.ini"],
-    "brandingSource": "data/component/application/desktop/kmono.txt",
-    "brandingFiles": ["screensaver.txt", "about.txt"],
+    "screensaverSource": "data/component/application/desktop/screensaver.txt",
+    "screensaverDestination": "os/branding/screensaver.txt",
     "fastfetchSource": "data/component/application/desktop/fastfetch.jsonc",
     "fastfetchDestination": "fastfetch/config.jsonc"
   }

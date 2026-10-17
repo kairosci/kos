@@ -2,7 +2,7 @@ local Pins = {}
 Pins.__index = Pins
 
 function Pins.new(process, policy)
-    return setmetatable({process=assert(process), policy=assert(policy)}, Pins)
+    return setmetatable({ process = assert(process), policy = assert(policy) }, Pins)
 end
 
 local function matches(package, pattern)

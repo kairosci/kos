@@ -70,9 +70,12 @@ for file in kitty/kitty.conf alacritty/alacritty.toml ghostty/config foot/foot.i
 done
 mkdir -p "$RECOVERY_HOME/.config/kitty"
 printf 'previous terminal\n' > "$RECOVERY_HOME/.config/kitty/kitty.conf"
+mkdir -p "$RECOVERY_HOME/.config/os/branding"
+printf 'old logo\n' > "$RECOVERY_HOME/.config/os/branding/screensaver.txt"
+printf 'old logo\n' > "$RECOVERY_HOME/.config/os/branding/about.txt"
 chown() { return 0; }
 assert_true "desktop recovery restores native terminal configs with a persistent backup" 'SETUP_SCOPE=desktop root_recovery_shell && cmp "$OMARCHY_PATH/config/kitty/kitty.conf" "$RECOVERY_HOME/.config/kitty/kitty.conf" && grep -qx "previous terminal" "$RECOVERY_HOME/.local/state/os/desktop-defaults/kitty/kitty.conf"'
 assert_true "repeated desktop recovery preserves the first terminal backup" 'SETUP_SCOPE=desktop root_recovery_shell && grep -qx "previous terminal" "$RECOVERY_HOME/.local/state/os/desktop-defaults/kitty/kitty.conf"'
-assert_true "desktop recovery installs the KMono ASCII logo for screensaver and About" 'cmp "$PROJECT_DIR/data/component/application/desktop/kmono.txt" "$RECOVERY_HOME/.config/os/branding/screensaver.txt" && cmp "$PROJECT_DIR/data/component/application/desktop/kmono.txt" "$RECOVERY_HOME/.config/os/branding/about.txt"'
-assert_true "desktop recovery installs the native Fastfetch layout with the KMono logo" 'cmp "$PROJECT_DIR/data/component/application/desktop/fastfetch.jsonc" "$RECOVERY_HOME/.config/fastfetch/config.jsonc" && grep -q "source.*os/branding/about.txt" "$RECOVERY_HOME/.config/fastfetch/config.jsonc" && grep -q "Hardware" "$RECOVERY_HOME/.config/fastfetch/config.jsonc" && grep -q "Software" "$RECOVERY_HOME/.config/fastfetch/config.jsonc"'
+assert_true "desktop recovery installs the Unicode screensaver logo and preserves its prior copy" 'cmp "$PROJECT_DIR/data/component/application/desktop/screensaver.txt" "$RECOVERY_HOME/.config/os/branding/screensaver.txt" && grep -qx "old logo" "$RECOVERY_HOME/.local/state/os/desktop-defaults/os/branding/screensaver.txt" && [[ ! -e "$RECOVERY_HOME/.config/os/branding/about.txt" ]]'
+assert_true "desktop recovery uses the K logo in Fastfetch" 'jq -e ".logo.type == \"file\" and .logo.source == \"~/.config/os/branding/screensaver.txt\" and ([.modules[] | if type == \"object\" then .type else . end] | any(. == \"host\") and any(. == \"cpu\"))" "$RECOVERY_HOME/.config/fastfetch/config.jsonc"'
 test_summary

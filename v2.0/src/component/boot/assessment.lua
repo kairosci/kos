@@ -6,13 +6,25 @@ local Assessment = {}
 Assessment.__index = Assessment
 
 function Assessment.new(root, process, policy, boot, format)
-    return setmetatable({root=root, process=process, policy=policy, boot=boot, menu=Menu.new(process, format), publisher=Publisher.new(process)}, Assessment)
+    return setmetatable({
+        root = root,
+        process = process,
+        policy = policy,
+        boot = boot,
+        menu = Menu.new(process, format),
+        publisher = Publisher.new(process),
+    }, Assessment)
 end
 
 function Assessment:read_optional(path)
     local file, failure, code = io.open(path, "rb")
-    if not file then assert(code == 2, failure); return nil end
-    local content = assert(file:read("a")); assert(file:close()); return content
+    if not file then
+        assert(code == 2, failure)
+        return nil
+    end
+    local content = assert(file:read("a"))
+    assert(file:close())
+    return content
 end
 
 function Assessment:record()
@@ -29,16 +41,23 @@ function Assessment:record()
         local content = self:read_optional(path)
         if content then contents[assert(path:match("([^/]+)$"))] = content end
     end
-    local presets = self.process:run("bootPresets", {policy.presets, "-maxdepth", "1", "-type", "f", "-name", policy.presetPattern, "-print0"})
-    for path in presets:gmatch("[^%z]+") do contents[assert(path:match("([^/]+)$"))] = File.read(path) end
+    local presets = self.process:run(
+        "bootPresets",
+        { policy.presets, "-maxdepth", "1", "-type", "f", "-name", policy.presetPattern, "-print0" }
+    )
+    for path in presets:gmatch("[^%z]+") do
+        contents[assert(path:match("([^/]+)$"))] = File.read(path)
+    end
     local inventory = File.read(boot.esp .. "/" .. policy.inventory)
     local entries = self.menu:verify(self.menu:read(inventory), boot.esp)
     contents[policy.inventory] = inventory
-    contents["verified-menu.json"] = Json.encode({entries=entries, trialBootVerified=false})
-    self.process:run("directory", {policy.destination})
-    self.process:run("permissions", {policy.directoryMode, policy.destination})
-    for name, content in pairs(contents) do self.publisher:publish(policy.destination .. "/" .. name, content, policy.fileMode) end
-    return {entries=#entries, trialBootVerified=false}
+    contents["verified-menu.json"] = Json.encode({ entries = entries, trialBootVerified = false })
+    self.process:run("directory", { policy.destination })
+    self.process:run("permissions", { policy.directoryMode, policy.destination })
+    for name, content in pairs(contents) do
+        self.publisher:publish(policy.destination .. "/" .. name, content, policy.fileMode)
+    end
+    return { entries = #entries, trialBootVerified = false }
 end
 
 return Assessment

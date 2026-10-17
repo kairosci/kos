@@ -14,10 +14,13 @@ local ok, status = pcall(function()
         suites = {}
         for index = 3, #arg do
             local path = arg[index]
-            suites[#suites + 1] = {path=path, language=path:match("%.lua$") and "lua" or "shell"}
+            suites[#suites + 1] = { path = path, language = path:match("%.lua$") and "lua" or "shell" }
         end
     end
     return Runner.new(root, Process.new(File.json(root .. "/data/core/commands.json")), policy):run(suites)
 end)
-if not ok then io.stderr:write(tostring(status), "\n"); os.exit(1) end
+if not ok then
+    io.stderr:write(tostring(status), "\n")
+    os.exit(1)
+end
 os.exit(status)

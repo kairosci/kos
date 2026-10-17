@@ -3,7 +3,10 @@ local Files = {}
 Files.__index = Files
 
 function Files.new(root, paths, publisher, process, registry)
-    return setmetatable({root=root, paths=paths, publisher=publisher, process=process, registry=registry}, Files)
+    return setmetatable(
+        { root = root, paths = paths, publisher = publisher, process = process, registry = registry },
+        Files
+    )
 end
 
 function Files:apply(name)
@@ -19,7 +22,9 @@ function Files:apply(name)
         end)
     end
     self.publisher:publish(self.paths:resolve(policy.root, policy.destination), content, policy.mode)
-    if policy.refresh then self.process:run(policy.refresh.command, {self.paths:resolve(policy.root, policy.refresh.directory)}) end
+    if policy.refresh then
+        self.process:run(policy.refresh.command, { self.paths:resolve(policy.root, policy.refresh.directory) })
+    end
     return policy.display
 end
 
