@@ -24,12 +24,16 @@ function MenuPolicy:apply_paths_qml()
 end
 function MenuPolicy:apply_dialog()
   self:replace_once("ConfirmDialog {", "ControlConfirmDialog {")
-  self:replace_once('text: row.label', 'text: row.kind === "app" ? row.label : SessionI18n.text(row.label)')
+  self:replace_once('text: row.label', 'text: row.kind === "app" ? row.label + " >" : SessionI18n.text(row.label)')
+end
+function MenuPolicy:apply_order()
+  self:replace_once("    for (var k = 0; k < rows.length; k++) displayModel.append(rows[k])", "    root.sortMenuRows(rows)\n    for (var k = 0; k < rows.length; k++) displayModel.append(rows[k])")
 end
 function MenuPolicy:finish(support_path)
   self:apply_paths_qml()
   self:apply_width()
   self:apply_dialog()
+  self:apply_order()
   local ending = assert(self.text:find("}%s*$"))
   self.text = self.text:sub(1, ending - 1) .. MenuPolicy.read(assert(support_path)) .. "\n  AppCatalog { id: appCatalog; policy: root.sessionPolicy }\n" .. self.text:sub(ending)
   return self.text
