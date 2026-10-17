@@ -35,6 +35,7 @@ function Application:apply(names, single)
         local application
         if policy.kind == "settings" then application = settings:apply(name)
         elseif policy.kind == "ini" then application = configuration:apply(name)
+        elseif policy.kind == "retirement" or policy.kind == "json-provider" then application = require("component.application.retirement").new(paths, publisher, self.process, registry):apply(name)
         elseif policy.kind == "file" or policy.kind == "desktop" then application = files:apply(name)
         else error("unknown_application_kind") end
         io.write(self.catalog:text("gui.install_done", application), "\n")
@@ -54,21 +55,60 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
-    if mode == "settings-snapshot" or mode == "settings-set" or mode == "settings-write" or mode == "install-settings" then
+    if mode == "boot-appearance-diagnostics" then
+        assert(self.process:run("identity"):match("^0%s*$"), "root_required")
+        local policy = File.json(self.root .. "/" .. self.layout.bootAppearance)
+        io.write(File.read(policy.lastAttempt), "\n")
+        return
+    end
+    if mode == "grub-repair" then
+        local policy = File.json(self.root .. "/" .. self.layout.bootCandidate)
+        local boot = File.json(self.root .. "/" .. self.layout.bootPolicy)
+        io.write(Json.encode(require("component.boot.candidate").new(self.process, policy, boot):repair()), "\n")
+        return
+    end
+    if mode == "boot-diagnostics" then
+        assert(self.process:run("identity"):match("^0%s*$"), "root_required")
+        local policy = File.json(self.root .. "/" .. self.layout.bootPolicy)
+        local image = policy.esp .. "/EFI/" .. policy.candidateId .. "/" .. policy.candidateFile
+        local configuration = policy.esp .. "/" .. policy.grubConfiguration
+        self.process:run("validateGrub", {configuration})
+        local prefixes = Json.array({})
+        for line in self.process:run("bootImageStrings", {image}):gmatch("[^\r\n]+") do
+            if line:find("/grub", 1, true) then prefixes[#prefixes + 1] = line end
+        end
+        local files = File.json(self.root .. "/" .. self.layout.bootFiles)
+        local inventory = require("component.boot.menu").new(self.process, File.json(self.root .. "/" .. self.layout.bootFormat)):read(File.read(policy.esp .. "/" .. files.inventory))
+        for _, entry in ipairs(inventory) do entry.observedDigest = self.process:run("digest", {policy.esp .. entry.path}):match("^(%x+)") end
+        io.write(Json.encode({inventory=inventory, firmware=self.process:run("bootFirmware"), imageSections=self.process:run("bootCandidateInspect", {image}), prefixes=prefixes, configuration=File.read(configuration), espUuid=self.process:run("mountUuid", {policy.esp}):gsub("\n$", ""), hardwareBootVerified=false}), "\n")
+        return
+    end
+    if mode == "boot-appearance" then
+        assert(config == nil, "invalid_boot_appearance_arguments")
+        local policy = File.json(self.root .. "/" .. self.layout.bootAppearance)
+        local result = require("component.boot.appearance").new(self.root, self.process, policy):apply()
+        io.write(Json.encode(result), "\n")
+        return
+    end
+    if mode == "settings-snapshot" or mode == "settings-set" or mode == "settings-write" or mode == "settings-set-session" or mode == "settings-write-session" or mode == "install-settings" then
         local Paths = require("core.paths")
         local paths = Paths.new(File.json(self.root .. "/" .. self.layout.paths))
         local policy = File.json(self.root .. "/" .. self.layout.settings)
         local model = require("component.settings.model").new(self.root, self.process, paths, Publisher.new(self.process), policy, self.catalog)
         if mode == "install-settings" then return require("component.settings.installer").new(model):apply() end
-        if mode == "settings-set" then
+        if mode == "settings-set" or mode == "settings-set-session" then
             assert(config and esp and uuid == nil, "invalid_settings_arguments")
             local lock = paths:resolve("state", policy.lock)
             self.process:run("directory", {assert(lock:match("^(.*)/[^/]+$"))})
-            io.write(self.process:run("settingsSerialized", {lock, self.root .. "/script/os-lua", "settings-write", config, esp}))
+            io.write(self.process:run("settingsSerialized", {lock, self.root .. "/script/os-lua", mode == "settings-set-session" and "settings-write-session" or "settings-write", config, esp}))
             return
         end
         local result
-        if mode == "settings-write" then
+        if mode == "settings-write-session" then
+            assert(config and esp and uuid == nil, "invalid_settings_arguments")
+            require("component.settings.session").new(paths, Publisher.new(self.process), policy):write(config, Json.decode(esp))
+            result = model:snapshot()
+        elseif mode == "settings-write" then
             assert(config and esp and uuid == nil, "invalid_settings_arguments")
             result = model:write(config, Json.decode(esp))
         else result = model:snapshot() end

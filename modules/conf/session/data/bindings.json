@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "key": "SUPER + SPACE",
+    "labelKey": "session.os_menu",
+    "command": "os menu toggle"
+  },
+  {
+    "key": "SUPER + SHIFT + code:201",
+    "labelKey": "session.os_menu",
+    "command": "os menu toggle root"
+  }
+]

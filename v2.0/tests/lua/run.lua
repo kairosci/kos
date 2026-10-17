@@ -39,6 +39,10 @@ end
 if arg[2] == "json" then
     local settingsTests = assert(loadfile(root .. "/tests/lua/settings.lua"))()
     settingsTests(suite, root, process)
+    local appearanceTests = assert(loadfile(root .. "/tests/lua/boot_appearance.lua"))()
+    appearanceTests(suite, root, process)
+    local candidateTests = assert(loadfile(root .. "/tests/lua/boot_candidate.lua"))()
+    candidateTests(suite, root, process)
     suite:test("migration inventory cannot certify retained shell algorithms", function()
         local Inventory = require("component.migration.inventory")
         local inventory = Inventory.new(root, process, File.json(root .. "/data/component/migration/policy.json"))
@@ -148,6 +152,9 @@ if arg[2] == "json" then
     suite:test("failed native processes propagate", function()
         local runner = Process.new({fail={"/usr/bin/false"}})
         suite:reject(function() runner:run("fail") end)
+        assert(runner:status("fail") == 1)
+        local exits = Process.new({exit={"/usr/bin/sh", "-c", "exit 37"}})
+        assert(exits:status("exit") == 37)
     end)
 elseif arg[2] == "catalog" then
     local locale = File.json(root .. "/data/core/locale.json")
@@ -175,6 +182,7 @@ elseif arg[2] == "applications" then
         suite:test("Lua applies every declared setting for " .. name, function()
             local calls = {}
             local backend = {run=function(_, command, arguments)
+                if arguments[1] == "list-schemas" then return "org.gnome.Resources\n" end
                 assert(command == "gsettings" and arguments[1] == "set" and #arguments == 4)
                 calls[#calls + 1] = table.concat(arguments, "\t")
                 return ""
@@ -182,7 +190,10 @@ elseif arg[2] == "applications" then
             assert(Settings.new(root, backend, registry):apply(name) == policy_entry.display)
             local lines = File.list(root .. "/" .. policy_entry.settings)
             assert(#calls == #lines)
-            for index, line in ipairs(lines) do assert(calls[index] == "set\t" .. line) end
+            for index, line in ipairs(lines) do
+                if policy_entry.schemaSelection then line = line:gsub("net.nokyan.Resources", "org.gnome.Resources", 1) end
+                assert(calls[index] == "set\t" .. line)
+            end
         end)
         end
     end

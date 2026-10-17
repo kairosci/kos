@@ -20,6 +20,7 @@
     "update.config",
     "desktop-tools.audio",
     "desktop-tools.network",
-    "desktop-tools.bluetooth"
+    "desktop-tools.bluetooth",
+    "desktop-tools.settings"
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "stateRoot": "/var/lib/os/grub-candidate",
+  "output": "grubx64.efi",
+  "embeddedEntry": "boot/grub/grub.cfg",
+  "embeddedFormat": "search --no-floppy --fs-uuid --set=root %s\nset prefix=($root)/grub\nconfigfile ($root)/grub/grub.cfg\n",
+  "fileMode": "644",
+  "modules": [
+    "part_gpt",
+    "fat",
+    "normal",
+    "chain",
+    "search",
+    "search_fs_uuid",
+    "tpm"
+  ],
+  "manifest": "/var/lib/os/grub-candidate/state.json"
+}

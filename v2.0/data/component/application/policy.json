@@ -73,5 +73,55 @@
       "command": "desktopDatabase",
       "directory": "applications"
     }
+  },
+  "resources": {
+    "display": "Resources",
+    "kind": "settings",
+    "settings": "data/component/application/resources/settings.tsv",
+    "schemaSelection": {
+      "command": [
+        "list-schemas"
+      ],
+      "schemas": [
+        "org.gnome.Resources",
+        "net.nokyan.Resources"
+      ],
+      "original": "net.nokyan.Resources",
+      "legacy": "data/component/application/resources/legacy-settings.tsv"
+    }
+  },
+  "micro": {
+    "display": "Micro",
+    "kind": "retirement",
+    "guards": [
+      "micro",
+      "micro/plug",
+      "micro/plug/filemanager",
+      "micro/settings.json"
+    ],
+    "removeTree": "micro/plug/filemanager",
+    "configuration": "micro/settings.json",
+    "removeKeys": [
+      "filemanager.openonstart"
+    ],
+    "mode": "600"
+  },
+  "agents": {
+    "display": "Agents",
+    "kind": "json-provider",
+    "configuration": "omarchy/shell.json",
+    "container": [
+      "bar",
+      "layout"
+    ],
+    "identity": "omarchy.agents",
+    "identityKey": "id",
+    "assign": [
+      "providers",
+      "claude",
+      "enabled"
+    ],
+    "value": false,
+    "mode": "600"
   }
 }

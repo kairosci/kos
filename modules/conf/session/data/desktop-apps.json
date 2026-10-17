@@ -18,11 +18,6 @@
     "action": "os app clock",
     "icon": "󰥔"
   },
-  "desktop-tools.settings": {
-    "label": "Settings",
-    "action": "os app settings",
-    "icon": "󰒓"
-  },
   "desktop-tools.resources": {
     "label": "Resources",
     "action": "os app resources",

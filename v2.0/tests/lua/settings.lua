@@ -11,6 +11,7 @@ return function(suite, root, process)
         if key == "HOME" then return directory end
     end)
     local publisher = Publisher.new(process)
+    publisher:publish(paths:resolve("config", policy.sessionConfiguration), [[{"idle":{"lock":300,"screensaver":150},"personal":true}]], "600")
     local main = paths:resolve("config", policy.main)
     publisher:publish(main, "hl.config({})\n" .. policy.include .. "\n", "600")
     local stateFile = paths:resolve("config", policy.state)
@@ -21,6 +22,7 @@ return function(suite, root, process)
     for _, option in ipairs(policy.options) do
         values[#values + 1] = {name=option.key, current=option.kind == "boolean" and false or option.kind == "number" and option.min or "it"}
         if option.kind == "boolean" then values[#values].current = false end
+        if option.kind == "choice" then values[#values].current = option.choices[1] end
     end
     local backend = {failure=nil, run=function(self, command, arguments)
         counts[command] = (counts[command] or 0) + 1
@@ -94,6 +96,19 @@ return function(suite, root, process)
         end
         assert(counts.settingsReload == reloads)
         publisher:publish(stateFile, original, "600")
+    end)
+    suite:test("session settings persist timers without replacing unrelated desktop preferences", function()
+        local Session = require("component.settings.session")
+        local session = Session.new(paths, publisher, policy)
+        session:write("lock", 450)
+        local config = File.json(paths:resolve("config", policy.sessionConfiguration))
+        assert(config.personal and config.idle.lock == 450 and config.idle.screensaver == 150)
+        assert(session:snapshot()[1].value == 450)
+        local before = File.read(paths:resolve("config", policy.sessionConfiguration))
+        suite:reject(function() session:write("lock", 1) end)
+        suite:reject(function() session:write("screensaver", 0.5) end)
+        suite:reject(function() session:write("exec", 60) end)
+        assert(File.read(paths:resolve("config", policy.sessionConfiguration)) == before)
     end)
     suite:test("invalid theme data cannot become application palette", function()
         publisher:publish(paths:resolve("state", policy.palette.path), 'accent="#bad"', "600")

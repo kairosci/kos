@@ -25,8 +25,16 @@ Pane {
                     checked: row.modelData.value === true
                     onClicked: root.app.save(row.modelData.key, checked)
                 }
+                ComboBox {
+                    visible: row.modelData.kind === "choice"
+                    model: row.modelData.choices ? row.modelData.choices.map((value, index) => ({value: value, label: row.modelData.choiceNames ? root.app.text(row.modelData.choiceNames[index]) : String(value)})) : []
+                    textRole: "label"
+                    valueRole: "value"
+                    currentIndex: row.modelData.choices ? row.modelData.choices.indexOf(row.modelData.value) : -1
+                    onActivated: root.app.save(row.modelData.key, currentValue)
+                }
                 TextField {
-                    visible: row.modelData.kind !== "boolean"
+                    visible: row.modelData.kind === "string" || row.modelData.kind === "number"
                     text: String(row.modelData.value)
                     selectByMouse: true
                     onEditingFinished: {
