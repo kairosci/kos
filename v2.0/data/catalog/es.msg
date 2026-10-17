@@ -184,6 +184,7 @@ power.usb_storage=Deshabilitar el almacenamiento USB
 power.protocols=Deshabilitar los protocolos innecesarios
 power.filesystems=Deshabilitar los sistemas de archivos innecesarios
 power.firewire=Deshabilitar FireWire
+power.baseline_failed=No se pudo aplicar la base de seguridad
 
 maint.sudo=Endurecer sudo
 maint.sudoers_invalid=sudoers.d/security no válido, revertido

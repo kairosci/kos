@@ -29,3 +29,5 @@ La pile de sécurité utilise désormais Lua et des données externes pour l’i
 Le basculement DNS fonctionne désormais en Lua avec `systemd-resolved`, sans appeler le runtime Omarchy. Seuils, délai, fournisseurs et adresses proviennent des données canoniques ; la vérification contrôle la configuration active et le service.
 
 La vérification Lua contrôle aussi les permissions sensibles, les fichiers de blacklist des modules, le paramètre LSM AppArmor actif et la suppression du contenu TPM depuis les données canoniques. La vérification des services rejette aussi les substitutions NetworkManager ; les contrôles Bash équivalents ont été supprimés.
+
+L’étape matérielle délègue à Lua la publication des listes noires des modules et les permissions sensibles, selon des contenus et modes canoniques. Le composant rejette une identité non root avant toute modification du système.

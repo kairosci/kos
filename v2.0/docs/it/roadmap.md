@@ -79,3 +79,5 @@ Lo stack sicurezza passa a Lua e dati esterni: installazione dei pacchetti, rego
 Il failover DNS è gestito da Lua e `systemd-resolved`, senza chiamare il runtime Omarchy. Soglie, cooldown, provider e indirizzi sono dati canonici; la verifica controlla configurazione attiva e servizio.
 
 La verifica Lua confronta anche i permessi sensibili, i file blacklist dei moduli, il parametro LSM AppArmor attivo e la rimozione del payload TPM con i dati canonici. I servizi verificano inoltre l’assenza di override NetworkManager; i controlli Bash equivalenti sono stati rimossi.
+
+Lo stage hardware delega a Lua la pubblicazione delle blacklist dei moduli e l’applicazione dei permessi sensibili, con modalità e contenuti canonici. Il componente rifiuta l’identità non root prima di modificare il sistema.

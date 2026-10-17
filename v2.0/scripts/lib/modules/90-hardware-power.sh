@@ -3,50 +3,11 @@
 set -euo pipefail
 
 log "power.usb_storage"
-cat > /etc/modprobe.d/disable-usb-storage.conf << 'USB'
-install usb-storage /bin/true
-blacklist usb-storage
-USB
-
 log "power.protocols"
-cat > /etc/modprobe.d/disable-protocols.conf << 'PROTO'
-install dccp /bin/true
-install sctp /bin/true
-install rds /bin/true
-install tipc /bin/true
-PROTO
-
 log "power.firewire"
-cat > /etc/modprobe.d/disable-firewire.conf << 'FIREWIRE'
-blacklist firewire-core
-blacklist firewire-ohci
-blacklist firewire-sbp2
-FIREWIRE
-
 log "power.filesystems"
-cat > /etc/modprobe.d/disable-ramfs.conf << 'RAMFS'
-blacklist cramfs
-blacklist freevxfs
-blacklist hfs
-blacklist hfsplus
-blacklist jffs2
-blacklist udf
-RAMFS
-
 log "power.perms"
-chmod 700 /root
-chmod 600 /etc/shadow
-chmod 600 /etc/gshadow
-chmod 644 /etc/passwd
-chmod 644 /etc/group
-chmod 750 /etc/ssh
-for _ssh_conf in /etc/ssh/ssh_config /etc/ssh/sshd_config /etc/ssh/sshd_config.d/*.conf /etc/ssh/ssh_config.d/*.conf; do
-    [[ -f "$_ssh_conf" ]] || continue
-    case "$_ssh_conf" in
-        /etc/ssh/sshd_config|/etc/ssh/sshd_config.d/*) chmod 600 "$_ssh_conf" ;;
-        *) chmod 644 "$_ssh_conf" ;;
-    esac
-done
+"$PROJECT_ROOT/script/os-lua" apply-security-baseline || err "power.baseline_failed"
 for u_home in /home/*; do
     [[ -d "$u_home" ]] || continue
     "$PROJECT_ROOT/script/os-lua" secure-home "$u_home" 2>/dev/null || warn "power.home_chown" "$u_home"

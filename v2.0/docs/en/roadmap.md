@@ -29,3 +29,5 @@ The security stack now uses Lua and external data for package installation, audi
 DNS failover now runs in Lua through `systemd-resolved`, without calling the Omarchy runtime. Thresholds, cooldown, providers and addresses come from canonical data; verification checks the active configuration and service.
 
 Lua verification also checks sensitive file modes, module blacklist files, the active AppArmor LSM parameter and TPM payload removal against canonical data. Service verification also rejects NetworkManager overrides; the equivalent Bash checks have been removed.
+
+The hardware stage delegates module blacklist publication and sensitive file modes to Lua, using canonical content and modes. The component rejects non-root identities before changing the system.

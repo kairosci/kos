@@ -29,9 +29,9 @@ assert_file_contains "AppArmor profiles are world readable" "$PROJECT_DIR/src/co
 assert_file_not_contains "sshd AppArmor profile does not deny the privilege separation directory" "$PROJECT_DIR/data/component/security/stack.json" "deny /tmp/\*\* rw"
 
 assert_file_exists "hardware power module exists" "$POWER_MODULE"
-assert_file_contains "hardware module blacklists usb-storage" "$POWER_MODULE" "blacklist usb-storage"
-assert_file_contains "hardware module blacklists protocols" "$POWER_MODULE" "disable-protocols.conf"
-assert_file_contains "hardware module blacklists firewire" "$POWER_MODULE" "disable-firewire.conf"
+assert_file_contains "hardware module delegates security baseline to Lua" "$POWER_MODULE" "apply-security-baseline"
+assert_file_contains "security baseline owns module blacklist application" "$PROJECT_DIR/src/component/security/baseline.lua" "moduleFiles"
+assert_file_contains "security baseline declares module policy" "$PROJECT_DIR/data/component/security/baseline.json" "disable-usb-storage.conf"
 
 assert_file_exists "maintenance module exists" "$MAINT_MODULE"
 assert_file_exists "security audit module exists" "$AUDIT_MODULE"
@@ -48,8 +48,8 @@ assert_file_contains "service policy delegates to Lua" "$SERVICES_MODULE" "apply
 assert_file_contains "service policy is declared as external data" "$PROJECT_DIR/data/component/security/services.json" "avahi-daemon.service"
 assert_file_contains "clamav update is deferred when freshclam already runs" "$PROJECT_DIR/src/component/security/stack.lua" "freshclamRunning"
 assert_file_not_contains "auditd is not restarted via the missing initscripts service wrapper" "$SECURITY_STACK_MODULE" "service auditd restart"
-assert_file_contains "ssh config chmod targets the real config files" "$POWER_MODULE" "sshd_config.d/..conf"
-assert_file_not_contains "ssh config chmod no longer relies on a non-matching glob" "$POWER_MODULE" "chmod 644 /etc/ssh/..conf 2>"
+assert_file_contains "SSH directory mode is declared in security policy" "$PROJECT_DIR/data/component/security/baseline.json" '"directory": \["/etc/ssh", "750"\]'
+assert_file_contains "SSH file modes are applied by Lua" "$PROJECT_DIR/src/component/security/baseline.lua" "_applySshPermissions"
 assert_file_not_contains "pacman cache cleanup no longer pipes yes through pipefail" "$MAINT_MODULE" "yes .. pacman -Scc"
 assert_file_contains "pacman cache cleanup retains rollback packages" "$MAINT_MODULE" "paccache -rk2"
 assert_file_contains "voxtype global disable is guarded on unit existence" "$MAINT_MODULE" "list-unit-files voxtype.service"

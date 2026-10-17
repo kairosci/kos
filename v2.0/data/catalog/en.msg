@@ -184,6 +184,7 @@ power.usb_storage=Disabling USB storage
 power.protocols=Disabling unused protocols
 power.filesystems=Disabling unused filesystems
 power.firewire=Disabling FireWire
+power.baseline_failed=Security baseline application failed
 
 maint.sudo=Hardening sudo
 maint.sudoers_invalid=sudoers.d/security invalid, rolled back
