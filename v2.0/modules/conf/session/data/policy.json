@@ -21,6 +21,7 @@
     "desktop-tools.audio",
     "desktop-tools.network",
     "desktop-tools.bluetooth",
-    "desktop-tools.settings"
+    "desktop-tools.settings",
+    "update.channel"
   ]
 }
