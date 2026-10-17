@@ -19,6 +19,12 @@ function Assessment:report()
     for _, package in ipairs(packages) do installed[package] = true end
     local repositories = Assessment.lines(process:run("platformRepositories"))
     for _, package in ipairs(Assessment.lines(process:run("platformOfficialPackages", policy.officialRepositories))) do official[package] = true end
+    local repositoryPackages = {}
+    for line in process:run("platformRepositoryCatalog"):gmatch("[^\r\n]+") do
+        local repository, package = line:match("^(%S+)%s+(%S+)%s+%S+")
+        assert(repository and package, "invalid_repository_catalog")
+        if repository == policy.runtimeRepository then repositoryPackages[package] = true end
+    end
     local arguments = {"-l", "-e", policy.runtimeReferencePattern}
     for _, relative in ipairs(policy.sourceDirectories) do arguments[#arguments + 1] = self.root .. "/" .. relative end
     local references, status = process:capture("platformReferences", arguments)
@@ -34,10 +40,19 @@ function Assessment:report()
     local report = {schemaVersion=policy.schemaVersion, target=policy.target,
         runningKernel=process:run("platformKernel"):gsub("\n$", ""),
         externalPackages=Json.array({}), repositories=repositories, packagesWithoutOfficialSource=Json.array({}),
+        packagesFromRuntimeRepository=Json.array({}), packagesFromRuntimeRepositoryWithoutOfficialSource=Json.array({}),
         dependentSources=Assessment.lines(references), runtimeFileCount=count, capabilities=Json.array({}),
-        readyToRemoveRuntime=false, readyToRemoveRepository=false, requiresTrialBoot=true}
+        readyToRemoveRuntime=false, readyToRemoveRepository=false, runtimeRepositoryConfigured=false, requiresTrialBoot=true}
+    for _, repository in ipairs(repositories) do if repository == policy.runtimeRepository then report.runtimeRepositoryConfigured = true end end
     for _, package in ipairs(policy.externalPackages) do if installed[package] then report.externalPackages[#report.externalPackages + 1] = package end end
-    for _, package in ipairs(packages) do if not official[package] then report.packagesWithoutOfficialSource[#report.packagesWithoutOfficialSource + 1] = package end end
+    for _, package in ipairs(packages) do
+        if not official[package] then report.packagesWithoutOfficialSource[#report.packagesWithoutOfficialSource + 1] = package end
+        if repositoryPackages[package] then
+            report.packagesFromRuntimeRepository[#report.packagesFromRuntimeRepository + 1] = package
+            if not official[package] then report.packagesFromRuntimeRepositoryWithoutOfficialSource[#report.packagesFromRuntimeRepositoryWithoutOfficialSource + 1] = package end
+        end
+    end
+    report.readyToRemoveRepository = #report.packagesFromRuntimeRepositoryWithoutOfficialSource == 0
     for _, capability in ipairs(policy.requiredCapabilities) do
         local result = {}
         for key, value in pairs(capability) do result[key] = value end
