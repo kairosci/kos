@@ -350,6 +350,13 @@
         "language": "lua",
         "path": "tests/lua/run.lua",
         "arguments": [
+          "services"
+        ]
+      },
+      {
+        "language": "lua",
+        "path": "tests/lua/run.lua",
+        "arguments": [
           "kernel"
         ]
       },

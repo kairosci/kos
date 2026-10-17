@@ -484,5 +484,33 @@
     "/usr/bin/sudo",
     "-n",
     "/usr/bin/cat"
+  ],
+  "systemdUnitFiles": [
+    "/usr/bin/systemctl",
+    "list-unit-files",
+    "--no-legend"
+  ],
+  "journaldRestart": [
+    "/usr/bin/systemctl",
+    "restart",
+    "systemd-journald"
+  ],
+  "systemdDisableUnit": [
+    "/usr/bin/systemctl",
+    "disable",
+    "--now"
+  ],
+  "systemdUnitEnabledPrivileged": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/systemctl",
+    "is-enabled"
+  ],
+  "systemdUnitFilesPrivileged": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/systemctl",
+    "list-unit-files",
+    "--no-legend"
   ]
 }

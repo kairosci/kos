@@ -162,8 +162,7 @@ fi
 
 section verify.sec_services
 if can_inspect_system; then
-    tcheck "check.avahi_disabled" "! priv systemctl is-enabled avahi-daemon.service 2>/dev/null | grep -q '^enabled$'"
-    tcheck "check.cups_disabled" "! priv systemctl is-enabled cups.service 2>/dev/null | grep -q '^enabled$'"
+    tcheck "check.services_policy" "\"$SCRIPT_DIR/../script/os-lua\" verify-services"
 else
     skip "$(t verify.skip_root)"
 fi

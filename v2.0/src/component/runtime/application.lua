@@ -127,6 +127,17 @@ function Application:run(arguments)
         assert(firewall:verify(), "firewall_policy_drift")
         return
     end
+    if mode == "apply-services" or mode == "verify-services" then
+        assert(#arguments == 1, "invalid_services_arguments")
+        local services = require("component.security.services").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/services.json"),
+            self.catalog
+        )
+        if mode == "apply-services" then return services:apply() end
+        assert(services:verify(), "services_policy_drift")
+        return
+    end
     if mode == "apply-kernel" or mode == "verify-kernel" then
         assert(#arguments == 1, "invalid_kernel_arguments")
         local kernel = require("component.security.kernel").new(

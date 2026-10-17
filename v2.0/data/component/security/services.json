@@ -1,0 +1,7 @@
+{
+  "files": {
+    "/etc/systemd/resolved.conf.d/hardened.conf": "[Resolve]\nLLMNR=no\nMulticastDNS=no\n",
+    "/etc/systemd/journald.conf.d/security.conf": "[Journal]\nSystemMaxUse=500M\nSystemMaxRetentionSec=30day\nCompress=yes\n"
+  },
+  "units": ["avahi-daemon.service", "avahi-daemon.socket", "cups.service", "cups.socket", "cups-browsed.service", "cups-browsed.socket"]
+}

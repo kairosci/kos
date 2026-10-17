@@ -295,6 +295,7 @@ check.sshd_root_login=PermitRootLogin no
 check.sshd_password_auth=PasswordAuthentication disabled
 check.avahi_disabled=avahi-daemon disabled
 check.cups_disabled=cups disabled
+check.services_policy=systemd service security policy
 check.bluetooth_enabled=bluetooth enabled
 check.sshd_service_hardened=sshd service hardened
 check.networkmanager_intact=NetworkManager not overridden
