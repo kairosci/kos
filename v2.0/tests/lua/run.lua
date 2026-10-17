@@ -436,10 +436,14 @@ elseif arg[2] == "applications" then
         assert(
             File.read(desktopPaths:resolve("data", desktopPolicy.launcher.destination)):find("[Desktop Entry]", 1, true)
         )
+        assert(
+            File.read(desktopPaths:resolve("config", "os/branding/screensaver.txt"))
+                == File.read(root .. "/" .. desktopPolicy.files[1].source)
+        )
         for _, name in ipairs(desktopPolicy.retiredBranding.names) do
             assert(not io.open(desktopPaths:resolve("config", desktopPolicy.retiredBranding.directory .. "/" .. name), "rb"))
         end
-        assert(File.json(root .. "/" .. desktopPolicy.files[1].source).logo.type == "none")
+        assert(File.json(root .. "/" .. desktopPolicy.files[2].source).logo.type == "none")
         for _, name in ipairs(desktopPolicy.retiredHooks.names) do
             assert(
                 not io.open(desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/" .. name), "rb")

@@ -76,6 +76,6 @@ printf 'old logo\n' > "$RECOVERY_HOME/.config/os/branding/about.txt"
 chown() { return 0; }
 assert_true "desktop recovery restores native terminal configs with a persistent backup" 'SETUP_SCOPE=desktop root_recovery_shell && cmp "$OMARCHY_PATH/config/kitty/kitty.conf" "$RECOVERY_HOME/.config/kitty/kitty.conf" && grep -qx "previous terminal" "$RECOVERY_HOME/.local/state/os/desktop-defaults/kitty/kitty.conf"'
 assert_true "repeated desktop recovery preserves the first terminal backup" 'SETUP_SCOPE=desktop root_recovery_shell && grep -qx "previous terminal" "$RECOVERY_HOME/.local/state/os/desktop-defaults/kitty/kitty.conf"'
-assert_false "desktop recovery removes existing ASCII logos" '[[ -e "$RECOVERY_HOME/.config/os/branding/screensaver.txt" || -e "$RECOVERY_HOME/.config/os/branding/about.txt" ]]'
+assert_true "desktop recovery installs the Unicode screensaver logo and preserves its prior copy" 'cmp "$PROJECT_DIR/data/component/application/desktop/screensaver.txt" "$RECOVERY_HOME/.config/os/branding/screensaver.txt" && grep -qx "old logo" "$RECOVERY_HOME/.local/state/os/desktop-defaults/os/branding/screensaver.txt" && [[ ! -e "$RECOVERY_HOME/.config/os/branding/about.txt" ]]'
 assert_true "desktop recovery disables Fastfetch logo rendering" 'jq -e ".logo.type == \"none\" and ([.modules[] | if type == \"object\" then .type else . end] | any(. == \"host\") and any(. == \"cpu\"))" "$RECOVERY_HOME/.config/fastfetch/config.jsonc"'
 test_summary

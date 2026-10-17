@@ -117,6 +117,12 @@ function Desktop:restore()
             "644"
         )
     end
+    self:backup(backup, restore.backupMode, restore.screensaverDestination)
+    self.publisher:publish(
+        self.paths:resolve("config", restore.screensaverDestination),
+        File.read(self.root .. "/" .. restore.screensaverSource),
+        "644"
+    )
     self:retire(policy.retiredBranding)
     self.publisher:publish(
         self.paths:resolve("config", restore.fastfetchDestination),
