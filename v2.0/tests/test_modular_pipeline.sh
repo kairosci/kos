@@ -53,6 +53,7 @@ done
 
 
 assert_file_contains "00-env defines aur_verified_install" "$MODULES_DIR/00-env.sh" "aur_verified_install\(\)"
+assert_file_contains "AUR install delegates to the Lua component" "$MODULES_DIR/00-env.sh" 'install-aur.*PRIMARY_USER'
 assert_file_contains "00-env defines omarchy_as helper" "$MODULES_DIR/00-env.sh" "omarchy_as\(\)"
 assert_file_contains "omarchy_as forwards the user session bus" "$MODULES_DIR/00-env.sh" "DBUS_SESSION_BUS_ADDRESS"
 assert_file_contains "20-defaults routes the browser through omarchy_as" "$MODULES_DIR/20-defaults.sh" "omarchy_as"
@@ -70,24 +71,5 @@ for scope in migrate release iso kernel; do
 done
 assert_file_contains_literal "setup requires the installed Omarchy runtime" "$PROJECT_DIR/scripts/setup.sh" 'pacman -Q omarchy'
 assert_file_not_contains "setup preserves the upstream system identity" "$PROJECT_DIR/scripts/setup.sh" 'os-identity'
-
-AUR_SANDBOX=$(mktemp -d)
-trap 'rm -rf "$AUR_SANDBOX"' EXIT
-# shellcheck source=/dev/null
-source <(sed -n '/^aur_source_dependencies()/,/^}/p' "$MODULES_DIR/00-env.sh")
-printf 'depends = gtk3\nmakedepends = patch\ndepends_x86_64 = libx11\ndepends_aarch64 = wrong-architecture\noptdepends = libreoffice: fonts\n' > "$AUR_SANDBOX/srcinfo"
-assert_true "AUR selects required dependencies for the current architecture" "[[ \$(aur_source_dependencies '$AUR_SANDBOX/srcinfo' x86_64) == \$'gtk3\npatch\nlibx11' ]]"
-assert_false "AUR propagates unreadable metadata" "aur_source_dependencies '$AUR_SANDBOX/missing' x86_64"
-if command -v pacman >/dev/null; then
-    # shellcheck source=/dev/null
-    source <(sed -n '/^aur_package_artifact()/,/^}/p' "$MODULES_DIR/00-env.sh")
-    mkdir -p "$AUR_SANDBOX/payload"
-    printf 'pkgname = wanted-git\npkgver = 1-1\npkgdesc = Fixture\nsize = 0\narch = any\n' > "$AUR_SANDBOX/payload/.PKGINFO"
-    tar -cf "$AUR_SANDBOX/wanted-0-1-any.pkg.tar.fixture" -C "$AUR_SANDBOX/payload" .PKGINFO
-    assert_false "AUR rejects an artifact with a different package name" "aur_package_artifact '$AUR_SANDBOX' wanted"
-    sed -i 's/wanted-git/wanted/' "$AUR_SANDBOX/payload/.PKGINFO"
-    tar -cf "$AUR_SANDBOX/wanted-1-1-any.pkg.tar.fixture" -C "$AUR_SANDBOX/payload" .PKGINFO
-    assert_true "AUR resolves the artifact from real pacman package metadata" "[[ \$(aur_package_artifact '$AUR_SANDBOX' wanted) == '$AUR_SANDBOX/wanted-1-1-any.pkg.tar.fixture' ]]"
-fi
 
 test_summary
