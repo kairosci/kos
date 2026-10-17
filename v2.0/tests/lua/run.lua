@@ -443,7 +443,8 @@ elseif arg[2] == "applications" then
         for _, name in ipairs(desktopPolicy.retiredBranding.names) do
             assert(not io.open(desktopPaths:resolve("config", desktopPolicy.retiredBranding.directory .. "/" .. name), "rb"))
         end
-        assert(File.json(root .. "/" .. desktopPolicy.files[2].source).logo.type == "none")
+        local fastfetchLogo = File.json(root .. "/" .. desktopPolicy.files[2].source).logo
+        assert(fastfetchLogo.type == "file" and fastfetchLogo.source == "~/.config/os/branding/screensaver.txt")
         for _, name in ipairs(desktopPolicy.retiredHooks.names) do
             assert(
                 not io.open(desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/" .. name), "rb")
