@@ -13,3 +13,5 @@ The final structural sprint removes remaining shell algorithms and legacy layout
 Arch independence requires separate capability evidence, an independent runtime, real cold boot, suspend, encrypted unlock and recovery. Preserve Limine, working kernels and recovery until these trials pass. Runtime tests and package names do not establish hardware parity. Public guides live in it, en and fr; shared operational instructions and licenses retain their canonical source.
 
 Default package provisioning now reads a validated package policy and installs missing official and AUR packages through Lua. The existing setup stage remains the only system application path; optional package groups retain their graceful failure behavior.
+
+The firewall sprint moves UFW policy application and status verification to Lua. Defaults, ports, rule permissions and service state are checked against canonical data, and drift fails explicitly. Other security policies remain to be migrated.

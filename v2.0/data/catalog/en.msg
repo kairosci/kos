@@ -616,3 +616,5 @@ git.ruleset_verified=Repository ruleset verified for %s
 make.easyeffects=Install EasyEffects preset
 
 make.gtk=Install GTK integration
+check.ufw_policy=UFW policy, rules and boot service
+firewall.apply_failed=UFW configuration failed

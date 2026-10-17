@@ -1,0 +1,13 @@
+{
+  "package": "ufw",
+  "defaults": { "incoming": "deny", "outgoing": "allow" },
+  "ports": ["53317/udp", "53317/tcp"],
+  "rulesFiles": [
+    "/etc/ufw/user.rules",
+    "/etc/ufw/user6.rules",
+    "/etc/ufw/before.rules",
+    "/etc/ufw/before6.rules",
+    "/etc/ufw/after.rules",
+    "/etc/ufw/after6.rules"
+  ]
+}

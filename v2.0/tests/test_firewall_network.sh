@@ -12,10 +12,11 @@ source "$SCRIPT_DIR/test_lib.sh"
 test_section "Firewall, Network & SSH Security"
 
 assert_file_exists "firewall module exists" "$FW_MODULE"
-assert_file_contains "firewall module sets default deny incoming" "$FW_MODULE" "ufw default deny incoming"
-assert_file_not_contains "firewall reconciliation preserves existing rules" "$FW_MODULE" "ufw --force reset"
-assert_file_contains "firewall module sets default allow outgoing" "$FW_MODULE" "ufw default allow outgoing"
-assert_file_contains "firewall module enables ufw.service" "$FW_MODULE" "systemctl enable ufw.service"
+assert_file_contains "firewall module delegates policy to Lua" "$FW_MODULE" "apply-firewall"
+assert_file_contains "firewall policy denies incoming and permits outgoing" "$PROJECT_DIR/data/component/security/firewall.json" '"incoming": "deny"'
+assert_file_contains "firewall policy permits outgoing" "$PROJECT_DIR/data/component/security/firewall.json" '"outgoing": "allow"'
+assert_file_not_contains "firewall component preserves existing rules" "$PROJECT_DIR/src/component/security/firewall.lua" "ufwReset"
+assert_file_contains "firewall policy verifies the boot service" "$PROJECT_DIR/src/component/security/firewall.lua" "firewallServiceEnabledPrivileged"
 
 assert_file_exists "ssh module exists" "$SSH_MODULE"
 assert_file_contains "ssh module sets PermitRootLogin no" "$SSH_MODULE" "PermitRootLogin no"

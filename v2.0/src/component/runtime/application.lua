@@ -116,6 +116,17 @@ function Application:run(arguments)
             .new(self.process, policy, require("component.package.aur"), aurPolicy, self.catalog)
             :install(arguments[2])
     end
+    if mode == "apply-firewall" or mode == "verify-firewall" then
+        assert(#arguments == 1, "invalid_firewall_arguments")
+        local firewall = require("component.security.firewall").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/firewall.json"),
+            self.catalog
+        )
+        if mode == "apply-firewall" then return firewall:apply() end
+        assert(firewall:verify(), "firewall_policy_drift")
+        return
+    end
     if mode and mode:match("^project-") then
         local interface = require("component.project.interface").new(
             self.root,

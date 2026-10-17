@@ -133,15 +133,8 @@ tcheck "check.default_browser" "[[ \"\$(env -u BROWSER xdg-settings get default-
 tcheck "check.default_editor"  "[[ \"\$(cat \$HOME/.local/state/omarchy/defaults/editor 2>/dev/null)\" == zed ]]"
 tcheck "check.default_editor" "[[ \"\$(xdg-mime query default text/plain)\" == dev.zed.Zed.desktop ]]"
 section verify.sec_firewall
-if UFW_STATUS=$(priv ufw status 2>/dev/null); then
-    tcheck "check.ufw_active"          "echo '$UFW_STATUS' | grep -q 'Status: active'"
-    tcheck "check.ufw_deny_incoming"       "priv ufw status verbose 2>/dev/null | grep -q 'Default: deny (incoming)'"
-    tcheck "check.ufw_allow_outgoing"      "priv ufw status verbose 2>/dev/null | grep -q 'allow (outgoing)'"
-else
-    skip "$(t verify.skip_root)"
-fi
 if can_inspect_system; then
-    tcheck "check.ufw_boot" "priv systemctl is-enabled ufw.service &>/dev/null"
+    tcheck "check.ufw_policy" "\"$SCRIPT_DIR/../script/os-lua\" verify-firewall"
 else
     skip "$(t verify.skip_root)"
 fi
