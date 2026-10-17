@@ -36,7 +36,9 @@ local function source(path, command)
     return "/Arch\n //linux\n protocol: efi\n path: boot():" .. path .. "\n cmdline: " .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor") .. "\n"
 end
 
-if arg[2] == "neovim" then
+if arg[2] == "repository" then
+    assert(loadfile(root .. "/tests/lua/repository.lua"))()(suite, root, process)
+elseif arg[2] == "neovim" then
     assert(loadfile(root .. "/tests/lua/neovim.lua"))()(suite, root, process)
 elseif arg[2] == "terminal" then
     assert(loadfile(root .. "/tests/lua/terminal.lua"))()(suite, root, process)

@@ -1,0 +1,13 @@
+# Politica del repository
+
+[Italiano](repository-policy.md) · [English](../en/repository-policy.md) · [Français](../fr/repository-policy.md)
+
+`v2.0/data/repository/main-ruleset.json`, esposto come `.github/main-ruleset.json`, è la policy canonica di protezione di main. Ha come destinazione `refs/heads/main` con applicazione attiva e nessun attore esente: creazione, cancellazione e force push sono bloccati, i commit devono essere firmati, la storia è lineare, le pull request si uniscono solo con squash, nessuna approvazione è obbligatoria, le approvazioni superate vengono annullate, le discussioni vanno risolte e i controlli richiesti sono valutati sull’ultima base. La restrizione generale sugli aggiornamenti resta disattivata perché, senza attori esenti, blocca anche le unioni legittime delle pull request.
+
+L’algoritmo che verifica e applica la policy è `src/component/repository/policy.lua`, con i nomi dei comandi in `data/core/commands.json` e la propria policy in `data/repository/policy.json`. Il componente legge il file canonico, elenca tutte le pagine dei ruleset con `gh api --paginate --slurp`, risolve il nome canonico su tutte le pagine e rifiuta un duplicato ambiguo. L’applicazione crea il ruleset mancante con `POST` o aggiorna quello esistente con `PUT`, quindi lo rilegge e confronta.
+
+Il confronto è strutturale. Verifica ogni campo canonico, accetta i metadati aggiuntivi e gli array annidati restituiti dall’API e distingue gli array dagli oggetti anche quando entrambi sono vuoti. Gli array devono mantenere la stessa cardinalità con gli stessi elementi a prescindere dall’ordine e inclusi i duplicati: una regola in più, un attore esente aggiunto o una restrizione sugli aggiornamenti vengono rifiutati prima di soddisfare l’hook locale. Il valore `null` è confrontato esplicitamente e un campo canonico mancante fallisce.
+
+L’ingresso di sola lettura è `script/os-lua repository-policy-check <proprietario>/<repository>`; `repository-policy-apply` esegue la modifica e va usato solo dopo un controllo riuscito. L’hook `.githooks/pre-push` è un ingresso Lua che legge i record di push dallo standard input e rifiuta un riferimento `main` diretto o cancellato, consentendo rami di argomento e record ripetuti; i record malformati falliscono. Git esegue l’hook dalla radice dell’albero di lavoro, quindi i percorsi relativi del runtime si risolvono.
+
+I comandi verificati richiedono GitHub CLI con token autenticato e l’applicazione della protezione è un’operazione privilegiata che necessita dello scope di amministrazione del repository. I test automatici esercitano il componente con backend isolati e non chiamano mai l’API reale; la protezione attiva sul server è ispezionata separatamente dal workflow di provenienza.

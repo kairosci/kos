@@ -614,3 +614,4 @@ make.run_setup=Configurar e indicar el archivo de registro
 make.entry=Configurar desde una sesión root existente
 make.keyring=Seleccionar el servicio de llavero compatible
 terminal.helper_unknown=Tema de ayuda desconocido %s
+git.ruleset_verified=Reglas del repositorio verificadas para %s

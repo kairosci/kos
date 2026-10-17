@@ -68,6 +68,12 @@ function Application:run(arguments)
         if mode == "project-locale-status" then assert(#values == 0, "invalid_project_arguments"); return interface:locale_status() end
         return interface:launch(mode, values)
     end
+    if mode == "repository-pre-push" or mode == "repository-policy-check" or mode == "repository-policy-apply" then
+        local policy = require("component.repository.policy").new(self.root, self.process, self.catalog, File.json(self.root .. "/data/repository/policy.json"))
+        if mode == "repository-pre-push" then assert(config == nil, "invalid_push_guard_arguments"); return policy:pre_push() end
+        assert(#arguments <= 2, "invalid_repository_policy_arguments")
+        return policy:reconcile(config, mode == "repository-policy-apply")
+    end
     if mode == "terminal-helper" then
         local values = {}; for index = 2, #arguments do values[#values + 1] = arguments[index] end
         return require("component.terminal.helper").new(self.root, self.catalog, File.json(self.root .. "/data/component/terminal/policy.json")):run(values)

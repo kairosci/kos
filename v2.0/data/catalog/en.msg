@@ -614,3 +614,4 @@ make.run_setup=Run setup and report its log
 make.entry=Run setup from an existing root session
 make.keyring=Select the supported keyring backend
 terminal.helper_unknown=Unknown helper topic %s
+git.ruleset_verified=Repository ruleset verified for %s

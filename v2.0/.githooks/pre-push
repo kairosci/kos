@@ -1,11 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-PROJECT_DIR="$(git rev-parse --show-toplevel)"
-source "$PROJECT_DIR/v2.0/scripts/lib/i18n.sh"
-locale_init
-while read -r local_ref local_sha remote_ref remote_sha; do
-    if [[ "$remote_ref" == refs/heads/main ]]; then
-        err "git.main_push_forbidden"
-    fi
-done
+#!/usr/bin/env -S lua -E
+arg = {"v2.0", "repository-pre-push"}
+dofile("v2.0/src/main.lua")
