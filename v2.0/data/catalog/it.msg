@@ -609,3 +609,7 @@ settings.lockDelay=Blocco automatico dopo secondi
 settings.screensaverDelay=Salvaschermo dopo secondi
 settings.battery=Batteria
 os.dispatcher_version=dispatcher os %s
+make.launch=Avvia la configurazione interattiva
+make.run_setup=Avvia la configurazione e indica il log
+make.entry=Avvia la configurazione da una sessione root
+make.keyring=Seleziona il backend supportato del portachiavi

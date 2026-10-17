@@ -56,6 +56,15 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
+    if self.layout.statusModes[mode] and mode ~= "cli" then
+        local interface = require("component.project.interface").new(self.root, self.process, self.catalog,
+            File.json(self.root .. "/data/component/project/policy.json"), File.json(self.root .. "/" .. self.layout.locale))
+        local values = {}; for index = 2, #arguments do values[#values + 1] = arguments[index] end
+        if mode == "project-help" then assert(#values == 0, "invalid_project_arguments"); return interface:help() end
+        if mode == "project-languages" then assert(#values == 0, "invalid_project_arguments"); return interface:languages() end
+        if mode == "project-locale-status" then assert(#values == 0, "invalid_project_arguments"); return interface:locale_status() end
+        return interface:launch(mode, values)
+    end
     if mode == "arch-report" or mode == "arch-check" then
         assert(config == nil, "invalid_arch_assessment_arguments")
         local policy = File.json(self.root .. "/data/component/platform/parity.json")

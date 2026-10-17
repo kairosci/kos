@@ -32,7 +32,7 @@ else
 $(error BACKEND must be gnome-keyring)
 endif
 
-.PHONY: help setup keyring verify test hook icons theme zed cli herdr os changelog editors clean lang i18n-status lint iso
+.PHONY: help launch run-setup entry setup keyring verify test hook icons theme zed cli herdr os changelog editors clean lang i18n-status lint iso
 
 lint:
 	@cd "$(PROJECT_ROOT)" && if ! command -v shellcheck &> /dev/null; then \
@@ -54,13 +54,22 @@ lint:
 		script/*
 
 help:
-	@cd "$(PROJECT_ROOT)" && bash scripts/lib/help.sh
+	@cd "$(PROJECT_ROOT)" && script/os-lua project-help
+
+launch:
+	@cd "$(PROJECT_ROOT)" && script/os-lua project-launch
+
+run-setup:
+	@cd "$(PROJECT_ROOT)" && script/os-lua project-run-setup
+
+entry:
+	@cd "$(PROJECT_ROOT)" && script/os-lua project-entry
 
 setup:
 	cd "$(PROJECT_ROOT)" && pkexec bash $(PROJECT_ROOT)/scripts/setup.sh --scope "$(SCOPE)" $(if $(filter 1,$(REBUILD_PREVIEWS)),--rebuild-previews) $(if $(filter 1,$(RESTORE_OMARCHY)),--restore-omarchy) $(if $(filter 1,$(RESET_SNAPSHOTS)),--reset-snapshots) $(if $(filter 1,$(RUN_MIGRATIONS)),--run-migrations) $(if $(filter 1,$(PREVIEW_INTERFACE)),--preview-interface)
 
 keyring:
-	cd "$(PROJECT_ROOT)" && bash $(PROJECT_ROOT)/scripts/keyring-switch.sh "$(KEYRING_BACKEND)"
+	cd "$(PROJECT_ROOT)" && script/os-lua project-keyring "$(KEYRING_BACKEND)"
 
 verify:
 	cd "$(PROJECT_ROOT)" && bash scripts/verify.sh
@@ -100,10 +109,10 @@ changelog:
 editors: zed cli
 
 lang:
-	@cd "$(PROJECT_ROOT)" && bash scripts/lib/i18n.sh --list
+	@cd "$(PROJECT_ROOT)" && script/os-lua project-languages
 
 i18n-status:
-	@cd "$(PROJECT_ROOT)" && bash scripts/lib/i18n.sh
+	@cd "$(PROJECT_ROOT)" && script/os-lua project-locale-status
 
 iso:
 	cd "$(PROJECT_ROOT)" && bash modules/iso/scripts/customize.sh

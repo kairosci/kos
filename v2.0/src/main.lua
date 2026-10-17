@@ -8,7 +8,7 @@ if not ok then
     application:report(failure)
     os.exit(1)
 end
-if arguments[1] == "cli" then
-    assert(math.type(failure) == "integer" and failure >= 0 and failure <= 255, "invalid_cli_status")
+if application.layout.statusModes[arguments[1]] then
+    assert(math.type(failure) == "integer" and failure >= 0 and failure <= 255, "invalid_runtime_status")
     os.exit(failure)
 end

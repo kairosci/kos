@@ -101,6 +101,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Lua Test Runtime
+        run: sudo apt-get update && sudo apt-get install -y lua5.4
+
       - name: Run Modular Architecture Tests
         run: bash tests/test_modular_pipeline.sh
 
