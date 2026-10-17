@@ -1,0 +1,20 @@
+{
+  "files": [
+    {
+      "path": "/etc/ssh/sshd_config.d/hardened.conf",
+      "mode": "600",
+      "validator": "sshdValidate",
+      "content": "PermitRootLogin no\nPasswordAuthentication no\nPubkeyAuthentication yes\nKbdInteractiveAuthentication no\nMaxAuthTries 3\nMaxSessions 4\nX11Forwarding no\nAllowTcpForwarding no\nAllowAgentForwarding no\nPermitTunnel no\nPermitUserEnvironment no\nClientAliveInterval 300\nClientAliveCountMax 2\nLoginGraceTime 60\nStrictModes yes\nAuthenticationMethods publickey\nChrootDirectory none\nKexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512\nCiphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com\nMACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com\n"
+    },
+    {
+      "path": "/etc/ssh/ssh_config.d/hardened.conf",
+      "mode": "644",
+      "content": "Host *\n    KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512\n    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com\n    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com\n    HostKeyAlgorithms ssh-ed25519,rsa-sha2-512,rsa-sha2-256\n"
+    },
+    {
+      "path": "/etc/systemd/system/sshd.service.d/hardened.conf",
+      "mode": "644",
+      "content": "[Service]\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nNoNewPrivileges=yes\nRestrictSUIDSGID=yes\nReadWritePaths=/etc/ssh /var/log /var/run/sshd /run/sshd\n"
+    }
+  ]
+}

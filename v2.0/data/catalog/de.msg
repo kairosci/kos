@@ -620,3 +620,7 @@ check.ufw_policy=UFW-Richtlinie, Regeln und Startdienst
 firewall.apply_failed=UFW-Konfiguration fehlgeschlagen
 kernel.apply_failed=Kernel-Härtung konnte nicht konfiguriert werden
 check.kernel_policy=Kernel-Härtungsrichtlinie und aktive Werte
+auth.apply_failed=Konfiguration der Authentifizierungsrichtlinie fehlgeschlagen
+check.authentication_policy=Authentifizierungskonfiguration und PAM-Stack
+ssh.apply_failed=Konfiguration der SSH-Richtlinie fehlgeschlagen
+check.ssh_policy=SSH-Richtlinie für Server, Client und Dienst

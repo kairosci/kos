@@ -352,6 +352,13 @@
         "arguments": [
           "kernel"
         ]
+      },
+      {
+        "language": "lua",
+        "path": "tests/lua/run.lua",
+        "arguments": [
+          "auth-ssh"
+        ]
       }
     ],
     "obscure": [

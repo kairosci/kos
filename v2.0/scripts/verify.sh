@@ -147,22 +147,17 @@ else
 fi
 
 section verify.sec_pam
-tcheck "check.faillock"    "[[ -f /etc/security/faillock.conf ]] && grep -q '^[^#].*pam_faillock.so' /etc/pam.d/system-auth && ! grep -Eq '^[^#].*pam_faillock.so.*(deny|unlock_time|conf)=' /etc/pam.d/system-auth"
-tcheck "check.pwquality"   "[[ -f /etc/security/pwquality.conf ]] && grep -Eq '^password[[:space:]]+requisite[[:space:]]+pam_pwquality.so' /etc/pam.d/system-auth && grep -Eq '^password.*pam_unix.so.*use_authtok' /etc/pam.d/system-auth"
-tcheck "check.access_conf" "[[ -f /etc/security/access.conf ]] && grep -q 'ALL:ALL' /etc/security/access.conf"
+if can_inspect_system; then
+    tcheck "check.authentication_policy" "\"$SCRIPT_DIR/../script/os-lua\" verify-authentication"
+else
+    skip "$(t verify.skip_root)"
+fi
 
 section verify.sec_ssh
-SSHD_DIR="/etc/ssh/sshd_config.d"
-if [[ -r "$SSHD_DIR/hardened.conf" ]]; then
-    tcheck "check.sshd_hardened"        "[[ -f $SSHD_DIR/hardened.conf ]]"
-    tcheck "check.sshd_root_login"     "grep -q '^PermitRootLogin no' $SSHD_DIR/hardened.conf"
-    tcheck "check.sshd_password_auth"  "grep -q '^PasswordAuthentication no' $SSHD_DIR/hardened.conf"
-elif priv test -r "$SSHD_DIR/hardened.conf" 2>/dev/null; then
-    tcheck "check.sshd_hardened"        "priv test -f $SSHD_DIR/hardened.conf"
-    tcheck "check.sshd_root_login"     "priv grep -q '^PermitRootLogin no' $SSHD_DIR/hardened.conf"
-    tcheck "check.sshd_password_auth"  "priv grep -q '^PasswordAuthentication no' $SSHD_DIR/hardened.conf"
+if can_inspect_system; then
+    tcheck "check.ssh_policy" "\"$SCRIPT_DIR/../script/os-lua\" verify-ssh"
 else
-    skip "$(t verify.skip_ssh)"
+    skip "$(t verify.skip_root)"
 fi
 
 section verify.sec_services

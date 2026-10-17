@@ -17,3 +17,5 @@ Default package provisioning now reads a validated package policy and installs m
 The firewall sprint moves UFW policy application and status verification to Lua. Defaults, ports, rule permissions and service state are checked against canonical data, and drift fails explicitly. Other security policies remain to be migrated.
 
 Sysctl policy, kexec lockdown and core dump limits now use a Lua component with external data and idempotent publication. Verification compares persistent files and 19 active values; other security policies remain to be migrated.
+
+Authentication and SSH policies now live in external data applied by Lua components. PAM migration preserves comments and other stack entries, removes conflicting inline options, keeps a one-time backup and rejects unsupported stacks. SSH validates staged files before publication and verifies its three managed files.

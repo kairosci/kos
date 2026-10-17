@@ -6,6 +6,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 FW_MODULE="$PROJECT_DIR/scripts/lib/modules/40-firewall.sh"
 SSH_MODULE="$PROJECT_DIR/scripts/lib/modules/70-ssh.sh"
+SSH_POLICY="$PROJECT_DIR/data/component/security/ssh.json"
 
 source "$SCRIPT_DIR/test_lib.sh"
 
@@ -19,9 +20,10 @@ assert_file_not_contains "firewall component preserves existing rules" "$PROJECT
 assert_file_contains "firewall policy verifies the boot service" "$PROJECT_DIR/src/component/security/firewall.lua" "firewallServiceEnabledPrivileged"
 
 assert_file_exists "ssh module exists" "$SSH_MODULE"
-assert_file_contains "ssh module sets PermitRootLogin no" "$SSH_MODULE" "PermitRootLogin no"
-assert_file_contains "ssh module sets PasswordAuthentication no" "$SSH_MODULE" "PasswordAuthentication no"
-assert_file_contains "ssh module provisions systemd sandboxing" "$SSH_MODULE" "ProtectSystem=strict"
+assert_file_contains "ssh module delegates to Lua" "$SSH_MODULE" "apply-ssh"
+assert_file_contains "SSH policy disables root login" "$SSH_POLICY" "PermitRootLogin no"
+assert_file_contains "SSH policy disables password authentication" "$SSH_POLICY" "PasswordAuthentication no"
+assert_file_contains "SSH policy provisions systemd sandboxing" "$SSH_POLICY" "ProtectSystem=strict"
 
 assert_false "NetworkManager configuration unmolested" "[[ -f /etc/NetworkManager/conf.d/security.conf ]]"
 if ip link show lo &>/dev/null; then

@@ -620,3 +620,7 @@ check.ufw_policy=Policy UFW, regole e servizio di avvio
 firewall.apply_failed=Configurazione UFW non riuscita
 kernel.apply_failed=Configurazione dell'hardening del kernel non riuscita
 check.kernel_policy=Policy e valori attivi di hardening del kernel
+auth.apply_failed=Configurazione della policy di autenticazione non riuscita
+check.authentication_policy=Configurazione di autenticazione e stack PAM
+ssh.apply_failed=Configurazione della policy SSH non riuscita
+check.ssh_policy=Policy SSH per server, client e servizio

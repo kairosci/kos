@@ -1,0 +1,22 @@
+{
+  "package": "libpwquality",
+  "pamPath": "/etc/pam.d/system-auth",
+  "files": [
+    {
+      "path": "/etc/security/faillock.conf",
+      "mode": "644",
+      "content": "deny = 5\nunlock_time = 900\n"
+    },
+    {
+      "path": "/etc/security/pwquality.conf",
+      "mode": "644",
+      "content": "minlen = 14\ndcredit = -1\nucredit = -1\nlcredit = -1\nocredit = -1\ndifok = 5\nminclass = 4\n"
+    },
+    {
+      "path": "/etc/security/access.conf",
+      "mode": "644",
+      "content": "+:root:LOCAL\n+:root:ALL\n+:wheel:LOCAL\n+:wheel:ALL\n+:sddm:LOCAL\n+:sddm:ALL\n+:gdm:LOCAL\n+:gdm:ALL\n+:greetd:LOCAL\n+:greetd:ALL\n+:lightdm:LOCAL\n+:lightdm:ALL\n-:ALL:ALL\n"
+    }
+  ],
+  "pamQualityLine": "password requisite pam_pwquality.so retry=3 enforce_for_root"
+}
