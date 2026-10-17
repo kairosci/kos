@@ -162,6 +162,20 @@ function Application:run(arguments)
         assert(stack:verify(), "security_stack_policy_drift")
         return
     end
+    if mode == "apply-resolver-failover" or mode == "verify-resolver-failover" or mode == "run-resolver-failover" then
+        assert(#arguments == 1, "invalid_resolver_arguments")
+        local resolver = require("component.security.resolver").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/resolver.json"),
+            self.catalog
+        )
+        if mode == "apply-resolver-failover" then return resolver:apply() end
+        if mode == "verify-resolver-failover" then
+            assert(resolver:verify(), "resolver_policy_drift")
+            return
+        end
+        return resolver:run()
+    end
     if mode == "apply-kernel" or mode == "verify-kernel" then
         assert(#arguments == 1, "invalid_kernel_arguments")
         local kernel = require("component.security.kernel").new(

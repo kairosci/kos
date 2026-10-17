@@ -169,7 +169,11 @@ fi
 tcheck "check.sshd_service_hardened"   "[[ -f /etc/systemd/system/sshd.service.d/hardened.conf ]]"
 tcheck "check.networkmanager_intact" "! [[ -f /etc/NetworkManager/conf.d/security.conf ]]"
 tcheck "check.resolved_hardened" "[[ -f /etc/systemd/resolved.conf.d/hardened.conf ]]"
-tcheck "check.resolver_failover" "systemctl is-enabled --quiet os-resolver-failover.service && systemctl is-active --quiet os-resolver-failover.service"
+if can_inspect_system; then
+    tcheck "check.resolver_failover" "\"$SCRIPT_DIR/../script/os-lua\" verify-resolver-failover"
+else
+    skip "$(t verify.skip_root)"
+fi
 
 section verify.sec_tooling
 if can_inspect_system; then
