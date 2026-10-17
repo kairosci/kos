@@ -12,7 +12,7 @@ ACCENT=$(awk -F '"' '/^accent[[:space:]]*=/ { print $2; exit }' "$COLORS")
 FOREGROUND=$(awk -F '"' '/^foreground[[:space:]]*=/ { print $2; exit }' "$COLORS")
 [[ "$FOREGROUND" =~ ^#[0-9a-fA-F]{6}$ ]] || { warn "hooks.gtk_palette_failed" "$COLORS"; exit 1; }
 NERD_ASSETS="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/nerd-icons"
-[[ -r "$NERD_ASSETS/aliases.tsv" ]] || NERD_ASSETS="$SCRIPT_DIR/../../modules/conf/gtk/data/nerd-icons"
+[[ -r "$NERD_ASSETS/aliases.tsv" ]] || NERD_ASSETS="$SCRIPT_DIR/../../data/component/application/gtk/nerd-icons"
 [[ -r "$NERD_ASSETS/aliases.tsv" ]] || { warn "defaults.icons_failed"; exit 1; }
 MODE=$(awk -F '"' '/^mode[[:space:]]*=/ { print $2; exit }' "$COLORS")
 if [[ "$MODE" == light ]]; then BASE=Qogir; else BASE=Qogir-Dark; fi

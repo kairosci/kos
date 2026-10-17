@@ -53,6 +53,8 @@ assert_file_executable "hooks/pre-refresh-pacman.d/99-os-persist is executable" 
 assert_file_executable "hooks/post-update.d/99-os-persist is executable" "$PROJECT_DIR/hooks/post-update.d/99-os-persist"
 assert_file_executable "modules/conf/zed/install.sh is executable" "$PROJECT_DIR/modules/conf/zed/install.sh"
 assert_true "Herdr Bash installer is retired" "[[ ! -e '$PROJECT_DIR/modules/conf/herdr/install.sh' ]]"
+assert_true "GTK Bash installer is retired" "[[ ! -e '$PROJECT_DIR/modules/conf/gtk/install.sh' ]]"
+assert_true "GTK Lua component syntax is valid" "luac -p '$PROJECT_DIR/src/component/application/gtk.lua'"
 assert_file_exists "Herdr menu payload is under application data" "$PROJECT_DIR/data/component/application/herdr/menu"
 
 for mod in "$PROJECT_DIR"/scripts/lib/modules/*.sh; do

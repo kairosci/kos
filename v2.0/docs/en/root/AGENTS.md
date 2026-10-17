@@ -189,3 +189,5 @@ Neovim provisioning belongs to `src/component/editor/neovim/`, with paths, nativ
 Herdr menu publication and its managed Hyprland binding belong to `src/component/application/keybindings.lua`, with the menu payload and paths in `data/component/application/`. The application registry owns its identity; `make herdr` applies it through `make setup SCOPE=herdr`. Preserve unrelated bindings and reject redirected paths.
 
 EasyEffects preset publication, validation, database snapshots and session activation belong to `src/component/application/easyeffects.lua` with policy in `data/component/application/policy.json`. Apply it through `make setup SCOPE=easyeffects`; do not retain the legacy shell installer or activator.
+
+GTK settings, managed Hyprland inclusion, palette template, Nerd Font assets and conditional legacy hook archival belong to `src/component/application/gtk.lua` and `data/component/application/gtk/`. Apply through `make setup SCOPE=gtk`; preserve unrelated configuration and archive only the exact legacy hook command.

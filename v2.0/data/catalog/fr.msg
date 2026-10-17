@@ -614,3 +614,5 @@ terminal.helper_unknown=Rubrique helper inconnue %s
 git.ruleset_verified=Règles du dépôt vérifiées pour %s
 
 make.easyeffects=Installer le préréglage EasyEffects
+
+make.gtk=Installer l’intégration GTK

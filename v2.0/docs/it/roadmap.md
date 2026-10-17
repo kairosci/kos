@@ -20,7 +20,7 @@ Il catalogo sfondi espone una sola immagine con il logo e la palette del tema. L
 
 Il criterio di completamento è eseguibile: `script/os-lua migration-report` elenca algoritmi shell residui e file nella struttura legacy; `script/os-lua verify-full-lua` fallisce finché rimangono. Gli starter essenziali ammessi sono verificati per contenuto tramite digest BLAKE2b. Il report include anche file nuovi e script senza estensione; non usa una percentuale dedotta dal numero di file.
 
-Stato aggiornato il 17 ottobre 2026: 172 algoritmi shell residui, 282 file nella struttura legacy e sette starter verificati. Herdr ed EasyEffects sono migrati a componenti Lua con policy esterna; `verify-full-lua` fallisce correttamente e la migrazione non è completa.
+Stato aggiornato il 17 ottobre 2026: 171 algoritmi shell residui, 252 file nella struttura legacy e sette starter verificati. Herdr, EasyEffects e GTK sono migrati a componenti Lua con policy esterna; `verify-full-lua` fallisce correttamente e la migrazione non è completa.
 
 La parità completa con la versione Bash non è raggiunta. Rimangono da riscrivere provisioning dei pacchetti, sicurezza, alimentazione, manutenzione, verifica, integrazioni di sessione e produttori di configurazione residui. Gli ingressi Make e documentazione in radice sono collegamenti; gli alberi del codice vivono soltanto in `v2.0/`. Gli inventari eseguiti dalla radice e da `v2.0/` devono coincidere e includere il provisioning Bash; `verify-full-lua` deve continuare a fallire finché questi algoritmi sono attivi.
 
