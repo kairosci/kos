@@ -77,6 +77,8 @@ elseif arg[2] == "aur" then
     assert(loadfile(root .. "/tests/lua/aur_installer.lua"))()(suite, root, process)
 elseif arg[2] == "package-debloat" then
     assert(loadfile(root .. "/tests/lua/package_debloat.lua"))()(suite, root)
+elseif arg[2] == "package-defaults" then
+    assert(loadfile(root .. "/tests/lua/package_defaults.lua"))()(suite, root)
 elseif arg[2] == "boot-trial" then
     assert(loadfile(root .. "/tests/lua/boot_trial.lua"))()(suite, root, process)
 elseif arg[2] == "json" then

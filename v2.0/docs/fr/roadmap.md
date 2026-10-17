@@ -11,3 +11,5 @@ L’installation du menu Herdr et de son raccourci Hyprland géré, du prérégl
 Le sprint final supprime les algorithmes shell et l’ancienne structure après remplacement équivalent. `migration-report` examine tout le dépôt, y compris les fichiers nouveaux et sans extension ; `verify-full-lua` échoue tant que des algorithmes historiques restent actifs. Déplacer des fichiers ou déléguer Bash depuis Lua ne suffit jamais.
 
 L’indépendance Arch exige des preuves par capacité, un moteur autonome, démarrage à froid réel, veille, déverrouillage chiffré et récupération. Conserver Limine, noyaux fonctionnels et secours jusqu’à réussite. Tests et noms de paquets ne prouvent pas la parité matérielle. Les guides publics existent en it, en et fr ; instructions opérationnelles et licences gardent leur source canonique partagée.
+
+Le provisionnement des paquets par défaut lit désormais une politique validée et installe les paquets manquants des dépôts officiels et de l’AUR avec Lua. L’étape setup reste l’unique voie d’application au système ; les groupes facultatifs conservent leur gestion tolérante des échecs.

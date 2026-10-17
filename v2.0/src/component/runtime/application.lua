@@ -108,6 +108,14 @@ function Application:run(arguments)
         local policy = File.json(self.root .. "/data/component/package/debloat.json")
         return require("component.package.debloat").new(self.process, policy):apply()
     end
+    if mode == "install-default-packages" then
+        assert(#arguments == 2, "invalid_default_package_arguments")
+        local policy = File.json(self.root .. "/data/component/package/defaults.json")
+        local aurPolicy = File.json(self.root .. "/data/component/package/aur.json")
+        return require("component.package.defaults")
+            .new(self.process, policy, require("component.package.aur"), aurPolicy, self.catalog)
+            :install(arguments[2])
+    end
     if mode and mode:match("^project-") then
         local interface = require("component.project.interface").new(
             self.root,

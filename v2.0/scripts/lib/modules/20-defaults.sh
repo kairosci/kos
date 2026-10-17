@@ -2,10 +2,8 @@
 
 set -euo pipefail
 
-log "defaults.browser_install"
-if ! pacman -Q brave-origin-bin &>/dev/null; then
-    aur_verified_install brave-origin-bin || err "defaults.browser_failed"
-fi
+log "defaults.packages"
+"$PROJECT_DIR/script/os-lua" install-default-packages "$PRIMARY_USER" || err "defaults.app_failed" "default packages"
 for _policy_dir in /etc/brave /etc/brave/policies /etc/brave/policies/managed; do
     [[ ! -L "$_policy_dir" ]] || err "defaults.app_failed" "$_policy_dir"
     install -d -m 755 -o root -g root "$_policy_dir"
@@ -19,39 +17,12 @@ for user_home in /home/*; do
 done
 
 log "defaults.graphical_apps"
-pacman -S --noconfirm --needed zed papers loupe celluloid baobab resources materia-gtk-theme || err "defaults.app_failed" "graphical desktop"
-pacman -S --noconfirm --needed fastfetch || err "defaults.app_failed" "Fastfetch"
 
 BRAND_ICON="$PROJECT_ROOT/modules/iso/assets/kmono-cyan.png"
 [[ -s "$BRAND_ICON" && ! -L "$BRAND_ICON" ]] || err "branding.install_failed" "$BRAND_ICON"
 install -Dm644 -- "$BRAND_ICON" /usr/share/pixmaps/os.png || err "branding.install_failed" /usr/share/pixmaps/os.png
 
-_easyeffects_packages=()
-while IFS= read -r _easyeffects_package; do
-    [[ "$_easyeffects_package" =~ ^[a-z0-9][a-z0-9.-]*$ ]] || err "env.aur_invalid" "$_easyeffects_package"
-    _easyeffects_packages+=("$_easyeffects_package")
-done < "$PROJECT_DIR/modules/conf/easyeffects/data/packages.list"
-pacman -S --noconfirm --needed "${_easyeffects_packages[@]}" || err "defaults.app_failed" "EasyEffects"
-
 log "gui.install_done" "LazyVim"
-pacman -S --noconfirm --needed neovim omarchy-nvim fd ripgrep lazygit tree-sitter-cli || err "defaults.app_failed" "LazyVim"
-
-for pkg in fzf universal-ctags shellcheck shfmt ruff yamllint; do
-    if ! pacman -Q "$pkg" &>/dev/null; then
-        pacman -S --noconfirm --needed "$pkg" || err "defaults.app_failed" "$pkg"
-    fi
-done
-
-if ! pacman -Q onlyoffice-bin &>/dev/null; then
-    aur_verified_install onlyoffice-bin || err "defaults.app_failed" "OnlyOffice"
-fi
-
-log "defaults.collaboration_apps"
-for pkg in slack-desktop discord; do
-    if ! pacman -Q "$pkg" &>/dev/null; then
-        aur_verified_install "$pkg" || err "defaults.app_failed" "$pkg"
-    fi
-done
 
 log "defaults.editor"
 for user_home in /home/*; do
@@ -63,14 +34,7 @@ for user_home in /home/*; do
 done
 
 log "defaults.7zip_install"
-if ! pacman -Q 7zip &>/dev/null; then
-    pacman -S --noconfirm --needed 7zip
-fi
-
 log "defaults.kitty_install"
-if ! pacman -Q kitty &>/dev/null; then
-    pacman -S --noconfirm --needed kitty
-fi
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
     _user=$(basename "$user_home")
@@ -78,18 +42,12 @@ for user_home in /home/*; do
 done
 
 log "defaults.trash_install"
-if ! pacman -Q trash-cli &>/dev/null; then
-    pacman -S --noconfirm --needed trash-cli
-fi
 
 log "defaults.system_settings"
 source "$PROJECT_DIR/scripts/lib/hyprmod.sh"
 source "$PROJECT_DIR/scripts/lib/wallpaper.sh"
 
 log "defaults.filemanager"
-for pkg in nautilus gvfs gvfs-mtp file-roller; do
-    pacman -S --noconfirm --needed "$pkg" || err "defaults.app_failed" "$pkg"
-done
 source "$PROJECT_DIR/scripts/lib/desktop-workflow.sh"
 for user_home in /home/*; do
     [[ -d "$user_home" ]] || continue
@@ -178,22 +136,11 @@ LUAEOF
 done
 
 log "defaults.podman"
-for pkg in podman podman-compose podman-docker slirp4netns; do
-    if ! pacman -Q "$pkg" &>/dev/null; then
-        pacman -S --noconfirm --needed "$pkg" || warn "defaults.podman_failed" "$pkg"
-    fi
-done
 systemctl enable podman.socket 2>/dev/null || warn "defaults.podman_socket_skipped"
 
 log "defaults.cursors_install"
-if ! pacman -Q capitaine-cursors &>/dev/null; then
-    pacman -S --noconfirm --needed capitaine-cursors || warn "defaults.cursors_failed"
-fi
 
 log "defaults.icons_install"
-if ! pacman -Q qogir-icon-theme &>/dev/null; then
-    aur_verified_install qogir-icon-theme || err "defaults.icons_failed"
-fi
 
 log "desktop.sweep"
 if [[ -f "$PROJECT_DIR/scripts/lib/desktop-cleanup.sh" ]]; then

@@ -11,3 +11,5 @@ The Herdr menu and managed Hyprland binding, EasyEffects preset installer and ac
 The final structural sprint removes remaining shell algorithms and legacy layout files after equivalent replacements exist. `migration-report` inventories the whole repository, including new and extensionless files; `verify-full-lua` must fail while active legacy algorithms remain. Moving files or delegating Bash from Lua never counts as completion.
 
 Arch independence requires separate capability evidence, an independent runtime, real cold boot, suspend, encrypted unlock and recovery. Preserve Limine, working kernels and recovery until these trials pass. Runtime tests and package names do not establish hardware parity. Public guides live in it, en and fr; shared operational instructions and licenses retain their canonical source.
+
+Default package provisioning now reads a validated package policy and installs missing official and AUR packages through Lua. The existing setup stage remains the only system application path; optional package groups retain their graceful failure behavior.

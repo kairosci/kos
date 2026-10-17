@@ -1,0 +1,9 @@
+{
+  "groups": [
+    { "packages": ["zed", "papers", "loupe", "celluloid", "baobab", "resources", "materia-gtk-theme", "fastfetch", "neovim", "omarchy-nvim", "fd", "ripgrep", "lazygit", "tree-sitter-cli", "fzf", "universal-ctags", "shellcheck", "shfmt", "ruff", "yamllint", "7zip", "kitty", "trash-cli", "nautilus", "gvfs", "gvfs-mtp", "file-roller"], "source": "official", "required": true },
+    { "packages": ["easyeffects", "calf", "lsp-plugins-lv2", "mda.lv2", "x42-plugins-lv2", "zam-plugins-lv2"], "source": "official", "required": true },
+    { "packages": ["brave-origin-bin", "onlyoffice-bin", "slack-desktop", "discord", "qogir-icon-theme"], "source": "aur", "required": true },
+    { "packages": ["podman", "podman-compose", "podman-docker", "slirp4netns"], "source": "official", "required": false },
+    { "packages": ["capitaine-cursors"], "source": "official", "required": false }
+  ]
+}
