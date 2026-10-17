@@ -425,12 +425,8 @@ elseif arg[2] == "applications" then
                 "755"
             )
         end
-        publisher:publish(
-            desktopPaths:resolve("config", "os/branding/screensaver.txt"),
-            "old screensaver logo\n",
-            "644"
-        )
-        publisher:publish(desktopPaths:resolve("config", "os/branding/about.txt"), "old About logo\n", "644")
+        publisher:publish(desktopPaths:resolve("config", "os/branding/screensaver.txt"), "old logo\n", "644")
+        publisher:publish(desktopPaths:resolve("config", "os/branding/about.txt"), "old logo\n", "644")
         publisher:publish(desktopPaths:resolve("state", "omarchy/toggles/screensaver-off"), "", "644")
         assert(desktop():apply() == desktopPolicy.display)
         local shell = File.read(home)
@@ -440,11 +436,10 @@ elseif arg[2] == "applications" then
         assert(
             File.read(desktopPaths:resolve("data", desktopPolicy.launcher.destination)):find("[Desktop Entry]", 1, true)
         )
-        assert(
-            File.read(desktopPaths:resolve("config", "os/branding/screensaver.txt"))
-                == File.read(root .. "/" .. desktopPolicy.restore.brandingSource)
-        )
-        assert(File.read(desktopPaths:resolve("config", "os/branding/screensaver.txt.bak")) == "old screensaver logo\n")
+        for _, name in ipairs(desktopPolicy.retiredBranding.names) do
+            assert(not io.open(desktopPaths:resolve("config", desktopPolicy.retiredBranding.directory .. "/" .. name), "rb"))
+        end
+        assert(File.json(root .. "/" .. desktopPolicy.files[1].source).logo.type == "none")
         for _, name in ipairs(desktopPolicy.retiredHooks.names) do
             assert(
                 not io.open(desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/" .. name), "rb")

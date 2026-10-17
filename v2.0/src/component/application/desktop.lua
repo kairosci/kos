@@ -79,6 +79,7 @@ function Desktop:apply()
     self:shell()
     self:retire(policy.retiredHooks)
     self:launcher()
+    self:retire(policy.retiredBranding)
     self:publish(policy.files)
     self:retire(policy.retiredToggles)
     return policy.display
@@ -116,15 +117,7 @@ function Desktop:restore()
             "644"
         )
     end
-    for _, asset in ipairs(restore.brandingFiles) do
-        local destination = "os/branding/" .. asset
-        self:backup(backup, restore.backupMode, destination)
-        self.publisher:publish(
-            self.paths:resolve("config", destination),
-            File.read(self.root .. "/" .. restore.brandingSource),
-            "644"
-        )
-    end
+    self:retire(policy.retiredBranding)
     self.publisher:publish(
         self.paths:resolve("config", restore.fastfetchDestination),
         File.read(self.root .. "/" .. restore.fastfetchSource),

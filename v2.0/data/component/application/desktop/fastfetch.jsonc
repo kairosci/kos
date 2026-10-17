@@ -1,15 +1,6 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-  "logo": {
-    "type": "file",
-    "source": "~/.config/os/branding/about.txt",
-    "color": { "1": "cyan" },
-    "padding": {
-      "top": 2,
-      "right": 6,
-      "left": 2
-    }
-  },
+  "logo": { "type": "none" },
   "display": {
     "disableLinewrap": true
   },
