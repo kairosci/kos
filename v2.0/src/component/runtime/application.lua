@@ -65,6 +65,11 @@ function Application:run(arguments)
         local policy = File.json(self.root .. "/data/component/package/aur.json")
         return require("component.package.aur").new(self.process, policy, arguments[3]):install(arguments[2])
     end
+    if mode == "apply-debloat" then
+        assert(#arguments == 1, "invalid_debloat_arguments")
+        local policy = File.json(self.root .. "/data/component/package/debloat.json")
+        return require("component.package.debloat").new(self.process, policy):apply()
+    end
     if mode and mode:match("^project-") then
         local interface = require("component.project.interface").new(self.root, self.process, self.catalog,
             File.json(self.root .. "/data/component/project/policy.json"), File.json(self.root .. "/" .. self.layout.locale))
