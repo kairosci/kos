@@ -195,8 +195,8 @@ case "$1" in
 esac
 MOCK
 chmod 755 "$WORKFLOW_SANDBOX/resources-bin/gsettings"
-assert_true "Resources GNOME schema applies supported preferences without retired keys" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=org.gnome.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-modern" bash "$PROJECT_DIR/modules/conf/resources/install.sh" && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-modern") == 2 ]]'
-assert_true "legacy Resources retains its detailed sidebar preference" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=net.nokyan.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-legacy" bash "$PROJECT_DIR/modules/conf/resources/install.sh" && grep -qx "set net.nokyan.Resources sidebar-details true" "$WORKFLOW_SANDBOX/resources-legacy" && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-legacy") == 3 ]]'
-assert_false "missing Resources schema stops configuration visibly" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=missing RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-missing" bash "$PROJECT_DIR/modules/conf/resources/install.sh"'
+assert_true "Resources GNOME schema applies supported preferences without retired keys" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=org.gnome.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-modern" lua "$PROJECT_DIR/tests/lua/apply_settings.lua" "$PROJECT_DIR" resources && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-modern") == 2 ]]'
+assert_true "legacy Resources retains its detailed sidebar preference" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=net.nokyan.Resources RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-legacy" lua "$PROJECT_DIR/tests/lua/apply_settings.lua" "$PROJECT_DIR" resources && grep -qx "set net.nokyan.Resources sidebar-details true" "$WORKFLOW_SANDBOX/resources-legacy" && [[ $(wc -l < "$WORKFLOW_SANDBOX/resources-legacy") == 3 ]]'
+assert_false "missing Resources schema stops configuration visibly" 'PATH="$WORKFLOW_SANDBOX/resources-bin:$PATH" RESOURCES_SCHEMA=missing RESOURCES_SETTINGS_LOG="$WORKFLOW_SANDBOX/resources-missing" lua "$PROJECT_DIR/tests/lua/apply_settings.lua" "$PROJECT_DIR" resources'
 
 test_summary

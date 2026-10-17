@@ -10,5 +10,7 @@
   "wallpaper": "data/component/wallpaper/policy.json",
   "migration": "data/component/migration/policy.json",
   "performance": "data/component/performance/policy.json",
-  "settings": "data/component/settings/policy.json"
+  "settings": "data/component/settings/policy.json",
+  "bootAppearance": "data/component/boot/appearance.json",
+  "bootCandidate": "data/component/boot/candidate.json"
 }

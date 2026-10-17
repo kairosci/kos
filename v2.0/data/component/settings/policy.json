@@ -71,6 +71,112 @@
       "kind": "string",
       "pattern": "^[a-z][a-z,]*$",
       "maximumLength": 64
+    },
+    {
+      "key": "general:resize_on_border",
+      "label": "resizeBorder",
+      "kind": "boolean"
+    },
+    {
+      "key": "general:allow_tearing",
+      "label": "tearing",
+      "kind": "boolean"
+    },
+    {
+      "key": "decoration:active_opacity",
+      "label": "activeOpacity",
+      "kind": "number",
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    {
+      "key": "decoration:inactive_opacity",
+      "label": "inactiveOpacity",
+      "kind": "number",
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    {
+      "key": "decoration:fullscreen_opacity",
+      "label": "fullscreenOpacity",
+      "kind": "number",
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    {
+      "key": "decoration:blur:size",
+      "label": "blurSize",
+      "kind": "number",
+      "min": 1,
+      "max": 40,
+      "step": 1
+    },
+    {
+      "key": "decoration:blur:passes",
+      "label": "blurPasses",
+      "kind": "number",
+      "min": 1,
+      "max": 10,
+      "step": 1
+    },
+    {
+      "key": "input:touchpad:disable_while_typing",
+      "label": "typing",
+      "kind": "boolean"
+    },
+    {
+      "key": "input:touchpad:clickfinger_behavior",
+      "label": "clickfinger",
+      "kind": "boolean"
+    },
+    {
+      "key": "input:touchpad:drag_lock",
+      "label": "dragLock",
+      "kind": "choice",
+      "choices": [
+        0,
+        1,
+        2
+      ],
+      "choiceNames": [
+        "dragOff",
+        "dragNormal",
+        "dragSticky"
+      ]
+    },
+    {
+      "key": "input:touchpad:tap-and-drag",
+      "label": "tapDrag",
+      "kind": "boolean"
+    },
+    {
+      "key": "misc:focus_on_activate",
+      "label": "focusActivate",
+      "kind": "boolean"
+    },
+    {
+      "key": "misc:mouse_move_enables_dpms",
+      "label": "mouseWake",
+      "kind": "boolean"
+    },
+    {
+      "key": "misc:key_press_enables_dpms",
+      "label": "keyWake",
+      "kind": "boolean"
+    },
+    {
+      "key": "general:layout",
+      "label": "layout",
+      "kind": "choice",
+      "choices": [
+        "dwindle",
+        "master",
+        "scrolling",
+        "monocle"
+      ]
     }
   ],
   "state": "os/settings/hyprland.json",
@@ -98,13 +204,15 @@
     "desktop",
     "network",
     "bluetooth",
-    "audio"
+    "audio",
+    "power"
   ],
   "icons": {
     "desktop": "preferences-desktop-display-symbolic",
     "network": "network-wireless-symbolic",
     "bluetooth": "bluetooth-symbolic",
-    "audio": "audio-volume-high-symbolic"
+    "audio": "audio-volume-high-symbolic",
+    "power": "battery-symbolic"
   },
   "runtimeCurrent": "current",
   "runtimeManifest": "manifest.json",
@@ -121,7 +229,8 @@
     "src/component/settings/qml/AudioPage.qml",
     "src/component/settings/qml/Validate.qml",
     "script/os-settings",
-    "data/component/settings/os.settings.desktop"
+    "data/component/settings/os.settings.desktop",
+    "src/component/settings/qml/PowerPage.qml"
   ],
   "fileMode": "644",
   "launcher": "bin/os-settings",
@@ -146,5 +255,35 @@
   "validator": "src/component/settings/qml/Validate.qml",
   "qmlValidationSuccess": "settings-components-valid",
   "desktopSource": "data/component/settings/os.settings.desktop",
-  "configDirectory": "hypr"
+  "configDirectory": "hypr",
+  "sessionConfiguration": "os/shell.json",
+  "sessionOptions": [
+    {
+      "key": "lock",
+      "label": "lockDelay",
+      "path": [
+        "idle",
+        "lock"
+      ],
+      "min": 60,
+      "max": 86400
+    },
+    {
+      "key": "screensaver",
+      "label": "screensaverDelay",
+      "path": [
+        "idle",
+        "screensaver"
+      ],
+      "min": 0,
+      "max": 86400
+    }
+  ],
+  "pageSources": {
+    "desktop": "DesktopPage.qml",
+    "network": "NetworkPage.qml",
+    "bluetooth": "BluetoothPage.qml",
+    "audio": "AudioPage.qml",
+    "power": "PowerPage.qml"
+  }
 }

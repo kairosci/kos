@@ -26,6 +26,10 @@ function Model:validate(key, value)
     elseif option.kind == "number" then
         assert(type(value) == "number" and value == value and value >= option.min and value <= option.max, "invalid_number_setting")
         if option.step == 1 then assert(value % 1 == 0, "integer_setting_required") end
+    elseif option.kind == "choice" then
+        local found = false
+        for _, choice in ipairs(option.choices) do if value == choice then found = true end end
+        assert(found, "invalid_choice_setting")
     elseif option.kind == "string" then
         assert(type(value) == "string" and #value <= option.maximumLength and value:match(option.pattern), "invalid_string_setting")
     else error("unsupported_setting_kind") end
@@ -77,7 +81,7 @@ function Model:snapshot()
         assert(color:match("^#%x%x%x%x%x%x$"), "invalid_palette_color")
         palette[role] = color
     end
-    return {options=options, labels=labels, policy=self.policy, palette=palette, palettePath=palettePath}
+    return {options=options, labels=labels, policy=self.policy, palette=palette, palettePath=palettePath, sessionOptions=require("component.settings.session").new(self.paths, self.publisher, self.policy):snapshot()}
 end
 
 function Model:write(key, value)

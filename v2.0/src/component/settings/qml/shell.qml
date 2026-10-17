@@ -19,6 +19,12 @@ ShellRoot {
         saveProcess.command = [executable, "settings-set", key, JSON.stringify(value)]
         saveProcess.running = true
     }
+    function saveSession(key, value) {
+        if (busy) return
+        failure = ""
+        saveProcess.command = [executable, "settings-set-session", key, JSON.stringify(value)]
+        saveProcess.running = true
+    }
     Process {
         id: readProcess
         command: [app.executable, "settings-snapshot"]
@@ -96,7 +102,7 @@ ShellRoot {
                 Loader {
                     width: parent.width
                     active: app.snapshot !== null
-                    source: app.page === "desktop" ? "DesktopPage.qml" : app.page === "network" ? "NetworkPage.qml" : app.page === "bluetooth" ? "BluetoothPage.qml" : "AudioPage.qml"
+                    source: app.snapshot ? app.snapshot.policy.pageSources[app.page] : ""
                     onLoaded: item.app = app
                 }
             }

@@ -151,7 +151,7 @@ assert_true "changed menu configuration restarts the shell after validation" "SE
 : > "$WORK_DIR/commands.log"
 assert_true "compositor errors prevent a shell restart" "! SESSION_TEST_CHANGE=1 SESSION_TEST_ERRORS=1 bash '$WORK_DIR/harness.sh' '$PROJECT_DIR' && ! grep -q 'restart shell' '$WORK_DIR/commands.log'"
 assert_true "controls and panels are retired from the session policy" "jq -e 'has(\"controls\") | not' '$PROJECT_DIR/modules/conf/session/data/policy.json' && jq -e '.panels == []' '$PROJECT_DIR/modules/conf/session/data/policy.json'"
-assert_true "session bindings carry no panel shortcuts" "jq -e '. == []' '$PROJECT_DIR/modules/conf/session/data/bindings.json'"
+assert_true "session menu branding carries no panel shortcuts" "jq -e 'length == 2 and all(.[]; .command | startswith(\"os menu toggle\"))' '$PROJECT_DIR/modules/conf/session/data/bindings.json'"
 assert_true "managed menu data is retired" "[[ ! -e '$PROJECT_DIR/modules/conf/session/data/menu.json' ]]"
 assert_true "installer retires previously installed control copies" "grep -q 'os.controls' '$PROJECT_DIR/modules/conf/session/install.sh'"
 printf '%s\n' '{"plugins":[{"id":"os.audio"},{"id":"personal.plugin"}],"bar":{"layout":[]}}' > "$WORK_DIR/stale-shell.json"

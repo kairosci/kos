@@ -10,5 +10,7 @@
     "colorNormal": "white/black",
     "colorHighlight": "black/cyan",
     "rootTitle": "OS"
-  }
+  },
+  "candidateFile": "grubx64.efi",
+  "grubConfiguration": "grub/grub.cfg"
 }

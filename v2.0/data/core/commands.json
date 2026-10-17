@@ -28,5 +28,16 @@
   "settingsReload": ["/usr/bin/timeout", "10", "hyprctl", "reload", "config-only"],
   "settingsErrors": ["/usr/bin/timeout", "10", "hyprctl", "configerrors"],
   "settingsSerialized": ["/usr/bin/flock", "--exclusive", "--wait", "10"],
-  "settingsQml": ["/usr/bin/env"]
+  "settingsQml": ["/usr/bin/env"],
+  "bootRegenerate": ["/usr/bin/timeout", "900", "/usr/bin/limine-update"],
+  "bootCopy": ["/usr/bin/cp", "-r", "--preserve=timestamps", "--"],
+  "bootFirmware": ["/usr/bin/efibootmgr"],
+  "bootExtractInitrd": ["/usr/bin/objcopy", "--dump-section"],
+  "bootListInitrd": ["/usr/bin/lsinitcpio", "-l"],
+  "bootFirmwareRestore": ["/usr/bin/efibootmgr", "--bootorder"],
+  "bootImageStrings": ["/usr/bin/strings"],
+  "bootCandidateInspect": ["/usr/bin/objdump", "-h"],
+  "bootBuildStandalone": ["/usr/bin/grub-mkstandalone", "--format=x86_64-efi", "--locales=", "--fonts="],
+  "bootCheckGrubEFI": ["/usr/bin/grub-file", "--is-x86_64-efi"],
+  "isLink": ["/usr/bin/test", "-L"]
 }

@@ -13,7 +13,7 @@ test_section "Config Validity & Placement Regression"
 
 assert_file_contains "shell plugins module refreshes the installed catalog" "$SHELL_PLUGINS_MODULE" "shell shell rescanPlugins"
 assert_file_not_contains "tiling media does not enable a retired popup" "$SHELL_PLUGINS_MODULE" "plugin enable os.media"
-assert_true "Micro installer syntax valid" "bash -n '$PROJECT_DIR/modules/conf/micro/install.sh'"
+assert_true "Lua retirement component syntax valid" "luac -p '$PROJECT_DIR/src/component/application/retirement.lua'"
 
 
 

@@ -53,7 +53,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|desktop-tools|grub-trial|boot-trial-select|lua-applications|performance) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|boot-appearance|boot-appearance-diagnostics|boot-diagnostics|grub-repair|desktop-tools|grub-trial|boot-trial-select|lua-applications|performance) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$OS_INTERFACE_PREVIEW" == 0 || "$SETUP_SCOPE" == interface ]] || err "setup.invalid_args"
@@ -169,6 +169,26 @@ fi
 
 if [[ "$SETUP_SCOPE" == grub-trial ]]; then
     source "$SCRIPT_DIR/lib/grub-trial.sh"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == boot-appearance-diagnostics ]]; then
+    "$PROJECT_DIR/script/os-lua" boot-appearance-diagnostics
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == grub-repair ]]; then
+    "$PROJECT_DIR/script/os-lua" grub-repair
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == boot-diagnostics ]]; then
+    "$PROJECT_DIR/script/os-lua" boot-diagnostics
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == boot-appearance ]]; then
+    "$PROJECT_DIR/script/os-lua" boot-appearance
     exit 0
 fi
 

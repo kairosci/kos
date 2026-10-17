@@ -80,14 +80,14 @@ assert_true "invalid palette preserves the previous Zed theme" "jq -e '.theme_ov
 unset OS_THEME_NAME OS_THEME_COLORS
 mkdir -p "$XDG_CONFIG_HOME/omarchy"
 printf '%s\n' '{"bar":{"layout":{"right":[{"id":"omarchy.agents","refreshIntervalSec":120,"providers":{"claude":{"enabled":true},"codex":{"enabled":true},"fireworks":{"enabled":false}}}] }},"idle":{"lock":321}}' > "$XDG_CONFIG_HOME/omarchy/shell.json"
-assert_true "Agents installer disables only the Claude provider" "bash '$PROJECT_DIR/modules/conf/agents/install.sh' && jq -e '.bar.layout.right[0].providers.claude.enabled == false and .bar.layout.right[0].providers.codex.enabled == true and .bar.layout.right[0].providers.fireworks.enabled == false and .bar.layout.right[0].refreshIntervalSec == 120 and .idle.lock == 321' '$XDG_CONFIG_HOME/omarchy/shell.json'"
-assert_true "Agents configuration is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/omarchy/shell.json'); bash '$PROJECT_DIR/modules/conf/agents/install.sh'; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/omarchy/shell.json')\" ]]"
+assert_true "Agents installer disables only the Claude provider" "lua '$PROJECT_DIR/src/main.lua' '$PROJECT_DIR' apply-settings agents && jq -e '.bar.layout.right[0].providers.claude.enabled == false and .bar.layout.right[0].providers.codex.enabled == true and .bar.layout.right[0].providers.fireworks.enabled == false and .bar.layout.right[0].refreshIntervalSec == 120 and .idle.lock == 321' '$XDG_CONFIG_HOME/omarchy/shell.json'"
+assert_true "Agents configuration is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/omarchy/shell.json'); lua '$PROJECT_DIR/src/main.lua' '$PROJECT_DIR' apply-settings agents; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/omarchy/shell.json')\" ]]"
 printf '%s\n' '{"bar":{"layout":{"left":["omarchy.agents"],"right":[]}}}' > "$XDG_CONFIG_HOME/omarchy/shell.json"
-assert_true "Agents installer handles string widget entries" "bash '$PROJECT_DIR/modules/conf/agents/install.sh' && jq -e '.bar.layout.left[0].id == \"omarchy.agents\" and .bar.layout.left[0].providers.claude.enabled == false' '$XDG_CONFIG_HOME/omarchy/shell.json'"
+assert_true "Agents installer handles string widget entries" "lua '$PROJECT_DIR/src/main.lua' '$PROJECT_DIR' apply-settings agents && jq -e '.bar.layout.left[0].id == \"omarchy.agents\" and .bar.layout.left[0].providers.claude.enabled == false' '$XDG_CONFIG_HOME/omarchy/shell.json'"
 printf '%s\n' '{"idle":{"lock":123}}' > "$XDG_CONFIG_HOME/omarchy/shell.json"
-assert_true "Agents installer preserves a configuration without the widget" "bash '$PROJECT_DIR/modules/conf/agents/install.sh' && jq -e '.bar == null and .idle.lock == 123' '$XDG_CONFIG_HOME/omarchy/shell.json'"
+assert_true "Agents installer preserves a configuration without the widget" "lua '$PROJECT_DIR/src/main.lua' '$PROJECT_DIR' apply-settings agents && jq -e '.bar == null and .idle.lock == 123' '$XDG_CONFIG_HOME/omarchy/shell.json'"
 printf '%s\n' '{invalid' > "$XDG_CONFIG_HOME/omarchy/shell.json"
-assert_false "Agents installer rejects malformed configuration" "bash '$PROJECT_DIR/modules/conf/agents/install.sh'"
+assert_false "Agents installer rejects malformed configuration" "lua '$PROJECT_DIR/src/main.lua' '$PROJECT_DIR' apply-settings agents"
 assert_file_contains_literal "Agents failure preserves the original configuration" "$XDG_CONFIG_HOME/omarchy/shell.json" '{invalid'
 
 test_summary

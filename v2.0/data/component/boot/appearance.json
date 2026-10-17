@@ -1,0 +1,20 @@
+{
+  "configuration": "/etc/plymouth/plymouthd.conf",
+  "theme": "text",
+  "themeDefinition": "/usr/share/plymouth/themes/text/text.plymouth",
+  "esp": "/boot",
+  "inventory": "limine.conf",
+  "backupRoot": "/var/lib/os/boot-appearance",
+  "state": "/var/lib/os/boot-appearance/state.json",
+  "mode": "600",
+  "configMode": "644",
+  "themeMember": "usr/share/plymouth/themes/text/text.plymouth",
+  "retiredMembers": [
+    "usr/share/plymouth/themes/omarchy/"
+  ],
+  "regenerator": "bootRegenerate",
+  "menu": "data/component/boot/render.json",
+  "cmdline": "/proc/cmdline",
+  "rootArgument": "rootflags",
+  "lastAttempt": "/var/lib/os/boot-appearance/last-attempt.json"
+}

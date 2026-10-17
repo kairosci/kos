@@ -4,6 +4,10 @@ This file is the single narrative source for what changed in every release. It i
 
 ## Unreleased
 
+## Release v1.8
+
+Settings is a standalone application with five integrated sections, twenty six Hyprland preferences and two native session timers. Its menu descriptions use OS branding, while Resources, Agents and Micro retirement now use Lua components with preserved personal data. Boot recovery gains a standalone GRUB candidate and a verified text only unlock theme with persistent EFI backups. Firmware boot verification remains pending and the complete Lua migration is not yet achieved.
+
 The migration now targets Lua exclusively. Lua owns the boot parser and renderer, native process arguments, JSON and INI handling, message catalogs and atomic publication. Seven desktop application configurations use Lua components with external data. Ruby sources and runtime dependencies are retired, and the previous Bash source remains archived in v1.0.
 
 La pubblicazione delle configurazioni utente è atomica per evitare file Hyprland temporaneamente mancanti. La versione precedente è conservata nell archivio verificabile `v1.0`; la roadmap e quattro nuove skill governano la migrazione modulare Lua. I cataloghi Lua coprono le sei lingue e la generazione GRUB usa un unico percorso verificato anche per sicurezza e snapshot.
