@@ -27,3 +27,5 @@ The weekly audit now runs Lynis, rkhunter, ClamAV and arch-audit through Lua. Th
 The security stack now uses Lua and external data for package installation, audit rules, Fail2ban configuration and AppArmor profiles, with explicit verification. USBGuard creates an initial policy only when no nonempty configuration exists and preserves established rules; hardware capability behavior still requires device verification.
 
 DNS failover now runs in Lua through `systemd-resolved`, without calling the Omarchy runtime. Thresholds, cooldown, providers and addresses come from canonical data; verification checks the active configuration and service.
+
+Lua verification also checks sensitive file modes, module blacklist files, the active AppArmor LSM parameter and TPM payload removal against canonical data. Service verification also rejects NetworkManager overrides; the equivalent Bash checks have been removed.

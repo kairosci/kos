@@ -119,6 +119,10 @@
     "/usr/bin/test",
     "-x"
   ],
+  "isReadable": [
+    "/usr/bin/test",
+    "-r"
+  ],
   "isLink": [
     "/usr/bin/test",
     "-L"

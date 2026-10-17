@@ -166,9 +166,6 @@ if can_inspect_system; then
 else
     skip "$(t verify.skip_root)"
 fi
-tcheck "check.sshd_service_hardened"   "[[ -f /etc/systemd/system/sshd.service.d/hardened.conf ]]"
-tcheck "check.networkmanager_intact" "! [[ -f /etc/NetworkManager/conf.d/security.conf ]]"
-tcheck "check.resolved_hardened" "[[ -f /etc/systemd/resolved.conf.d/hardened.conf ]]"
 if can_inspect_system; then
     tcheck "check.resolver_failover" "\"$SCRIPT_DIR/../script/os-lua\" verify-resolver-failover"
 else
@@ -181,23 +178,36 @@ if can_inspect_system; then
 else
     skip "$(t verify.skip_root)"
 fi
-tcheck "check.apparmor_kernel" "grep -Eq '(^| )lsm=[^ ]*apparmor[^ ]*( |$)' /proc/cmdline && [[ -r /sys/kernel/security/apparmor/profiles ]]"
+if can_inspect_system; then
+    tcheck "check.apparmor_kernel" "\"$SCRIPT_DIR/../script/os-lua\" verify-security-baseline apparmor_kernel"
+else
+    skip "$(t verify.skip_root)"
+fi
 
 section verify.sec_perms
-tcheck "check.perm_root"       "[[ \"\$(stat -c %a /root)\" == 700 ]]"
-tcheck "check.perm_shadow" "[[ \"\$(stat -c %a /etc/shadow)\" == 600 ]]"
-tcheck "check.perm_gshadow" "[[ \"\$(stat -c %a /etc/gshadow)\" == 600 ]]"
-tcheck "check.perm_passwd" "[[ \"\$(stat -c %a /etc/passwd)\" == 644 ]]"
-tcheck "check.perm_group"  "[[ \"\$(stat -c %a /etc/group)\" == 644 ]]"
+if can_inspect_system; then
+    for check_name in root shadow gshadow passwd group; do
+        tcheck "check.perm_$check_name" "\"$SCRIPT_DIR/../script/os-lua\" verify-security-baseline $check_name"
+    done
+else
+    skip "$(t verify.skip_root)"
+fi
 
 section verify.sec_modules
-tcheck "check.usb_storage_blocked"      "[[ -f /etc/modprobe.d/disable-usb-storage.conf ]]"
-tcheck "check.protocols_blocked" "[[ -f /etc/modprobe.d/disable-protocols.conf ]]"
-tcheck "check.firewire_blocked"         "[[ -f /etc/modprobe.d/disable-firewire.conf ]]"
-tcheck "check.filesystems_blocked" "[[ -f /etc/modprobe.d/disable-ramfs.conf ]]"
+if can_inspect_system; then
+    for check_name in usb_storage protocols firewire filesystems; do
+        tcheck "check.${check_name}_blocked" "\"$SCRIPT_DIR/../script/os-lua\" verify-security-baseline $check_name"
+    done
+else
+    skip "$(t verify.skip_root)"
+fi
 
 section verify.sec_health
-tcheck "check.tpm_verity_removed" "! [[ -f /usr/lib/nvpcr/verity.nvpcr ]]"
+if can_inspect_system; then
+    tcheck "check.tpm_verity_removed" "\"$SCRIPT_DIR/../script/os-lua\" verify-security-baseline tpm_verity_removed"
+else
+    skip "$(t verify.skip_root)"
+fi
 tcheck "check.voxtype_inactive" "! systemctl --user is-active voxtype 2>/dev/null | grep -q '^active$'"
 tcheck "check.kitty_terminal" "pacman -Q kitty &>/dev/null && ! pacman -Q foot &>/dev/null"
 tcheck "check.webapps_removed" "! grep -rlE 'omarchy-(launch-webapp|webapp-handler)' /usr/share/omarchy/applications 2>/dev/null"

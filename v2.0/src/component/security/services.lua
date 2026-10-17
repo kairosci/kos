@@ -54,6 +54,11 @@ function Services:verify()
             end
         end
     end
+    for _, path in ipairs(self.policy.forbiddenFiles or {}) do
+        local exists = process:status("pathExists", { path })
+        if exists ~= 0 and exists ~= 1 then return false end
+        if exists == 0 then return false end
+    end
     return true
 end
 

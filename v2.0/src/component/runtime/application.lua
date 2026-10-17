@@ -162,6 +162,14 @@ function Application:run(arguments)
         assert(stack:verify(), "security_stack_policy_drift")
         return
     end
+    if mode == "verify-security-baseline" then
+        assert(#arguments == 2, "invalid_security_baseline_arguments")
+        assert(require("component.security.baseline").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/baseline.json")
+        ):verify(arguments[2]), "security_baseline_drift")
+        return
+    end
     if mode == "apply-resolver-failover" or mode == "verify-resolver-failover" or mode == "run-resolver-failover" then
         assert(#arguments == 1, "invalid_resolver_arguments")
         local resolver = require("component.security.resolver").new(
