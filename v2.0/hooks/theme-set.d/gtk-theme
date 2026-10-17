@@ -42,7 +42,7 @@ SURFACE=$BACKGROUND
 HOVER=$(mix_color 10)
 MUTED=$(mix_color 55)
 template="${XDG_DATA_HOME:-$HOME/.local/share}/os/gtk/palette.css.in"
-[[ -r "$template" ]] || template="$SCRIPT_DIR/../../modules/conf/gtk/data/palette.css.in"
+[[ -r "$template" ]] || template="$SCRIPT_DIR/../../data/component/application/gtk/palette.css.in"
 [[ -r "$template" ]] || err "hooks.gtk_palette_failed" "$template"
 THEME_HASH=$(printf '%s\n' "$BACKGROUND" "$FOREGROUND" "$ACCENT" "$SELECTION" "$MODE" "$(sha256sum "$template")" | sha256sum)
 GTK_THEME_NAME="OS-${THEME_HASH:0:16}"
