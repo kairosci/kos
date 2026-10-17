@@ -19,8 +19,8 @@ assert_true "Lua retirement component syntax valid" "luac -p '$PROJECT_DIR/src/c
 
 assert_true "terminal helper Lua syntax valid" "luac -p '$PROJECT_DIR/src/component/terminal/helper.lua'"
 assert_true "terminal installer Lua syntax valid" "luac -p '$PROJECT_DIR/src/component/terminal/installer.lua'"
-assert_true "herdr menu bash syntax valid" "bash -n '$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu'"
-assert_true "herdr installer bash syntax valid" "bash -n '$PROJECT_DIR/modules/conf/herdr/install.sh'"
+assert_true "herdr menu bash syntax valid" "bash -n '$PROJECT_DIR/data/component/application/herdr/menu'"
+assert_true "Herdr Lua component syntax valid" "luac -p '$PROJECT_DIR/src/component/application/keybindings.lua'"
 
 for tool in fzf rg fd bat eza zoxide git lazygit gum ai; do
     assert_file_contains "cliconf covers $tool" "$CLICONF_DATA/en.json" "\"$tool\""
@@ -45,7 +45,7 @@ for installer in "$PROJECT_DIR"/modules/conf/*/install.sh; do
         "$installer" "userconf.sh"
 done
 
-HERDR_MENU="$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu"
+HERDR_MENU="$PROJECT_DIR/data/component/application/herdr/menu"
 assert_file_contains "herdr menu lists the upstream herdr bindings" "$HERDR_MENU" "herdr --default-config"
 assert_file_contains "herdr menu supports print mode" "$HERDR_MENU" '[-]-print'
 assert_file_contains "herdr menu keeps the upstream display format" "$HERDR_MENU" "→ %s"
@@ -55,9 +55,9 @@ assert_file_contains "herdr menu focuses the herdr window" "$HERDR_MENU" "focusw
 assert_file_contains "herdr menu replays keys into herdr" "$HERDR_MENU" "wtype"
 assert_file_contains "herdr menu exits cleanly on menu cancel" "$HERDR_MENU" '\|\| exit 0'
 assert_file_not_contains "herdr menu has no raw failure suppression" "$HERDR_MENU" '\|\|[[:space:]]*true'
-assert_file_contains "herdr installer deploys the menu per user" "$PROJECT_DIR/modules/conf/herdr/install.sh" "herdr-keybindings-menu"
-assert_file_contains "herdr installer manages the hyprland binding" "$PROJECT_DIR/modules/conf/herdr/install.sh" "bindings.lua"
-assert_file_contains "herdr installer keeps super-ctrl-k on herdr" "$PROJECT_DIR/modules/conf/herdr/install.sh" 'SUPER [+] CTRL [+] K'
+assert_true "Herdr Bash installer was retired" "[[ ! -e '$PROJECT_DIR/modules/conf/herdr/install.sh' ]]"
+assert_file_contains "Herdr component publishes the menu" "$PROJECT_DIR/src/component/application/keybindings.lua" "menuDestination"
+assert_file_contains "Herdr policy owns the binding" "$PROJECT_DIR/data/component/application/policy.json" '"herdr"'
 
 if ((UID != 0)); then
     USERCONF_SANDBOX="$(mktemp -d)"

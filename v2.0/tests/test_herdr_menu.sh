@@ -4,8 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-HERDR_MENU="$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu"
-HERDR_INSTALLER="$PROJECT_DIR/modules/conf/herdr/install.sh"
+HERDR_MENU="$PROJECT_DIR/data/component/application/herdr/menu"
+HERDR_INSTALLER="$PROJECT_DIR/src/component/application/keybindings.lua"
 MSG_DIR="$PROJECT_DIR/data/catalog"
 
 source "$SCRIPT_DIR/test_lib.sh"
@@ -167,28 +167,14 @@ gen_records() (
 test_section "Menu Structure & Conventions"
 
 assert_file_exists "herdr menu script exists" "$HERDR_MENU"
-assert_file_exists "herdr installer exists" "$HERDR_INSTALLER"
-assert_file_executable "herdr menu is executable" "$HERDR_MENU"
-assert_file_executable "herdr installer is executable" "$HERDR_INSTALLER"
+assert_file_exists "Herdr keybinding component exists" "$HERDR_INSTALLER"
+assert_true "Herdr Bash installer was removed" "[[ ! -e '$PROJECT_DIR/modules/conf/herdr/install.sh' ]]"
+assert_true "Herdr policy is registered" "[[ \$(jq -r '.herdr.kind' '$PROJECT_DIR/data/component/application/policy.json') == keybindings ]]"
 assert_file_contains "herdr menu uses strict mode" "$HERDR_MENU" "set -euo pipefail"
-assert_file_contains "herdr installer uses strict mode" "$HERDR_INSTALLER" "set -euo pipefail"
 assert_true "herdr menu has no raw failure suppression" \
     "! grep -qE '\\|\\|[[:space:]]*true\\b' '$HERDR_MENU'"
-assert_true "herdr installer has no raw failure suppression" \
-    "! grep -qE '\\|\\|[[:space:]]*true\\b' '$HERDR_INSTALLER'"
-assert_file_contains "herdr installer sources the i18n library" "$HERDR_INSTALLER" "i18n.sh"
-assert_file_contains "herdr installer calls locale_init" "$HERDR_INSTALLER" "locale_init"
-assert_file_contains "herdr installer sources the user config library" "$HERDR_INSTALLER" "userconf.sh"
-assert_file_contains "herdr installer deploys through the shared helper" "$HERDR_INSTALLER" 'install_user_file.*755'
-assert_file_contains "herdr installer manages the hyprland binding block" "$HERDR_INSTALLER" "bindings.lua"
-assert_file_contains "herdr installer unbinds the upstream key" "$HERDR_INSTALLER" 'hl.unbind..SUPER [+] CTRL [+] K'
-assert_file_contains "herdr installer rebinds super-ctrl-k to the menu" "$HERDR_INSTALLER" 'o.bind..SUPER [+] CTRL [+] K'
-assert_file_contains "herdr installer warns when bindings are missing" "$HERDR_INSTALLER" "herdr.bind_skipped"
-assert_file_contains "herdr installer logs completion" "$HERDR_INSTALLER" "install.herdr_done"
-assert_true "herdr installer has no untranslated literal message" \
-    "! grep -qE '^[[:space:]]*(log|warn|err) \"[^\"]* [^\"]*\"' '$HERDR_INSTALLER'"
-assert_true "herdr installer hardcodes no user home" \
-    "! grep -qE '/home/[a-z]' '$HERDR_INSTALLER'"
+assert_file_contains "Herdr component preserves unrelated binding text" "$HERDR_INSTALLER" "Blocks.merge"
+assert_file_contains "Herdr component warns when bindings are missing" "$HERDR_INSTALLER" "herdr.bind_skipped"
 
 test_section "Records: Display Parity & Raw Channel"
 
@@ -322,7 +308,7 @@ sandbox_install() (
             printf 'o.bind("SUPER + RETURN", "Terminal", "xdg-terminal-exec")\n' > "$SB/home/.config/hypr/bindings.lua"
         fi
     fi
-    bash "$HERDR_INSTALLER" > "$SB/install.out" 2> "$SB/install.err"
+    lua -E "$PROJECT_DIR/src/main.lua" "$PROJECT_DIR" apply-settings herdr > "$SB/install.out" 2> "$SB/install.err"
     printf '%s' "$?"
 )
 
@@ -341,17 +327,19 @@ assert_true "exactly one managed block survives" \
 assert_true "missing bindings file warns but succeeds" \
     "[[ \"\$(sandbox_install en 0)\" == 0 ]] && grep -q 'Hyprland Herdr binding skipped' '$SB/install.err'"
 assert_true "english completion message is exact" \
-    "sandbox_install en 1 >/dev/null && grep -qx 'Herdr keybindings menu installed successfully.' '$SB/install.out'"
+    "sandbox_install en 1 >/dev/null && grep -qx 'Desktop integration installed: Herdr' '$SB/install.out'"
 assert_true "italian completion message is exact" \
-    "sandbox_install it 1 >/dev/null && grep -qx 'Menu dei tasti di Herdr installato con successo.' '$SB/install.out'"
+    "sandbox_install it 1 >/dev/null && grep -qx 'Integrazione desktop installata: Herdr' '$SB/install.out'"
 assert_true "replaced menu keeps a single slot backup" \
     "sandbox_install en 1 >/dev/null && printf 'stale' > '$SB/home/.local/share/omarchy/herdr-keybindings-menu' && sandbox_install en 1 keep >/dev/null && [[ -f '$SB/home/.local/share/omarchy/herdr-keybindings-menu.bak' ]] && [[ \$(ls '$SB/home/.local/share/omarchy' | grep -c 'herdr-keybindings-menu') -eq 2 ]]"
 
 test_section "Wiring, Provisioning & Catalogues"
 
-assert_file_contains "make herdr runs the installer" "$PROJECT_DIR/Makefile" 'herdr:'
-assert_true "make herdr body calls herdrconf" \
-    "grep -A1 '^herdr:' '$PROJECT_DIR/Makefile' | grep -q 'modules/conf/herdr/install.sh'"
+assert_file_contains "make herdr uses the setup pipeline" "$PROJECT_DIR/Makefile" 'herdr:'
+assert_true "make herdr selects its dedicated scope" \
+    "grep -A1 '^herdr:' '$PROJECT_DIR/Makefile' | grep -q 'setup SCOPE=herdr'"
+assert_file_contains "setup accepts the dedicated Herdr scope" "$PROJECT_DIR/scripts/setup.sh" 'herdr|performance'
+assert_file_contains "setup applies Herdr through Lua" "$PROJECT_DIR/scripts/setup.sh" 'apply-settings herdr'
 assert_file_contains "make phony lists herdr" "$PROJECT_DIR/Makefile" 'herdr'
 assert_file_contains "make lint covers every app config" "$PROJECT_DIR/Makefile" 'modules/conf/\*/\*.sh'
 assert_file_contains "make help lists herdr" "$PROJECT_DIR/data/component/project/policy.json" 'make.herdr'
@@ -361,11 +349,11 @@ assert_file_contains "test runner includes the herdr suite" "$PROJECT_DIR/data/c
 
 for lang in en it fr de es pt; do
     assert_true "catalogue $lang carries the herdr keys" \
-        "for k in make.herdr install.herdr_done defaults.herdrconf defaults.herdrconf_skipped herdr.bind_skipped; do grep -q \"^\$k=\" '$MSG_DIR/$lang.msg' || exit 1; done"
+        "for k in make.herdr herdr.bind_skipped gui.install_done; do grep -q \"^\$k=\" '$MSG_DIR/$lang.msg' || exit 1; done"
 done
 
 assert_true "herdr keys keep placeholder parity" \
-    "for k in make.herdr install.herdr_done defaults.herdrconf defaults.herdrconf_skipped herdr.bind_skipped; do n=\$(awk -F%s -v k=\"^\$k=\" '\$0 ~ k { print NF - 1 }' \"\$MSG_DIR/en.msg\"); for l in it fr de es pt; do m=\$(awk -F%s -v k=\"^\$k=\" '\$0 ~ k { print NF - 1 }' \"\$MSG_DIR/\$l.msg\"); [[ \"\$n\" == \"\$m\" ]] || exit 1; done; done"
+    "for k in make.herdr herdr.bind_skipped gui.install_done; do n=\$(awk -F%s -v k=\"^\$k=\" '\$0 ~ k { print NF - 1 }' \"\$MSG_DIR/en.msg\"); for l in it fr de es pt; do m=\$(awk -F%s -v k=\"^\$k=\" '\$0 ~ k { print NF - 1 }' \"\$MSG_DIR/\$l.msg\"); [[ \"\$n\" == \"\$m\" ]] || exit 1; done; done"
 
 if [[ -x /usr/bin/omarchy-menu-herdr-keybindings || -x /usr/share/omarchy/bin/omarchy-menu-herdr-keybindings ]] && command -v herdr &>/dev/null; then
     UPSTREAM="$(command -v omarchy-menu-herdr-keybindings)"
