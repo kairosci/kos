@@ -56,9 +56,12 @@ elseif arg[2] == "test-runner" then
     assert(loadfile(root .. "/tests/lua/test_runner.lua"))()(suite, root, process)
 elseif arg[2] == "platform" then
     assert(loadfile(root .. "/tests/lua/platform.lua"))()(suite, root)
+elseif arg[2] == "package-pins" then
+    assert(loadfile(root .. "/tests/lua/package_pins.lua"))()(suite)
 elseif arg[2] == "boot-trial" then
     assert(loadfile(root .. "/tests/lua/boot_trial.lua"))()(suite, root, process)
 elseif arg[2] == "json" then
+    assert(loadfile(root .. "/tests/lua/package_pins.lua"))()(suite)
     assert(loadfile(root .. "/tests/lua/documentation.lua"))()(suite, root, process)
     local cliInstallTests = assert(loadfile(root .. "/tests/lua/cli_install.lua"))()
     cliInstallTests(suite, root, process)

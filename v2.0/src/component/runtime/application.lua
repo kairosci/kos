@@ -191,6 +191,12 @@ function Application:run(arguments)
         assert(config and esp == nil, "invalid_home_arguments")
         return require("core.paths").new(File.json(self.root .. "/" .. self.layout.paths)):protectHome(self.process, config)
     end
+    if mode == "verify-package-pins" then
+        assert(config == nil and esp == nil, "invalid_package_pin_arguments")
+        local pins = require("component.package.pins").new(self.process, File.json(self.root .. "/data/component/package/policy.json"))
+        if not pins:retained_updateable() then error("retained_package_pinned") end
+        return 0
+    end
     if mode == "apply-build-environment" then
         assert((config == nil or config == "--defer") and esp == nil, "invalid_environment_arguments")
         local Paths = require("core.paths")

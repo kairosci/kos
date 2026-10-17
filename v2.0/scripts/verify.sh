@@ -308,8 +308,7 @@ source "$SCRIPT_DIR/lib/desktop-cleanup.sh"
 tcheck "check.desktop_unique" "desktop_cleanup_unique \"\$HOME\""
 
 section verify.sec_debloat
-source "$SCRIPT_DIR/lib/package-pins.sh"
-tcheck "check.retained_updateable" "package_pins_retained_updateable"
+tcheck "check.retained_updateable" "\"$SCRIPT_DIR/../script/os-lua\" verify-package-pins"
 tcheck "check.ignorepkg" "! grep -q '^[[:space:]]*IgnorePkg[[:space:]]*=' /etc/pacman.conf"
 tcheck "check.icon_theme"      "gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | grep -q 'Qogir'"
 tcheck "check.cursor_theme"  "gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null | grep -q 'capitaine-cursors'"
