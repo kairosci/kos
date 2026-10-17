@@ -34,36 +34,12 @@ assert_file_contains "hardware module blacklists firewire" "$POWER_MODULE" "disa
 
 assert_file_exists "maintenance module exists" "$MAINT_MODULE"
 assert_file_exists "security audit module exists" "$AUDIT_MODULE"
-assert_file_contains "security audit module schedules weekly audit" "$AUDIT_MODULE" "/etc/cron.weekly/security-audit.sh"
-assert_file_contains "weekly audit scans installed system paths with ClamAV" "$AUDIT_MODULE" "clamdscan --fdpass --multiscan --infected"
-assert_file_contains "weekly audit records Arch advisories" "$AUDIT_MODULE" "arch-audit --show-cve"
-assert_file_contains "weekly audit flags Arch advisory results for review" "$AUDIT_MODULE" "arch-audit --quiet --show-cve"
-assert_file_contains "weekly audit fails when advisories need review" "$AUDIT_MODULE" "arch-audit-review"
-assert_file_contains "weekly audit has a timer when cron is absent" "$AUDIT_MODULE" "systemctl enable --now os-security-audit.timer"
-check_audit_scheduler() (
-    local scenario actions
-    actions=$(mktemp)
-    trap 'rm -f "$actions"' EXIT
-    # shellcheck disable=SC2329
-    systemctl() {
-        case "$*" in
-            'is-enabled --quiet cronie.service') [[ "$scenario" == enabled ]] ;;
-            'is-active --quiet cronie.service') [[ "$scenario" == active ]] ;;
-            *) printf '%s\n' "$*" >> "$actions" ;;
-        esac
-    }
-    for scenario in enabled active absent; do
-        : > "$actions"
-        # shellcheck source=/dev/null
-        source <(sed -n '/^if systemctl is-enabled --quiet cronie.service/,/^fi$/p' "$AUDIT_MODULE")
-        if [[ "$scenario" == absent ]]; then
-            [[ "$(cat "$actions")" == 'enable --now os-security-audit.timer' ]] || return 1
-        else
-            [[ "$(cat "$actions")" == $'enable --now cronie.service\ndisable --now os-security-audit.timer' ]] || return 1
-        fi
-    done
-)
-assert_true "audit scheduler starts stopped Cronie and avoids duplicate schedulers" "check_audit_scheduler"
+assert_file_contains "security audit module delegates to Lua" "$AUDIT_MODULE" "apply-security-audit"
+assert_file_contains "weekly audit service invokes Lua" "$PROJECT_DIR/data/component/security/audit.json" "run-security-audit"
+assert_file_contains "weekly audit scans canonical system paths" "$PROJECT_DIR/data/component/security/audit.json" "/boot"
+assert_file_contains "weekly audit declares vulnerability scanner" "$PROJECT_DIR/data/core/commands.json" "weeklyClamav"
+assert_file_contains "weekly audit declares Arch advisory scanner" "$PROJECT_DIR/data/core/commands.json" "weeklyArchAuditReview"
+assert_file_contains "weekly audit fails on advisory findings" "$PROJECT_DIR/src/component/security/audit.lua" "arch-audit-review"
 assert_file_not_contains "auditd reload does not mistake a successful change check for unchanged rules" "$SECURITY_STACK_MODULE" "augenrules --check"
 assert_file_contains "auditd rules are reloaded idempotently with augenrules" "$SECURITY_STACK_MODULE" "augenrules --load"
 assert_file_contains "merged audit rules clear the prior rules before reload" "$SECURITY_STACK_MODULE" '^-D$'

@@ -625,3 +625,5 @@ auth.apply_failed=Konfiguration der Authentifizierungsrichtlinie fehlgeschlagen
 check.authentication_policy=Authentifizierungskonfiguration und PAM-Stack
 ssh.apply_failed=Konfiguration der SSH-Richtlinie fehlgeschlagen
 check.ssh_policy=SSH-Richtlinie für Server, Client und Dienst
+
+security.audit_apply_failed=Zeitplanung des Sicherheitsaudits fehlgeschlagen

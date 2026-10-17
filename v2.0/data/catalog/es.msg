@@ -625,3 +625,5 @@ auth.apply_failed=Error al configurar la política de autenticación
 check.authentication_policy=Configuración de autenticación y pila PAM
 ssh.apply_failed=Error al configurar la política SSH
 check.ssh_policy=Política SSH de servidor, cliente y servicio
+
+security.audit_apply_failed=Error al configurar la programación de auditorías de seguridad

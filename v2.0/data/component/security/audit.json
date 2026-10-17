@@ -1,0 +1,16 @@
+{
+  "files": {
+    "/etc/cron.weekly/security-audit.sh": "#!/usr/bin/env bash\nset -euo pipefail\nexec /usr/bin/os-lua run-security-audit\n",
+    "/etc/systemd/system/os-security-audit.service": "[Unit]\nDescription=OS security audit\n\n[Service]\nType=oneshot\nExecStart=/usr/bin/os-lua run-security-audit\nNice=19\nIOSchedulingClass=idle\n",
+    "/etc/systemd/system/os-security-audit.timer": "[Unit]\nDescription=Weekly OS security audit\n\n[Timer]\nOnCalendar=weekly\nPersistent=true\nRandomizedDelaySec=1h\n\n[Install]\nWantedBy=timers.target\n",
+    "/etc/logrotate.d/os-security-audit": "/var/log/lynis-audit.log /var/log/rkhunter-audit.log /var/log/arch-audit.log /var/log/clamav/os-scan.log {\n    weekly\n    rotate 12\n    compress\n    missingok\n    notifempty\n    create 640 root root\n}\n"
+  },
+  "paths": ["/home", "/root", "/etc", "/usr", "/opt", "/var", "/boot"],
+  "logs": {
+    "lynis": "/var/log/lynis-audit.log",
+    "rkhunter": "/var/log/rkhunter-audit.log",
+    "arch-audit": "/var/log/arch-audit.log"
+  },
+  "timer": "os-security-audit.timer",
+  "cron": "cronie.service"
+}

@@ -21,3 +21,5 @@ Sysctl policy, kexec lockdown and core dump limits now use a Lua component with 
 Authentication and SSH policies now live in external data applied by Lua components. PAM migration preserves comments and other stack entries, removes conflicting inline options, keeps a one-time backup and rejects unsupported stacks. SSH validates staged files before publication and verifies its three managed files.
 
 The systemd service policy now runs in Lua. Journald and resolved drop-ins come from canonical data, and verification checks their contents and the disabled state of managed services and sockets.
+
+The weekly audit now runs Lynis, rkhunter, ClamAV and arch-audit through Lua. The systemd timer and Cronie are never enabled together; the runner, units, logrotate policy and minimal starter are verified from canonical data. Arch-audit findings return a failure for review.
