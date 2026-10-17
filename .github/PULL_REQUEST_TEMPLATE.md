@@ -1,1 +1,1 @@
-../docs/github/PULL_REQUEST_TEMPLATE.md
+../v2.0/docs/github/PULL_REQUEST_TEMPLATE.md

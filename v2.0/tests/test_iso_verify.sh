@@ -7,7 +7,7 @@ WORK_DIR=$(mktemp -d)
 trap 'rm -rf -- "$WORK_DIR"' EXIT
 VERIFY_SCRIPT="$PROJECT_DIR/modules/iso/scripts/verify-iso.sh"
 RESOLVE_SCRIPT="$PROJECT_DIR/modules/iso/scripts/resolve-release.sh"
-ISO_WORKFLOW="$PROJECT_DIR/.github/workflows/iso.yml"
+ISO_WORKFLOW="$PROJECT_DIR/../.github/workflows/iso.yml"
 assert_file_exists "verification script exists" "$VERIFY_SCRIPT"
 assert_file_executable "verification script is executable" "$VERIFY_SCRIPT"
 assert_true "verification script passes syntax check" "bash -n '$VERIFY_SCRIPT'"

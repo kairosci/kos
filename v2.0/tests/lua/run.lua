@@ -63,11 +63,32 @@ if arg[2] == "json" then
         assert(Json.encode(canonical) == Json.encode(legacy))
         local found = false
         for _, item in ipairs(canonical.remaining) do
-            if item.path == "scripts/setup.sh" then found = true end
+            if item.path == "v2.0/scripts/setup.sh" then found = true end
         end
         assert(found and not canonical.complete)
-        assert(File.read(repository .. "/src/main.lua") == File.read(repository .. "/v2.0/src/main.lua"))
-        assert(File.read(repository .. "/tests/lua/run.lua") == File.read(repository .. "/v2.0/tests/lua/run.lua"))
+        assert(File.read(root .. "/src/main.lua") == File.read(repository .. "/v2.0/src/main.lua"))
+        assert(File.read(root .. "/tests/lua/run.lua") == File.read(repository .. "/v2.0/tests/lua/run.lua"))
+    end)
+    suite:test("tracked project contents have one active versioned home", function()
+        local Inventory = require("component.migration.inventory")
+        local repository = Inventory.new(root, process, File.json(root .. "/data/component/migration/policy.json")).root
+        local layout = File.json(root .. "/data/component/migration/layout.json")
+        local native, links = {}, {}
+        for _, path in ipairs(layout.nativeFiles) do native[path] = true end
+        for _, path in ipairs(layout.links) do links[path] = true end
+        local files = process:run("repositoryFiles", {"-c", "safe.directory=" .. repository, "-C", repository, "ls-files", "-z"})
+        for path in files:gmatch("[^%z]+") do
+            local allowed = path:sub(1, #layout.active) == layout.active or path:sub(1, #layout.archive) == layout.archive or native[path]
+            for _, prefix in ipairs(layout.nativeDirectories) do if path:sub(1, #prefix) == prefix then allowed = true end end
+            if links[path] then
+                local mode = tonumber(process:run("fileMode", {repository .. "/" .. path}), 16)
+                assert(mode and mode & 0xF000 == 0xA000, "root_entry_must_be_link_" .. path)
+                local target = process:run("realpath", {repository .. "/" .. path}):gsub("\n$", "")
+                assert(target:sub(1, #repository + #layout.active + 1) == repository .. "/" .. layout.active, "root_entry_escapes_active_tree_" .. path)
+                allowed = true
+            end
+            assert(allowed, "unversioned_project_content_" .. path)
+        end
     end)
     suite:test("performance planning bounds work by both RAM and processors", function()
         local Editor = require("component.performance.editor")

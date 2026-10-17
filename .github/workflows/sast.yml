@@ -32,7 +32,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/semgrep"
           "$RUNNER_TEMP/semgrep/bin/python" -m pip install \
             --disable-pip-version-check \
-            -r requirements-sast.txt
+            -r v2.0/requirements-sast.txt
           echo "$RUNNER_TEMP/semgrep/bin" >> "$GITHUB_PATH"
 
       - name: Scan Bash sources
@@ -40,13 +40,13 @@ jobs:
           semgrep scan \
             --error \
             --metrics off \
-            --config .semgrep.yml \
+            --config v2.0/.semgrep.yml \
             --sarif \
             --output semgrep.sarif \
-            scripts hooks modules/conf tests modules/clean/scripts modules/clean/scripts/lib/modules \
-            modules/obscure/scripts modules/obscure/scripts/lib/modules modules/slop/scripts modules/slop/scripts/lib/modules \
-            modules/performance/scripts modules/performance/scripts/lib/modules modules/iso/scripts \
-            modules/theme-previews/scripts modules/theme-previews/scripts/lib v2.0/src v2.0/script
+            v2.0/scripts v2.0/hooks v2.0/modules/conf v2.0/tests v2.0/modules/clean/scripts v2.0/modules/clean/scripts/lib/modules \
+            v2.0/modules/obscure/scripts v2.0/modules/obscure/scripts/lib/modules v2.0/modules/slop/scripts v2.0/modules/slop/scripts/lib/modules \
+            v2.0/modules/performance/scripts v2.0/modules/performance/scripts/lib/modules v2.0/modules/iso/scripts \
+            v2.0/modules/theme-previews/scripts v2.0/modules/theme-previews/scripts/lib v2.0/src v2.0/script
 
       - name: Upload SARIF results
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

@@ -1,1 +1,1 @@
-docs/root/GEMINI.md
+v2.0/docs/root/GEMINI.md

@@ -39,7 +39,7 @@ jobs:
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
-          bash modules/iso/scripts/resolve-release.sh "$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          bash v2.0/modules/iso/scripts/resolve-release.sh "$RELEASE_TAG" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build OS ISO
@@ -63,11 +63,11 @@ jobs:
           mkdir -p "$overlay/opt/os" "$source_tree"
           git archive HEAD | tar -x -C "$source_tree"
           cp -aL "$source_tree/." "$overlay/opt/os/"
-          cp -aL "$source_tree/modules/iso/overlay/." "$overlay/"
+          cp -aL "$source_tree/v2.0/modules/iso/overlay/." "$overlay/"
       - name: Build customized ISO
         run: |
           set -euo pipefail
-          bash modules/iso/scripts/customize.sh \
+          bash v2.0/modules/iso/scripts/customize.sh \
             --overlay "$RUNNER_TEMP/os-overlay" \
             --output "$RUNNER_TEMP/os-base.iso"
       - name: Upload ISO artifact for verification
@@ -103,7 +103,7 @@ jobs:
           RELEASE_TAG: ${{ needs.resolve.outputs.tag }}
         run: |
           set -euo pipefail
-          bash modules/iso/scripts/verify-iso.sh \
+          bash v2.0/modules/iso/scripts/verify-iso.sh \
             --iso "$RUNNER_TEMP/os-iso/os-base.iso" \
             --ref "$RELEASE_TAG" \
             --expected-commit "$EXPECTED_COMMIT"
@@ -140,5 +140,5 @@ jobs:
           mapfile -t iso_parts < <(find "$iso_dir" -maxdepth 1 -type f -name "$ISO_NAME.part-*" -print | LC_ALL=C sort)
           ((${#iso_parts[@]} > 0))
           gh release create "$RELEASE_TAG" "${iso_parts[@]}" "$iso_dir/$ISO_NAME.sha256" \
-            modules/iso/scripts/download-release.sh modules/iso/scripts/download-release.ps1 \
+            v2.0/modules/iso/scripts/download-release.sh v2.0/modules/iso/scripts/download-release.ps1 \
             --verify-tag --title "$RELEASE_TAG" --notes-file /dev/null
