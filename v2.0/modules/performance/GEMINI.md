@@ -1,1 +1,1 @@
-../../docs/modules/performance/GEMINI.md
+../../docs/en/modules/performance/GEMINI.md

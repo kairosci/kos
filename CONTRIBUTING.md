@@ -1,1 +1,1 @@
-v2.0/docs/root/CONTRIBUTING.md
+v2.0/docs/en/root/CONTRIBUTING.md

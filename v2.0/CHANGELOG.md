@@ -4,6 +4,8 @@ This file is the single narrative source for what changed in every release. It i
 
 ## Unreleased
 
+Application dispatch, native command delegation, changelog reading, boot assessment and one time GRUB selection now use Lua components with external policy. CLI installation publishes a validated standalone bundle, preserves managed backups and verifies public directory permissions under restrictive umasks. Public documentation is organized in Italian, English and French with an executable completeness check. Remaining shell provisioning and tests are still inventoried as unfinished migration.
+
 ## Release v1.8
 
 Settings is a standalone application with five integrated sections, twenty six Hyprland preferences and two native session timers. Its menu descriptions use OS branding, while Resources, Agents and Micro retirement now use Lua components with preserved personal data. Boot recovery gains a standalone GRUB candidate and a verified text only unlock theme with persistent EFI backups. Firmware boot verification remains pending and the complete Lua migration is not yet achieved.

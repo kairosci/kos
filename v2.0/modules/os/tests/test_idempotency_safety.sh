@@ -10,13 +10,13 @@ source "$SCRIPT_DIR/test_lib.sh"
 
 test_section "Automation Idempotency & Safety Rules"
 
-assert_false "No raw '|| true' failure suppression in dispatcher" "grep -qE '\\|\\|[[:space:]]*true\\b' '$PROJECT_DIR/bin/os'"
+assert_false "No raw '|| true' failure suppression in dispatcher" "grep -qE '\\|\\|[[:space:]]*true\\b' '$ROOT_DIR/script/os'"
 assert_false "No raw '|| true' failure suppression in stage" "grep -qE '\\|\\|[[:space:]]*true\\b' '$ROOT_DIR/scripts/lib/modules/36-os-cli.sh'"
 assert_false "No raw '|| true' failure suppression in tests" "grep --exclude=test_idempotency_safety.sh -qE '\\|\\|[[:space:]]*true\\b' '$PROJECT_DIR'/tests/*.sh"
 
 check_no_hardcoded_user_paths() {
     local count
-    count=$(grep -rnE '/home/[a-zA-Z0-9_-]+/' "$PROJECT_DIR/bin/os" "$ROOT_DIR/scripts/lib/modules/36-os-cli.sh" 2>/dev/null | grep -cvE '(/home/\*|/home/\$|PRIMARY_USER)' || :)
+    count=$(grep -rnE '/home/[a-zA-Z0-9_-]+/' "$ROOT_DIR/script/os" "$ROOT_DIR/scripts/lib/modules/36-os-cli.sh" 2>/dev/null | grep -cvE '(/home/\*|/home/\$|PRIMARY_USER)' || :)
     [[ "$count" -eq 0 ]]
 }
 

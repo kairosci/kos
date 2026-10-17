@@ -1,1 +1,1 @@
-../../docs/skills/desktop-applications/SKILL.md
+../../docs/en/skills/desktop-applications/SKILL.md

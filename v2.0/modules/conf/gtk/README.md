@@ -1,1 +1,1 @@
-../../../docs/modules/conf/gtk/README.md
+../../../docs/en/modules/conf/gtk/README.md

@@ -1,1 +1,1 @@
-../../../../docs/modules/obscure/.skills/privacy-shield/SKILL.md
+../../../../docs/en/modules/obscure/.skills/privacy-shield/SKILL.md

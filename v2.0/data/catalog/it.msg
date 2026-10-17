@@ -608,3 +608,4 @@ settings.power=Alimentazione
 settings.lockDelay=Blocco automatico dopo secondi
 settings.screensaverDelay=Salvaschermo dopo secondi
 settings.battery=Batteria
+os.dispatcher_version=dispatcher os %s

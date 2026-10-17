@@ -1,1 +1,1 @@
-../../../docs/modules/conf/nvim/README.md
+../../../docs/en/modules/conf/nvim/README.md

@@ -1,1 +1,1 @@
-../../../../docs/modules/clean/.skills/system-cleanup/SKILL.md
+../../../../docs/en/modules/clean/.skills/system-cleanup/SKILL.md

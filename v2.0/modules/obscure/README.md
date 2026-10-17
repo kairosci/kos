@@ -1,1 +1,1 @@
-../../docs/modules/obscure/README.md
+../../docs/en/modules/obscure/README.md

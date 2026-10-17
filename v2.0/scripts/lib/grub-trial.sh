@@ -3,8 +3,7 @@ set -euo pipefail
 
 _trial_policy="$PROJECT_DIR/data/component/boot/policy.json"
 _trial_id=$(jq -er '.candidateId | select(test("^[A-Za-z][A-Za-z-]*$"))' "$_trial_policy") || err "bootloader.install_failed"
-source "$PROJECT_DIR/scripts/lib/boot-assessment.sh"
-boot_assessment /var/lib/os/boot-assessment
+"$PROJECT_DIR/script/os-lua" boot-assessment
 _trial_esp=$(findmnt -nro TARGET /boot) || err "bootloader.esp_missing"
 [[ "$_trial_esp" == /boot && "$(findmnt -nro FSTYPE /boot)" == vfat ]] || err "bootloader.esp_missing"
 _trial_before=$(efibootmgr | sed -n 's/^BootOrder: //p') || err "bootloader.install_failed"

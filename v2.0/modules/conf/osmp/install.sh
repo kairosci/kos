@@ -19,7 +19,7 @@ for file in "$SOURCE"/src/* "$SOURCE/manifest.json"; do
     relative="${file#"$SOURCE"/}"
     install_user_file "$file" "$STAGE/$relative"
 done
-license="$PROJECT_DIR/docs/modules/plugins/osmp/LICENSE"
+license="$PROJECT_DIR/docs/en/modules/plugins/osmp/LICENSE"
 [[ -f "$license" && ! -L "$license" ]] || err "defaults.app_failed" "osmp"
 install_user_file "$license" "$STAGE/LICENSE"
 omarchy plugin validate "$STAGE"

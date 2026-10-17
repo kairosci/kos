@@ -1,1 +1,1 @@
-../../../docs/modules/conf/bluetooth/README.md
+../../../docs/en/modules/conf/bluetooth/README.md

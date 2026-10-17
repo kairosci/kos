@@ -1,1 +1,1 @@
-../../../docs/modules/conf/brave/README.md
+../../../docs/en/modules/conf/brave/README.md

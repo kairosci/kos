@@ -56,6 +56,41 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
+    if mode == "documentation-report" or mode == "verify-documentation" then
+        assert(config == nil, "invalid_documentation_arguments")
+        local report = require("component.documentation.catalog").new(self.root, self.process, File.json(self.root .. "/data/component/documentation/policy.json")):report()
+        io.write(Json.encode(report), "\n")
+        if mode == "verify-documentation" then assert(report.complete, "documentation_incomplete") end
+        return
+    end
+    if mode == "boot-assessment" or mode == "boot-trial-select" then
+        assert(config == nil, "invalid_boot_assessment_arguments")
+        local boot = File.json(self.root .. "/" .. self.layout.bootPolicy)
+        local assessment = require("component.boot.assessment").new(self.root, self.process, File.json(self.root .. "/data/component/boot/assessment.json"), boot, File.json(self.root .. "/" .. self.layout.bootFormat))
+        io.write(Json.encode(assessment:record()), "\n")
+        if mode == "boot-trial-select" then
+            self.process:run("validateGrub", {boot.esp .. "/" .. boot.grubConfiguration})
+            local entry = require("component.boot.trial").new(self.process, boot):select()
+            io.write(self.catalog:text("bootloader.trial_selected", entry), "\n")
+        end
+        return
+    end
+    if mode == "install-cli" or mode == "install-cli-user" then
+        assert(config == nil, "invalid_cli_install_arguments")
+        local paths = require("core.paths").new(File.json(self.root .. "/" .. self.layout.paths))
+        local installer = require("component.cli.installer").new(self.root, self.process, File.json(self.root .. "/data/component/cli/installation.json"), paths)
+        if mode == "install-cli" then
+            installer:system()
+            io.write(self.catalog:text("os.changelog_installed", installer.policy.systemChangelog), "\n")
+            io.write(self.catalog:text("os.cli_installed", installer.policy.systemExecutable), "\n")
+            return
+        end
+        return installer:user()
+    end
+    if mode == "cli" then
+        local values = {}; for index = 2, #arguments do values[#values + 1] = arguments[index] end
+        return require("component.cli.application").new(self.root, self.process, self.catalog, File.json(self.root .. "/data/component/cli/policy.json")):run(values)
+    end
     if mode == "boot-appearance-diagnostics" then
         assert(self.process:run("identity"):match("^0%s*$"), "root_required")
         local policy = File.json(self.root .. "/" .. self.layout.bootAppearance)

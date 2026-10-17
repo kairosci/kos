@@ -608,3 +608,4 @@ settings.power=Energie
 settings.lockDelay=Automatisch sperren nach Sekunden
 settings.screensaverDelay=Bildschirmschoner nach Sekunden
 settings.battery=Akku
+os.dispatcher_version=os Dispatcher %s

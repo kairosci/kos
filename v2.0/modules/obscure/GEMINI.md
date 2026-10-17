@@ -1,1 +1,1 @@
-../../docs/modules/obscure/GEMINI.md
+../../docs/en/modules/obscure/GEMINI.md

@@ -608,3 +608,4 @@ settings.power=Alimentation
 settings.lockDelay=Verrouillage après secondes
 settings.screensaverDelay=Écran de veille après secondes
 settings.battery=Batterie
+os.dispatcher_version=dispatcher os %s

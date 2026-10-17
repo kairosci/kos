@@ -1,1 +1,1 @@
-docs/root/AGENTS.md
+docs/en/root/AGENTS.md

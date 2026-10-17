@@ -1,1 +1,1 @@
-../../docs/skills/purist/SKILL.md
+../../docs/en/skills/purist/SKILL.md

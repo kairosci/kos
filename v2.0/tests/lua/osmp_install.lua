@@ -16,8 +16,8 @@ local destination = home .. "/.config/os/plugins/os.osmp"
 local function write(path, content)
     local file = assert(io.open(path, "w")); assert(file:write(content)); assert(file:close())
 end
-for _, path in ipairs({project .. "/scripts/lib", project .. "/modules/conf/osmp", source .. "/src", project .. "/docs/modules/plugins/osmp", directory .. "/bin", home}) do process:run("directory", {path}) end
-for _, path in ipairs({"scripts/lib/i18n.sh", "scripts/lib/userconf.sh", "modules/conf/osmp/install.sh", "docs/modules/plugins/osmp/LICENSE", "modules/plugins/osmp/manifest.json"}) do process:run("copy", {root .. "/" .. path, project .. "/" .. path}) end
+for _, path in ipairs({project .. "/scripts/lib", project .. "/modules/conf/osmp", source .. "/src", project .. "/docs/en/modules/plugins/osmp", directory .. "/bin", home}) do process:run("directory", {path}) end
+for _, path in ipairs({"scripts/lib/i18n.sh", "scripts/lib/userconf.sh", "modules/conf/osmp/install.sh", "docs/en/modules/plugins/osmp/LICENSE", "modules/plugins/osmp/manifest.json"}) do process:run("copy", {root .. "/" .. path, project .. "/" .. path}) end
 for path in process:run("find", {root .. "/modules/plugins/osmp/src", "-maxdepth", "1", "-type", "f", "-print0"}):gmatch("[^%z]+") do
     process:run("copy", {path, source .. "/src/" .. path:match("[^/]+$")})
 end
@@ -49,7 +49,7 @@ suite:test("OSMP validates a standalone payload without repository metadata", fu
     assert(File.read(destination .. "/manifest.json") == File.read(source .. "/manifest.json"))
 end)
 suite:test("OSMP installs canonical license as a regular runtime file", function()
-    assert(File.read(destination .. "/LICENSE") == File.read(project .. "/docs/modules/plugins/osmp/LICENSE"))
+    assert(File.read(destination .. "/LICENSE") == File.read(project .. "/docs/en/modules/plugins/osmp/LICENSE"))
     assert(process:run("find", {destination, "-type", "l", "-print"}) == "")
 end)
 suite:test("OSMP repeated installation preserves runtime content", function()

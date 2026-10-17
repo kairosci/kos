@@ -1,1 +1,1 @@
-../../docs/skills/code-cleanup/SKILL.md
+../../docs/en/skills/code-cleanup/SKILL.md

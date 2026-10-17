@@ -10,7 +10,7 @@ arch_migration_report() {
     official_packages=$(pacman -Slq "${official_repositories[@]}") || return 1
     runtime_package=$(jq -er '.runtimePackage' "$policy") || return 1
     runtime_pattern=$(jq -er '.runtimeReferencePattern' "$policy") || return 1
-    if references=$(rg -l -e "$runtime_pattern" "$project/scripts" "$project/hooks" "$project/modules/conf" "$project/modules/os/bin"); then
+    if references=$(rg -l -e "$runtime_pattern" "$project/scripts" "$project/hooks" "$project/modules/conf" "$project/src" "$project/script"); then
         status=0
     else
         status=$?

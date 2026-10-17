@@ -1,1 +1,1 @@
-../../docs/modules/performance/AGENTS.md
+../../docs/en/modules/performance/AGENTS.md

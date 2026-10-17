@@ -1,1 +1,1 @@
-../../../docs/modules/conf/easyeffects/README.md
+../../../docs/en/modules/conf/easyeffects/README.md

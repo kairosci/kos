@@ -1,0 +1,8 @@
+Avvio applicazioni native e comandi OS
+
+Uso:
+  os <group> <command> [args...]
+  os app [--resolve] <role> [args...]
+  os changelog [release]
+  os version
+  os --help

@@ -1,1 +1,1 @@
-docs/root/SECURITY.md
+docs/en/root/SECURITY.md

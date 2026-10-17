@@ -1,1 +1,1 @@
-../../docs/skills/systemd-sandboxing/SKILL.md
+../../docs/en/skills/systemd-sandboxing/SKILL.md

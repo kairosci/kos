@@ -1,1 +1,1 @@
-../../../docs/modules/conf/power/README.md
+../../../docs/en/modules/conf/power/README.md

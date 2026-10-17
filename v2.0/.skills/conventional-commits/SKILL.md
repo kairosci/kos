@@ -1,1 +1,1 @@
-../../docs/skills/conventional-commits/SKILL.md
+../../docs/en/skills/conventional-commits/SKILL.md

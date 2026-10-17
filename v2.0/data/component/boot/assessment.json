@@ -1,0 +1,17 @@
+{
+  "destination": "/var/lib/os/boot-assessment",
+  "directoryMode": "700",
+  "fileMode": "600",
+  "cmdline": "/proc/cmdline",
+  "inventory": "limine.conf",
+  "observations": [
+    {"command": "bootRootMount", "file": "root.json", "json": true},
+    {"command": "bootEspMount", "file": "boot.json", "json": true},
+    {"command": "bootFirmware", "file": "firmware.txt"},
+    {"command": "bootDevices", "file": "devices.json", "json": true},
+    {"command": "bootFileInventory", "file": "boot-files.tsv"}
+  ],
+  "configuration": ["/etc/default/limine", "/etc/mkinitcpio.conf", "/etc/default/grub"],
+  "presets": "/etc/mkinitcpio.d",
+  "presetPattern": "*.preset"
+}

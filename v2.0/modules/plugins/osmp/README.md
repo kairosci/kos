@@ -1,1 +1,1 @@
-../../../docs/modules/plugins/osmp/README.md
+../../../docs/en/modules/plugins/osmp/README.md

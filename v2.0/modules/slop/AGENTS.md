@@ -1,1 +1,1 @@
-../../docs/modules/slop/AGENTS.md
+../../docs/en/modules/slop/AGENTS.md

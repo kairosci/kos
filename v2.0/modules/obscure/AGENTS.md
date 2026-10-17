@@ -1,1 +1,1 @@
-../../docs/modules/obscure/AGENTS.md
+../../docs/en/modules/obscure/AGENTS.md
