@@ -13,3 +13,5 @@ Le sprint final supprime les algorithmes shell et l’ancienne structure après 
 L’indépendance Arch exige des preuves par capacité, un moteur autonome, démarrage à froid réel, veille, déverrouillage chiffré et récupération. Conserver Limine, noyaux fonctionnels et secours jusqu’à réussite. Tests et noms de paquets ne prouvent pas la parité matérielle. Les guides publics existent en it, en et fr ; instructions opérationnelles et licences gardent leur source canonique partagée.
 
 Le provisionnement des paquets par défaut lit désormais une politique validée et installe les paquets manquants des dépôts officiels et de l’AUR avec Lua. L’étape setup reste l’unique voie d’application au système ; les groupes facultatifs conservent leur gestion tolérante des échecs.
+
+Le sprint pare-feu transfère à Lua l’application de la politique UFW et la vérification de son état. Les valeurs par défaut, les ports, les permissions des règles et l’état du service sont contrôlés depuis les données canoniques ; toute dérive échoue explicitement. Les autres politiques de sécurité restent à migrer.
