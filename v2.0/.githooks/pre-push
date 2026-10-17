@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_DIR="$(git rev-parse --show-toplevel)"
-source "$PROJECT_DIR/scripts/lib/i18n.sh"
+source "$PROJECT_DIR/v2.0/scripts/lib/i18n.sh"
 locale_init
 while read -r local_ref local_sha remote_ref remote_sha; do
     if [[ "$remote_ref" == refs/heads/main ]]; then

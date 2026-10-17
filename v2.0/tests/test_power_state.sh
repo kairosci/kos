@@ -20,17 +20,18 @@ function chargeThresholdActive(d, onBattery, states) {
 JS
 printf '{"id":"omarchy.power"}\n' > "$source_dir/manifest.json"
 printf '{"bar":{"layout":{"right":[{"id":"omarchy.audio"},{"id":"omarchy.power","showPercentage":true}]}},"idle":{"lock":300}}\n' > "$XDG_CONFIG_HOME/omarchy/shell.json"
-installer="$SCRIPT_DIR/../modules/conf/power/install.sh"
+installer="$SCRIPT_DIR/../src/main.lua"
+project="$(dirname "$SCRIPT_DIR")"
 plugin="$XDG_CONFIG_HOME/omarchy/plugins/omaconf.power"
 test_section "Power charging state"
-assert_true "installer generates the power clone" 'bash "$installer" && [[ -f "$plugin/Model.js" ]]'
+assert_true "installer generates the power clone" 'lua "$installer" "$project" apply-settings power && [[ -f "$plugin/Model.js" ]]'
 assert_true "clone preserves the original panel and IPC" 'cmp -s "$source_dir/Panel.qml" "$plugin/Panel.qml" && jq -e '\''.omarchy.clonedFrom == "omarchy.power"'\'' "$plugin/manifest.json"'
 assert_file_not_contains "slow charging is not treated as a threshold pause" "$plugin/Model.js" 'changeRate|timeToFull'
 assert_file_contains_literal "pending charge remains a threshold pause" "$plugin/Model.js" 'if (d.state === states.PendingCharge) return true'
 assert_true "bar position and percentage setting survive" 'jq -e '\''.bar.layout.right[0].id == "omarchy.audio" and .bar.layout.right[1].id == "omaconf.power" and .bar.layout.right[1].showPercentage and .idle.lock == 300'\'' "$XDG_CONFIG_HOME/omarchy/shell.json"'
 first_hash=$(sha256sum "$plugin/Model.js" "$XDG_CONFIG_HOME/omarchy/shell.json")
-assert_true "repeated installation is idempotent" 'bash "$installer" && [[ "$first_hash" == "$(sha256sum "$plugin/Model.js" "$XDG_CONFIG_HOME/omarchy/shell.json")" ]]'
+assert_true "repeated installation is idempotent" 'lua "$installer" "$project" apply-settings power && [[ "$first_hash" == "$(sha256sum "$plugin/Model.js" "$XDG_CONFIG_HOME/omarchy/shell.json")" ]]'
 printf 'function chargeThresholdActive() { return false }\n' > "$source_dir/Model.js"
-assert_false "unsupported upstream fails before installation" 'bash "$installer"'
+assert_false "unsupported upstream fails before installation" 'lua "$installer" "$project" apply-settings power'
 assert_true "failed migration preserves previous state" '[[ "$first_hash" == "$(sha256sum "$plugin/Model.js" "$XDG_CONFIG_HOME/omarchy/shell.json")" ]]'
 test_summary

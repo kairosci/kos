@@ -35,6 +35,7 @@ function Application:apply(names, single)
         local application
         if policy.kind == "settings" then application = settings:apply(name)
         elseif policy.kind == "ini" then application = configuration:apply(name)
+        elseif policy.kind == "native-panel" then application = require("component.application.panel").new(self.root, paths, publisher, registry):apply(name)
         elseif policy.kind == "retirement" or policy.kind == "json-provider" then application = require("component.application.retirement").new(paths, publisher, self.process, registry):apply(name)
         elseif policy.kind == "file" or policy.kind == "desktop" then application = files:apply(name)
         else error("unknown_application_kind") end

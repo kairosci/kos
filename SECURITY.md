@@ -1,1 +1,1 @@
-docs/root/SECURITY.md
+v2.0/docs/root/SECURITY.md
