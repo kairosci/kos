@@ -71,6 +71,24 @@ assert_true "panel migration preserves the idle policy and calendar preferences"
 assert_true "panel migration is idempotent" "session_layout '$WORK_DIR/shell-new.json' > '$WORK_DIR/shell-again.json' && cmp '$WORK_DIR/shell-new.json' '$WORK_DIR/shell-again.json'"
 printf '%s\n' '{"learn":{},"learn.arch":{},"bar":{},"style.bar.position":{},"apps":{"provider":"apps"},"personal":{},"setup":{},"setup.config":{},"update.config":{}}' > "$WORK_DIR/menu.json"
 assert_true "menu filtering removes Learn and bar routes while retaining Apps and personal entries" "jq --slurpfile policy '$PROJECT_DIR/modules/conf/session/data/policy.json' -f '$PROJECT_DIR/modules/conf/session/scripts/filter-menu.jq' '$WORK_DIR/menu.json' | jq -e 'keys == [\"apps\",\"personal\"]'"
+printf '%s\n' '{"update":{},"update.channel":{},"update.channel.stable":{},"apps":{}}' > "$WORK_DIR/channel-menu.json"
+assert_true "menu filtering removes release channel selection" "jq --slurpfile policy '$PROJECT_DIR/modules/conf/session/data/policy.json' -f '$PROJECT_DIR/modules/conf/session/scripts/filter-menu.jq' '$WORK_DIR/channel-menu.json' | jq -e 'keys == [\"apps\",\"update\"]'"
+assert_file_contains "all menu rows are sorted alphabetically" "$PROJECT_DIR/modules/conf/session/qml/MenuSupport.qml.inc" 'rows.sort'
+cat > "$WORK_DIR/menu.qml" <<'QML'
+Item {
+  readonly property var appLibrary: root.shell ? root.shell.appLibrary : null
+  property string defaultMenuPath: omarchyPath + "/default/omarchy/omarchy-menu.jsonc"
+  property string userMenuPath: Quickshell.env("HOME") + "/.config/omarchy/extensions/omarchy-menu.jsonc"
+  property int cardWidth: Style.space(520) : Style.space(300)
+  function rebuildDisplay() {
+    for (var k = 0; k < rows.length; k++) displayModel.append(rows[k])
+  }
+  ConfirmDialog {
+    text: row.label
+  }
+}
+QML
+assert_true "menu adapter sorts rows and adds a chevron to every app" "lua '$PROJECT_DIR/modules/conf/session/scripts/prepare-menu.lua' '$WORK_DIR/menu.qml' '$PROJECT_DIR/modules/conf/session/qml/MenuSupport.qml.inc' > '$WORK_DIR/menu-adapted.qml' && grep -q 'root.sortMenuRows(rows)' '$WORK_DIR/menu-adapted.qml' && grep -F 'row.label + \" >\"' '$WORK_DIR/menu-adapted.qml' && grep -q 'ControlConfirmDialog' '$WORK_DIR/menu-adapted.qml'"
 printf '%s\n' '{"literal":",}","url":"https://example.org",/* block */"items":[1,2,],}' > "$WORK_DIR/jsonc.json"
 assert_true "JSONC parsing preserves strings while stripping comments and trailing commas" "lua '$PROJECT_DIR/modules/conf/session/scripts/jsonc.lua' '$WORK_DIR/jsonc.json' | jq -e '.literal == \",}\" and .url == \"https://example.org\" and .items == [1,2]'"
 assert_true "managed state is JSON data rather than executable Lua" "jq -e 'type == \"object\" and has(\"os locale\")' '$WORK_DIR/state-new.lua'"

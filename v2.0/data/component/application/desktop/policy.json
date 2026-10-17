@@ -22,8 +22,7 @@
     "source": "data/component/application/desktop/mpv.desktop",
     "root": "data",
     "destination": "applications/mpv.desktop",
-    "mode": "644",
-    "refresh": {"command": "desktopDatabase", "directory": "applications"}
+    "mode": "644"
   },
   "files": [
     {"source": "data/component/application/desktop/kmono.txt", "root": "config", "destination": "os/branding/screensaver.txt", "mode": "644"},

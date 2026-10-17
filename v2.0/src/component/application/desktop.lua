@@ -55,7 +55,6 @@ function Desktop:launcher()
     local content = File.read(self.root .. "/" .. launcher.source)
     assert(content:find("[Desktop Entry]", 1, true), "invalid_desktop_entry")
     self.publisher:publish(self.paths:resolve(launcher.root, launcher.destination), content, launcher.mode)
-    if launcher.refresh then self.process:run(launcher.refresh.command, {self.paths:resolve(launcher.root, launcher.refresh.directory)}) end
 end
 
 function Desktop:apply()

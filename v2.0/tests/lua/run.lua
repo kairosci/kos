@@ -287,8 +287,15 @@ elseif arg[2] == "applications" then
     end)
     local desktopPolicy = File.json(root .. "/data/component/application/desktop/policy.json")
     local desktopCatalog = Catalog.new(File.json(root .. "/data/core/locale.json"), root .. "/data/catalog")
+    local desktopCommands = {}
+    local desktopProcess = setmetatable({}, {__index=function(_, method)
+        return function(_, command, arguments)
+            desktopCommands[command] = true
+            return process[method](process, command, arguments)
+        end
+    end})
     local desktop = function()
-        return Desktop.new(root, desktopPaths, publisher, process, desktopCatalog, desktopPolicy)
+        return Desktop.new(root, desktopPaths, publisher, desktopProcess, desktopCatalog, desktopPolicy)
     end
     suite:test("Lua desktop integration retires managed shell helpers and hooks", function()
         local home = desktopPaths:resolve("home", ".bashrc")
@@ -315,6 +322,7 @@ elseif arg[2] == "applications" then
         local before = process:run("digest", {home}) .. process:run("digest", {desktopPaths:resolve("data", desktopPolicy.launcher.destination)})
         assert(desktop():apply())
         assert(before == process:run("digest", {home}) .. process:run("digest", {desktopPaths:resolve("data", desktopPolicy.launcher.destination)}))
+        assert(not desktopCommands.desktopDatabase, "desktop_database_dependency")
     end)
     process:run("removeDirectory", {desktopDirectory})
     assert(os.remove(paths:resolve("data", "applications")))

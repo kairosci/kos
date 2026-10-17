@@ -1,4 +1,13 @@
   property var sessionPolicy: null
+  function sortMenuRows(rows) {
+    rows.sort(function(a, b) {
+      var aLabel = String(a.label || "").toLocaleLowerCase()
+      var bLabel = String(b.label || "").toLocaleLowerCase()
+      var comparison = aLabel.localeCompare(bLabel)
+      if (comparison !== 0) return comparison
+      return String(a.itemId || "").localeCompare(String(b.itemId || ""))
+    })
+  }
   FileView {
     path: (Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share") + "/os/session/data/policy.json"
     watchChanges: true
