@@ -364,6 +364,13 @@
         "language": "lua",
         "path": "tests/lua/run.lua",
         "arguments": [
+          "security-stack"
+        ]
+      },
+      {
+        "language": "lua",
+        "path": "tests/lua/run.lua",
+        "arguments": [
           "kernel"
         ]
       },

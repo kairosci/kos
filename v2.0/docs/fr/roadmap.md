@@ -23,3 +23,5 @@ Les politiques d’authentification et SSH sont désormais des données externes
 La politique des services systemd passe à Lua. Les fichiers journald et resolved proviennent des données canoniques, et la vérification contrôle leur contenu ainsi que l’état désactivé des services et sockets gérés.
 
 L’audit hebdomadaire exécute désormais Lynis, rkhunter, ClamAV et arch-audit via Lua. Le timer systemd et Cronie ne sont jamais activés simultanément ; le lanceur, les unités, la configuration logrotate et l’amorce minimale sont vérifiés depuis les données canoniques. Les alertes arch-audit entraînent un échec à examiner.
+
+La pile de sécurité utilise désormais Lua et des données externes pour l’installation des paquets, les règles d’audit, la configuration Fail2ban et les profils AppArmor, avec vérification explicite. USBGuard ne génère une politique initiale qu’en l’absence de configuration non vide et conserve les règles existantes ; les capacités matérielles restent à vérifier sur l’appareil.

@@ -1,0 +1,34 @@
+{
+  "packages": [
+    "lynis",
+    "arch-audit",
+    "rkhunter",
+    "clamav",
+    "audit",
+    "usbguard",
+    "fail2ban",
+    "apparmor"
+  ],
+  "files": {
+    "/etc/audit/rules.d/hardened.rules": "-D\n-w /etc/passwd -p wa -k identity\n-w /etc/group -p wa -k identity\n-w /etc/shadow -p wa -k identity\n-w /etc/gshadow -p wa -k identity\n-w /etc/sudoers -p wa -k sudoers\n-w /etc/sudoers.d -p wa -k sudoers\n-w /etc/ssh/sshd_config -p wa -k sshd\n-w /etc/ssh/sshd_config.d -p wa -k sshd\n-w /etc/ufw -p wa -k firewall\n-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k privilege_escalation\n-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k privilege_escalation\n-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k privilege_escalation\n-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k privilege_escalation\n-w /etc/hosts -p wa -k system-locale\n-w /etc/hostname -p wa -k system-locale\n-w /etc/sysctl.conf -p wa -k sysctl\n-w /etc/sysctl.d -p wa -k sysctl\n-w /etc/modprobe.d -p wa -k modules\n-a always,exit -F arch=b64 -S mount -k mount\n-a always,exit -F arch=b32 -S mount -k mount\n"
+  },
+  "profiles": [
+    "/etc/apparmor.d/usr.bin.sshd",
+    "/etc/apparmor.d/usr.bin.useradd",
+    "/etc/apparmor.d/usr.bin.curl",
+    "/etc/apparmor.d/usr.bin.wget"
+  ],
+  "auditRules": "/etc/audit/rules.d/hardened.rules",
+  "usbguardRules": "/etc/usbguard/rules.conf",
+  "packageFiles": {
+    "fail2ban": {
+      "/etc/fail2ban/jail.local": "[DEFAULT]\nbantime = 3600\nfindtime = 600\nmaxretry = 5\nignoreip = 127.0.0.1/8 ::1\nbackend = systemd\n\n[sshd]\nenabled = true\nport = ssh\nfilter = sshd\nmaxretry = 3\n"
+    },
+    "apparmor": {
+      "/etc/apparmor.d/usr.bin.sshd": "#include <tunables/global>\n\n/usr/bin/sshd {\n\n  #include <abstractions/base>\n  #include <abstractions/authentication>\n  #include <abstractions/nameservice>\n  #include <abstractions/openssl>\n  #include <abstractions/ssl_certs>\n\n  capability dac_override,\n  capability dac_read_search,\n  capability setuid,\n  capability setgid,\n  capability net_bind_service,\n\n  /etc/ssh/** r,\n  /etc/ssh/sshd_config.d/** r,\n  /etc/nsswitch.conf r,\n  /etc/passwd r,\n  /etc/group r,\n  /etc/shadow r,\n  /etc/gshadow r,\n  /var/log/* w,\n  /var/empty/** rw,\n  /var/run/sshd/ rw,\n  /run/sshd/ rw,\n  /proc/sys/net/ipv4/tcp_max_syn_backlog r,\n  /proc/sys/net/core/somaxconn r,\n  /dev/log w,\n  /run/nscd.pid rw,\n  /run/systemd/notify rw,\n\n  deny /home/** w,\n  deny /root/** w,\n  deny /var/tmp/** rw,\n}\n",
+      "/etc/apparmor.d/usr.bin.useradd": "#include <tunables/global>\n\n/usr/bin/useradd {\n\n  #include <abstractions/base>\n  #include <abstractions/nameservice>\n\n  /etc/passwd rw,\n  /etc/shadow rw,\n  /etc/group rw,\n  /etc/gshadow rw,\n  /etc/login.defs r,\n  /etc/default/** r,\n  /etc/skel/** r,\n  /home/** rw,\n  /var/spool/mail/** rw,\n\n  deny /etc/sudoers r,\n  deny /etc/ssh/** r,\n}\n",
+      "/etc/apparmor.d/usr.bin.curl": "#include <tunables/global>\n\n/usr/bin/curl {\n\n  #include <abstractions/base>\n  #include <abstractions/nameservice>\n  #include <abstractions/openssl>\n  #include <abstractions/ssl_certs>\n  #include <abstractions/user-download>\n  #include <abstractions/user-tmp>\n\n  network inet stream,\n  network inet6 stream,\n  network unix stream,\n\n  /etc/ssl/** r,\n  /etc/ca-certificates/** r,\n  /etc/resolv.conf r,\n  /etc/hosts r,\n  /dev/null rw,\n  /dev/urandom r,\n  /tmp/** rwkl,\n  /var/tmp/** rwkl,\n  /home/** rwkl,\n  /root/** rwkl,\n  /var/cache/** rwkl,\n  owner @{HOME}/** rwkl,\n\n  deny /etc/shadow r,\n  deny /etc/gshadow r,\n  deny /etc/sudoers r,\n  deny /etc/ssh/sshd_config r,\n  deny /etc/ssh/*key* r,\n}\n",
+      "/etc/apparmor.d/usr.bin.wget": "#include <tunables/global>\n\n/usr/bin/wget {\n\n  #include <abstractions/base>\n  #include <abstractions/nameservice>\n  #include <abstractions/openssl>\n  #include <abstractions/ssl_certs>\n  #include <abstractions/user-download>\n  #include <abstractions/user-tmp>\n\n  network inet stream,\n  network inet6 stream,\n\n  /etc/ssl/** r,\n  /etc/ca-certificates/** r,\n  /etc/resolv.conf r,\n  /etc/hosts r,\n  /dev/null rw,\n  /dev/urandom r,\n  /tmp/** rwkl,\n  /var/tmp/** rwkl,\n  /home/** rwkl,\n  /root/** rwkl,\n  /var/cache/** rwkl,\n  owner @{HOME}/** rwkl,\n\n  deny /etc/shadow r,\n  deny /etc/gshadow r,\n  deny /etc/sudoers r,\n  deny /etc/ssh/sshd_config r,\n  deny /etc/ssh/*key* r,\n}\n"
+    }
+  }
+}

@@ -87,6 +87,8 @@ elseif arg[2] == "services" then
     assert(loadfile(root .. "/tests/lua/services.lua"))()(suite, root)
 elseif arg[2] == "audit" then
     assert(loadfile(root .. "/tests/lua/audit.lua"))()(suite, root)
+elseif arg[2] == "security-stack" then
+    assert(loadfile(root .. "/tests/lua/security_stack.lua"))()(suite, root)
 elseif arg[2] == "auth-ssh" then
     assert(loadfile(root .. "/tests/lua/auth_ssh.lua"))()(suite, root)
 elseif arg[2] == "boot-trial" then

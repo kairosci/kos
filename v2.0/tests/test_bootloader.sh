@@ -22,7 +22,7 @@ assert_file_contains "bootloader has a dedicated setup scope" "$PROJECT_DIR/scri
 assert_file_contains "full setup includes GRUB provisioning" "$PROJECT_DIR/scripts/setup.sh" '27-bootloader.sh'
 assert_file_contains "recovery rolls back the selected Snapper snapshot" "$PROJECT_DIR/scripts/lib/root-recovery.sh" 'snapper -c root rollback'
 assert_file_contains "snapshot cleanup invokes the canonical menu generator" "$PROJECT_DIR/scripts/lib/snapshot-baseline.sh" 'os-grub-menu'
-assert_file_contains "security reconciliation invokes the same generator" "$PROJECT_DIR/scripts/lib/modules/85-security-stack.sh" 'os-grub-menu'
+assert_file_contains "security reconciliation invokes the same Lua generator" "$PROJECT_DIR/src/component/security/stack.lua" 'grubMenuUpdate'
 assert_file_not_contains "candidate never rewrites initramfs policy" "$PROJECT_DIR/scripts/lib/grub-trial.sh" 'mkinitcpio -P'
 assert_file_not_contains "candidate never requests a reboot" "$PROJECT_DIR/scripts/lib/grub-trial.sh" 'systemctl reboot'
 test_summary

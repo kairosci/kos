@@ -23,3 +23,5 @@ Authentication and SSH policies now live in external data applied by Lua compone
 The systemd service policy now runs in Lua. Journald and resolved drop-ins come from canonical data, and verification checks their contents and the disabled state of managed services and sockets.
 
 The weekly audit now runs Lynis, rkhunter, ClamAV and arch-audit through Lua. The systemd timer and Cronie are never enabled together; the runner, units, logrotate policy and minimal starter are verified from canonical data. Arch-audit findings return a failure for review.
+
+The security stack now uses Lua and external data for package installation, audit rules, Fail2ban configuration and AppArmor profiles, with explicit verification. USBGuard creates an initial policy only when no nonempty configuration exists and preserves established rules; hardware capability behavior still requires device verification.

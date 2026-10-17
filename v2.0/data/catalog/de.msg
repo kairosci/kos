@@ -627,3 +627,5 @@ ssh.apply_failed=Konfiguration der SSH-Richtlinie fehlgeschlagen
 check.ssh_policy=SSH-Richtlinie für Server, Client und Dienst
 
 security.audit_apply_failed=Zeitplanung des Sicherheitsaudits fehlgeschlagen
+security.apply_failed=Konfiguration des Sicherheitsstapels fehlgeschlagen
+check.security_stack=Sicherheitsstapelrichtlinie
