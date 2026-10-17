@@ -19,3 +19,5 @@ Le sprint pare-feu transfère à Lua l’application de la politique UFW et la v
 La politique sysctl, le verrouillage kexec et les limites des dumps mémoire utilisent désormais un composant Lua avec des données externes et une publication idempotente. La vérification compare les fichiers persistants et 19 valeurs actives ; les autres politiques de sécurité restent à migrer.
 
 Les politiques d’authentification et SSH sont désormais des données externes appliquées par Lua. La migration PAM conserve les commentaires et les autres règles, supprime les options en ligne conflictuelles, garde une sauvegarde initiale et rejette les piles non prises en charge. SSH valide les fichiers temporaires avant publication et vérifie ses trois fichiers gérés.
+
+La politique des services systemd passe à Lua. Les fichiers journald et resolved proviennent des données canoniques, et la vérification contrôle leur contenu ainsi que l’état désactivé des services et sockets gérés.
