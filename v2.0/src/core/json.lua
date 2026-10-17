@@ -5,6 +5,10 @@ function Json.array(values)
     return setmetatable(values, array)
 end
 
+function Json.isArray(value)
+    return type(value) == "table" and getmetatable(value) == array
+end
+
 function Json.decode(source)
     assert(utf8.len(source), "json_invalid_utf8")
     local position = 1
@@ -116,7 +120,7 @@ function Json.encode(value)
     if kind == "number" then assert(value == value and math.abs(value) ~= math.huge, "json_number"); return tostring(value) end
     assert(kind == "table", "json_type")
     local result = {}
-    if getmetatable(value) == array then
+    if Json.isArray(value) then
         for _, item in ipairs(value) do result[#result + 1] = Json.encode(item) end
         return "[" .. table.concat(result, ",") .. "]"
     end

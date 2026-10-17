@@ -1,0 +1,1 @@
+{"apiCommand":"repositoryApi","pagination":["--paginate","--slurp"],"protectedRefs":["refs/heads/main"],"query":"?includes_parents=false&per_page=100","repositoryCommand":"repositoryName","ruleset":"data/repository/main-ruleset.json","rulesetsEndpoint":"repos/%s/rulesets"}
