@@ -357,7 +357,7 @@ assert_file_contains "make lint covers every app config" "$PROJECT_DIR/Makefile"
 assert_file_contains "make help lists herdr" "$PROJECT_DIR/scripts/lib/help.sh" 'row herdr "make.herdr"'
 assert_file_contains "setup discovers app installers per user" "$PROJECT_DIR/scripts/lib/modules/24-user-configurations.sh" 'modules/conf/\*/install.sh'
 assert_file_contains "ci syntax job covers app installers" "$PROJECT_DIR/../.github/workflows/ci.yml" 'modules/conf/'
-assert_file_contains "test runner includes the herdr suite" "$PROJECT_DIR/tests/run-all.sh" "test_herdr_menu.sh"
+assert_file_contains "test runner includes the herdr suite" "$PROJECT_DIR/data/component/testing/policy.json" "test_herdr_menu.sh"
 
 for lang in en it fr de es pt; do
     assert_true "catalogue $lang carries the herdr keys" \

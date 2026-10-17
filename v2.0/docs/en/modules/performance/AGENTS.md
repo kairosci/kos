@@ -6,7 +6,7 @@ performance is the energy and runtime microcomponent for OS on Arch Linux. It ow
 
 ## Repository Architecture
 
-Provisioning in `scripts/setup.sh` loads this project's stage modules from `scripts/lib/modules/` and sources the shared charge threshold module from the root project. Verification runner in `scripts/verify.sh` asserts persisted policy and live runtime state. Modular test suite under `tests/` validates power policy and tuning and syntax and pipeline and safety through `tests/run-all.sh`. Logging is managed by `scripts/run-setup.sh` and interactive execution is supported by `scripts/launch.sh`. Root Makefile exposes setup and verification and testing and cleanup targets. Operational runbook resides in `.skills/` with truly specific runbook only and shared runbooks living in profile repo.
+Provisioning in `scripts/setup.sh` loads this project's stage modules from `scripts/lib/modules/` and sources the shared charge threshold module from the root project. Verification runner in `scripts/verify.sh` asserts persisted policy and live runtime state. Modular test suite under `tests/` validates power policy and tuning and syntax and pipeline and safety through `tests/main.lua`. Logging is managed by `scripts/run-setup.sh` and interactive execution is supported by `scripts/launch.sh`. Root Makefile exposes setup and verification and testing and cleanup targets. Operational runbook resides in `.skills/` with truly specific runbook only and shared runbooks living in profile repo.
 
 ## Ownership Details
 

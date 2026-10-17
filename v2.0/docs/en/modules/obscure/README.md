@@ -109,7 +109,7 @@ Real suite in `tests` with single run file covers yazi gate and password helpers
 Test code without comments:
 
 ```bash
-bash tests/run-all.sh
+lua -E tests/main.lua "$PWD" --group full
 make test
 bash tests/test_yazi_gate.sh
 bash tests/test_auth_helpers.sh

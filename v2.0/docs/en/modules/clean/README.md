@@ -95,7 +95,7 @@ Real suite in `tests` with single run file covers system cleanup and home cleanu
 Test code without comments:
 
 ```bash
-bash tests/run-all.sh
+lua -E tests/main.lua "$PWD" --group full
 make test
 bash tests/test_system_cleanup.sh
 bash tests/test_home_cleanup.sh

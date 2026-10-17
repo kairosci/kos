@@ -38,7 +38,7 @@ assert_file_contains "verify checks foot orphans" "$PROJECT_DIR/scripts/verify.s
 assert_file_contains "verify validates the disk entry" "$PROJECT_DIR/scripts/verify.sh" "disk_entry_valid"
 assert_file_contains "verify checks docker orphans" "$PROJECT_DIR/scripts/verify.sh" "check.desktop_no_docker"
 assert_file_contains "verify checks the cleanup hook" "$PROJECT_DIR/scripts/verify.sh" "check.desktop_hook"
-assert_file_contains "test runner includes the desktop suite" "$PROJECT_DIR/tests/run-all.sh" "test_desktop_cleanup.sh"
+assert_file_contains "test runner includes the desktop suite" "$PROJECT_DIR/data/component/testing/policy.json" "test_desktop_cleanup.sh"
 
 # shellcheck source=../scripts/lib/desktop-cleanup.sh
 source "$LIB"

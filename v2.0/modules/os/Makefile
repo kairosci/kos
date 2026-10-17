@@ -15,7 +15,7 @@ verify:
 	$(MAKE) -C ../.. verify
 
 test:
-	bash tests/run-all.sh
+	lua -E ../../tests/main.lua "$(abspath ../..)" --group os
 
 clean:
 	rm -f setup.log

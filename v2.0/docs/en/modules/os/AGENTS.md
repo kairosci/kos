@@ -6,7 +6,7 @@ os is the command dispatcher microcomponent for OS on Arch Linux. It owns the os
 
 ## Repository Architecture
 
-The dispatcher source lives in `modules/os/bin/os`. The setup stage module `scripts/lib/modules/36-os-cli.sh` installs the dispatcher to the system executable path and publishes `CHANGELOG.md` under the shared system directory before reconciling per user copies. Verification lives in `modules/os/tests/` through `tests/run-all.sh`. Canonical documentation lives in `docs/modules/os/` with symlinks at the module paths.
+The dispatcher source lives in `modules/os/bin/os`. The setup stage module `scripts/lib/modules/36-os-cli.sh` installs the dispatcher to the system executable path and publishes `CHANGELOG.md` under the shared system directory before reconciling per user copies. Verification lives in `modules/os/tests/` through `tests/main.lua`. Canonical documentation lives in `docs/modules/os/` with symlinks at the module paths.
 
 ## Ownership Details
 

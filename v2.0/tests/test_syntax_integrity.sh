@@ -27,10 +27,10 @@ assert_file_contains "Dependabot tracks SAST dependencies" "$PROJECT_DIR/../.git
 assert_file_exists "security policy exists" "$PROJECT_DIR/SECURITY.md"
 assert_file_contains "Arch CI installs the YAML test dependency" "$PROJECT_DIR/../.github/workflows/ci.yml" 'base-devel git sudo jq python python-yaml'
 assert_true "CI checkout actions use immutable refs" "! grep -q 'uses: actions/checkout@v' '$PROJECT_DIR/../.github/workflows/ci.yml'"
-assert_file_contains "test runner delegates to shared suite runner" "$PROJECT_DIR/tests/run-all.sh" 'run-suite-list.sh'
-assert_file_exists "shared suite runner exists" "$PROJECT_DIR/tests/run-suite-list.sh"
-assert_file_contains "shared suite runner reports executed assertions" "$PROJECT_DIR/tests/run-suite-list.sh" 'Tests Executed: %s'
-assert_file_contains "shared suite runner counts assertion results" "$PROJECT_DIR/tests/run-suite-list.sh" 'pass|fail|warn'
+assert_file_exists "Lua test entry point exists" "$PROJECT_DIR/tests/main.lua"
+assert_file_exists "Lua suite orchestration exists" "$PROJECT_DIR/src/component/testing/runner.lua"
+assert_file_contains "suite policy includes native Lua tests" "$PROJECT_DIR/data/component/testing/policy.json" 'tests/lua/run.lua'
+assert_file_contains "suite runner reports executed assertions" "$PROJECT_DIR/src/component/testing/runner.lua" 'Tests Executed: %d'
 assert_file_contains_literal "root modules live under lib" "$PROJECT_DIR/scripts/setup.sh" 'MODULES_DIR="$SCRIPT_DIR/lib/modules"'
 
 markdown_lists=0

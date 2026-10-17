@@ -31,4 +31,4 @@ Scan before every cleanup with ripgrep from the repository root:
 `rg -n 'echo -e' .`
 `rg -n '^\s*#[^!]' scripts/ hooks/ tests/ --glob '*.sh'`
 `rg -l '\x{1F300}-\x{1FAFF}' .` for non-ASCII emoji ranges.
-Classify each hit against the keep classes above, delete the rest, then verify with `shellcheck` and the full test suite (`bash tests/run-all.sh` plus each subproject runner) before committing.
+Classify each hit against the keep classes above, delete the rest, then verify with `shellcheck` and the full test suite (`lua -E tests/main.lua "$PWD" --group full` plus each subproject runner) before committing.

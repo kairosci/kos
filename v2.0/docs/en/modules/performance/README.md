@@ -104,7 +104,7 @@ Real suite in `tests` with single run file covers energy policy and runtime tuni
 Test code without comments:
 
 ```bash
-bash tests/run-all.sh
+lua -E tests/main.lua "$PWD" --group full
 make test
 bash tests/test_power_policy.sh
 bash tests/test_performance_tuning.sh

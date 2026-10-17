@@ -18,7 +18,7 @@ done
 
 assert_file_executable "bin/os is executable" "$ROOT_DIR/script/os"
 assert_file_contains "bin/os uses strict mode" "$ROOT_DIR/script/os" "set -euo pipefail"
-assert_file_executable "tests/run-all.sh is executable" "$PROJECT_DIR/tests/run-all.sh"
+assert_file_exists "Lua suite entry point exists" "$PROJECT_DIR/../../tests/main.lua"
 
 for helper in "$PROJECT_DIR"/bin/*; do
     [[ -f "$helper" ]] || continue
