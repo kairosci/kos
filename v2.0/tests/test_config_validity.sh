@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 SHELL_PLUGINS_MODULE="$PROJECT_DIR/scripts/lib/modules/35-shell-plugins.sh"
-CLICONF_DATA="$PROJECT_DIR/modules/conf/cli/data"
+CLICONF_DATA="$PROJECT_DIR/data/component/terminal/help"
 
 source "$SCRIPT_DIR/test_lib.sh"
 
@@ -17,13 +17,13 @@ assert_true "Lua retirement component syntax valid" "luac -p '$PROJECT_DIR/src/c
 
 
 
-assert_true "cliconf helpers bash syntax valid" "bash -n '$CLICONF_DATA/helpers.sh'"
-assert_true "cliconf installer bash syntax valid" "bash -n '$PROJECT_DIR/modules/conf/cli/install.sh'"
+assert_true "terminal helper Lua syntax valid" "luac -p '$PROJECT_DIR/src/component/terminal/helper.lua'"
+assert_true "terminal installer Lua syntax valid" "luac -p '$PROJECT_DIR/src/component/terminal/installer.lua'"
 assert_true "herdr menu bash syntax valid" "bash -n '$PROJECT_DIR/modules/conf/herdr/data/herdr-keybindings-menu'"
 assert_true "herdr installer bash syntax valid" "bash -n '$PROJECT_DIR/modules/conf/herdr/install.sh'"
 
 for tool in fzf rg fd bat eza zoxide git lazygit gum ai; do
-    assert_file_contains "cliconf covers $tool" "$CLICONF_DATA/helpers.sh" "$tool)"
+    assert_file_contains "cliconf covers $tool" "$CLICONF_DATA/en.json" "\"$tool\""
 done
 
 

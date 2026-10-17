@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+helper() {
+    "${XDG_DATA_HOME:-$HOME/.local/share}/os/terminal/runtime/current/script/os-lua" terminal-helper "$@"
+}

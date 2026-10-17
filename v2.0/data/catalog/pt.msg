@@ -613,3 +613,4 @@ make.launch=Iniciar a configuração interativa
 make.run_setup=Configurar e indicar o ficheiro de registo
 make.entry=Configurar numa sessão root existente
 make.keyring=Selecionar o serviço de porta chaves suportado
+terminal.helper_unknown=Tópico de ajuda desconhecido %s

@@ -1,0 +1,1 @@
+export FZF_DEFAULT_OPTS="--color=bg+:{selection},bg:{background},spinner:{accent},hl:{red},fg:{foreground},header:{accent},info:{yellow},pointer:{accent},marker:{green},fg+:{bright_foreground},prompt:{accent},hl+:{red} --layout=reverse --border"

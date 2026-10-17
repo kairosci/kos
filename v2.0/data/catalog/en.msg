@@ -613,3 +613,4 @@ make.launch=Run interactive setup
 make.run_setup=Run setup and report its log
 make.entry=Run setup from an existing root session
 make.keyring=Select the supported keyring backend
+terminal.helper_unknown=Unknown helper topic %s
