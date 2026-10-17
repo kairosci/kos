@@ -346,6 +346,73 @@ elseif arg[2] == "applications" then
         suite:reject(function() Settings.new(root, backend, registry):apply("nautilus") end)
         assert(count == 1)
     end)
+    suite:test("EasyEffects publishes its preset and preserves the first private database snapshot", function()
+        local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
+        local home, runtime = directory .. "/home", directory .. "/runtime"
+        local environment = {HOME=home, XDG_CONFIG_HOME=directory .. "/config", XDG_DATA_HOME=directory .. "/data", XDG_STATE_HOME=directory .. "/state"}
+        local function getenv(key) return environment[key] end
+        local paths = require("core.paths").new(File.json(root .. "/data/core/paths.json"), getenv)
+        local configDb = paths:resolve("config", "easyeffects/db")
+        process:run("directory", {configDb})
+        local database = configDb .. "/personal.db"
+        publisher:publish(database, "personal database\n", "600")
+        local state = paths:resolve("state", registry.easyeffects.state)
+        local installedPreset = paths:resolve("data", registry.easyeffects.destination)
+        local selected, missingPackage, failLoad, bypassed = "", nil, false, false
+        local backend = {}
+        function backend:run(command, arguments) return process:run(command, arguments) end
+        function backend:status(command, arguments)
+            if command == "isSocket" then return environment.XDG_RUNTIME_DIR == runtime and 0 or 1 end
+            if command == "easyEffects" and arguments[1] == "--load-preset" then
+                if failLoad then return 1 end
+                selected = arguments[2]; return 0
+            end
+            if command == "easyEffects" and arguments[1] == "--bypass" then bypassed = arguments[2] == "1"; return 0 end
+            return process:status(command, arguments)
+        end
+        function backend:capture(command, arguments)
+            if command == "pacmanInstalled" then
+                local installed = {"easyeffects", "calf", "lsp-plugins-lv2"}
+                local output = {}; for _, package in ipairs(installed) do if package ~= missingPackage then output[#output + 1] = package end end
+                return table.concat(output, "\n") .. "\n", 0
+            end
+            if command == "findFiles" then
+                local output, status = process:capture(command, arguments)
+                return output, status
+            end
+            if command == "easyEffects" then
+                if arguments[1] ~= "--last-loaded-preset" then return "", 1 end
+                return selected .. "\n", 0
+            end
+            return process:capture(command, arguments)
+        end
+        local app = require("component.application.easyeffects").new(root, paths, Publisher.new(backend), backend, Catalog.new(File.json(root .. "/data/core/locale.json"), root .. "/data/catalog"), registry, getenv)
+        assert(app:apply("easyeffects") == registry.easyeffects.display)
+        local backup = state .. "/before-setup/personal.db"
+        assert(File.read(backup) == "personal database\n")
+        assert(tonumber(process:run("fileMode", {backup}), 16) & 0x1FF == tonumber("600", 8))
+        assert(File.read(installedPreset) == File.read(root .. "/" .. registry.easyeffects.source))
+        missingPackage = "calf"
+        suite:reject(function() app:apply("easyeffects") end)
+        missingPackage = nil
+        publisher:publish(database, "changed database\n", "600")
+        assert(app:apply("easyeffects") == registry.easyeffects.display)
+        assert(File.read(backup) == "personal database\n")
+        environment.XDG_RUNTIME_DIR = runtime
+        failLoad = true
+        suite:reject(function() app:apply("easyeffects") end)
+        assert(bypassed and not io.open(state .. "/default-applied", "rb"))
+        failLoad = false
+        assert(app:apply("easyeffects") == registry.easyeffects.display)
+        assert(File.read(state .. "/default-applied") == "OS-Subwoofer\n")
+        selected = "Personal"
+        app:apply("easyeffects")
+        assert(selected == "Personal")
+        assert(os.remove(database)); assert(os.remove(backup)); assert(os.remove(installedPreset))
+        local desktop = paths:resolve("config", registry.easyeffects.autostart)
+        assert(os.remove(desktop)); assert(os.remove(state .. "/default-applied"))
+        process:run("removeDirectory", {directory})
+    end)
 elseif arg[2] == "publisher" then
     local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
     local destination = directory .. "/hyprland.lua"

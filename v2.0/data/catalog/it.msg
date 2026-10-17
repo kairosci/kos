@@ -612,3 +612,5 @@ make.entry=Avvia la configurazione da una sessione root
 make.keyring=Seleziona il backend supportato del portachiavi
 terminal.helper_unknown=Argomento helper sconosciuto %s
 git.ruleset_verified=Regole del repository verificate per %s
+
+make.easyeffects=Installa il preset EasyEffects
