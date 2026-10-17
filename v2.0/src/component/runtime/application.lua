@@ -138,6 +138,28 @@ function Application:run(arguments)
         assert(kernel:verify(), "kernel_policy_drift")
         return
     end
+    if mode == "apply-authentication" or mode == "verify-authentication" then
+        assert(#arguments == 1, "invalid_authentication_arguments")
+        local authentication = require("component.security.authentication").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/authentication.json"),
+            self.catalog
+        )
+        if mode == "apply-authentication" then return authentication:apply() end
+        assert(authentication:verify(), "authentication_policy_drift")
+        return
+    end
+    if mode == "apply-ssh" or mode == "verify-ssh" then
+        assert(#arguments == 1, "invalid_ssh_arguments")
+        local ssh = require("component.security.ssh").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/ssh.json"),
+            self.catalog
+        )
+        if mode == "apply-ssh" then return ssh:apply() end
+        assert(ssh:verify(), "ssh_policy_drift")
+        return
+    end
     if mode and mode:match("^project-") then
         local interface = require("component.project.interface").new(
             self.root,

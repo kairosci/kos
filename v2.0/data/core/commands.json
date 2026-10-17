@@ -446,5 +446,43 @@
     "/usr/bin/sudo",
     "-n",
     "/usr/bin/sysctl"
+  ],
+  "permissionsReference": [
+    "/usr/bin/chmod",
+    "--reference"
+  ],
+  "ownershipReference": [
+    "/usr/bin/chown",
+    "--reference"
+  ],
+  "copyPreserve": [
+    "/usr/bin/cp",
+    "-p",
+    "--"
+  ],
+  "sshdValidate": [
+    "/usr/bin/sshd",
+    "-t",
+    "-f"
+  ],
+  "systemdDaemonReload": [
+    "/usr/bin/systemctl",
+    "daemon-reload"
+  ],
+  "sshdActive": [
+    "/usr/bin/systemctl",
+    "is-active",
+    "--quiet",
+    "sshd.service"
+  ],
+  "sshdRestart": [
+    "/usr/bin/systemctl",
+    "restart",
+    "sshd.service"
+  ],
+  "securityFilePrivileged": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/cat"
   ]
 }

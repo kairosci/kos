@@ -620,3 +620,7 @@ check.ufw_policy=Política UFW, reglas y servicio de inicio
 firewall.apply_failed=Falló la configuración de UFW
 kernel.apply_failed=Error al configurar el endurecimiento del kernel
 check.kernel_policy=Política de endurecimiento y valores activos del kernel
+auth.apply_failed=Error al configurar la política de autenticación
+check.authentication_policy=Configuración de autenticación y pila PAM
+ssh.apply_failed=Error al configurar la política SSH
+check.ssh_policy=Política SSH de servidor, cliente y servicio

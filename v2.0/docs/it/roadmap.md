@@ -67,3 +67,5 @@ Lo sprint provisioning predefinito sposta in Lua la policy dei pacchetti e l’i
 Lo sprint firewall trasferisce in Lua la policy UFW e la verifica di stato: default, porte, permessi delle regole e servizio vengono confrontati con i dati canonici. La verifica segnala esplicitamente ogni deriva; le altre policy di sicurezza restano da migrare.
 
 La policy sysctl, il lockdown kexec e i limiti dei core dump passano a un componente Lua con dati esterni e pubblicazione idempotente. La verifica confronta i file persistenti e 19 valori attivi; le altre policy di sicurezza restano da migrare.
+
+Le policy di autenticazione e SSH sono ora dati esterni applicati da componenti Lua. La migrazione PAM preserva i commenti e gli altri stack, rimuove opzioni inline conflittuali, crea un backup una sola volta e rifiuta stack non supportati; SSH valida i file temporanei prima della pubblicazione e verifica i tre file gestiti.

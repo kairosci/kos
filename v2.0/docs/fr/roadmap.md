@@ -17,3 +17,5 @@ Le provisionnement des paquets par défaut lit désormais une politique validée
 Le sprint pare-feu transfère à Lua l’application de la politique UFW et la vérification de son état. Les valeurs par défaut, les ports, les permissions des règles et l’état du service sont contrôlés depuis les données canoniques ; toute dérive échoue explicitement. Les autres politiques de sécurité restent à migrer.
 
 La politique sysctl, le verrouillage kexec et les limites des dumps mémoire utilisent désormais un composant Lua avec des données externes et une publication idempotente. La vérification compare les fichiers persistants et 19 valeurs actives ; les autres politiques de sécurité restent à migrer.
+
+Les politiques d’authentification et SSH sont désormais des données externes appliquées par Lua. La migration PAM conserve les commentaires et les autres règles, supprime les options en ligne conflictuelles, garde une sauvegarde initiale et rejette les piles non prises en charge. SSH valide les fichiers temporaires avant publication et vérifie ses trois fichiers gérés.
