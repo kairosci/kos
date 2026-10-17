@@ -612,3 +612,5 @@ make.entry=Einrichtung aus einer Root Sitzung starten
 make.keyring=Unterstützten Schlüsselbund auswählen
 terminal.helper_unknown=Unbekanntes Hilfethema %s
 git.ruleset_verified=Repositoryregeln für %s geprüft
+
+make.easyeffects=EasyEffects-Voreinstellung installieren

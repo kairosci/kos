@@ -612,3 +612,5 @@ make.entry=Configurer depuis une session root existante
 make.keyring=Choisir le service de trousseau pris en charge
 terminal.helper_unknown=Rubrique helper inconnue %s
 git.ruleset_verified=Règles du dépôt vérifiées pour %s
+
+make.easyeffects=Installer le préréglage EasyEffects

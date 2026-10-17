@@ -6,7 +6,7 @@ Preserve the verified Bash archive under `v1.0/`, then replace algorithms and th
 
 The roadmap covers reusable runtime primitives, encrypted boot assessment and rendering, graphical application configuration, wallpaper, unified Settings, editor resource planning, package provisioning, security, power, maintenance, verification and session integration. Replace installed callers only after behavioral validation. Keep `make setup` as the sole application path.
 
-The Herdr menu installer and managed Hyprland binding now use the Lua application component and dedicated setup scope. The Italian status ledger records the current inventory.
+The Herdr menu installer and managed Hyprland binding, and the EasyEffects preset installer and activator, now use Lua application components with dedicated setup scopes. The Italian status ledger records the current inventory.
 
 The final structural sprint removes remaining shell algorithms and legacy layout files after equivalent replacements exist. `migration-report` inventories the whole repository, including new and extensionless files; `verify-full-lua` must fail while active legacy algorithms remain. Moving files or delegating Bash from Lua never counts as completion.
 
