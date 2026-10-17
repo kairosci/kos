@@ -618,3 +618,5 @@ make.easyeffects=Installer le préréglage EasyEffects
 make.gtk=Installer l’intégration GTK
 check.ufw_policy=Politique UFW, règles et service au démarrage
 firewall.apply_failed=Échec de la configuration UFW
+kernel.apply_failed=Échec de la configuration du durcissement du noyau
+check.kernel_policy=Politique de durcissement et valeurs actives du noyau

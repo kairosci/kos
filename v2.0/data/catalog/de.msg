@@ -618,3 +618,5 @@ make.easyeffects=EasyEffects-Voreinstellung installieren
 make.gtk=GTK-Integration installieren
 check.ufw_policy=UFW-Richtlinie, Regeln und Startdienst
 firewall.apply_failed=UFW-Konfiguration fehlgeschlagen
+kernel.apply_failed=Kernel-Härtung konnte nicht konfiguriert werden
+check.kernel_policy=Kernel-Härtungsrichtlinie und aktive Werte

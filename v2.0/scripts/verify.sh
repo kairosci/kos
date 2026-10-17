@@ -141,36 +141,10 @@ fi
 
 section verify.sec_kernel
 if can_inspect_system; then
-for setting in \
-    "kernel.randomize_va_space	2" \
-    "kernel.kptr_restrict	2" \
-    "kernel.dmesg_restrict	1" \
-    "kernel.perf_event_paranoid	3" \
-    "kernel.unprivileged_bpf_disabled	1" \
-    "kernel.yama.ptrace_scope	1" \
-    "kernel.sysrq	16" \
-    "fs.suid_dumpable	0" \
-    "fs.protected_hardlinks	1" \
-    "fs.protected_symlinks	1" \
-    "fs.protected_fifos	2" \
-    "fs.protected_regular	2" \
-    "net.ipv4.conf.all.rp_filter	1" \
-    "net.ipv4.conf.all.accept_redirects	0" \
-    "net.ipv4.conf.all.send_redirects	0" \
-    "net.ipv4.conf.all.accept_source_route	0" \
-    "net.ipv4.icmp_echo_ignore_broadcasts	1" \
-    "net.ipv4.tcp_syncookies	1" \
-    "net.ipv4.tcp_rfc1337	1" \
-    ; do
-    key="${setting%%	*}"
-    expected="${setting##*	}"
-    check "$key = $expected" "[[ \"\$(priv sysctl -n $key 2>/dev/null)\" == $expected ]]"
-done
+    tcheck "check.kernel_policy" "\"$SCRIPT_DIR/../script/os-lua\" verify-kernel"
 else
     skip "$(t verify.skip_root)"
 fi
-tcheck "check.sysctl_persisted"         "[[ -f /etc/sysctl.d/99-security.conf ]]"
-tcheck "check.coredump_disabled"             "[[ -f /etc/security/limits.d/99-no-core.conf ]]"
 
 section verify.sec_pam
 tcheck "check.faillock"    "[[ -f /etc/security/faillock.conf ]] && grep -q '^[^#].*pam_faillock.so' /etc/pam.d/system-auth && ! grep -Eq '^[^#].*pam_faillock.so.*(deny|unlock_time|conf)=' /etc/pam.d/system-auth"

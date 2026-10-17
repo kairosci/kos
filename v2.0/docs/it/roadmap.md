@@ -65,3 +65,5 @@ Lo sprint AUR trasferisce in Lua la compilazione e l’installazione verificata 
 Lo sprint provisioning predefinito sposta in Lua la policy dei pacchetti e l’installazione dei mancanti dai repository ufficiali e da AUR. Lo stage setup resta l’unica via di applicazione al sistema e i gruppi opzionali mantengono la gestione non bloccante degli errori. La migrazione complessiva resta aperta.
 
 Lo sprint firewall trasferisce in Lua la policy UFW e la verifica di stato: default, porte, permessi delle regole e servizio vengono confrontati con i dati canonici. La verifica segnala esplicitamente ogni deriva; le altre policy di sicurezza restano da migrare.
+
+La policy sysctl, il lockdown kexec e i limiti dei core dump passano a un componente Lua con dati esterni e pubblicazione idempotente. La verifica confronta i file persistenti e 19 valori attivi; le altre policy di sicurezza restano da migrare.

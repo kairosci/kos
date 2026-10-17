@@ -81,6 +81,8 @@ elseif arg[2] == "package-defaults" then
     assert(loadfile(root .. "/tests/lua/package_defaults.lua"))()(suite, root)
 elseif arg[2] == "firewall" then
     assert(loadfile(root .. "/tests/lua/firewall.lua"))()(suite, root)
+elseif arg[2] == "kernel" then
+    assert(loadfile(root .. "/tests/lua/kernel.lua"))()(suite, root)
 elseif arg[2] == "boot-trial" then
     assert(loadfile(root .. "/tests/lua/boot_trial.lua"))()(suite, root, process)
 elseif arg[2] == "json" then

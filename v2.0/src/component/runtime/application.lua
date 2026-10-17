@@ -127,6 +127,17 @@ function Application:run(arguments)
         assert(firewall:verify(), "firewall_policy_drift")
         return
     end
+    if mode == "apply-kernel" or mode == "verify-kernel" then
+        assert(#arguments == 1, "invalid_kernel_arguments")
+        local kernel = require("component.security.kernel").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/kernel.json"),
+            self.catalog
+        )
+        if mode == "apply-kernel" then return kernel:apply() end
+        assert(kernel:verify(), "kernel_policy_drift")
+        return
+    end
     if mode and mode:match("^project-") then
         local interface = require("component.project.interface").new(
             self.root,
