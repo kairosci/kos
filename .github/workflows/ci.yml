@@ -162,7 +162,7 @@ jobs:
         run: script/os-lua verify-documentation
 
       - name: Run Full Test Suite
-        run: bash tests/run-all.sh
+        run: lua -E tests/main.lua "$PWD" --group full
 
   osmp-validation:
     name: OSMP Media Plugin

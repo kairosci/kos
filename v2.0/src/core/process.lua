@@ -25,8 +25,9 @@ function Process:status(name, arguments)
     return reason == "signal" and 128 + status or status
 end
 
-function Process:capture(name, arguments)
-    local pipe = assert(io.popen(self:command(name, arguments), "r"))
+function Process:capture(name, arguments, merge)
+    assert(merge == nil or merge == true, "invalid_capture_mode")
+    local pipe = assert(io.popen(self:command(name, arguments) .. (merge and " 2>&1" or ""), "r"))
     local output, read_error = pipe:read("a")
     local success, reason, status = pipe:close()
     assert(output, read_error)

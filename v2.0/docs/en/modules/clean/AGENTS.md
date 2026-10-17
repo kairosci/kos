@@ -6,7 +6,7 @@ clean is the post debloat hygiene microcomponent for OS on Arch Linux. It owns s
 
 ## Repository Architecture
 
-Provisioning in `scripts/setup.sh` loads this project's stage modules from `scripts/lib/modules/`. Verification runner in `scripts/verify.sh` asserts hygiene and absent leftovers. Modular test suite under `tests/` validates system cleanup and home cleanup and syntax and pipeline and safety through `tests/run-all.sh`. Logging is managed by `scripts/run-setup.sh` and interactive execution is supported by `scripts/launch.sh`. Root Makefile exposes setup and verification and testing and cleanup targets. Operational runbook resides in `.skills/` with truly specific runbook only and shared runbooks living in profile repo.
+Provisioning in `scripts/setup.sh` loads this project's stage modules from `scripts/lib/modules/`. Verification runner in `scripts/verify.sh` asserts hygiene and absent leftovers. Modular test suite under `tests/` validates system cleanup and home cleanup and syntax and pipeline and safety through `tests/main.lua`. Logging is managed by `scripts/run-setup.sh` and interactive execution is supported by `scripts/launch.sh`. Root Makefile exposes setup and verification and testing and cleanup targets. Operational runbook resides in `.skills/` with truly specific runbook only and shared runbooks living in profile repo.
 
 ## Ownership Details
 

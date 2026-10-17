@@ -66,7 +66,7 @@ verify:
 	cd "$(PROJECT_ROOT)" && bash scripts/verify.sh
 
 test:
-	cd "$(PROJECT_ROOT)" && bash tests/run-all.sh
+	cd "$(PROJECT_ROOT)" && lua -E tests/main.lua "$(PROJECT_ROOT)" --group full
 
 hook:
 	@cd "$(PROJECT_ROOT)" && mkdir -p ~/.config/omarchy/hooks/theme-set.d ~/.config/omarchy/hooks/i18n/messages

@@ -15,7 +15,7 @@ verify:
 	bash scripts/verify.sh
 
 test:
-	bash tests/run-all.sh
+	lua -E ../../tests/main.lua "$(abspath ../..)" --group obscure
 
 clean:
 	rm -f setup.log
