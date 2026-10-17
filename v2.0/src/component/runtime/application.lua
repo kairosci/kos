@@ -33,7 +33,8 @@ function Application:apply(names, single)
     for _, name in ipairs(applications) do
         local policy = assert(registry[name], "unknown_application")
         local application
-        if policy.kind == "terminal" then application = require("component.terminal.installer").new(self.root, paths, publisher, self.process, File.json(self.root .. "/" .. policy.policy)):install()
+        if policy.kind == "neovim" then application = require("component.editor.neovim.installer").new(self.root, paths, publisher, self.process, File.json(self.root .. "/" .. policy.policy), self.catalog):install()
+        elseif policy.kind == "terminal" then application = require("component.terminal.installer").new(self.root, paths, publisher, self.process, File.json(self.root .. "/" .. policy.policy)):install()
         elseif policy.kind == "plugin" then application = require("component.media.plugin").new(self.root, paths, publisher, self.process, registry):apply(name)
         elseif policy.kind == "settings" then application = settings:apply(name)
         elseif policy.kind == "ini" then application = configuration:apply(name)

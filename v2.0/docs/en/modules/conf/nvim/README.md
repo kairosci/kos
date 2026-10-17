@@ -20,4 +20,6 @@ F1 opens a help window; close it with `q` or `Esc`. In pickers, type to filter, 
 
 Use `:Lazy` to manage plugins, `:LazyExtras` to select additional features and `:LazyHealth` to diagnose the editor. Plugins and language servers execute code with your user permissions; review additions and updates. Project-local configuration and modelines are disabled by the OS extension. Personal retired Neovim configurations remain archived and are never automatically restored over the packaged starter.
 
-Apply through `make setup` only after the current live-state freeze is lifted. First launch may download missing plugins or language tools. Upstream references: [LazyVim configuration](https://www.lazyvim.org/configuration) and [installation](https://www.lazyvim.org/installation).
+First launch may download missing plugins or language tools. Upstream references: [LazyVim configuration](https://www.lazyvim.org/configuration) and [installation](https://www.lazyvim.org/installation).
+
+Apply with `make setup SCOPE=neovim`. Installer algorithms and native extension live in `src/component/editor/neovim/`; policy, bindings and six help catalogs live in `data/component/editor/neovim/`. Isolated tests: `lua -E tests/lua/run.lua "$PWD" neovim` from `v2.0/`.
