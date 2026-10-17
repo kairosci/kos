@@ -53,7 +53,7 @@ while (($#)); do
     esac
 done
 case "$SETUP_SCOPE" in
-    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|boot-appearance|boot-appearance-diagnostics|boot-diagnostics|grub-repair|desktop-tools|grub-trial|boot-trial-select|lua-applications|terminal|neovim|performance) ;;
+    full|keyboard|security|recovery|desktop|fontconfig|branding|bootloader|session|settings|wallpaper|cli|desktop-health|interface|boot-assessment|boot-appearance|boot-appearance-diagnostics|boot-diagnostics|grub-repair|desktop-tools|grub-trial|boot-trial-select|lua-applications|terminal|neovim|herdr|performance) ;;
     *) err "setup.invalid_args" ;;
 esac
 [[ "$OS_INTERFACE_PREVIEW" == 0 || "$SETUP_SCOPE" == interface ]] || err "setup.invalid_args"
@@ -155,6 +155,13 @@ if [[ "$SETUP_SCOPE" == lua-applications || "$SETUP_SCOPE" == terminal || "$SETU
     PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
     source "$MODULES_DIR/00-env.sh" --functions-only
     user_as "$PRIMARY_USER" lua -E "$PROJECT_DIR/src/main.lua" "$PROJECT_DIR" apply-applications "${SETUP_SCOPE/lua-applications/}" || err "defaults.app_failed" "Lua applications"
+    exit 0
+fi
+
+if [[ "$SETUP_SCOPE" == herdr ]]; then
+    PRIMARY_USER=${OS_SETUP_USER:-$(target_user_resolve)} || err "__cannot_determine_user"
+    source "$MODULES_DIR/00-env.sh" --functions-only
+    user_as "$PRIMARY_USER" lua -E "$PROJECT_DIR/src/main.lua" "$PROJECT_DIR" apply-settings herdr || err "defaults.app_failed" Herdr
     exit 0
 fi
 
