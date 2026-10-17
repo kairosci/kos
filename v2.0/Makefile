@@ -32,7 +32,7 @@ else
 $(error BACKEND must be gnome-keyring)
 endif
 
-.PHONY: help launch run-setup entry setup keyring verify test hook icons theme zed cli herdr easyeffects os changelog editors clean lang i18n-status lint iso
+.PHONY: help launch run-setup entry setup keyring verify test hook icons theme zed cli gtk herdr easyeffects os changelog editors clean lang i18n-status lint iso
 
 lint:
 	@cd "$(PROJECT_ROOT)" && if ! command -v shellcheck &> /dev/null; then \
@@ -99,6 +99,9 @@ cli:
 
 herdr:
 	+$(MAKE) -C "$(PROJECT_ROOT)" setup SCOPE=herdr
+
+gtk:
+	+$(MAKE) -C "$(PROJECT_ROOT)" setup SCOPE=gtk
 
 easyeffects:
 	+$(MAKE) -C "$(PROJECT_ROOT)" setup SCOPE=easyeffects

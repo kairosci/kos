@@ -614,3 +614,5 @@ terminal.helper_unknown=Unbekanntes Hilfethema %s
 git.ruleset_verified=Repositoryregeln für %s geprüft
 
 make.easyeffects=EasyEffects-Voreinstellung installieren
+
+make.gtk=GTK-Integration installieren

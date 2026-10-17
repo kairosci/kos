@@ -27,10 +27,10 @@ test_section "Graphical Application Integration"
 assert_false "missing configuration source cannot report successful installation" 'install_user_file "$SANDBOX/missing" "$SANDBOX/destination"'
 printf 'mode = "dark"\nbackground = "#101010"\nforeground = "#eeeeee"\naccent = "#abcdef"\nselection = "#303030"\nmuted = "#777777"\nred = "#ff0000"\ngreen = "#00ff00"\nblue = "#0000ff"\nyellow = "#ffff00"\ncyan = "#00ffff"\nmagenta = "#ff00ff"\n' > "$SANDBOX/palette.toml"
 export OS_THEME_COLORS="$SANDBOX/palette.toml"
-assert_true "animation policy disables tearing and inherited workspace motion" "lua '$SCRIPT_DIR/animation-policy.lua' '$PROJECT_DIR/modules/conf/gtk/data/tiling.lua'"
-assert_file_contains_literal "floating Hyprland windows use monitor-bounded dimensions" "$PROJECT_DIR/modules/conf/gtk/data/tiling.lua" 'o.window({ float = true }, { max_size = { "monitor_w-2", "monitor_h-2" } })'
-assert_file_not_contains "automatic tiled layout remains unconstrained by the floating size cap" "$PROJECT_DIR/modules/conf/gtk/data/tiling.lua" 'size_limits_tiled = true'
-assert_file_contains_literal "GTK portal file picker stays centered within the monitor" "$PROJECT_DIR/modules/conf/gtk/data/tiling.lua" 'o.window("xdg-desktop-portal-gtk", { center = true, max_size = { "monitor_w-2", "monitor_h-2" } })'
+assert_true "animation policy disables tearing and inherited workspace motion" "lua '$SCRIPT_DIR/animation-policy.lua' '$PROJECT_DIR/data/component/application/gtk/tiling.lua'"
+assert_file_contains_literal "floating Hyprland windows use monitor-bounded dimensions" "$PROJECT_DIR/data/component/application/gtk/tiling.lua" 'o.window({ float = true }, { max_size = { "monitor_w-2", "monitor_h-2" } })'
+assert_file_not_contains "automatic tiled layout remains unconstrained by the floating size cap" "$PROJECT_DIR/data/component/application/gtk/tiling.lua" 'size_limits_tiled = true'
+assert_file_contains_literal "GTK portal file picker stays centered within the monitor" "$PROJECT_DIR/data/component/application/gtk/tiling.lua" 'o.window("xdg-desktop-portal-gtk", { center = true, max_size = { "monitor_w-2", "monitor_h-2" } })'
 assert_true "Zed native configuration installs" "bash '$PROJECT_DIR/modules/conf/zed/install.sh'"
 assert_true "Zed uses native project preferences" "jq -e '.restore_on_startup == \"last_workspace\" and .project_panel.git_status == true and .terminal.shell == \"system\"' '$XDG_CONFIG_HOME/zed/settings.json'"
 assert_true "Zed settings installation is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/zed/settings.json'); bash '$PROJECT_DIR/modules/conf/zed/install.sh'; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/zed/settings.json')\" ]]"
@@ -46,12 +46,21 @@ printf '.personal { color: red; }\n' > "$XDG_CONFIG_HOME/gtk-4.0/gtk.css"
 mkdir -p "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d" "$XDG_CONFIG_HOME/omarchy"
 printf '%s\n' '#!/bin/bash' 'exec /usr/bin/python "$HOME/.config/omarchy/gtk-unified.py"' > "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons"
 printf '%s\n' 'legacy generator' > "$XDG_CONFIG_HOME/omarchy/gtk-unified.py"
-assert_true "GTK integration installs through the user installer" "bash '$PROJECT_DIR/modules/conf/gtk/install.sh'"
+mkdir -p "$XDG_CONFIG_HOME/omarchy/hooks/post-update.d"
+printf '%s\n' '#!/bin/bash' 'exec "$HOME/.config/omarchy/hooks/theme-set.d/zz-unified-icons"' > "$XDG_CONFIG_HOME/omarchy/hooks/post-update.d/zz-unified-icons"
+assert_true "GTK integration installs through Lua" "lua '$PROJECT_DIR/tests/lua/apply_gtk.lua' '$PROJECT_DIR'"
 assert_file_contains_literal "GTK installer enables native toolkit animations" "$GUI_TEST_ARGS" 'set org.gnome.desktop.interface enable-animations true'
 assert_file_contains_literal "GTK installer preserves personal Hyprland settings" "$XDG_CONFIG_HOME/hypr/hyprland.lua" 'custom_setting = true'
-assert_true "GTK installer retires the competing Python icon hook with a backup" "[[ ! -e '$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons' && ! -e '$XDG_CONFIG_HOME/omarchy/gtk-unified.py' ]] && grep -qx 'legacy generator' '$XDG_CONFIG_HOME/omarchy/migrations/gtk-unified/generator.py'"
-assert_true "GTK installer provisions the canonical terminal icon assets" "cmp '$PROJECT_DIR/modules/conf/gtk/data/nerd-icons/aliases.tsv' '$XDG_CONFIG_HOME/omarchy/nerd-icons/aliases.tsv'"
-assert_true "GTK integration is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/hypr/hyprland.lua' '$XDG_CONFIG_HOME/hypr/os-gtk.lua'); bash '$PROJECT_DIR/modules/conf/gtk/install.sh'; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/hypr/hyprland.lua' '$XDG_CONFIG_HOME/hypr/os-gtk.lua')\" ]]"
+assert_true "GTK integration archives the legacy hook generator and update hook" "[[ ! -e '$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons' && ! -e '$XDG_CONFIG_HOME/omarchy/gtk-unified.py' && ! -e '$XDG_CONFIG_HOME/omarchy/hooks/post-update.d/zz-unified-icons' ]] && grep -qx 'legacy generator' '$XDG_CONFIG_HOME/omarchy/migrations/gtk-unified/generator.py' && grep -qF 'gtk-unified.py' '$XDG_CONFIG_HOME/omarchy/migrations/gtk-unified/theme-set' && grep -qF 'exec ' '$XDG_CONFIG_HOME/omarchy/migrations/gtk-unified/post-update'"
+assert_true "GTK integration provisions the canonical terminal icon assets" "cmp '$PROJECT_DIR/data/component/application/gtk/nerd-icons/aliases.tsv' '$XDG_CONFIG_HOME/omarchy/nerd-icons/aliases.tsv'"
+assert_true "GTK integration is idempotent" "before=\$(sha256sum '$XDG_CONFIG_HOME/hypr/hyprland.lua' '$XDG_CONFIG_HOME/hypr/os-gtk.lua'); lua '$PROJECT_DIR/tests/lua/apply_gtk.lua' '$PROJECT_DIR'; [[ \"\$before\" == \"\$(sha256sum '$XDG_CONFIG_HOME/hypr/hyprland.lua' '$XDG_CONFIG_HOME/hypr/os-gtk.lua')\" ]]"
+printf '%s\n' 'personal hook' > "$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons"
+assert_true "GTK integration preserves unrelated legacy hook contents" "lua '$PROJECT_DIR/tests/lua/apply_gtk.lua' '$PROJECT_DIR' && grep -qx 'personal hook' '$XDG_CONFIG_HOME/omarchy/hooks/theme-set.d/zz-unified-icons'"
+mkdir -p "$SANDBOX/redirect-config/hypr" "$SANDBOX/outside"
+ln -s "$SANDBOX/outside" "$SANDBOX/redirect-config/omarchy"
+assert_false "GTK integration rejects redirected icon directories before publishing" "XDG_CONFIG_HOME='$SANDBOX/redirect-config' lua '$PROJECT_DIR/tests/lua/apply_gtk.lua' '$PROJECT_DIR'"
+assert_false "redirected GTK integration publishes no adapter" "[[ -e '$SANDBOX/redirect-config/hypr/os-gtk.lua' ]]"
+assert_true "make target routes GTK through its setup scope" "grep -q 'SCOPE=gtk' '$PROJECT_DIR/Makefile' && grep -q 'SETUP_SCOPE.*gtk' '$PROJECT_DIR/scripts/setup.sh'"
 printf 'mode = "dark"\nbackground = "#101010"\nforeground = "#eeeeee"\naccent = "#abcdef"\nselection = "#303030"\nmuted = "#777777"\nred = "#ff0000"\ngreen = "#00ff00"\nblue = "#0000ff"\nyellow = "#ffff00"\ncyan = "#00ffff"\nmagenta = "#ff00ff"\n' > "$SANDBOX/palette.toml"
 export OS_THEME_NAME=test OS_THEME_COLORS="$SANDBOX/palette.toml"
 mkdir -p "$XDG_CONFIG_HOME/zed/themes"
