@@ -84,6 +84,13 @@
         "path": "tests/lua/run.lua"
       },
       {
+        "arguments": [
+          "security-baseline"
+        ],
+        "language": "lua",
+        "path": "tests/lua/run.lua"
+      },
+      {
         "language": "shell",
         "path": "tests/test_debloat_theming.sh"
       },

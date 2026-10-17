@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "root": ["/root", "700"],
+    "shadow": ["/etc/shadow", "600"],
+    "gshadow": ["/etc/gshadow", "600"],
+    "passwd": ["/etc/passwd", "644"],
+    "group": ["/etc/group", "644"]
+  },
+  "moduleFiles": {
+    "usb_storage": ["/etc/modprobe.d/disable-usb-storage.conf", "install usb-storage /bin/true\nblacklist usb-storage\n"],
+    "protocols": ["/etc/modprobe.d/disable-protocols.conf", "install dccp /bin/true\ninstall sctp /bin/true\ninstall rds /bin/true\ninstall tipc /bin/true\n"],
+    "firewire": ["/etc/modprobe.d/disable-firewire.conf", "blacklist firewire-core\nblacklist firewire-ohci\nblacklist firewire-sbp2\n"],
+    "filesystems": ["/etc/modprobe.d/disable-ramfs.conf", "blacklist cramfs\nblacklist freevxfs\nblacklist hfs\nblacklist hfsplus\nblacklist jffs2\nblacklist udf\n"]
+  },
+  "absentFiles": {
+    "tpm_verity_removed": "/usr/lib/nvpcr/verity.nvpcr"
+  }
+}
