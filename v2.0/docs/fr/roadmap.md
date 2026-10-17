@@ -21,3 +21,5 @@ La politique sysctl, le verrouillage kexec et les limites des dumps mémoire uti
 Les politiques d’authentification et SSH sont désormais des données externes appliquées par Lua. La migration PAM conserve les commentaires et les autres règles, supprime les options en ligne conflictuelles, garde une sauvegarde initiale et rejette les piles non prises en charge. SSH valide les fichiers temporaires avant publication et vérifie ses trois fichiers gérés.
 
 La politique des services systemd passe à Lua. Les fichiers journald et resolved proviennent des données canoniques, et la vérification contrôle leur contenu ainsi que l’état désactivé des services et sockets gérés.
+
+L’audit hebdomadaire exécute désormais Lynis, rkhunter, ClamAV et arch-audit via Lua. Le timer systemd et Cronie ne sont jamais activés simultanément ; le lanceur, les unités, la configuration logrotate et l’amorce minimale sont vérifiés depuis les données canoniques. Les alertes arch-audit entraînent un échec à examiner.

@@ -625,3 +625,5 @@ auth.apply_failed=Configurazione della policy di autenticazione non riuscita
 check.authentication_policy=Configurazione di autenticazione e stack PAM
 ssh.apply_failed=Configurazione della policy SSH non riuscita
 check.ssh_policy=Policy SSH per server, client e servizio
+
+security.audit_apply_failed=Configurazione della pianificazione degli audit di sicurezza fallita

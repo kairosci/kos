@@ -138,6 +138,19 @@ function Application:run(arguments)
         assert(services:verify(), "services_policy_drift")
         return
     end
+    if mode == "apply-security-audit" or mode == "verify-security-audit" or mode == "run-security-audit" then
+        assert(#arguments == 1, "invalid_security_audit_arguments")
+        local audit = require("component.security.audit").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/audit.json")
+        )
+        if mode == "apply-security-audit" then return audit:apply() end
+        if mode == "verify-security-audit" then
+            assert(audit:verify(), "security_audit_policy_drift")
+            return
+        end
+        return audit:run()
+    end
     if mode == "apply-kernel" or mode == "verify-kernel" then
         assert(#arguments == 1, "invalid_kernel_arguments")
         local kernel = require("component.security.kernel").new(

@@ -512,5 +512,64 @@
     "/usr/bin/systemctl",
     "list-unit-files",
     "--no-legend"
+  ],
+  "systemdUnitEnabled": [
+    "/usr/bin/systemctl",
+    "is-enabled",
+    "--quiet"
+  ],
+  "systemdUnitActive": [
+    "/usr/bin/systemctl",
+    "is-active",
+    "--quiet"
+  ],
+  "systemdTimerEnabled": [
+    "/usr/bin/systemctl",
+    "is-enabled",
+    "--quiet"
+  ],
+  "systemdTimerActive": [
+    "/usr/bin/systemctl",
+    "is-active",
+    "--quiet"
+  ],
+  "systemdUnitEnableNow": [
+    "/usr/bin/systemctl",
+    "enable",
+    "--now"
+  ],
+  "systemdUnitDisableNow": [
+    "/usr/bin/systemctl",
+    "disable",
+    "--now"
+  ],
+  "weeklyLynis": [
+    "/usr/bin/lynis",
+    "--cron",
+    "system"
+  ],
+  "weeklyRkhunter": [
+    "/usr/bin/rkhunter",
+    "--check",
+    "--skip-keypress",
+    "--report-warnings-only"
+  ],
+  "weeklyClamav": [
+    "/usr/bin/clamdscan",
+    "--fdpass",
+    "--multiscan",
+    "--infected",
+    "--log=/var/log/clamav/os-scan.log"
+  ],
+  "weeklyArchAudit": [
+    "/usr/bin/arch-audit",
+    "--show-cve",
+    "--format",
+    "%n %v %s %c"
+  ],
+  "weeklyArchAuditReview": [
+    "/usr/bin/arch-audit",
+    "--quiet",
+    "--show-cve"
   ]
 }

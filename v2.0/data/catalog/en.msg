@@ -625,3 +625,5 @@ auth.apply_failed=Authentication policy configuration failed
 check.authentication_policy=Authentication configuration and PAM stack
 ssh.apply_failed=SSH policy configuration failed
 check.ssh_policy=SSH server, client and service policy
+
+security.audit_apply_failed=Security audit scheduler configuration failed

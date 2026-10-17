@@ -357,6 +357,13 @@
         "language": "lua",
         "path": "tests/lua/run.lua",
         "arguments": [
+          "audit"
+        ]
+      },
+      {
+        "language": "lua",
+        "path": "tests/lua/run.lua",
+        "arguments": [
           "kernel"
         ]
       },
