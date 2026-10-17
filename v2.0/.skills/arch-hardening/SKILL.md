@@ -1,1 +1,1 @@
-../../docs/skills/arch-hardening/SKILL.md
+../../docs/en/skills/arch-hardening/SKILL.md

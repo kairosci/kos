@@ -1,1 +1,1 @@
-../../docs/modules/slop/README.md
+../../docs/en/modules/slop/README.md

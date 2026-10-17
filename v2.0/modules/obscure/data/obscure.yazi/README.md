@@ -1,1 +1,1 @@
-../../../../docs/modules/obscure/data/obscure.yazi/README.md
+../../../../docs/en/modules/obscure/data/obscure.yazi/README.md

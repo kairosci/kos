@@ -1,1 +1,1 @@
-../../docs/modules/clean/GEMINI.md
+../../docs/en/modules/clean/GEMINI.md

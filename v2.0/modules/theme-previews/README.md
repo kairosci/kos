@@ -1,1 +1,1 @@
-../../docs/modules/theme-previews/README.md
+../../docs/en/modules/theme-previews/README.md

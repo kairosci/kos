@@ -20,6 +20,6 @@ assert_file_contains "changelog narrates release v1.2" "$CHANGELOG" "## Release 
 assert_file_contains "changelog narrates release v1.1" "$CHANGELOG" "## Release v1.1"
 assert_file_contains "changelog narrates release v1.0" "$CHANGELOG" "## Release v1.0"
 assert_true "changelog uses prose instead of lists" "! grep -qE '^[[:space:]]*([-*+][[:space:]]+|[0-9]+[.)][[:space:]]+)' '$CHANGELOG'"
-assert_true "dispatcher section matches the changelog file" "OS_CHANGELOG='$CHANGELOG' '$PROJECT_DIR/bin/os' changelog v1.0 | grep -q 'Release v1.0'"
+assert_true "dispatcher section matches the changelog file" "OS_CHANGELOG='$CHANGELOG' '$ROOT_DIR/script/os' changelog v1.0 | grep -q 'Release v1.0'"
 
 test_summary

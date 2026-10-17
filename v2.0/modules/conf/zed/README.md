@@ -1,1 +1,1 @@
-../../../docs/modules/conf/zed/README.md
+../../../docs/en/modules/conf/zed/README.md

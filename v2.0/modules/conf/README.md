@@ -1,1 +1,1 @@
-../../docs/modules/conf/README.md
+../../docs/en/modules/conf/README.md

@@ -1,0 +1,8 @@
+{
+  "directory": "docs",
+  "languages": ["it", "en", "fr"],
+  "sourceLanguage": "en",
+  "pattern": "*.md",
+  "sharedNames": ["AGENTS.md", "GEMINI.md", "SKILL.md", "LICENSE", "PULL_REQUEST_TEMPLATE.md"],
+  "entry": "README.md"
+}

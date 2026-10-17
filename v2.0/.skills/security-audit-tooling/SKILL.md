@@ -1,1 +1,1 @@
-../../docs/skills/security-audit-tooling/SKILL.md
+../../docs/en/skills/security-audit-tooling/SKILL.md

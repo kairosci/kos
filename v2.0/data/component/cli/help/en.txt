@@ -1,0 +1,8 @@
+Native application launcher and OS commands
+
+Usage:
+  os <group> <command> [args...]
+  os app [--resolve] <role> [args...]
+  os changelog [release]
+  os version
+  os --help

@@ -1,1 +1,1 @@
-../../docs/skills/regression-prevention/SKILL.md
+../../docs/en/skills/regression-prevention/SKILL.md

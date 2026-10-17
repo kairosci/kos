@@ -1,1 +1,1 @@
-../../docs/modules/clean/AGENTS.md
+../../docs/en/modules/clean/AGENTS.md

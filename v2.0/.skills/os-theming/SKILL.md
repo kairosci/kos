@@ -1,1 +1,1 @@
-../../docs/skills/os-theming/SKILL.md
+../../docs/en/skills/os-theming/SKILL.md

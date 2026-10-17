@@ -55,7 +55,7 @@ run_app() {
         OMARCHY_PATH="$WORK_DIR/native" APP_TEST_RUNTIME="$WORK_DIR/native" APP_TEST_NATIVE="$WORK_DIR/native-used" \
         APP_TEST_ARGV="$WORK_DIR/argv" APP_TEST_QUERY_FAIL="${APP_TEST_QUERY_FAIL:-0}" \
         APP_TEST_BROWSER="${APP_TEST_BROWSER-browser.desktop}" APP_TEST_LAUNCH_STATUS="${APP_TEST_LAUNCH_STATUS:-0}" \
-        BROWSER=untrusted-browser OS_LANG=en bash "$PROJECT_DIR/bin/os" app "$@"
+        BROWSER=untrusted-browser OS_LANG=en lua -E "$ROOT_DIR/src/main.lua" "$ROOT_DIR" cli app "$@"
 }
 assert_true "browser resolution ignores BROWSER and preserves the exact URL argument" "run_app --resolve browser 'https://example.org/a b?x=1&y=2' > '$WORK_DIR/resolve.json' && jq -e '.desktop==\"browser.desktop\" and .argv==[\"uwsm-app\",\"--\",\"browser.desktop\",\"https://example.org/a b?x=1&y=2\"]' '$WORK_DIR/resolve.json'"
 assert_true "read only resolution never starts an app or loads the native runtime" "[[ ! -e '$WORK_DIR/argv' && ! -e '$WORK_DIR/native-used' ]]"
@@ -85,11 +85,9 @@ launch_failure_propagates() {
     [[ "$status" == 37 ]]
 }
 assert_true "launcher failures preserve their original exit status" "launch_failure_propagates"
-mkdir -p "$WORK_DIR/installed/bin" "$WORK_DIR/installed/lib" "$WORK_DIR/installed/data"
-sed "s|/usr/share/os|$WORK_DIR/installed|g" "$PROJECT_DIR/bin/os" > "$WORK_DIR/installed/bin/os"
-sed "s|/usr/share/os|$WORK_DIR/installed|g" "$PROJECT_DIR/scripts/lib/app-launch.sh" > "$WORK_DIR/installed/lib/app-launch.sh"
-cp "$PROJECT_DIR/data/app-launch.json" "$WORK_DIR/installed/data/"
-assert_true "installed layout loads its shared library and policy without repository paths" "env -i HOME='$WORK_DIR/home' PATH='$WORK_DIR/bin:/usr/bin:/bin' XDG_DATA_DIRS='$WORK_DIR/system' bash '$WORK_DIR/installed/bin/os' app --resolve settings | jq -e '.role==\"settings\"'"
-assert_true "native app diagnostics are localized" "OS_LANG=it bash '$PROJECT_DIR/bin/os' app --help | grep -q '^Uso:'"
-assert_false "migration readiness remains blocked after implementing only app launchers" "bash '$ROOT_DIR/scripts/lib/arch-migration.sh' --check"
+mkdir -p "$WORK_DIR/installed"
+cp -a "$ROOT_DIR/src" "$ROOT_DIR/data" "$ROOT_DIR/script" "$WORK_DIR/installed/"
+assert_true "installed layout loads its Lua runtime and policy without repository paths" "env -i HOME='$WORK_DIR/home' PATH='$WORK_DIR/bin:/usr/bin:/bin' XDG_DATA_DIRS='$WORK_DIR/system' lua -E '$WORK_DIR/installed/src/main.lua' '$WORK_DIR/installed' cli app --resolve settings | jq -e '.role==\"settings\"'"
+assert_true "native app diagnostics are localized" "OS_LANG=it lua -E '$ROOT_DIR/src/main.lua' '$ROOT_DIR' cli app --help | grep -q '^Uso:'"
+assert_false "migration readiness remains blocked after implementing only app launchers" "lua -E '$ROOT_DIR/src/main.lua' '$ROOT_DIR' arch-check"
 test_summary

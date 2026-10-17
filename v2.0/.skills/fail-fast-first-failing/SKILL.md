@@ -1,1 +1,1 @@
-../../docs/skills/fail-fast-first-failing/SKILL.md
+../../docs/en/skills/fail-fast-first-failing/SKILL.md

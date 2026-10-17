@@ -1,1 +1,1 @@
-../../../docs/modules/conf/onlyoffice/README.md
+../../../docs/en/modules/conf/onlyoffice/README.md

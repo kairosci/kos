@@ -1,1 +1,1 @@
-../../docs/skills/apparmor-management/SKILL.md
+../../docs/en/skills/apparmor-management/SKILL.md

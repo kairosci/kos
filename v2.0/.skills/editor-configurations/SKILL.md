@@ -1,1 +1,1 @@
-../../docs/skills/editor-configurations/SKILL.md
+../../docs/en/skills/editor-configurations/SKILL.md

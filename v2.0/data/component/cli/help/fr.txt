@@ -1,0 +1,8 @@
+Lanceur d’applications natives et commandes OS
+
+Utilisation:
+  os <group> <command> [args...]
+  os app [--resolve] <role> [args...]
+  os changelog [release]
+  os version
+  os --help

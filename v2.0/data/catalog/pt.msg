@@ -608,3 +608,4 @@ settings.power=Energia
 settings.lockDelay=Bloqueio automático após segundos
 settings.screensaverDelay=Proteção de ecrã após segundos
 settings.battery=Bateria
+os.dispatcher_version=despachante os %s

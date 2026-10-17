@@ -1,1 +1,1 @@
-../../../../docs/modules/performance/.skills/power-performance/SKILL.md
+../../../../docs/en/modules/performance/.skills/power-performance/SKILL.md

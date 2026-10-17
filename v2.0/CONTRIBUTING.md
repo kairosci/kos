@@ -1,1 +1,1 @@
-docs/root/CONTRIBUTING.md
+docs/en/root/CONTRIBUTING.md

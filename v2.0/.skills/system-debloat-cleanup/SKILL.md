@@ -1,1 +1,1 @@
-../../docs/skills/system-debloat-cleanup/SKILL.md
+../../docs/en/skills/system-debloat-cleanup/SKILL.md

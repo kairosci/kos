@@ -32,6 +32,16 @@ function Bundle:link(target, destination)
     assert(ok, failure)
 end
 
+function Bundle:permissions(directory)
+    local policy = self.policy
+    if not policy.runtimeDirectoryMode then return end
+    local directories = self.process:run("runtimeFiles", {directory .. "/", "-type", "d", "-print0"})
+    for path in directories:gmatch("([^%z]+)%z") do self.process:run("permissions", {policy.runtimeDirectoryMode, path}) end
+    for _, relative in ipairs(policy.runtimeDirectories) do
+        self.process:run("permissions", {policy.runtimeDirectoryMode, self.paths:resolve("data", relative)})
+    end
+end
+
 function Bundle:publish()
     local process, policy = self.process, self.policy
     local runtime = self.paths:resolve("data", policy.runtime)
@@ -39,6 +49,10 @@ function Bundle:publish()
     local publisher = Publisher.new(process)
     local listing = process:run("runtimeFiles", {"-L", self.root .. "/src", self.root .. "/data", self.root .. "/script", "-type", "f", "-print0"})
     local files, present, unchanged = {}, {}, true
+    for _, relative in ipairs(policy.runtimeExtraFiles or {}) do
+        assert(relative:sub(1, 1) ~= "/" and not relative:find("..", 1, true), "invalid_runtime_extra_file")
+        listing = listing .. self.root .. "/" .. relative .. "\0"
+    end
     for source in listing:gmatch("([^%z]+)%z") do
         local relative = source:sub(#self.root + 2)
         present[relative] = true
@@ -53,7 +67,10 @@ function Bundle:publish()
     for _, file in ipairs(files) do names[#names + 1] = file.relative end
     local manifest = Json.encode(names)
     if self:optional(active .. "/" .. policy.runtimeManifest) ~= manifest then unchanged = false end
-    if unchanged then return end
+    if unchanged then
+        self:permissions(active)
+        return
+    end
     process:run("directory", {runtime})
     local stage = process:run("temporary", {"-d", runtime .. "/.release.XXXXXXXX"}):gsub("\n$", "")
     local ok, failure = pcall(function()
@@ -64,6 +81,7 @@ function Bundle:publish()
             elseif file.relative:match("%.json$") then File.json(destination) end
         end
         publisher:publish(stage .. "/" .. policy.runtimeManifest, manifest, policy.mode)
+        self:permissions(stage)
         self:link(stage, active)
     end)
     if not ok then process:run("removeDirectory", {stage}); error(failure) end

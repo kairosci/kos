@@ -159,11 +159,7 @@ if [[ "$SETUP_SCOPE" == lua-applications ]]; then
 fi
 
 if [[ "$SETUP_SCOPE" == boot-trial-select ]]; then
-    source "$SCRIPT_DIR/lib/boot-assessment.sh"
-    boot_assessment /var/lib/os/boot-assessment
-    grub-script-check /boot/grub/grub.cfg || err "bootloader.config_failed"
-    source "$SCRIPT_DIR/lib/boot-trial-select.sh"
-    boot_trial_select "$PROJECT_DIR/data/component/boot/policy.json" || err "bootloader.install_failed"
+    "$PROJECT_DIR/script/os-lua" boot-trial-select
     exit 0
 fi
 
@@ -193,8 +189,7 @@ if [[ "$SETUP_SCOPE" == boot-appearance ]]; then
 fi
 
 if [[ "$SETUP_SCOPE" == boot-assessment ]]; then
-    source "$SCRIPT_DIR/lib/boot-assessment.sh"
-    boot_assessment /var/lib/os/boot-assessment
+    "$PROJECT_DIR/script/os-lua" boot-assessment
     exit 0
 fi
 

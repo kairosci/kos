@@ -1,43 +1,259 @@
 {
-  "realpath": ["/usr/bin/realpath", "-e", "--"],
-  "digest": ["/usr/bin/b2sum", "--"],
-  "mountUuid": ["/usr/bin/findmnt", "-nro", "UUID"],
-  "validateGrub": ["/usr/bin/grub-script-check"],
-  "temporary": ["/usr/bin/mktemp"],
-  "permissions": ["/usr/bin/chmod"],
-  "copy": ["/usr/bin/cp", "--"],
-  "directory": ["/usr/bin/mkdir", "-p", "--"],
-  "identity": ["/usr/bin/id", "-u"],
-  "fileMode": ["/usr/bin/stat", "--format=%f", "--"],
-  "gsettings": ["/usr/bin/gsettings"],
-  "wallpaperEntries": ["/usr/bin/find", "-L"],
-  "move": ["/usr/bin/mv", "--"],
-  "symbolicLink": ["/usr/bin/ln", "-s", "--"],
-  "monitors": ["hyprctl", "monitors", "-j"],
-  "renderWallpaper": ["/usr/bin/magick"],
-  "runtimeFiles": ["/usr/bin/find"],
-  "desktopDatabase": ["/usr/bin/update-desktop-database"],
-  "repositoryFiles": ["/usr/bin/git"],
-  "validateLua": ["/usr/bin/luac", "-p"],
-  "removeDirectory": ["/usr/bin/rm", "-r", "--"],
-  "processorCount": ["/usr/bin/getconf", "_NPROCESSORS_ONLN"],
-  "userEnvironment": ["/usr/bin/systemctl", "--user", "set-environment"],
-  "settingsDescriptions": ["/usr/bin/timeout", "10", "hyprctl", "descriptions", "-j"],
-  "copyTree": ["/usr/bin/cp", "-a", "--"],
-  "settingsValidate": ["/usr/bin/timeout", "20", "/usr/bin/env"],
-  "settingsReload": ["/usr/bin/timeout", "10", "hyprctl", "reload", "config-only"],
-  "settingsErrors": ["/usr/bin/timeout", "10", "hyprctl", "configerrors"],
-  "settingsSerialized": ["/usr/bin/flock", "--exclusive", "--wait", "10"],
-  "settingsQml": ["/usr/bin/env"],
-  "bootRegenerate": ["/usr/bin/timeout", "900", "/usr/bin/limine-update"],
-  "bootCopy": ["/usr/bin/cp", "-r", "--preserve=timestamps", "--"],
-  "bootFirmware": ["/usr/bin/efibootmgr"],
-  "bootExtractInitrd": ["/usr/bin/objcopy", "--dump-section"],
-  "bootListInitrd": ["/usr/bin/lsinitcpio", "-l"],
-  "bootFirmwareRestore": ["/usr/bin/efibootmgr", "--bootorder"],
-  "bootImageStrings": ["/usr/bin/strings"],
-  "bootCandidateInspect": ["/usr/bin/objdump", "-h"],
-  "bootBuildStandalone": ["/usr/bin/grub-mkstandalone", "--format=x86_64-efi", "--locales=", "--fonts="],
-  "bootCheckGrubEFI": ["/usr/bin/grub-file", "--is-x86_64-efi"],
-  "isLink": ["/usr/bin/test", "-L"]
+  "bootBuildStandalone": [
+    "/usr/bin/grub-mkstandalone",
+    "--format=x86_64-efi",
+    "--locales=",
+    "--fonts="
+  ],
+  "bootCandidateInspect": [
+    "/usr/bin/objdump",
+    "-h"
+  ],
+  "bootCheckGrubEFI": [
+    "/usr/bin/grub-file",
+    "--is-x86_64-efi"
+  ],
+  "bootCopy": [
+    "/usr/bin/cp",
+    "-r",
+    "--preserve=timestamps",
+    "--"
+  ],
+  "bootDevices": [
+    "/usr/bin/lsblk",
+    "--json",
+    "--output",
+    "NAME,TYPE,FSTYPE,UUID,PARTUUID,MOUNTPOINTS"
+  ],
+  "bootEspMount": [
+    "/usr/bin/findmnt",
+    "--json",
+    "/boot"
+  ],
+  "bootExtractInitrd": [
+    "/usr/bin/objcopy",
+    "--dump-section"
+  ],
+  "bootFileInventory": [
+    "/usr/bin/find",
+    "/boot",
+    "-maxdepth",
+    "4",
+    "-type",
+    "f",
+    "-printf",
+    "%P\t%s\n"
+  ],
+  "bootFirmware": [
+    "/usr/bin/efibootmgr"
+  ],
+  "bootFirmwareNext": [
+    "/usr/bin/efibootmgr",
+    "--bootnext"
+  ],
+  "bootFirmwareRestore": [
+    "/usr/bin/efibootmgr",
+    "--bootorder"
+  ],
+  "bootImageStrings": [
+    "/usr/bin/strings"
+  ],
+  "bootListInitrd": [
+    "/usr/bin/lsinitcpio",
+    "-l"
+  ],
+  "bootPresets": [
+    "/usr/bin/find"
+  ],
+  "bootRegenerate": [
+    "/usr/bin/timeout",
+    "900",
+    "/usr/bin/limine-update"
+  ],
+  "bootRootMount": [
+    "/usr/bin/findmnt",
+    "--json",
+    "/"
+  ],
+  "copy": [
+    "/usr/bin/cp",
+    "--"
+  ],
+  "copyTree": [
+    "/usr/bin/cp",
+    "-a",
+    "--"
+  ],
+  "desktopDatabase": [
+    "/usr/bin/update-desktop-database"
+  ],
+  "digest": [
+    "/usr/bin/b2sum",
+    "--"
+  ],
+  "directory": [
+    "/usr/bin/mkdir",
+    "-p",
+    "--"
+  ],
+  "environment": [
+    "/usr/bin/env"
+  ],
+  "fileMode": [
+    "/usr/bin/stat",
+    "--format=%f",
+    "--"
+  ],
+  "gsettings": [
+    "/usr/bin/gsettings"
+  ],
+  "identity": [
+    "/usr/bin/id",
+    "-u"
+  ],
+  "isDirectory": [
+    "/usr/bin/test",
+    "-d"
+  ],
+  "isExecutable": [
+    "/usr/bin/test",
+    "-x"
+  ],
+  "isLink": [
+    "/usr/bin/test",
+    "-L"
+  ],
+  "isSocket": [
+    "/usr/bin/test",
+    "-S"
+  ],
+  "monitors": [
+    "hyprctl",
+    "monitors",
+    "-j"
+  ],
+  "mountUuid": [
+    "/usr/bin/findmnt",
+    "-nro",
+    "UUID"
+  ],
+  "move": [
+    "/usr/bin/mv",
+    "--"
+  ],
+  "permissions": [
+    "/usr/bin/chmod"
+  ],
+  "platformKernel": [
+    "/usr/bin/uname",
+    "-r"
+  ],
+  "platformOfficialPackages": [
+    "/usr/bin/pacman",
+    "-Slq"
+  ],
+  "platformPackages": [
+    "/usr/bin/pacman",
+    "-Qq"
+  ],
+  "platformReferences": [
+    "/usr/bin/rg"
+  ],
+  "platformRepositories": [
+    "/usr/bin/pacman-conf",
+    "--repo-list"
+  ],
+  "platformRuntimeFiles": [
+    "/usr/bin/pacman",
+    "-Qlq"
+  ],
+  "platformRuntimeInstalled": [
+    "/usr/bin/pacman",
+    "-Q"
+  ],
+  "processorCount": [
+    "/usr/bin/getconf",
+    "_NPROCESSORS_ONLN"
+  ],
+  "readLink": [
+    "/usr/bin/readlink",
+    "--"
+  ],
+  "realpath": [
+    "/usr/bin/realpath",
+    "-e",
+    "--"
+  ],
+  "removeDirectory": [
+    "/usr/bin/rm",
+    "-r",
+    "--"
+  ],
+  "renderWallpaper": [
+    "/usr/bin/magick"
+  ],
+  "repositoryFiles": [
+    "/usr/bin/git"
+  ],
+  "runtimeFiles": [
+    "/usr/bin/find"
+  ],
+  "settingsDescriptions": [
+    "/usr/bin/timeout",
+    "10",
+    "hyprctl",
+    "descriptions",
+    "-j"
+  ],
+  "settingsErrors": [
+    "/usr/bin/timeout",
+    "10",
+    "hyprctl",
+    "configerrors"
+  ],
+  "settingsQml": [
+    "/usr/bin/env"
+  ],
+  "settingsReload": [
+    "/usr/bin/timeout",
+    "10",
+    "hyprctl",
+    "reload",
+    "config-only"
+  ],
+  "settingsSerialized": [
+    "/usr/bin/flock",
+    "--exclusive",
+    "--wait",
+    "10"
+  ],
+  "settingsValidate": [
+    "/usr/bin/timeout",
+    "20",
+    "/usr/bin/env"
+  ],
+  "symbolicLink": [
+    "/usr/bin/ln",
+    "-s",
+    "--"
+  ],
+  "temporary": [
+    "/usr/bin/mktemp"
+  ],
+  "userEnvironment": [
+    "/usr/bin/systemctl",
+    "--user",
+    "set-environment"
+  ],
+  "validateGrub": [
+    "/usr/bin/grub-script-check"
+  ],
+  "validateLua": [
+    "/usr/bin/luac",
+    "-p"
+  ],
+  "wallpaperEntries": [
+    "/usr/bin/find",
+    "-L"
+  ]
 }

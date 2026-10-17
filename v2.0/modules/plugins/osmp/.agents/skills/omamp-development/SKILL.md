@@ -1,1 +1,1 @@
-../../../../../../docs/modules/plugins/osmp/.agents/skills/omamp-development/SKILL.md
+../../../../../../docs/en/modules/plugins/osmp/.agents/skills/omamp-development/SKILL.md

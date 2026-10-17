@@ -1,1 +1,1 @@
-../../docs/skills/idempotent-bash-automation/SKILL.md
+../../docs/en/skills/idempotent-bash-automation/SKILL.md

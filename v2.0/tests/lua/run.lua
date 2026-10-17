@@ -36,18 +36,26 @@ local function source(path, command)
     return "/Arch\n //linux\n protocol: efi\n path: boot():" .. path .. "\n cmdline: " .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor") .. "\n"
 end
 
-if arg[2] == "json" then
+if arg[2] == "platform" then
+    assert(loadfile(root .. "/tests/lua/platform.lua"))()(suite, root)
+elseif arg[2] == "boot-trial" then
+    assert(loadfile(root .. "/tests/lua/boot_trial.lua"))()(suite, root, process)
+elseif arg[2] == "json" then
+    assert(loadfile(root .. "/tests/lua/documentation.lua"))()(suite, root, process)
+    local cliInstallTests = assert(loadfile(root .. "/tests/lua/cli_install.lua"))()
+    cliInstallTests(suite, root, process)
     local settingsTests = assert(loadfile(root .. "/tests/lua/settings.lua"))()
     settingsTests(suite, root, process)
     local appearanceTests = assert(loadfile(root .. "/tests/lua/boot_appearance.lua"))()
     appearanceTests(suite, root, process)
     local candidateTests = assert(loadfile(root .. "/tests/lua/boot_candidate.lua"))()
     candidateTests(suite, root, process)
+    assert(loadfile(root .. "/tests/lua/boot_assessment.lua"))()(suite, root, process)
     suite:test("migration inventory cannot certify retained shell algorithms", function()
         local Inventory = require("component.migration.inventory")
         local inventory = Inventory.new(root, process, File.json(root .. "/data/component/migration/policy.json"))
         local report = inventory:report()
-        assert(not report.complete and #report.remaining > 0 and #report.starters == 5)
+        assert(not report.complete and #report.remaining > 0 and #report.starters == 6)
         assert(inventory:classify("module/tool", "#!/usr/bin/env bash\nexit 0\n") == "shell")
         assert(inventory:classify("module/tool", "#!/bin/sh\nexit 0\n") == "shell")
         assert(inventory:classify("module/test.rb", "") == "ruby")

@@ -1,1 +1,1 @@
-../../docs/modules/os/AGENTS.md
+../../docs/en/modules/os/AGENTS.md

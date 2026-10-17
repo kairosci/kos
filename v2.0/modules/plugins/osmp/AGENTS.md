@@ -1,1 +1,1 @@
-../../../docs/modules/plugins/osmp/AGENTS.md
+../../../docs/en/modules/plugins/osmp/AGENTS.md

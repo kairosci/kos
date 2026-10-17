@@ -68,7 +68,7 @@ jobs:
             modules/conf/*/*.sh \
             modules/conf/*/scripts/*.sh \
             tests/*.sh \
-            modules/os/bin/* modules/os/scripts/lib/*.sh modules/os/tests/*.sh \
+            modules/os/tests/*.sh \
             modules/clean/scripts/*.sh modules/clean/scripts/lib/modules/*.sh \
             modules/obscure/scripts/*.sh modules/obscure/scripts/lib/modules/*.sh \
             modules/slop/scripts/*.sh modules/slop/scripts/lib/modules/*.sh \
@@ -157,6 +157,9 @@ jobs:
           while IFS= read -r -d '' source; do
             luac -p "$source"
           done < <(find src tests/lua -type f -name '*.lua' -print0)
+
+      - name: Verify Documentation Languages
+        run: script/os-lua verify-documentation
 
       - name: Run Full Test Suite
         run: bash tests/run-all.sh
