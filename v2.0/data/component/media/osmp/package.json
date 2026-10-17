@@ -1,0 +1,1 @@
+{"author":"krosci","description":"OS media controls using the native Omarchy shell and MPRIS","keywords":["omarchy","quickshell","mpris","media-player"],"license":"MIT","name":"osmp","scripts":{"test":"node --test ../../../../tests/media/osmp/*.test.js"},"type":"module","version":"1.5.0"}

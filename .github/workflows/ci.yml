@@ -180,7 +180,7 @@ jobs:
           persist-credentials: false
 
       - name: Run OSMP Tests
-        run: npm test --prefix modules/plugins/osmp
+        run: npm test --prefix src/component/media/osmp
 
   ci-status-gate:
     name: CI Completion Status Gate

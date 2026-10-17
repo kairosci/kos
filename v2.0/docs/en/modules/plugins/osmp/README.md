@@ -4,7 +4,7 @@ OSMP 1.5.0 is OS's media control plugin for the native Omarchy shell. Its identi
 
 ## Installation and updates
 
-Run `make setup` from the root repository. The pipeline installs the canonical local sources, enables the widget in the right bar section and archives any previous `krosci.omamp` installation under `~/.local/state/os/retired-plugins/`. Repeated setup reconciles the installed files without downloading a separate plugin repository. Personal changes to replaced files are backed up by the shared configuration installer.
+Run `make setup` from the root repository. The pipeline installs the canonical local sources, preserves existing widget enablement and archives any previous `krosci.omamp` installation under `~/.local/state/os/retired-plugins/`. Repeated setup reconciles the installed files without downloading a separate plugin repository. Personal changes to replaced files are backed up by the shared configuration installer.
 
 ## Playback behavior
 
@@ -18,6 +18,6 @@ Playback uses Quickshell's MPRIS service. Optional TrackList requests use argume
 
 ## Development checks
 
-Run `npm test --prefix modules/plugins/osmp` from the root repository. Run `make lint` and `make test` for provisioning changes. Apply runtime changes only through `make setup`; inspect the native shell plugin list and journal afterwards.
+Run `npm test --prefix src/component/media/osmp` from the root repository. Run `make lint` and `make test` for provisioning changes. Apply runtime changes only through `make setup`; inspect the native shell plugin list and journal afterwards.
 
 The plugin uses the MIT license. See [LICENSE](LICENSE).

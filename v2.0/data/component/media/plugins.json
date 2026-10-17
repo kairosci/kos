@@ -1,0 +1,1 @@
+{"plugins":[{"id":"os.osmp","install":"make setup","kind":"bar-widget","name":"OSMP","path":"src/component/media/osmp","version":"1.5.0"}],"schemaVersion":1}
