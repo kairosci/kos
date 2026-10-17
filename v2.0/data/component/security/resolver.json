@@ -1,0 +1,18 @@
+{
+  "stateDirectory": "/run/os-resolver-failover",
+  "failureFile": "failures",
+  "lastSwitchFile": "last-switch",
+  "failureLimit": 3,
+  "cooldownSeconds": 900,
+  "providerFile": "provider",
+  "resolverConfiguration": "/etc/systemd/resolved.conf.d/os-resolver-failover.conf",
+  "probeHosts": ["archlinux.org", "github.com", "herdr.dev"],
+  "providers": ["Cloudflare", "Google"],
+  "providerAddresses": {
+    "Cloudflare": ["1.1.1.1", "1.0.0.1"],
+    "Google": ["8.8.8.8", "8.8.4.4"]
+  },
+  "files": {
+    "/etc/systemd/system/os-resolver-failover.service": "[Unit]\nDescription=Monitor DNS resolution and switch providers on failure\nAfter=NetworkManager.service systemd-resolved.service\nWants=NetworkManager.service systemd-resolved.service\n\n[Service]\nType=simple\nExecStart=/usr/bin/os-lua run-resolver-failover\nRestart=always\nRestartSec=15s\nRuntimeDirectory=os-resolver-failover\nRuntimeDirectoryMode=0755\nProtectSystem=strict\nProtectHome=yes\nReadWritePaths=/etc/systemd/resolved.conf.d /run/os-resolver-failover\nPrivateTmp=yes\nProtectKernelTunables=yes\nProtectKernelModules=yes\nProtectControlGroups=yes\nNoNewPrivileges=yes\nRestrictAddressFamilies=AF_UNIX AF_INET AF_INET6\n\n[Install]\nWantedBy=multi-user.target\n"
+  }
+}

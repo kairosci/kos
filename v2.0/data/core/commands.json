@@ -418,6 +418,12 @@
     "-f",
     "--"
   ],
+  "removeTree": [
+    "/usr/bin/rm",
+    "-r",
+    "-f",
+    "--"
+  ],
   "findFiles": [
     "/usr/bin/find"
   ],
@@ -613,5 +619,36 @@
     "/usr/bin/arch-audit",
     "--quiet",
     "--show-cve"
+  ],
+  "networkState": [
+    "/usr/bin/nmcli",
+    "-t",
+    "-f",
+    "STATE",
+    "general"
+  ],
+  "networkConnectivity": [
+    "/usr/bin/nmcli",
+    "-t",
+    "-f",
+    "CONNECTIVITY",
+    "general"
+  ],
+  "resolverProbe": [
+    "/usr/bin/resolvectl",
+    "--cache=no",
+    "--type=A",
+    "query"
+  ],
+  "systemdUnitRestart": [
+    "/usr/bin/systemctl",
+    "restart"
+  ],
+  "systemdUnitTryRestart": [
+    "/usr/bin/systemctl",
+    "try-restart"
+  ],
+  "sleep": [
+    "/usr/bin/sleep"
   ]
 }

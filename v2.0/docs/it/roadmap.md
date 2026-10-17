@@ -75,3 +75,5 @@ La policy dei servizi systemd passa a Lua: i drop-in di journald e resolved prov
 L’audit settimanale ora esegue Lynis, rkhunter, ClamAV e arch-audit tramite Lua. Un timer systemd e Cronie non vengono attivati insieme; runner, unità, logrotate e starter minimo sono verificabili dai dati canonici. Le finding arch-audit causano un esito fallito per la revisione.
 
 Lo stack sicurezza passa a Lua e dati esterni: installazione dei pacchetti, regole audit, configurazione Fail2ban e profili AppArmor sono verificati. USBGuard genera una policy iniziale solo se non esiste una configurazione non vuota e conserva le regole già presenti; la gestione delle capability hardware resta da verificare sul dispositivo.
+
+Il failover DNS è gestito da Lua e `systemd-resolved`, senza chiamare il runtime Omarchy. Soglie, cooldown, provider e indirizzi sono dati canonici; la verifica controlla configurazione attiva e servizio.
