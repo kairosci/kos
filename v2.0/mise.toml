@@ -1,0 +1,42 @@
+[env]
+
+[tools]
+lua = "5.4.9"
+node = "24.22.0"
+"aqua:BurntSushi/ripgrep" = "15.2.0"
+"aqua:JohnnyMorganz/StyLua" = "2.6.0"
+"aqua:LuaLS/lua-language-server" = "3.19.2"
+"aqua:koalaman/shellcheck" = "0.11.0"
+"aqua:mvdan/sh" = "3.14.1"
+"aqua:jqlang/jq" = "1.8.2"
+"aqua:rhysd/actionlint" = "1.7.12"
+"aqua:zizmorcore/zizmor" = "1.31.1"
+
+[tasks.lua-check]
+dir = "v2.0"
+run = "rg --files -0 data src modules tests -g '*.lua' | xargs -0 -r luac -p"
+
+[tasks.lua-format]
+dir = "v2.0"
+run = "stylua --config-path stylua.toml data src modules tests"
+
+[tasks.lua-format-check]
+dir = "v2.0"
+run = "stylua --check --config-path stylua.toml data src modules tests"
+
+[tasks.lua-lint]
+dir = "v2.0"
+run = "lua-language-server --check . --checklevel=Error --logpath /tmp/os-lua-language-server"
+
+[tasks.test]
+dir = "v2.0"
+run = "lua -E tests/main.lua \"$PWD\" --group full"
+
+[tasks.test-osmp]
+dir = "v2.0"
+run = "npm test --prefix src/component/media/osmp"
+
+[tasks.check]
+depends = ["lua-check", "lua-format-check", "lua-lint", "test", "test-osmp"]
+dir = "v2.0"
+run = "make lint"

@@ -3,5 +3,5 @@
   "archive": "v1.0/",
   "nativeDirectories": [".github/"],
   "nativeFiles": [".gitattributes", ".gitignore"],
-  "links": [".agents/skills", ".githooks", ".skills", "AGENTS.md", "AUDIT.md", "CONTRIBUTING.md", "GEMINI.md", "Makefile", "README.md", "SECURITY.md"]
+  "links": [".agents/skills", ".githooks", ".skills", "AGENTS.md", "AUDIT.md", "CONTRIBUTING.md", "GEMINI.md", "Makefile", "README.md", "SECURITY.md", "mise.toml"]
 }
