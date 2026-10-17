@@ -36,7 +36,9 @@ local function source(path, command)
     return "/Arch\n //linux\n protocol: efi\n path: boot():" .. path .. "\n cmdline: " .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor") .. "\n"
 end
 
-if arg[2] == "media" then
+if arg[2] == "terminal" then
+    assert(loadfile(root .. "/tests/lua/terminal.lua"))()(suite, root, process)
+elseif arg[2] == "media" then
     assert(loadfile(root .. "/tests/lua/media_plugin.lua"))()(suite, root, process)
 elseif arg[2] == "project" then
     assert(loadfile(root .. "/tests/lua/project_interface.lua"))()(suite, root, process)
@@ -67,7 +69,7 @@ elseif arg[2] == "json" then
         local Inventory = require("component.migration.inventory")
         local inventory = Inventory.new(root, process, File.json(root .. "/data/component/migration/policy.json"))
         local report = inventory:report()
-        assert(not report.complete and #report.remaining > 0 and #report.starters == 5)
+        assert(not report.complete and #report.remaining > 0 and #report.starters == 7)
         assert(inventory:classify("module/tool", "#!/usr/bin/env bash\nexit 0\n") == "shell")
         assert(inventory:classify("module/tool", "#!/bin/sh\nexit 0\n") == "shell")
         assert(inventory:classify("module/test.rb", "") == "ruby")

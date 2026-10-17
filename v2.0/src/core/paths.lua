@@ -28,5 +28,17 @@ function Paths:protectHome(process, home)
     local secured = (current & 0xE00) | (current & maximum & 0x1FF)
     if secured ~= current then process:run("permissions", {("%o"):format(secured), target}) end
 end
+function Paths:guardDirectory(process, base, relative)
+    assert(relative:sub(1, 1) ~= "/", "invalid_managed_directory")
+    local path = base
+    for segment in relative:gmatch("[^/]+") do
+        assert(segment ~= "..", "unsafe_managed_directory")
+        path = path .. "/" .. segment
+        assert(process:status("isLink", {path}) == 1, "redirected_managed_directory")
+        local exists = process:status("pathExists", {path})
+        assert(exists == 0 or exists == 1, "managed_directory_probe_failed")
+        if exists == 0 then assert(process:status("isDirectory", {path}) == 0, "non_directory_managed_path") end
+    end
+end
 
 return Paths

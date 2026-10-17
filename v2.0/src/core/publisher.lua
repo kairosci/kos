@@ -5,6 +5,19 @@ function Publisher.new(process)
     return setmetatable({process=assert(process)}, Publisher)
 end
 
+function Publisher:inspect(destination)
+    assert(self.process:status("isLink", {destination}) == 1, "redirected_publication_path")
+    local exists = self.process:status("pathExists", {destination})
+    assert(exists == 0 or exists == 1, "publication_probe_failed")
+    if exists == 1 then return nil end
+    local mode = assert(tonumber(self.process:run("fileMode", {destination}), 16))
+    assert(mode & 0xF000 == 0x8000, "nonregular_publication_path")
+    local file = assert(io.open(destination, "rb"))
+    local content, readFailure = file:read("a")
+    assert(file:close()); assert(content, readFailure)
+    return content, mode
+end
+
 function Publisher:publish(destination, content, mode, validator, preserve)
     local parent = assert(destination:match("^(.*)/[^/]+$"), "invalid_destination")
     self.process:run("directory", {parent})

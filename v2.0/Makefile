@@ -95,7 +95,7 @@ zed:
 	cd "$(PROJECT_ROOT)" && bash modules/conf/zed/install.sh
 
 cli:
-	cd "$(PROJECT_ROOT)" && bash modules/conf/cli/install.sh
+	+$(MAKE) -C "$(PROJECT_ROOT)" setup SCOPE=terminal
 
 herdr:
 	cd "$(PROJECT_ROOT)" && bash modules/conf/herdr/install.sh

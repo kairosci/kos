@@ -28,12 +28,13 @@ function Application:apply(names, single)
     local configuration = Configuration.new(self.root, paths, publisher, registry)
     local files = require("component.application.files").new(self.root, paths, publisher, self.process, registry)
     local applications = {}
-    if single then applications[1] = assert(names, "application_required")
+    if single or (names and names ~= "") then applications[1] = assert(names, "application_required")
     else for name in pairs(registry) do applications[#applications + 1] = name end; table.sort(applications) end
     for _, name in ipairs(applications) do
         local policy = assert(registry[name], "unknown_application")
         local application
-        if policy.kind == "plugin" then application = require("component.media.plugin").new(self.root, paths, publisher, self.process, registry):apply(name)
+        if policy.kind == "terminal" then application = require("component.terminal.installer").new(self.root, paths, publisher, self.process, File.json(self.root .. "/" .. policy.policy)):install()
+        elseif policy.kind == "plugin" then application = require("component.media.plugin").new(self.root, paths, publisher, self.process, registry):apply(name)
         elseif policy.kind == "settings" then application = settings:apply(name)
         elseif policy.kind == "ini" then application = configuration:apply(name)
         elseif policy.kind == "native-panel" then application = require("component.application.panel").new(self.root, paths, publisher, registry):apply(name)
@@ -57,7 +58,7 @@ end
 
 function Application:run(arguments)
     local mode, config, esp, uuid, policy_path = table.unpack(arguments)
-    if self.layout.statusModes[mode] and mode ~= "cli" then
+    if mode and mode:match("^project-") then
         local interface = require("component.project.interface").new(self.root, self.process, self.catalog,
             File.json(self.root .. "/data/component/project/policy.json"), File.json(self.root .. "/" .. self.layout.locale))
         local values = {}; for index = 2, #arguments do values[#values + 1] = arguments[index] end
@@ -65,6 +66,15 @@ function Application:run(arguments)
         if mode == "project-languages" then assert(#values == 0, "invalid_project_arguments"); return interface:languages() end
         if mode == "project-locale-status" then assert(#values == 0, "invalid_project_arguments"); return interface:locale_status() end
         return interface:launch(mode, values)
+    end
+    if mode == "terminal-helper" then
+        local values = {}; for index = 2, #arguments do values[#values + 1] = arguments[index] end
+        return require("component.terminal.helper").new(self.root, self.catalog, File.json(self.root .. "/data/component/terminal/policy.json")):run(values)
+    end
+    if mode == "terminal-theme" then
+        assert(config == nil, "invalid_terminal_theme_arguments")
+        local paths = require("core.paths").new(File.json(self.root .. "/" .. self.layout.paths))
+        return require("component.terminal.theme").new(self.root, paths, Publisher.new(self.process), File.json(self.root .. "/data/component/terminal/policy.json")):apply()
     end
     if mode == "arch-report" or mode == "arch-check" then
         assert(config == nil, "invalid_arch_assessment_arguments")

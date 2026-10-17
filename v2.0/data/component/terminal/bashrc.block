@@ -1,0 +1,2 @@
+source "${XDG_DATA_HOME:-$HOME/.local/share}/os/terminal/scripts/helper.bash"
+source "${XDG_CONFIG_HOME:-$HOME/.config}/os/cli-theme.sh"

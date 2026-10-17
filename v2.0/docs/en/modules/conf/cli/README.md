@@ -1,19 +1,9 @@
-# cliconf
+# Terminal helpers and themes
 
-Native CLI helper installer for os terminal stack.
+`make cli` applies the Lua terminal component through `make setup SCOPE=terminal`.
 
-## Overview
+`src/component/terminal/` owns helper dispatch, palette rendering and installation. Tool guidance is available in six languages under `data/component/terminal/help/`. Policy, shell integration and rendering templates live alongside those dictionaries. The sourced Bash adapter only exposes `helper` to the interactive shell; the theme hook only starts Lua.
 
-cliconf installs helper command with English cheatsheet per tool in the stack. Tools with built in help stay referenced with never duplicated text. All operations run in user scope with native Bash and standard Unix tools.
+The installer preserves personal shell content and permissions, publishes one managed block and archives the retired helper privately. FZF reads validated colors from the actual theme. LazyGit uses its native `LG_CONFIG_FILE` layers: the personal configuration remains intact, with a separate generated palette layer appended once. Explicit configuration lists are preserved. Invalid palettes, redirected backups and incomplete shell blocks fail before replacing the active shell integration.
 
-## Installation
-
-Run in user scope:
-
-```bash
-bash modules/conf/cli/install.sh
-```
-
-## Architecture
-
-Installer copies data helpers into the shared os path and registers a marked source block in bashrc idempotently. Helpers cover the retained command line tools. Retired application helpers are removed during setup; graphical applications use their native help.
+Run `lua -E tests/lua/run.lua "$PWD" terminal` from `v2.0/` for isolated behavior checks.

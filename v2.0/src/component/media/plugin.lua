@@ -13,18 +13,6 @@ function Plugin:regular(path)
     assert(mode & 0xF000 == 0x8000, "nonregular_plugin_payload")
 end
 
-function Plugin:guard(base, relative)
-    assert(relative:sub(1, 1) ~= "/", "invalid_plugin_target")
-    local path = base
-    for segment in relative:gmatch("[^/]+") do
-        assert(segment ~= "..", "unsafe_plugin_target")
-        path = path .. "/" .. segment
-        assert(self.process:status("isLink", {path}) == 1, "redirected_plugin_target")
-        local exists = self.process:status("pathExists", {path})
-        assert(exists == 0 or exists == 1, "plugin_target_probe_failed")
-        if exists == 0 then assert(self.process:status("isDirectory", {path}) == 0, "non_directory_plugin_target") end
-    end
-end
 
 function Plugin:apply(name)
     local policy = assert(self.registry[name], "unknown_application")
@@ -61,11 +49,11 @@ function Plugin:apply(name)
         process:run("environment", arguments)
         Configuration.new(self.paths, process, File.json(self.root .. "/" .. policy.namespace)):migrate()
         local target = self.paths:resolve("config", policy.target)
-        self:guard(self.paths:resolve("config", ""), policy.target)
+        self.paths:guardDirectory(process, self.paths:resolve("config", ""), policy.target)
         for _, file in ipairs(files) do
             local destination = target .. "/" .. file.path
             local parent = file.path:match("^(.*)/[^/]+$")
-            if parent then self:guard(target, parent) end
+            if parent then self.paths:guardDirectory(process, target, parent) end
             for _, path in ipairs({destination, destination .. ".bak"}) do
                 assert(process:status("isLink", {path}) == 1, "redirected_plugin_target")
                 local exists = process:status("pathExists", {path})
