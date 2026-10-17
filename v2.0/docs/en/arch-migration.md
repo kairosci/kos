@@ -11,3 +11,13 @@ The application launcher sprint implements `os app browser`, `os app editor`, `o
 This sprint establishes application dispatch independent of the Omarchy entrypoint. It does not establish parity for the complete applications capability: native menu integration, terminal working directory handling, all historical launch options and independent shortcuts remain to be evaluated. The migration assessment therefore keeps every capability unverified and refuses removal of the runtime or repository. The current kernel, login session, locker, audio, network and recovery entries remain the active implementations.
 
 The next desktop sprint should introduce an isolated compositor and shell trial profile with explicit ownership of session startup, notifications, launcher, wallpaper and the single locker. It must be tested independently before replacing the active session. Kernel selection still requires the trial boot and hardware checks described in [the kernel assessment](kernel-review.md). Package source retirement requires alternatives for every package supplied only by the current repository and a tested update and recovery path.
+
+## Upgrade from 1.9 to 2.0
+
+Before upgrading, back up personal data and record the active snapshot, kernel, firmware entry and essential service state. Run `make test`, `make verify` and `bash v2.0/scripts/test-os-compat.sh`; retain their results with `v2.0/script/os-lua migration-report` and `v2.0/script/os-lua arch-report`. These checks do not replace hardware trials.
+
+Apply changes only through the repository's privileged setup pipeline. Keep Limine, the working kernel, Omarchy repositories and keys, snapshots and EFI recovery entries. Do not run full provisioning from a snapshot or temporary root. When booted from a Snapper snapshot, use only `make setup SCOPE=recovery`; it saves configuration backups in persistent home storage and rolls back the booted snapshot.
+
+Record cold boot, encrypted unlock, desktop session, network, audio, suspend, resume and recovery results separately. For GRUB, installation and one-time selection do not count as a verified boot: keep Limine until all trials pass. Do not reset snapshot history before booting the persistent root and verifying the restored desktop.
+
+Version 2.0 is ready only when the Lua report finds no active Bash or Ruby algorithms, the Arch assessment confirms capabilities independent of Omarchy, and every required hardware trial has a recorded result. Otherwise, retain version 1.9 and its recovery paths.
