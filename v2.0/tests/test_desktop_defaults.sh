@@ -65,7 +65,7 @@ SHELL_PLUGINS_MODULE="$PROJECT_DIR/scripts/lib/modules/35-shell-plugins.sh"
 
 assert_file_not_contains "defaults never sets the browser as root" "$DEFAULTS_MODULE" 'omarchy default browser'
 
-assert_file_contains "debloat module removes IgnorePkg entries" "$DEBLOAT_MODULE" "IgnorePkg"
+assert_file_contains "debloat Lua component removes IgnorePkg entries" "$PROJECT_DIR/src/component/package/debloat.lua" "IgnorePkg"
 assert_file_not_contains "debloat module keeps no merged pin list" "$DEBLOAT_MODULE" "EXISTING_PINS"
 assert_file_contains "debloat module installs persistence hooks" "$DEBLOAT_MODULE" "99-os-persist"
 assert_file_contains "defaults module records file-manager state" "$PROJECT_DIR/scripts/lib/desktop-workflow.sh" "defaults/file-manager"

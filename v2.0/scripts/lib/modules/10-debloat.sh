@@ -2,74 +2,9 @@
 
 set -euo pipefail
 
-DEBLOAT=(
-    tensaku
-    btop
-    gdu
-    imv
-    mupdf
-    mpv-mpris
-    libreoffice-still
-    geany
-    geany-plugins
-    keepassxc
-    brave-bin
-    papirus-icon-theme
-    yazi
-    qutebrowser
-    python-adblock
-    xdg-desktop-portal-termfilechooser
-    kdenlive
-    obs-studio
-    obsidian
-    libreoffice-fresh
-    chromium
-    system-config-printer
-    thunar
-    thunar-archive-plugin
-    tumbler
-    totem
-    evince
-    eog
-    yaru-icon-theme
-    dolphin
-    okular
-    gwenview
-    xdg-desktop-portal-kde
-    plasma-integration
-    breeze
-    breeze-gtk
-    haruna
-    docker
-    docker-compose
-    gnome-disk-utility
-    gnome-themes-extra
-    sushi
-    gtksourceview4
-    gst-plugin-gtk
-    zathura
-    zathura-pdf-mupdf
-    dua-cli
-    foot
-    micro
-)
-
 log "debloat.start"
-INSTALLED_DEBLOAT=()
-for pkg in "${DEBLOAT[@]}"; do
-    if pacman -Qq "$pkg" 2>/dev/null | grep -qx "$pkg"; then
-        INSTALLED_DEBLOAT+=("$pkg")
-    fi
-done
-if [[ ${#INSTALLED_DEBLOAT[@]} -gt 0 ]]; then
-    if ! pacman -Rns --noconfirm "${INSTALLED_DEBLOAT[@]}"; then
-        err "debloat.partial_removal"
-    fi
-fi
-
 log "debloat.pin"
-sed -i -E "/^[[:space:]]*IgnorePkg[[:space:]]*=/d" /etc/pacman.conf
-rm -f /etc/pacman.d/omarchy/ignore-pkgs.list
+"$PROJECT_DIR/script/os-lua" apply-debloat || err "debloat.partial_removal"
 
 log "debloat.foot_cleanup"
 if ! pacman -Q foot &>/dev/null && ! command -v foot &>/dev/null; then
