@@ -1,6 +1,6 @@
 # Contributing
 
-All changes enter `main` through a pull request from a feature branch. Keep changes focused, follow the repository guidance in `AGENTS.md`, and write documentation in English without lists. Use a signed Conventional Commit message for every commit. Pull requests use the repository template and leave the pull request description empty.
+All changes enter `main` through a pull request from a feature branch. Keep changes focused and follow the repository guidance in `AGENTS.md`. Create GitHub issues in English by default. Update public documentation in Italian, English and French in the same change; keep shared machine instructions canonical in English and run `script/os-lua verify-documentation`. Use a signed Conventional Commit message for every commit. Pull requests use the repository template and leave the pull request description empty.
 
 ## Releases
 

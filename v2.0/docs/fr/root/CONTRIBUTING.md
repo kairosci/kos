@@ -1,6 +1,6 @@
 # Contribuer
 
-Les changements partent d’une branche dédiée et rejoignent main par pull request. Main reste en lecture seule pour le travail direct. Les commits sont signés et suivent Conventional Commits : type, portée éventuelle, deux-points et description ; aucun autre symbole dans le titre. Les descriptions des PR restent vides conformément au modèle du dépôt.
+Les changements partent d’une branche dédiée et rejoignent main par pull request. Main reste en lecture seule pour le travail direct. Créer les issues GitHub en anglais par défaut. Mettre à jour la documentation publique en italien, anglais et français dans le même changement ; les instructions machine partagées restent canoniques en anglais. Exécuter `script/os-lua verify-documentation` avant publication. Les commits sont signés et suivent Conventional Commits : type, portée éventuelle, deux-points et description ; aucun autre symbole dans le titre. Les descriptions des PR restent vides conformément au modèle du dépôt.
 
 Préparer d’abord les changements dans le dépôt, avec politiques séparées des algorithmes, messages dans les six catalogues et documentation publique en it, en et fr. Instructions opérationnelles et licences conservent leur source canonique partagée. Ne pas ajouter de classes cosmétiques, d’erreurs masquées ou de tests recopiant l’implémentation.
 
