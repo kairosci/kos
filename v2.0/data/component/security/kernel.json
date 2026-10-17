@@ -1,0 +1,45 @@
+{
+  "files": [
+    {
+      "path": "/etc/sysctl.d/99-security.conf",
+      "mode": "644",
+      "content": "kernel.randomize_va_space = 2\nkernel.kptr_restrict = 2\nkernel.dmesg_restrict = 1\nkernel.perf_event_paranoid = 3\nkernel.unprivileged_bpf_disabled = 1\nkernel.yama.ptrace_scope = 1\nkernel.core_uses_pid = 1\nkernel.sysrq = 16\nkernel.io_uring_disabled = 2\nfs.suid_dumpable = 0\nfs.protected_hardlinks = 1\nfs.protected_symlinks = 1\nfs.protected_fifos = 2\nfs.protected_regular = 2\nfs.file-max = 2000000\nfs.inotify.max_user_watches = 524288\nvm.mmap_rnd_bits = 28\nvm.mmap_rnd_compat_bits = 14\nnet.ipv4.conf.all.rp_filter = 1\nnet.ipv4.conf.default.rp_filter = 1\nnet.ipv4.conf.all.accept_redirects = 0\nnet.ipv4.conf.default.accept_redirects = 0\nnet.ipv4.conf.all.secure_redirects = 0\nnet.ipv4.conf.default.secure_redirects = 0\nnet.ipv4.conf.all.send_redirects = 0\nnet.ipv4.conf.default.send_redirects = 0\nnet.ipv4.conf.all.accept_source_route = 0\nnet.ipv4.conf.default.accept_source_route = 0\nnet.ipv4.conf.all.log_martians = 1\nnet.ipv4.conf.default.log_martians = 1\nnet.ipv4.icmp_echo_ignore_broadcasts = 1\nnet.ipv4.icmp_ignore_bogus_error_responses = 1\nnet.ipv4.tcp_syncookies = 1\nnet.ipv4.tcp_max_syn_backlog = 4096\nnet.ipv4.tcp_synack_retries = 2\nnet.ipv4.tcp_syn_retries = 5\nnet.ipv4.tcp_rfc1337 = 1\nnet.ipv4.tcp_timestamps = 0\nnet.ipv4.ip_forward = 0\nnet.core.bpf_jit_harden = 2\nnet.ipv6.conf.all.accept_redirects = 0\nnet.ipv6.conf.default.accept_redirects = 0\nnet.ipv6.conf.all.accept_source_route = 0\nnet.ipv6.conf.default.accept_source_route = 0\nnet.ipv6.conf.all.accept_ra = 0\nnet.ipv6.conf.default.accept_ra = 0\nnet.ipv6.conf.all.disable_ipv6 = 0\nnet.ipv6.conf.default.disable_ipv6 = 0\n"
+    },
+    {
+      "path": "/etc/sysctl.d/99-lockdown.conf",
+      "mode": "644",
+      "content": "kernel.kexec_load_disabled = 1\n"
+    },
+    {
+      "path": "/etc/security/limits.d/99-no-core.conf",
+      "mode": "644",
+      "content": "* hard core 0\n* soft core 0\n"
+    },
+    {
+      "path": "/etc/systemd/system.conf.d/99-no-core.conf",
+      "mode": "644",
+      "content": "[Manager]\nDefaultLimitCORE=0\n"
+    }
+  ],
+  "verification": [
+    ["kernel.randomize_va_space", "2"],
+    ["kernel.kptr_restrict", "2"],
+    ["kernel.dmesg_restrict", "1"],
+    ["kernel.perf_event_paranoid", "3"],
+    ["kernel.unprivileged_bpf_disabled", "1"],
+    ["kernel.yama.ptrace_scope", "1"],
+    ["kernel.sysrq", "16"],
+    ["fs.suid_dumpable", "0"],
+    ["fs.protected_hardlinks", "1"],
+    ["fs.protected_symlinks", "1"],
+    ["fs.protected_fifos", "2"],
+    ["fs.protected_regular", "2"],
+    ["net.ipv4.conf.all.rp_filter", "1"],
+    ["net.ipv4.conf.all.accept_redirects", "0"],
+    ["net.ipv4.conf.all.send_redirects", "0"],
+    ["net.ipv4.conf.all.accept_source_route", "0"],
+    ["net.ipv4.icmp_echo_ignore_broadcasts", "1"],
+    ["net.ipv4.tcp_syncookies", "1"],
+    ["net.ipv4.tcp_rfc1337", "1"]
+  ]
+}

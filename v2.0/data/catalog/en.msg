@@ -618,3 +618,5 @@ make.easyeffects=Install EasyEffects preset
 make.gtk=Install GTK integration
 check.ufw_policy=UFW policy, rules and boot service
 firewall.apply_failed=UFW configuration failed
+kernel.apply_failed=Kernel hardening configuration failed
+check.kernel_policy=Kernel hardening policy and runtime values

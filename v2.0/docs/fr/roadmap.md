@@ -15,3 +15,5 @@ L’indépendance Arch exige des preuves par capacité, un moteur autonome, dém
 Le provisionnement des paquets par défaut lit désormais une politique validée et installe les paquets manquants des dépôts officiels et de l’AUR avec Lua. L’étape setup reste l’unique voie d’application au système ; les groupes facultatifs conservent leur gestion tolérante des échecs.
 
 Le sprint pare-feu transfère à Lua l’application de la politique UFW et la vérification de son état. Les valeurs par défaut, les ports, les permissions des règles et l’état du service sont contrôlés depuis les données canoniques ; toute dérive échoue explicitement. Les autres politiques de sécurité restent à migrer.
+
+La politique sysctl, le verrouillage kexec et les limites des dumps mémoire utilisent désormais un composant Lua avec des données externes et une publication idempotente. La vérification compare les fichiers persistants et 19 valeurs actives ; les autres politiques de sécurité restent à migrer.

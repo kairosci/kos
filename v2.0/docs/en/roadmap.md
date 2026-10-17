@@ -15,3 +15,5 @@ Arch independence requires separate capability evidence, an independent runtime,
 Default package provisioning now reads a validated package policy and installs missing official and AUR packages through Lua. The existing setup stage remains the only system application path; optional package groups retain their graceful failure behavior.
 
 The firewall sprint moves UFW policy application and status verification to Lua. Defaults, ports, rule permissions and service state are checked against canonical data, and drift fails explicitly. Other security policies remain to be migrated.
+
+Sysctl policy, kexec lockdown and core dump limits now use a Lua component with external data and idempotent publication. Verification compares persistent files and 19 active values; other security policies remain to be migrated.
