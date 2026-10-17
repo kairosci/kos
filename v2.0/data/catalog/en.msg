@@ -627,3 +627,5 @@ ssh.apply_failed=SSH policy configuration failed
 check.ssh_policy=SSH server, client and service policy
 
 security.audit_apply_failed=Security audit scheduler configuration failed
+security.apply_failed=Security stack configuration failed
+check.security_stack=security stack policy

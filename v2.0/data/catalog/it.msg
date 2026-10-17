@@ -627,3 +627,5 @@ ssh.apply_failed=Configurazione della policy SSH non riuscita
 check.ssh_policy=Policy SSH per server, client e servizio
 
 security.audit_apply_failed=Configurazione della pianificazione degli audit di sicurezza fallita
+security.apply_failed=Configurazione dello stack di sicurezza fallita
+check.security_stack=policy dello stack di sicurezza

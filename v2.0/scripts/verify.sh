@@ -172,9 +172,11 @@ tcheck "check.resolved_hardened" "[[ -f /etc/systemd/resolved.conf.d/hardened.co
 tcheck "check.resolver_failover" "systemctl is-enabled --quiet os-resolver-failover.service && systemctl is-active --quiet os-resolver-failover.service"
 
 section verify.sec_tooling
-for pkg in lynis rkhunter clamav audit usbguard fail2ban apparmor; do
-    check "$pkg present" "pacman -Q $pkg &>/dev/null"
-done
+if can_inspect_system; then
+    tcheck "check.security_stack" "\"$SCRIPT_DIR/../script/os-lua\" verify-security-stack"
+else
+    skip "$(t verify.skip_root)"
+fi
 tcheck "check.apparmor_kernel" "grep -Eq '(^| )lsm=[^ ]*apparmor[^ ]*( |$)' /proc/cmdline && [[ -r /sys/kernel/security/apparmor/profiles ]]"
 
 section verify.sec_perms

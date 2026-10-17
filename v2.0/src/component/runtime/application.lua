@@ -151,6 +151,17 @@ function Application:run(arguments)
         end
         return audit:run()
     end
+    if mode == "apply-security-stack" or mode == "verify-security-stack" then
+        assert(#arguments == 1, "invalid_security_stack_arguments")
+        local stack = require("component.security.stack").new(
+            self.process,
+            File.json(self.root .. "/data/component/security/stack.json"),
+            self.catalog
+        )
+        if mode == "apply-security-stack" then return stack:apply() end
+        assert(stack:verify(), "security_stack_policy_drift")
+        return
+    end
     if mode == "apply-kernel" or mode == "verify-kernel" then
         assert(#arguments == 1, "invalid_kernel_arguments")
         local kernel = require("component.security.kernel").new(

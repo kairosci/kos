@@ -627,3 +627,5 @@ ssh.apply_failed=Error al configurar la política SSH
 check.ssh_policy=Política SSH de servidor, cliente y servicio
 
 security.audit_apply_failed=Error al configurar la programación de auditorías de seguridad
+security.apply_failed=Error al configurar el conjunto de seguridad
+check.security_stack=política del conjunto de seguridad

@@ -627,3 +627,5 @@ ssh.apply_failed=Falha ao configurar a política SSH
 check.ssh_policy=Política SSH do servidor, cliente e serviço
 
 security.audit_apply_failed=Falha ao configurar o agendamento de auditoria de segurança
+security.apply_failed=Falha ao configurar a camada de segurança
+check.security_stack=política da camada de segurança

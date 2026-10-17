@@ -627,3 +627,5 @@ ssh.apply_failed=Échec de la configuration de la politique SSH
 check.ssh_policy=Politique SSH du serveur, du client et du service
 
 security.audit_apply_failed=Échec de la configuration de la planification des audits de sécurité
+security.apply_failed=Échec de la configuration de la pile de sécurité
+check.security_stack=politique de la pile de sécurité

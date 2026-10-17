@@ -62,7 +62,7 @@ assert_file_not_contains "35-shell-plugins has no inaccessible default repositor
 assert_file_contains "35-shell-plugins routes through omarchy_as" "$MODULES_DIR/35-shell-plugins.sh" "omarchy_as"
 assert_file_contains "32-omaqt tracks the omaqt checkout" "$MODULES_DIR/32-omaqt.sh" "OMAQT_DIR"
 assert_file_contains "10-debloat delegates package reconciliation to Lua" "$MODULES_DIR/10-debloat.sh" "apply-debloat"
-assert_file_contains "85-security-stack defines SECURITY_PKGS array" "$MODULES_DIR/85-security-stack.sh" "SECURITY_PKGS=\("
+assert_file_contains "85-security-stack declares its package policy in JSON" "$PROJECT_DIR/data/component/security/stack.json" '"packages"'
 assert_file_contains "setup.sh checks EUID root requirement" "$PROJECT_DIR/scripts/setup.sh" "EUID -eq 0"
 assert_file_contains "security scope reconciles security and audit stages" "$PROJECT_DIR/scripts/setup.sh" 'SETUP_SCOPE.*security'
 

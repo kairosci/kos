@@ -16,16 +16,17 @@ source "$SCRIPT_DIR/test_lib.sh"
 test_section "Security Tooling, Isolation & Module Blacklists"
 
 assert_file_exists "security stack module exists" "$SEC_MODULE"
-assert_file_contains "security module defines audit rules" "$SEC_MODULE" "/etc/audit/rules.d/hardened.rules"
-assert_file_contains "security module configures usbguard" "$SEC_MODULE" "usbguard generate-policy"
-assert_file_contains "security module configures fail2ban jail" "$SEC_MODULE" "/etc/fail2ban/jail.local"
-assert_file_contains "security module defines apparmor profiles" "$SEC_MODULE" "/etc/apparmor.d/usr.bin.sshd"
+assert_file_contains "security stack module delegates to Lua" "$SEC_MODULE" "apply-security-stack"
+assert_file_contains "security policy defines audit rules" "$PROJECT_DIR/data/component/security/stack.json" "/etc/audit/rules.d/hardened.rules"
+assert_file_contains "security stack generates initial USBGuard rules" "$PROJECT_DIR/src/component/security/stack.lua" "usbguardGenerate"
+assert_file_contains "security policy configures fail2ban" "$PROJECT_DIR/data/component/security/stack.json" "packageFiles"
+assert_file_contains "security policy defines AppArmor profiles" "$PROJECT_DIR/data/component/security/stack.json" "usr.bin.sshd"
 assert_true "every apparmor profile includes abstractions/base for shared library loading" \
-    "[[ \$(grep -c '^[[:space:]]*#include <abstractions/base>' '$SEC_MODULE') -ge 4 ]]"
+    "[[ \$(grep -c '#include <abstractions/base>' '$PROJECT_DIR/data/component/security/stack.json') -ge 4 ]]"
 assert_true "every apparmor profile includes tunables/global" \
-    "[[ \$(grep -c '^#include <tunables/global>' '$SEC_MODULE') -ge 4 ]]"
-assert_file_contains "apparmor profiles are written world readable" "$SEC_MODULE" "chmod 644"
-assert_file_not_contains "sshd apparmor profile no longer denies the privilege separation directory" "$SEC_MODULE" "deny /tmp/\*\* rw"
+    "[[ \$(grep -c '#include <tunables/global>' '$PROJECT_DIR/data/component/security/stack.json') -ge 4 ]]"
+assert_file_contains "AppArmor profiles are world readable" "$PROJECT_DIR/src/component/security/stack.lua" '"644"'
+assert_file_not_contains "sshd AppArmor profile does not deny the privilege separation directory" "$PROJECT_DIR/data/component/security/stack.json" "deny /tmp/\*\* rw"
 
 assert_file_exists "hardware power module exists" "$POWER_MODULE"
 assert_file_contains "hardware module blacklists usb-storage" "$POWER_MODULE" "blacklist usb-storage"
@@ -40,12 +41,12 @@ assert_file_contains "weekly audit scans canonical system paths" "$PROJECT_DIR/d
 assert_file_contains "weekly audit declares vulnerability scanner" "$PROJECT_DIR/data/core/commands.json" "weeklyClamav"
 assert_file_contains "weekly audit declares Arch advisory scanner" "$PROJECT_DIR/data/core/commands.json" "weeklyArchAuditReview"
 assert_file_contains "weekly audit fails on advisory findings" "$PROJECT_DIR/src/component/security/audit.lua" "arch-audit-review"
-assert_file_not_contains "auditd reload does not mistake a successful change check for unchanged rules" "$SECURITY_STACK_MODULE" "augenrules --check"
-assert_file_contains "auditd rules are reloaded idempotently with augenrules" "$SECURITY_STACK_MODULE" "augenrules --load"
-assert_file_contains "merged audit rules clear the prior rules before reload" "$SECURITY_STACK_MODULE" '^-D$'
+assert_file_not_contains "auditd reload does not mistake a successful change check for unchanged rules" "$PROJECT_DIR/src/component/security/stack.lua" "augenrules --check"
+assert_file_contains "auditd rules are reloaded through Lua" "$PROJECT_DIR/src/component/security/stack.lua" "auditRulesLoad"
+assert_file_contains "merged audit rules clear prior rules before reload" "$PROJECT_DIR/data/component/security/stack.json" '"-D\\n'
 assert_file_contains "service policy delegates to Lua" "$SERVICES_MODULE" "apply-services"
 assert_file_contains "service policy is declared as external data" "$PROJECT_DIR/data/component/security/services.json" "avahi-daemon.service"
-assert_file_contains "clamav update is deferred when freshclam already runs" "$SECURITY_STACK_MODULE" "pgrep -x freshclam"
+assert_file_contains "clamav update is deferred when freshclam already runs" "$PROJECT_DIR/src/component/security/stack.lua" "freshclamRunning"
 assert_file_not_contains "auditd is not restarted via the missing initscripts service wrapper" "$SECURITY_STACK_MODULE" "service auditd restart"
 assert_file_contains "ssh config chmod targets the real config files" "$POWER_MODULE" "sshd_config.d/..conf"
 assert_file_not_contains "ssh config chmod no longer relies on a non-matching glob" "$POWER_MODULE" "chmod 644 /etc/ssh/..conf 2>"

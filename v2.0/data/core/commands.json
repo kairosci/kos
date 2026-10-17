@@ -366,6 +366,48 @@
     "--noconfirm",
     "--needed"
   ],
+  "pacmanInfo": [
+    "/usr/bin/pacman",
+    "-Si"
+  ],
+  "usbguardGenerate": [
+    "/usr/bin/usbguard",
+    "generate-policy"
+  ],
+  "freshclamUpdate": [
+    "/usr/bin/freshclam"
+  ],
+  "freshclamRunning": [
+    "/usr/bin/pgrep",
+    "-x",
+    "freshclam"
+  ],
+  "auditRulesLoad": [
+    "/usr/bin/augenrules",
+    "--load"
+  ],
+  "auditRulesFallback": [
+    "/usr/bin/auditctl",
+    "-R"
+  ],
+  "apparmorEnforce": [
+    "/usr/bin/aa-enforce"
+  ],
+  "apparmorStatus": [
+    "/usr/bin/aa-status"
+  ],
+  "grubMenuUpdate": [
+    "/usr/bin/os-lua",
+    "publish-grub"
+  ],
+  "unitEnable": [
+    "/usr/bin/systemctl",
+    "enable"
+  ],
+  "unitStart": [
+    "/usr/bin/systemctl",
+    "start"
+  ],
   "pacmanRemove": [
     "/usr/bin/pacman",
     "-Rns",
