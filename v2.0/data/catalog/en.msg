@@ -609,3 +609,7 @@ settings.lockDelay=Automatic lock after seconds
 settings.screensaverDelay=Screensaver after seconds
 settings.battery=Battery
 os.dispatcher_version=os dispatcher %s
+make.launch=Run interactive setup
+make.run_setup=Run setup and report its log
+make.entry=Run setup from an existing root session
+make.keyring=Select the supported keyring backend

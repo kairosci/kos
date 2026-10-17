@@ -1,16 +1,1 @@
-{
-  "catalog": "data/catalog",
-  "locale": "data/core/locale.json",
-  "commands": "data/core/commands.json",
-  "bootPolicy": "data/component/boot/policy.json",
-  "bootFormat": "data/component/boot/render.json",
-  "bootFiles": "data/component/boot/files.json",
-  "applications": "data/component/application/policy.json",
-  "paths": "data/core/paths.json",
-  "wallpaper": "data/component/wallpaper/policy.json",
-  "migration": "data/component/migration/policy.json",
-  "performance": "data/component/performance/policy.json",
-  "settings": "data/component/settings/policy.json",
-  "bootAppearance": "data/component/boot/appearance.json",
-  "bootCandidate": "data/component/boot/candidate.json"
-}
+{"applications":"data/component/application/policy.json","bootAppearance":"data/component/boot/appearance.json","bootCandidate":"data/component/boot/candidate.json","bootFiles":"data/component/boot/files.json","bootFormat":"data/component/boot/render.json","bootPolicy":"data/component/boot/policy.json","catalog":"data/catalog","commands":"data/core/commands.json","locale":"data/core/locale.json","migration":"data/component/migration/policy.json","paths":"data/core/paths.json","performance":"data/component/performance/policy.json","settings":"data/component/settings/policy.json","statusModes":{"cli":true,"project-entry":true,"project-help":true,"project-keyring":true,"project-languages":true,"project-launch":true,"project-locale-status":true,"project-run-setup":true},"wallpaper":"data/component/wallpaper/policy.json"}

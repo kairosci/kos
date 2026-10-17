@@ -609,3 +609,7 @@ settings.lockDelay=Automatisch sperren nach Sekunden
 settings.screensaverDelay=Bildschirmschoner nach Sekunden
 settings.battery=Akku
 os.dispatcher_version=os Dispatcher %s
+make.launch=Interaktive Einrichtung starten
+make.run_setup=Einrichtung starten und Protokollpfad anzeigen
+make.entry=Einrichtung aus einer Root Sitzung starten
+make.keyring=Unterstützten Schlüsselbund auswählen

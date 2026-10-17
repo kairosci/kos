@@ -19,7 +19,7 @@ done
 
 assert_file_exists "i18n library exists" "$LIB_DIR/i18n.sh"
 assert_file_exists "i18n bootstrap exists" "$LIB_DIR/i18n-boot.sh"
-assert_file_exists "help script exists" "$LIB_DIR/help.sh"
+assert_file_exists "Lua project interface exists" "$PROJECT_DIR/src/component/project/interface.lua"
 assert_true "i18n library leaves caller shell options untouched" \
     "bash -c 'set +e +u; source \"$LIB_DIR/i18n.sh\"; [[ \$- != *e* && \$- != *u* ]]'"
 assert_true "locale map library leaves caller shell options untouched" \
@@ -71,7 +71,7 @@ WARNING_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&
 ERROR_DE=$(OS_LANG=de bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&1; t "__error"' _ "$LIB_DIR")
 UNKNOWN_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&1; t "totally.unknown.key"' _ "$LIB_DIR")
 PKG_IT=$(OS_LANG=it bash -c 'source "$1/i18n.sh"; locale_init >/dev/null 2>&1; t "check.pkg_installed" "thunar"' _ "$LIB_DIR")
-HELP_IT=$(OS_LANG=it bash "$LIB_DIR/help.sh" 2>/dev/null | sed -n 's/^  setup *//p')
+HELP_IT=$(OS_LANG=it "$PROJECT_DIR/script/os-lua" project-help | sed -n 's/^  setup *//p')
 
 eq() { [[ "$1" == "$2" ]]; }
 ne() { [[ -n "$1" && "$1" != "$2" ]]; }
@@ -104,7 +104,7 @@ assert_true "error label is localized"                "eq \"\$ERROR_DE\" 'Fehler
 LIST_IT="$(OS_LANG=it bash "$LIB_DIR/i18n.sh" --list 2>/dev/null)"
 assert_true "engine lists available languages"       "list_contains \"\$LIST_IT\" 'Lingue disponibili'"
 assert_true "engine marks the current language"      "list_marks \"\$LIST_IT\" it '(corrente)'"
-assert_true "make lang target lists languages"       "grep -q 'i18n.sh --list' '$PROJECT_DIR/Makefile'"
+assert_true "make lang target lists languages"       "grep -q 'project-languages' '$PROJECT_DIR/Makefile'"
 BOOT_IT="$(OS_LANG=it bash -c 'SCRIPT_DIR="$1"; source "$2"; t "__complete"' _ "$LIB_DIR" "$LIB_DIR/i18n-boot.sh" 2>/dev/null)"
 BOOT_SANDBOX=$(mktemp -d)
 cp "$LIB_DIR/i18n-boot.sh" "$BOOT_SANDBOX/i18n-boot.sh"
@@ -119,13 +119,11 @@ assert_file_contains "setup.sh sources the i18n library" "$PROJECT_DIR/scripts/s
 assert_file_contains "setup.sh calls locale_init" "$PROJECT_DIR/scripts/setup.sh" "locale_init"
 assert_file_contains "verify.sh sources the i18n library" "$PROJECT_DIR/scripts/verify.sh" "lib/i18n.sh"
 assert_file_contains "verify.sh has a locale section" "$PROJECT_DIR/scripts/verify.sh" "section verify.sec_locale"
-assert_file_contains "run-setup.sh sources the i18n library" "$PROJECT_DIR/scripts/run-setup.sh" "lib/i18n.sh"
-assert_file_contains "launch.sh sources the i18n library" "$PROJECT_DIR/scripts/launch.sh" "lib/i18n.sh"
 assert_file_contains "Makefile exposes lang target" "$PROJECT_DIR/Makefile" "^lang:"
 assert_file_contains "Makefile exposes cli target" "$PROJECT_DIR/Makefile" "^cli:"
 assert_file_contains "Makefile exposes herdr target" "$PROJECT_DIR/Makefile" "^herdr:"
 assert_file_contains "Makefile exposes the canonical editor target" "$PROJECT_DIR/Makefile" "^zed:"
-assert_file_contains "Makefile help is translated" "$PROJECT_DIR/Makefile" "lib/help.sh"
+assert_file_contains "Makefile help is translated" "$PROJECT_DIR/Makefile" "project-help"
 assert_file_contains "Makefile hook target installs the i18n runtime" "$PROJECT_DIR/Makefile" "hooks/i18n"
 
 for installer in "$PROJECT_DIR"/modules/conf/*/install.sh; do

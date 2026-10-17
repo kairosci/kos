@@ -609,3 +609,7 @@ settings.lockDelay=Verrouillage après secondes
 settings.screensaverDelay=Écran de veille après secondes
 settings.battery=Batterie
 os.dispatcher_version=dispatcher os %s
+make.launch=Lancer la configuration interactive
+make.run_setup=Configurer et afficher le chemin du journal
+make.entry=Configurer depuis une session root existante
+make.keyring=Choisir le service de trousseau pris en charge

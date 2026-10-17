@@ -47,8 +47,6 @@ assert_true "tracked Markdown documentation uses prose instead of lists" "[[ '$m
 
 assert_file_executable "scripts/setup.sh is executable" "$PROJECT_DIR/scripts/setup.sh"
 assert_file_executable "scripts/verify.sh is executable" "$PROJECT_DIR/scripts/verify.sh"
-assert_file_executable "scripts/launch.sh is executable" "$PROJECT_DIR/scripts/launch.sh"
-assert_file_executable "scripts/run-setup.sh is executable" "$PROJECT_DIR/scripts/run-setup.sh"
 assert_file_executable "hooks/theme-set.d/folder-color is executable" "$PROJECT_DIR/hooks/theme-set.d/folder-color"
 assert_file_executable "hooks/pre-refresh-pacman.d/99-os-persist is executable" "$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-os-persist"
 assert_file_executable "hooks/post-update.d/99-os-persist is executable" "$PROJECT_DIR/hooks/post-update.d/99-os-persist"
@@ -64,14 +62,10 @@ for mod in "$PROJECT_DIR"/scripts/lib/modules/*.sh; do
 done
 
 assert_file_executable "scripts/lib/i18n.sh is executable" "$PROJECT_DIR/scripts/lib/i18n.sh"
-assert_file_executable "scripts/lib/help.sh is executable" "$PROJECT_DIR/scripts/lib/help.sh"
 assert_true "i18n.sh does not alter caller shell options" "bash -c 'set +e +u; source \"$PROJECT_DIR/scripts/lib/i18n.sh\"; [[ \$- != *e* && \$- != *u* ]]'"
 assert_true "locale-map.sh does not alter caller shell options" "bash -c 'set +e +u; source \"$PROJECT_DIR/scripts/lib/locale-map.sh\"; [[ \$- != *e* && \$- != *u* ]]'"
-assert_file_contains "help.sh uses strict mode" "$PROJECT_DIR/scripts/lib/help.sh" "set -euo pipefail"
 assert_file_contains "setup.sh uses strict mode" "$PROJECT_DIR/scripts/setup.sh" "set -euo pipefail"
 assert_file_contains "verify.sh uses strict mode" "$PROJECT_DIR/scripts/verify.sh" "set -uo pipefail"
-assert_file_contains "launch.sh uses strict mode" "$PROJECT_DIR/scripts/launch.sh" "set -euo pipefail"
-assert_file_contains "run-setup.sh uses strict mode" "$PROJECT_DIR/scripts/run-setup.sh" "set -euo pipefail"
 assert_file_contains "folder-color uses strict mode" "$PROJECT_DIR/hooks/theme-set.d/folder-color" "set -euo pipefail"
 assert_file_contains "pre-refresh persist hook uses strict mode" "$PROJECT_DIR/hooks/pre-refresh-pacman.d/99-os-persist" "set -euo pipefail"
 assert_file_contains "post-update persist hook uses strict mode" "$PROJECT_DIR/hooks/post-update.d/99-os-persist" "set -euo pipefail"

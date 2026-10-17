@@ -96,8 +96,8 @@ assert_file_contains "keyring module masks gnome-keyring" "$PROJECT_DIR/scripts/
 assert_file_contains "keyring module restores GNOME service" "$PROJECT_DIR/scripts/lib/modules/62-keyring.sh" "enable --now"
 assert_file_contains "keyring module selects GNOME backend" "$PROJECT_DIR/scripts/lib/modules/62-keyring.sh" "KEYRING_BACKEND=gnome-keyring"
 assert_file_contains "keyring module provisions Seahorse" "$PROJECT_DIR/scripts/lib/modules/62-keyring.sh" "seahorse"
-assert_file_contains "keyring switch accepts GNOME backend" "$PROJECT_DIR/scripts/keyring-switch.sh" "gnome-keyring)"
-assert_file_contains "Makefile exposes the keyring selection target" "$PROJECT_DIR/Makefile" "scripts/keyring-switch.sh"
+assert_file_contains "keyring switch accepts GNOME backend" "$PROJECT_DIR/data/component/project/policy.json" "gnome-keyring"
+assert_file_contains "Makefile exposes the keyring selection target" "$PROJECT_DIR/Makefile" "project-keyring"
 
 BRANDING_HOME=$(mktemp -d)
 trap 'rm -rf "$BRANDING_HOME"' EXIT

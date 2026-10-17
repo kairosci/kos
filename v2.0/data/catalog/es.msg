@@ -609,3 +609,7 @@ settings.lockDelay=Bloqueo automático tras segundos
 settings.screensaverDelay=Salvapantallas tras segundos
 settings.battery=Batería
 os.dispatcher_version=despachador os %s
+make.launch=Iniciar la configuración interactiva
+make.run_setup=Configurar e indicar el archivo de registro
+make.entry=Configurar desde una sesión root existente
+make.keyring=Seleccionar el servicio de llavero compatible
