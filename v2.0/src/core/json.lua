@@ -1,4 +1,4 @@
-local Json = {null = {}}
+local Json = { null = {} }
 local array = {}
 
 function Json.array(values)
@@ -28,7 +28,8 @@ function Json.decode(source)
             if char == "\\" then
                 local escape = source:sub(position, position)
                 position = position + 1
-                local escapes = {['"']='"', ['\\']='\\', ['/']='/', b='\b', f='\f', n='\n', r='\r', t='\t'}
+                local escapes =
+                    { ['"'] = '"', ["\\"] = "\\", ["/"] = "/", b = "\b", f = "\f", n = "\n", r = "\r", t = "\t" }
                 if escape == "u" then
                     local hex = source:sub(position, position + 3)
                     assert(hex:match("^%x%x%x%x$"), "json_unicode")
@@ -66,7 +67,10 @@ function Json.decode(source)
             local close = object and "}" or "]"
             position = position + 1
             space()
-            if source:sub(position, position) == close then position = position + 1; return result end
+            if source:sub(position, position) == close then
+                position = position + 1
+                return result
+            end
             while true do
                 space()
                 local key = object and string_value() or #result + 1
@@ -84,8 +88,11 @@ function Json.decode(source)
                 assert(separator == ",", "json_separator")
             end
         end
-        for literal, value in pairs({["true"]=true, ["false"]=false, ["null"]=Json.null}) do
-            if source:sub(position, position + #literal - 1) == literal then position = position + #literal; return value end
+        for literal, value in pairs({ ["true"] = true, ["false"] = false, ["null"] = Json.null }) do
+            if source:sub(position, position + #literal - 1) == literal then
+                position = position + #literal
+                return value
+            end
         end
         local token = source:match("^[-+%d.eE]+", position)
         assert(token, "json_value")
@@ -111,23 +118,35 @@ function Json.encode(value)
     if value == Json.null then return "null" end
     local kind = type(value)
     if kind == "string" then
-        return '"' .. value:gsub('[%z\1-\31\\"]', function(char)
-            local escapes = {['"']='\\"', ['\\']='\\\\', ['\n']='\\n', ['\r']='\\r', ['\t']='\\t'}
-            return escapes[char] or string.format("\\u%04x", char:byte())
-        end) .. '"'
+        return '"'
+            .. value:gsub('[%z\1-\31\\"]', function(char)
+                local escapes = { ['"'] = '\\"', ["\\"] = "\\\\", ["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t" }
+                return escapes[char] or string.format("\\u%04x", char:byte())
+            end)
+            .. '"'
     end
     if kind == "boolean" then return tostring(value) end
-    if kind == "number" then assert(value == value and math.abs(value) ~= math.huge, "json_number"); return tostring(value) end
+    if kind == "number" then
+        assert(value == value and math.abs(value) ~= math.huge, "json_number")
+        return tostring(value)
+    end
     assert(kind == "table", "json_type")
     local result = {}
     if Json.isArray(value) then
-        for _, item in ipairs(value) do result[#result + 1] = Json.encode(item) end
+        for _, item in ipairs(value) do
+            result[#result + 1] = Json.encode(item)
+        end
         return "[" .. table.concat(result, ",") .. "]"
     end
     local keys = {}
-    for key in pairs(value) do assert(type(key) == "string", "json_key"); keys[#keys + 1] = key end
+    for key in pairs(value) do
+        assert(type(key) == "string", "json_key")
+        keys[#keys + 1] = key
+    end
     table.sort(keys)
-    for _, key in ipairs(keys) do result[#result + 1] = Json.encode(key) .. ":" .. Json.encode(value[key]) end
+    for _, key in ipairs(keys) do
+        result[#result + 1] = Json.encode(key) .. ":" .. Json.encode(value[key])
+    end
     return "{" .. table.concat(result, ",") .. "}"
 end
 

@@ -4,26 +4,34 @@ local Gtk = {}
 Gtk.__index = Gtk
 
 function Gtk.new(root, paths, publisher, process, registry)
-    return setmetatable({root=root, paths=paths, publisher=publisher, process=process, registry=registry}, Gtk)
+    return setmetatable(
+        { root = root, paths = paths, publisher = publisher, process = process, registry = registry },
+        Gtk
+    )
 end
 
 local function read_sources(root, policy, process)
     local sources = {
-        {policy.adapterSource, policy.adapterDestination, "config", "644"},
-        {policy.paletteSource, policy.paletteDestination, "data", "644"}
+        { policy.adapterSource, policy.adapterDestination, "config", "644" },
+        { policy.paletteSource, policy.paletteDestination, "data", "644" },
     }
     local files = {}
-    local listed, status = process:capture("findFiles", {root .. "/" .. policy.iconSource, "-maxdepth", "1", "-type", "f", "-print0"})
+    local listed, status =
+        process:capture("findFiles", { root .. "/" .. policy.iconSource, "-maxdepth", "1", "-type", "f", "-print0" })
     assert(status == 0, "gtk_icon_inventory_failed")
-    for path in listed:gmatch("[^%z]+") do files[#files + 1] = path end
+    for path in listed:gmatch("[^%z]+") do
+        files[#files + 1] = path
+    end
     table.sort(files)
     assert(#files > 0, "gtk_icon_inventory_empty")
     for _, path in ipairs(files) do
         local name = assert(path:match("([^/]+)$"), "gtk_icon_name_invalid")
-        sources[#sources + 1] = {path:sub(#root + 2), policy.iconDestination .. "/" .. name, "config", "644"}
+        sources[#sources + 1] = { path:sub(#root + 2), policy.iconDestination .. "/" .. name, "config", "644" }
     end
     local content = {}
-    for _, item in ipairs(sources) do content[#content + 1] = {item[1], item[2], item[3], item[4], File.read(root .. "/" .. item[1])} end
+    for _, item in ipairs(sources) do
+        content[#content + 1] = { item[1], item[2], item[3], item[4], File.read(root .. "/" .. item[1]) }
+    end
     return content
 end
 
@@ -32,7 +40,7 @@ function Gtk:archive(path, target, expected)
     local content = self.publisher:inspect(source)
     if not content or not content:find(expected, 1, true) then return end
     self.publisher:publish(self.paths:resolve("config", target), content, "644")
-    self.process:run("removeFile", {source})
+    self.process:run("removeFile", { source })
 end
 
 function Gtk:retire_legacy(policy)
@@ -44,7 +52,7 @@ function Gtk:retire_legacy(policy)
         local generatorContent = self.publisher:inspect(generator)
         if generatorContent then
             self.publisher:publish(self.paths:resolve("config", policy.legacyGeneratorArchive), generatorContent, "644")
-            self.process:run("removeFile", {generator})
+            self.process:run("removeFile", { generator })
         end
         self:archive(policy.legacyUpdate, policy.legacyUpdateArchive, policy.legacyUpdateCommand)
     end
@@ -54,13 +62,22 @@ function Gtk:apply(name)
     local policy = assert(self.registry[name], "unknown_application")
     assert(policy.kind == "gtk", "unsupported_gtk_integration")
     local sources = read_sources(self.root, policy, self.process)
-    local roots = {config=self.paths:resolve("config", ""), data=self.paths:resolve("data", "")}
-    for _, relative in ipairs({policy.adapterDestination:match("^(.*)/[^/]+$"), policy.iconDestination, policy.legacyHook:match("^(.*)/[^/]+$"), policy.legacyHookArchive:match("^(.*)/[^/]+$"), policy.legacyGenerator:match("^(.*)/[^/]+$"), policy.legacyGeneratorArchive:match("^(.*)/[^/]+$"), policy.legacyUpdate:match("^(.*)/[^/]+$"), policy.legacyUpdateArchive:match("^(.*)/[^/]+$")}) do
+    local roots = { config = self.paths:resolve("config", ""), data = self.paths:resolve("data", "") }
+    for _, relative in ipairs({
+        policy.adapterDestination:match("^(.*)/[^/]+$"),
+        policy.iconDestination,
+        policy.legacyHook:match("^(.*)/[^/]+$"),
+        policy.legacyHookArchive:match("^(.*)/[^/]+$"),
+        policy.legacyGenerator:match("^(.*)/[^/]+$"),
+        policy.legacyGeneratorArchive:match("^(.*)/[^/]+$"),
+        policy.legacyUpdate:match("^(.*)/[^/]+$"),
+        policy.legacyUpdateArchive:match("^(.*)/[^/]+$"),
+    }) do
         self.paths:guardDirectory(self.process, roots.config, relative)
     end
     self.paths:guardDirectory(self.process, roots.data, policy.paletteDestination:match("^(.*)/[^/]+$"))
     local settings = require("component.application.settings").new(self.root, self.process, {
-        [name]={kind="settings", settings=policy.settings, display=policy.display}
+        [name] = { kind = "settings", settings = policy.settings, display = policy.display },
     })
     local content = self.publisher:inspect(self.paths:resolve("config", policy.hyprland))
     local mode = "644"

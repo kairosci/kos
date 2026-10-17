@@ -7,7 +7,7 @@ function Ini.merge(desired, current)
         if heading then
             section = heading
             assert(not sections[section], "duplicate_ini_section")
-            sections[section] = {keys={}, values={}}
+            sections[section] = { keys = {}, values = {} }
             order[#order + 1] = section
         else
             local key = line:match("^([^#;=]+)=")
@@ -23,7 +23,9 @@ function Ini.merge(desired, current)
     local function emit(name)
         local policy = sections[name]
         if not policy or emitted[name] then return end
-        for _, key in ipairs(policy.keys) do output[#output + 1] = policy.values[key] end
+        for _, key in ipairs(policy.keys) do
+            output[#output + 1] = policy.values[key]
+        end
         emitted[name] = true
     end
     section = ""
@@ -39,9 +41,14 @@ function Ini.merge(desired, current)
             if not (key and sections[section] and sections[section].values[key]) then output[#output + 1] = line end
         end
     end
-    while output[#output] == "" do output[#output] = nil end
+    while output[#output] == "" do
+        output[#output] = nil
+    end
     for _, name in ipairs(order) do
-        if not emitted[name] then output[#output + 1] = "[" .. name .. "]"; emit(name) end
+        if not emitted[name] then
+            output[#output + 1] = "[" .. name .. "]"
+            emit(name)
+        end
     end
     return table.concat(output, "\n") .. "\n"
 end

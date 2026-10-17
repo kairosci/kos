@@ -4,14 +4,21 @@ local Keybindings = {}
 Keybindings.__index = Keybindings
 
 function Keybindings.new(root, paths, publisher, process, catalog, registry)
-    return setmetatable({root=root, paths=paths, publisher=publisher, process=process, catalog=catalog, registry=registry}, Keybindings)
+    return setmetatable(
+        { root = root, paths = paths, publisher = publisher, process = process, catalog = catalog, registry = registry },
+        Keybindings
+    )
 end
 
 function Keybindings:apply(name)
     local policy = assert(self.registry[name], "unknown_application")
     assert(policy.kind == "keybindings", "unsupported_keybindings")
     local menu = self.paths:resolve("data", policy.menuDestination)
-    self.paths:guardDirectory(self.process, self.paths:resolve("data", ""), policy.menuDestination:match("^(.*)/[^/]+$"))
+    self.paths:guardDirectory(
+        self.process,
+        self.paths:resolve("data", ""),
+        policy.menuDestination:match("^(.*)/[^/]+$")
+    )
     self.publisher:publish(menu, File.read(self.root .. "/" .. policy.menuSource), policy.menuMode)
 
     local destination = self.paths:resolve("config", policy.bindings)

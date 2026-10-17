@@ -5,7 +5,7 @@ local Environment = {}
 Environment.__index = Environment
 
 function Environment.new(process, paths, publisher, policy)
-    return setmetatable({process=process, paths=paths, publisher=publisher, policy=policy}, Environment)
+    return setmetatable({ process = process, paths = paths, publisher = publisher, policy = policy }, Environment)
 end
 
 function Environment:apply(deferred)
@@ -22,18 +22,26 @@ function Environment:apply(deferred)
         exports[#exports + 1] = policy.environment.exportPrefix .. name .. "=" .. tostring(value)
     end
     assert(#entries > 0, "empty_build_environment")
-    table.sort(entries); table.sort(exports)
+    table.sort(entries)
+    table.sort(exports)
     local shell = self.paths:resolve(policy.environment.shellRoot, policy.environment.shellFile)
     local handle, failure, code = io.open(shell, "rb")
     local content, mode
     if handle then
-        content = assert(handle:read("a")); assert(handle:close())
+        content = assert(handle:read("a"))
+        assert(handle:close())
         content = Blocks.merge(content, policy.environment.first, policy.environment.last, table.concat(exports, "\n"))
-        local metadata = assert(tonumber(self.process:run("fileMode", {shell}), 16))
+        local metadata = assert(tonumber(self.process:run("fileMode", { shell }), 16))
         assert(metadata & 0xF000 == 0x8000, "nonregular_shell_configuration")
         mode = ("%o"):format(metadata & 0xFFF)
-    else assert(code == 2, failure) end
-    self.publisher:publish(self.paths:resolve(policy.environment.root, policy.environment.file), table.concat(entries, "\n") .. "\n", policy.environment.mode)
+    else
+        assert(code == 2, failure)
+    end
+    self.publisher:publish(
+        self.paths:resolve(policy.environment.root, policy.environment.file),
+        table.concat(entries, "\n") .. "\n",
+        policy.environment.mode
+    )
     if content then self.publisher:publish(shell, content, mode) end
     if not deferred then self.process:run("userEnvironment", entries) end
 end

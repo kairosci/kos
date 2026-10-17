@@ -3,7 +3,7 @@ local Settings = {}
 Settings.__index = Settings
 
 function Settings.new(root, process, registry)
-    return setmetatable({root=assert(root), process=assert(process), registry=assert(registry)}, Settings)
+    return setmetatable({ root = assert(root), process = assert(process), registry = assert(registry) }, Settings)
 end
 
 function Settings:apply(name)
@@ -13,12 +13,17 @@ function Settings:apply(name)
     if policy.schemaSelection then
         local available = "\n" .. self.process:run("gsettings", policy.schemaSelection.command) .. "\n"
         for _, schema in ipairs(policy.schemaSelection.schemas) do
-            if available:find("\n" .. schema .. "\n", 1, true) then selected = schema; break end
+            if available:find("\n" .. schema .. "\n", 1, true) then
+                selected = schema
+                break
+            end
         end
         assert(selected, "unsupported_application_schema")
     end
     local source = File.read(self.root .. "/" .. policy.settings)
-    if selected and selected == policy.schemaSelection.original then source = source .. "\n" .. File.read(self.root .. "/" .. policy.schemaSelection.legacy) end
+    if selected and selected == policy.schemaSelection.original then
+        source = source .. "\n" .. File.read(self.root .. "/" .. policy.schemaSelection.legacy)
+    end
     local rows, seen = {}, {}
     for line in source:gmatch("[^\r\n]+") do
         local schema, key, value = line:match("^([^\t]+)\t([^\t]+)\t([^\t]+)$")
@@ -27,10 +32,12 @@ function Settings:apply(name)
         local identity = schema .. ":" .. key
         assert(not seen[identity], "duplicate_setting")
         seen[identity] = true
-        rows[#rows + 1] = {"set", schema, key, value}
+        rows[#rows + 1] = { "set", schema, key, value }
     end
     assert(#rows > 0, "empty_settings")
-    for _, arguments in ipairs(rows) do self.process:run("gsettings", arguments) end
+    for _, arguments in ipairs(rows) do
+        self.process:run("gsettings", arguments)
+    end
     return policy.display
 end
 

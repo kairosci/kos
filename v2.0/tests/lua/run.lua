@@ -10,13 +10,18 @@ local Suite = {}
 Suite.__index = Suite
 
 function Suite.new()
-    return setmetatable({passed=0, failed=0}, Suite)
+    return setmetatable({ passed = 0, failed = 0 }, Suite)
 end
 
 function Suite:test(name, callback)
     local ok, failure = pcall(callback)
-    if ok then self.passed = self.passed + 1; print("  pass " .. name)
-    else self.failed = self.failed + 1; print("  fail " .. name .. ": " .. tostring(failure)) end
+    if ok then
+        self.passed = self.passed + 1
+        print("  pass " .. name)
+    else
+        self.failed = self.failed + 1
+        print("  fail " .. name .. ": " .. tostring(failure))
+    end
 end
 
 function Suite:reject(callback)
@@ -24,7 +29,13 @@ function Suite:reject(callback)
 end
 
 function Suite:finish()
-    print(("Summary: Tests Executed: %d | Passed: %d | Failed: %d | Warnings: 0"):format(self.passed + self.failed, self.passed, self.failed))
+    print(
+        ("Summary: Tests Executed: %d | Passed: %d | Failed: %d | Warnings: 0"):format(
+            self.passed + self.failed,
+            self.passed,
+            self.failed
+        )
+    )
     os.exit(self.failed == 0 and 0 or 1)
 end
 
@@ -33,7 +44,11 @@ local process = Process.new(File.json(root .. "/data/core/commands.json"))
 local menu = Menu.new(process, File.json(root .. "/data/component/boot/render.json"))
 local policy = File.json(root .. "/data/component/boot/policy.json").menu
 local function source(path, command)
-    return "/Arch\n //linux\n protocol: efi\n path: boot():" .. path .. "\n cmdline: " .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor") .. "\n"
+    return "/Arch\n //linux\n protocol: efi\n path: boot():"
+        .. path
+        .. "\n cmdline: "
+        .. (command or "cryptdevice=fixture root=/dev/mapper/root rootflags=subvol=@ resume_offset=123 lsm=apparmor")
+        .. "\n"
 end
 
 if arg[2] == "repository" then
@@ -85,7 +100,9 @@ elseif arg[2] == "json" then
         assert(inventory:classify("module/tool", "#!/bin/sh\nexit 0\n") == "shell")
         assert(inventory:classify("module/test.rb", "") == "ruby")
         assert(inventory:classify("data/hidden.sh", "") == "shell")
-        suite:reject(function() inventory:classify("v2.0/script/os-lua", "#!/bin/bash\nbash legacy.sh\n") end)
+        suite:reject(function()
+            inventory:classify("v2.0/script/os-lua", "#!/bin/bash\nbash legacy.sh\n")
+        end)
     end)
     suite:test("versioned entry points preserve the entire repository migration inventory", function()
         local Inventory = require("component.migration.inventory")
@@ -107,17 +124,31 @@ elseif arg[2] == "json" then
         local repository = Inventory.new(root, process, File.json(root .. "/data/component/migration/policy.json")).root
         local layout = File.json(root .. "/data/component/migration/layout.json")
         local native, links = {}, {}
-        for _, path in ipairs(layout.nativeFiles) do native[path] = true end
-        for _, path in ipairs(layout.links) do links[path] = true end
-        local files = process:run("repositoryFiles", {"-c", "safe.directory=" .. repository, "-C", repository, "ls-files", "-z"})
+        for _, path in ipairs(layout.nativeFiles) do
+            native[path] = true
+        end
+        for _, path in ipairs(layout.links) do
+            links[path] = true
+        end
+        local files = process:run(
+            "repositoryFiles",
+            { "-c", "safe.directory=" .. repository, "-C", repository, "ls-files", "-z" }
+        )
         for path in files:gmatch("[^%z]+") do
-            local allowed = path:sub(1, #layout.active) == layout.active or path:sub(1, #layout.archive) == layout.archive or native[path]
-            for _, prefix in ipairs(layout.nativeDirectories) do if path:sub(1, #prefix) == prefix then allowed = true end end
+            local allowed = path:sub(1, #layout.active) == layout.active
+                or path:sub(1, #layout.archive) == layout.archive
+                or native[path]
+            for _, prefix in ipairs(layout.nativeDirectories) do
+                if path:sub(1, #prefix) == prefix then allowed = true end
+            end
             if links[path] then
-                local mode = tonumber(process:run("fileMode", {repository .. "/" .. path}), 16)
+                local mode = tonumber(process:run("fileMode", { repository .. "/" .. path }), 16)
                 assert(mode and mode & 0xF000 == 0xA000, "root_entry_must_be_link_" .. path)
-                local target = process:run("realpath", {repository .. "/" .. path}):gsub("\n$", "")
-                assert(target:sub(1, #repository + #layout.active + 1) == repository .. "/" .. layout.active, "root_entry_escapes_active_tree_" .. path)
+                local target = process:run("realpath", { repository .. "/" .. path }):gsub("\n$", "")
+                assert(
+                    target:sub(1, #repository + #layout.active + 1) == repository .. "/" .. layout.active,
+                    "root_entry_escapes_active_tree_" .. path
+                )
                 allowed = true
             end
             assert(allowed, "unversioned_project_content_" .. path)
@@ -130,84 +161,130 @@ elseif arg[2] == "json" then
         assert(Editor.plan("MemTotal: 16777216 kB\n", 12, policy).workers == 4)
         assert(Editor.plan("MemTotal: 67108864 kB\n", 32, policy).workers == policy.maximumWorkers)
         assert(Editor.plan("MemTotal: 16777216 kB\n", 1, policy).workers == 1)
-        suite:reject(function() Editor.plan("invalid", 12, policy) end)
-        suite:reject(function() Editor.plan("MemTotal: 100 kB\n", 0, policy) end)
+        suite:reject(function()
+            Editor.plan("invalid", 12, policy)
+        end)
+        suite:reject(function()
+            Editor.plan("MemTotal: 100 kB\n", 0, policy)
+        end)
     end)
     suite:test("performance settings preserve unrelated language server options", function()
         local Editor = require("component.performance.editor")
-        local settings = Json.decode([[{"lsp":{"rust-analyzer":{"initialization_options":{"cargo":{"extraEnv":{"PERSONAL":"keep"}},"checkOnSave":true}}},"personal":[1,2]}]])
-        Editor.assign(settings, {"lsp","rust-analyzer","initialization_options","cargo","extraEnv","CARGO_BUILD_JOBS"}, "3")
+        local settings = Json.decode(
+            [[{"lsp":{"rust-analyzer":{"initialization_options":{"cargo":{"extraEnv":{"PERSONAL":"keep"}},"checkOnSave":true}}},"personal":[1,2]}]]
+        )
+        Editor.assign(
+            settings,
+            { "lsp", "rust-analyzer", "initialization_options", "cargo", "extraEnv", "CARGO_BUILD_JOBS" },
+            "3"
+        )
         local options = settings.lsp["rust-analyzer"].initialization_options
         assert(options.cargo.extraEnv.PERSONAL == "keep" and options.checkOnSave == true)
         assert(settings.personal[2] == 2 and options.cargo.extraEnv.CARGO_BUILD_JOBS == "3")
-        suite:reject(function() Editor.assign({lsp=false}, {"lsp","rust-analyzer"}, {}) end)
+        suite:reject(function()
+            Editor.assign({ lsp = false }, { "lsp", "rust-analyzer" }, {})
+        end)
     end)
     suite:test("managed blocks preserve personal text and reject incomplete boundaries", function()
         local Blocks = require("core.blocks")
         local result = Blocks.merge("export PERSONAL=1\n", "# begin", "# end", "export CARGO_BUILD_JOBS=3")
         assert(result:find("export PERSONAL=1", 1, true))
         assert(Blocks.merge(result, "# begin", "# end", "export CARGO_BUILD_JOBS=3") == result)
-        suite:reject(function() Blocks.merge("# begin\n", "# begin", "# end", "value") end)
-        suite:reject(function() Blocks.merge("# end\n", "# begin", "# end", "value") end)
+        suite:reject(function()
+            Blocks.merge("# begin\n", "# begin", "# end", "value")
+        end)
+        suite:reject(function()
+            Blocks.merge("# end\n", "# begin", "# end", "value")
+        end)
     end)
     suite:test("build environment persists calculated limits without using the real session bus", function()
         local Environment = require("component.performance.environment")
         local Paths = require("core.paths")
-        local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
+        local directory = process:run("temporary", { "-d" }):gsub("\n$", "")
         local policy = File.json(root .. "/data/component/performance/policy.json")
         policy.memoryInfo = directory .. "/memory"
         local publisher = Publisher.new(process)
         publisher:publish(policy.memoryInfo, "MemTotal: 16777216 kB\n", "600")
         publisher:publish(directory .. "/.bashrc", "export PERSONAL=1\n", "600")
-        local paths = Paths.new(File.json(root .. "/data/core/paths.json"), function(key) if key == "HOME" then return directory end end)
+        local paths = Paths.new(File.json(root .. "/data/core/paths.json"), function(key)
+            if key == "HOME" then return directory end
+        end)
         local activations = 0
-        local backend = {run=function(_, command, arguments)
-            if command == "processorCount" then return "12\n"
-            elseif command == "userEnvironment" then
-                assert(#arguments == 1 and arguments[1] == "CARGO_BUILD_JOBS=4")
-                activations = activations + 1
-                return ""
-            end
-            return process:run(command, arguments)
-        end}
+        local backend = {
+            run = function(_, command, arguments)
+                if command == "processorCount" then
+                    return "12\n"
+                elseif command == "userEnvironment" then
+                    assert(#arguments == 1 and arguments[1] == "CARGO_BUILD_JOBS=4")
+                    activations = activations + 1
+                    return ""
+                end
+                return process:run(command, arguments)
+            end,
+        }
         local instance = Environment.new(backend, paths, publisher, policy)
-        process:run("permissions", {"755", directory})
+        process:run("permissions", { "755", directory })
         instance:apply()
-        assert(tonumber(process:run("fileMode", {directory}), 16) & 0x1FF == tonumber("750", 8))
+        assert(tonumber(process:run("fileMode", { directory }), 16) & 0x1FF == tonumber("750", 8))
         local shell = File.read(directory .. "/.bashrc")
         assert(shell:find("export PERSONAL=1", 1, true) and shell:find("export CARGO_BUILD_JOBS=4", 1, true))
-        assert(tonumber(process:run("fileMode", {directory .. "/.bashrc"}), 16) & 0x1FF == 0x180)
-        process:run("permissions", {"700", directory})
+        assert(tonumber(process:run("fileMode", { directory .. "/.bashrc" }), 16) & 0x1FF == 0x180)
+        process:run("permissions", { "700", directory })
         instance:apply()
-        assert(tonumber(process:run("fileMode", {directory}), 16) & 0x1FF == tonumber("700", 8))
+        assert(tonumber(process:run("fileMode", { directory }), 16) & 0x1FF == tonumber("700", 8))
         assert(File.read(directory .. "/.bashrc") == shell and activations == 2)
         instance:apply(true)
         assert(activations == 2)
         local destination = paths:resolve(policy.environment.root, policy.environment.file)
         local before = File.read(destination)
         publisher:publish(directory .. "/.bashrc", policy.environment.first .. "\n", "600")
-        suite:reject(function() instance:apply() end)
+        suite:reject(function()
+            instance:apply()
+        end)
         assert(File.read(destination) == before and activations == 2)
-        process:run("removeDirectory", {directory})
+        process:run("removeDirectory", { directory })
     end)
     suite:test("JSON round trips arrays false null and Unicode", function()
         local value = Json.decode([[{"values":[false,null,"\uD83D\uDE00",1.25e2]}]])
-        assert(value.values[1] == false and value.values[2] == Json.null and value.values[3] == "😀" and value.values[4] == 125)
+        assert(
+            value.values[1] == false
+                and value.values[2] == Json.null
+                and value.values[3] == "😀"
+                and value.values[4] == 125
+        )
         assert(Json.encode(Json.decode(Json.encode(value))) == Json.encode(value))
     end)
-    for _, invalid in ipairs({'{"key":1,"key":2}', '[1,]', '01', '+1', '1.', '1e+', 'true false', '"\\uD800"', '"\\x"', '{"x" 1}', '"raw\nline"'}) do
-        suite:test("JSON rejects invalid input " .. Json.encode(invalid), function() suite:reject(function() Json.decode(invalid) end) end)
+    for _, invalid in ipairs({
+        '{"key":1,"key":2}',
+        "[1,]",
+        "01",
+        "+1",
+        "1.",
+        "1e+",
+        "true false",
+        '"\\uD800"',
+        '"\\x"',
+        '{"x" 1}',
+        '"raw\nline"',
+    }) do
+        suite:test("JSON rejects invalid input " .. Json.encode(invalid), function()
+            suite:reject(function()
+                Json.decode(invalid)
+            end)
+        end)
     end
     suite:test("process argument quoting never executes shell substitutions", function()
-        local runner = Process.new({print={"/usr/bin/printf", "%s"}})
+        local runner = Process.new({ print = { "/usr/bin/printf", "%s" } })
         local argument = "a' b $(exit 43); `exit 44`"
-        assert(runner:run("print", {argument}) == argument)
+        assert(runner:run("print", { argument }) == argument)
     end)
     suite:test("failed native processes propagate", function()
-        local runner = Process.new({fail={"/usr/bin/false"}})
-        suite:reject(function() runner:run("fail") end)
+        local runner = Process.new({ fail = { "/usr/bin/false" } })
+        suite:reject(function()
+            runner:run("fail")
+        end)
         assert(runner:status("fail") == 1)
-        local exits = Process.new({exit={"/usr/bin/sh", "-c", "exit 37"}})
+        local exits = Process.new({ exit = { "/usr/bin/sh", "-c", "exit 37" } })
         assert(exits:status("exit") == 37)
     end)
 elseif arg[2] == "catalog" then
@@ -215,17 +292,26 @@ elseif arg[2] == "catalog" then
     for _, language in ipairs(locale.languages) do
         suite:test("catalog selects " .. language .. " with environment precedence", function()
             local catalog = Catalog.new(locale, root .. "/data/catalog", function(key)
-                return ({OS_LANG=language .. "_XX.UTF-8", LANG="de_DE.UTF-8"})[key]
+                return ({ OS_LANG = language .. "_XX.UTF-8", LANG = "de_DE.UTF-8" })[key]
             end)
-            assert(catalog.language == language and catalog:text("boot.validation_failed", "invalid_efi"):find("invalid_efi", 1, true))
+            assert(
+                catalog.language == language
+                    and catalog:text("boot.validation_failed", "invalid_efi"):find("invalid_efi", 1, true)
+            )
         end)
     end
     suite:test("unknown translation keys fail explicitly", function()
-        local catalog = Catalog.new(locale, root .. "/data/catalog", function() return "en" end)
-        suite:reject(function() catalog:text("missing.key") end)
+        local catalog = Catalog.new(locale, root .. "/data/catalog", function()
+            return "en"
+        end)
+        suite:reject(function()
+            catalog:text("missing.key")
+        end)
     end)
     suite:test("unsupported language follows explicit locale policy", function()
-        local catalog = Catalog.new(locale, root .. "/data/catalog", function() return "xx" end)
+        local catalog = Catalog.new(locale, root .. "/data/catalog", function()
+            return "xx"
+        end)
         assert(catalog.language == locale.default)
     end)
 elseif arg[2] == "applications" then
@@ -233,28 +319,34 @@ elseif arg[2] == "applications" then
     local registry = File.json(root .. "/data/component/application/policy.json")
     for name, policy_entry in pairs(registry) do
         if policy_entry.kind == "settings" then
-        suite:test("Lua applies every declared setting for " .. name, function()
-            local calls = {}
-            local backend = {run=function(_, command, arguments)
-                if arguments[1] == "list-schemas" then return "org.gnome.Resources\n" end
-                assert(command == "gsettings" and arguments[1] == "set" and #arguments == 4)
-                calls[#calls + 1] = table.concat(arguments, "\t")
-                return ""
-            end}
-            assert(Settings.new(root, backend, registry):apply(name) == policy_entry.display)
-            local lines = File.list(root .. "/" .. policy_entry.settings)
-            assert(#calls == #lines)
-            for index, line in ipairs(lines) do
-                if policy_entry.schemaSelection then line = line:gsub("net.nokyan.Resources", "org.gnome.Resources", 1) end
-                assert(calls[index] == "set\t" .. line)
-            end
-        end)
+            suite:test("Lua applies every declared setting for " .. name, function()
+                local calls = {}
+                local backend = {
+                    run = function(_, command, arguments)
+                        if arguments[1] == "list-schemas" then return "org.gnome.Resources\n" end
+                        assert(command == "gsettings" and arguments[1] == "set" and #arguments == 4)
+                        calls[#calls + 1] = table.concat(arguments, "\t")
+                        return ""
+                    end,
+                }
+                assert(Settings.new(root, backend, registry):apply(name) == policy_entry.display)
+                local lines = File.list(root .. "/" .. policy_entry.settings)
+                assert(#calls == #lines)
+                for index, line in ipairs(lines) do
+                    if policy_entry.schemaSelection then
+                        line = line:gsub("net.nokyan.Resources", "org.gnome.Resources", 1)
+                    end
+                    assert(calls[index] == "set\t" .. line)
+                end
+            end)
         end
     end
     local Files = require("component.application.files")
     local Paths = require("core.paths")
-    local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
-    local paths = Paths.new(File.json(root .. "/data/core/paths.json"), function(key) if key == "HOME" then return directory end end)
+    local directory = process:run("temporary", { "-d" }):gsub("\n$", "")
+    local paths = Paths.new(File.json(root .. "/data/core/paths.json"), function(key)
+        if key == "HOME" then return directory end
+    end)
     local publisher = Publisher.new(process)
     suite:test("Lua installs native browser flags with a backup of existing preferences", function()
         local destination = paths:resolve("config", registry.brave.destination)
@@ -262,20 +354,24 @@ elseif arg[2] == "applications" then
         Files.new(root, paths, publisher, process, registry):apply("brave")
         assert(File.read(destination) == File.read(root .. "/" .. registry.brave.source))
         assert(File.read(destination .. ".bak") == "--personal\n")
-        assert(os.remove(destination)); assert(os.remove(destination .. ".bak"))
+        assert(os.remove(destination))
+        assert(os.remove(destination .. ".bak"))
     end)
     suite:test("Lua Electron integration preserves every packaged action and argument", function()
         local source = directory .. "/fixture.desktop"
-        local native = "[Desktop Entry]\nType=Application\nExec=/usr/bin/sample --original %U\n[Desktop Action New]\nExec=/usr/bin/sample --new %F\n"
+        local native =
+            "[Desktop Entry]\nType=Application\nExec=/usr/bin/sample --original %U\n[Desktop Action New]\nExec=/usr/bin/sample --new %F\n"
         publisher:publish(source, native, "644")
         local definition = Json.decode(Json.encode(registry.slack))
         definition.source = source
         local refreshed = 0
-        local backend = {run=function(_, command, arguments)
-            assert(command == "desktopDatabase" and arguments[1] == paths:resolve("data", "applications"))
-            refreshed = refreshed + 1
-        end}
-        local files = Files.new(root, paths, publisher, backend, {fixture=definition})
+        local backend = {
+            run = function(_, command, arguments)
+                assert(command == "desktopDatabase" and arguments[1] == paths:resolve("data", "applications"))
+                refreshed = refreshed + 1
+            end,
+        }
+        local files = Files.new(root, paths, publisher, backend, { fixture = definition })
         files:apply("fixture")
         local destination = paths:resolve("data", definition.destination)
         local content = File.read(destination)
@@ -284,10 +380,11 @@ elseif arg[2] == "applications" then
         assert(not content:find("ozone-platform", 1, true))
         files:apply("fixture")
         assert(File.read(destination) == content and refreshed == 2)
-        assert(os.remove(destination)); assert(os.remove(source))
+        assert(os.remove(destination))
+        assert(os.remove(source))
     end)
     local Desktop = require("component.application.desktop")
-    local desktopDirectory = process:run("temporary", {"-d"}):gsub("\n$", "")
+    local desktopDirectory = process:run("temporary", { "-d" }):gsub("\n$", "")
     local desktopPaths = Paths.new(File.json(root .. "/data/core/paths.json"), function(variable)
         if variable == "HOME" then return desktopDirectory end
         return ""
@@ -295,85 +392,149 @@ elseif arg[2] == "applications" then
     local desktopPolicy = File.json(root .. "/data/component/application/desktop/policy.json")
     local desktopCatalog = Catalog.new(File.json(root .. "/data/core/locale.json"), root .. "/data/catalog")
     local desktopCommands = {}
-    local desktopProcess = setmetatable({}, {__index=function(_, method)
-        return function(_, command, arguments)
-            desktopCommands[command] = true
-            return process[method](process, command, arguments)
-        end
-    end})
+    local desktopProcess = setmetatable({}, {
+        __index = function(_, method)
+            return function(_, command, arguments)
+                desktopCommands[command] = true
+                return process[method](process, command, arguments)
+            end
+        end,
+    })
     local desktop = function()
         return Desktop.new(root, desktopPaths, publisher, desktopProcess, desktopCatalog, desktopPolicy)
     end
     suite:test("Lua desktop integration retires managed shell helpers and hooks", function()
         local home = desktopPaths:resolve("home", ".bashrc")
-        publisher:publish(home, "export PERSONAL=1\n" .. desktopPolicy.shell.blocks[1].first .. "\nfunction mh() { printf old; }\n" .. desktopPolicy.shell.blocks[1].last .. "\n" .. desktopPolicy.shell.blocks[2].first .. "\nfunction dh() { printf old; }\n" .. desktopPolicy.shell.blocks[2].last .. "\n", "600")
-        for _, name in ipairs({"micro-theme", "disk-theme", "gtk-theme"}) do
-            publisher:publish(desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/" .. name), "hook\n", "755")
+        publisher:publish(
+            home,
+            "export PERSONAL=1\n"
+                .. desktopPolicy.shell.blocks[1].first
+                .. "\nfunction mh() { printf old; }\n"
+                .. desktopPolicy.shell.blocks[1].last
+                .. "\n"
+                .. desktopPolicy.shell.blocks[2].first
+                .. "\nfunction dh() { printf old; }\n"
+                .. desktopPolicy.shell.blocks[2].last
+                .. "\n",
+            "600"
+        )
+        for _, name in ipairs({ "micro-theme", "disk-theme", "gtk-theme" }) do
+            publisher:publish(
+                desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/" .. name),
+                "hook\n",
+                "755"
+            )
         end
-        publisher:publish(desktopPaths:resolve("config", "os/branding/screensaver.txt"), "old screensaver logo\n", "644")
+        publisher:publish(
+            desktopPaths:resolve("config", "os/branding/screensaver.txt"),
+            "old screensaver logo\n",
+            "644"
+        )
         publisher:publish(desktopPaths:resolve("config", "os/branding/about.txt"), "old About logo\n", "644")
         publisher:publish(desktopPaths:resolve("state", "omarchy/toggles/screensaver-off"), "", "644")
         assert(desktop():apply() == desktopPolicy.display)
         local shell = File.read(home)
         assert(shell:find("export PERSONAL=1", 1, true))
         assert(not shell:find("function mh", 1, true) and not shell:find("function dh", 1, true))
-        assert(tonumber(process:run("fileMode", {home}), 16) & 0x1FF == tonumber("600", 8))
-        assert(File.read(desktopPaths:resolve("data", desktopPolicy.launcher.destination)):find("[Desktop Entry]", 1, true))
-        assert(File.read(desktopPaths:resolve("config", "os/branding/screensaver.txt")) == File.read(root .. "/" .. desktopPolicy.restore.brandingSource))
+        assert(tonumber(process:run("fileMode", { home }), 16) & 0x1FF == tonumber("600", 8))
+        assert(
+            File.read(desktopPaths:resolve("data", desktopPolicy.launcher.destination)):find("[Desktop Entry]", 1, true)
+        )
+        assert(
+            File.read(desktopPaths:resolve("config", "os/branding/screensaver.txt"))
+                == File.read(root .. "/" .. desktopPolicy.restore.brandingSource)
+        )
         assert(File.read(desktopPaths:resolve("config", "os/branding/screensaver.txt.bak")) == "old screensaver logo\n")
         for _, name in ipairs(desktopPolicy.retiredHooks.names) do
-            assert(not io.open(desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/" .. name), "rb"))
+            assert(
+                not io.open(desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/" .. name), "rb")
+            )
         end
         assert(io.open(desktopPaths:resolve("config", desktopPolicy.retiredHooks.directory .. "/gtk-theme"), "rb"))
         assert(not io.open(desktopPaths:resolve("state", "omarchy/toggles/screensaver-off"), "rb"))
-        local before = process:run("digest", {home}) .. process:run("digest", {desktopPaths:resolve("data", desktopPolicy.launcher.destination)})
+        local before = process:run("digest", { home })
+            .. process:run("digest", { desktopPaths:resolve("data", desktopPolicy.launcher.destination) })
         assert(desktop():apply())
-        assert(before == process:run("digest", {home}) .. process:run("digest", {desktopPaths:resolve("data", desktopPolicy.launcher.destination)}))
+        assert(
+            before
+                == process:run("digest", { home })
+                    .. process:run("digest", { desktopPaths:resolve("data", desktopPolicy.launcher.destination) })
+        )
         assert(not desktopCommands.desktopDatabase, "desktop_database_dependency")
     end)
-    process:run("removeDirectory", {desktopDirectory})
+    process:run("removeDirectory", { desktopDirectory })
     assert(os.remove(paths:resolve("data", "applications")))
     assert(os.remove(paths:resolve("data", ""):gsub("/$", "")))
     assert(os.remove(paths:resolve("config", ""):gsub("/$", "")))
-    assert(os.remove(directory .. "/.local")); assert(os.remove(directory))
+    assert(os.remove(directory .. "/.local"))
+    assert(os.remove(directory))
     suite:test("unknown application cannot call a native backend", function()
-        local backend = {run=function() error("backend_called") end}
-        suite:reject(function() Settings.new(root, backend, registry):apply("missing") end)
+        local backend = {
+            run = function()
+                error("backend_called")
+            end,
+        }
+        suite:reject(function()
+            Settings.new(root, backend, registry):apply("missing")
+        end)
     end)
     suite:test("native settings errors stop the Lua component", function()
         local count = 0
-        local backend = {run=function() count = count + 1; error("native_failure") end}
-        suite:reject(function() Settings.new(root, backend, registry):apply("nautilus") end)
+        local backend = {
+            run = function()
+                count = count + 1
+                error("native_failure")
+            end,
+        }
+        suite:reject(function()
+            Settings.new(root, backend, registry):apply("nautilus")
+        end)
         assert(count == 1)
     end)
     suite:test("EasyEffects publishes its preset and preserves the first private database snapshot", function()
-        local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
+        local directory = process:run("temporary", { "-d" }):gsub("\n$", "")
         local home, runtime = directory .. "/home", directory .. "/runtime"
-        local environment = {HOME=home, XDG_CONFIG_HOME=directory .. "/config", XDG_DATA_HOME=directory .. "/data", XDG_STATE_HOME=directory .. "/state"}
-        local function getenv(key) return environment[key] end
+        local environment = {
+            HOME = home,
+            XDG_CONFIG_HOME = directory .. "/config",
+            XDG_DATA_HOME = directory .. "/data",
+            XDG_STATE_HOME = directory .. "/state",
+        }
+        local function getenv(key)
+            return environment[key]
+        end
         local paths = require("core.paths").new(File.json(root .. "/data/core/paths.json"), getenv)
         local configDb = paths:resolve("config", "easyeffects/db")
-        process:run("directory", {configDb})
+        process:run("directory", { configDb })
         local database = configDb .. "/personal.db"
         publisher:publish(database, "personal database\n", "600")
         local state = paths:resolve("state", registry.easyeffects.state)
         local installedPreset = paths:resolve("data", registry.easyeffects.destination)
         local selected, missingPackage, failLoad, bypassed = "", nil, false, false
         local backend = {}
-        function backend:run(command, arguments) return process:run(command, arguments) end
+        function backend:run(command, arguments)
+            return process:run(command, arguments)
+        end
         function backend:status(command, arguments)
             if command == "isSocket" then return environment.XDG_RUNTIME_DIR == runtime and 0 or 1 end
             if command == "easyEffects" and arguments[1] == "--load-preset" then
                 if failLoad then return 1 end
-                selected = arguments[2]; return 0
+                selected = arguments[2]
+                return 0
             end
-            if command == "easyEffects" and arguments[1] == "--bypass" then bypassed = arguments[2] == "1"; return 0 end
+            if command == "easyEffects" and arguments[1] == "--bypass" then
+                bypassed = arguments[2] == "1"
+                return 0
+            end
             return process:status(command, arguments)
         end
         function backend:capture(command, arguments)
             if command == "pacmanInstalled" then
-                local installed = {"easyeffects", "calf", "lsp-plugins-lv2"}
-                local output = {}; for _, package in ipairs(installed) do if package ~= missingPackage then output[#output + 1] = package end end
+                local installed = { "easyeffects", "calf", "lsp-plugins-lv2" }
+                local output = {}
+                for _, package in ipairs(installed) do
+                    if package ~= missingPackage then output[#output + 1] = package end
+                end
                 return table.concat(output, "\n") .. "\n", 0
             end
             if command == "findFiles" then
@@ -386,21 +547,33 @@ elseif arg[2] == "applications" then
             end
             return process:capture(command, arguments)
         end
-        local app = require("component.application.easyeffects").new(root, paths, Publisher.new(backend), backend, Catalog.new(File.json(root .. "/data/core/locale.json"), root .. "/data/catalog"), registry, getenv)
+        local app = require("component.application.easyeffects").new(
+            root,
+            paths,
+            Publisher.new(backend),
+            backend,
+            Catalog.new(File.json(root .. "/data/core/locale.json"), root .. "/data/catalog"),
+            registry,
+            getenv
+        )
         assert(app:apply("easyeffects") == registry.easyeffects.display)
         local backup = state .. "/before-setup/personal.db"
         assert(File.read(backup) == "personal database\n")
-        assert(tonumber(process:run("fileMode", {backup}), 16) & 0x1FF == tonumber("600", 8))
+        assert(tonumber(process:run("fileMode", { backup }), 16) & 0x1FF == tonumber("600", 8))
         assert(File.read(installedPreset) == File.read(root .. "/" .. registry.easyeffects.source))
         missingPackage = "calf"
-        suite:reject(function() app:apply("easyeffects") end)
+        suite:reject(function()
+            app:apply("easyeffects")
+        end)
         missingPackage = nil
         publisher:publish(database, "changed database\n", "600")
         assert(app:apply("easyeffects") == registry.easyeffects.display)
         assert(File.read(backup) == "personal database\n")
         environment.XDG_RUNTIME_DIR = runtime
         failLoad = true
-        suite:reject(function() app:apply("easyeffects") end)
+        suite:reject(function()
+            app:apply("easyeffects")
+        end)
         assert(bypassed and not io.open(state .. "/default-applied", "rb"))
         failLoad = false
         assert(app:apply("easyeffects") == registry.easyeffects.display)
@@ -408,20 +581,23 @@ elseif arg[2] == "applications" then
         selected = "Personal"
         app:apply("easyeffects")
         assert(selected == "Personal")
-        assert(os.remove(database)); assert(os.remove(backup)); assert(os.remove(installedPreset))
+        assert(os.remove(database))
+        assert(os.remove(backup))
+        assert(os.remove(installedPreset))
         local desktop = paths:resolve("config", registry.easyeffects.autostart)
-        assert(os.remove(desktop)); assert(os.remove(state .. "/default-applied"))
-        process:run("removeDirectory", {directory})
+        assert(os.remove(desktop))
+        assert(os.remove(state .. "/default-applied"))
+        process:run("removeDirectory", { directory })
     end)
 elseif arg[2] == "publisher" then
-    local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
+    local directory = process:run("temporary", { "-d" }):gsub("\n$", "")
     local destination = directory .. "/hyprland.lua"
     local publisher = Publisher.new(process)
-    process:run("permissions", {"700", directory})
+    process:run("permissions", { "700", directory })
     suite:test("publisher creates complete configuration without widening its parent", function()
         assert(publisher:publish(destination, "first", "600"))
         assert(File.read(destination) == "first")
-        assert(tonumber(process:run("fileMode", {directory}), 16) & 0x1FF == tonumber("700", 8))
+        assert(tonumber(process:run("fileMode", { directory }), 16) & 0x1FF == tonumber("700", 8))
     end)
     suite:test("publisher preserves the previous complete content", function()
         publisher:publish(destination, "second", "600")
@@ -436,8 +612,33 @@ elseif arg[2] == "publisher" then
         assert(File.read(destination .. ".bak") == "second")
     end)
     suite:test("failed validation preserves configuration and backup", function()
-        suite:reject(function() publisher:publish(destination, "invalid", "600", function() error("validation_failed") end) end)
+        suite:reject(function()
+            publisher:publish(destination, "invalid", "600", function()
+                error("validation_failed")
+            end)
+        end)
         assert(File.read(destination) == "third" and File.read(destination .. ".bak") == "second")
+    end)
+    suite:test("publisher rejects symlink destinations without changing their targets", function()
+        local target = directory .. "/target"
+        local link = directory .. "/linked.lua"
+        publisher:publish(target, "protected", "600")
+        process:run("symbolicLink", { target, link })
+        suite:reject(function()
+            publisher:publish(link, "redirected", "600")
+        end)
+        assert(File.read(target) == "protected" and not io.open(link .. ".bak", "rb"))
+        assert(os.remove(link))
+        assert(os.remove(target))
+    end)
+    suite:test("publisher rejects dangling symlink destinations", function()
+        local missing = directory .. "/missing"
+        local link = directory .. "/dangling.lua"
+        process:run("symbolicLink", { missing, link })
+        suite:reject(function()
+            publisher:publish(link, "redirected", "600")
+        end)
+        assert(os.remove(link))
     end)
     suite:test("repeated atomic replacements remain complete", function()
         for index = 1, 100 do
@@ -450,8 +651,10 @@ elseif arg[2] == "publisher" then
         local first, second = ("a"):rep(131072), ("b"):rep(131072)
         publisher:publish(destination, first, "600")
         local done = directory .. "/complete"
-        local words = {"/usr/bin/lua", root .. "/tests/lua/concurrent_writer.lua", root, destination, done}
-        for index, word in ipairs(words) do words[index] = Process.quote(word) end
+        local words = { "/usr/bin/lua", root .. "/tests/lua/concurrent_writer.lua", root, destination, done }
+        for index, word in ipairs(words) do
+            words[index] = Process.quote(word)
+        end
         local writer = assert(io.popen(table.concat(words, " "), "r"))
         local observations = 0
         local ok, failure = pcall(function()
@@ -461,7 +664,10 @@ elseif arg[2] == "publisher" then
                 assert(value == first or value == second, "partial_configuration")
                 observations = observations + 1
                 local signal = io.open(done, "r")
-                if signal then assert(signal:close()); break end
+                if signal then
+                    assert(signal:close())
+                    break
+                end
                 assert(os.time() < deadline, "writer_timeout")
             end
         end)
@@ -470,54 +676,101 @@ elseif arg[2] == "publisher" then
         assert(success and observations > 0 and File.read(done) == "complete")
         assert(os.remove(done))
     end)
-    assert(os.remove(destination)); assert(os.remove(destination .. ".bak")); assert(os.remove(directory))
+    assert(os.remove(destination))
+    assert(os.remove(destination .. ".bak"))
+    assert(os.remove(directory))
 else
     suite:test("boot retains encryption resume security and root arguments", function()
         local output = menu:render(menu:read(source("/kernel.efi")), "ABCD-1234", policy)
-        for _, value in ipairs({"cryptdevice=fixture", "resume_offset=123", "lsm=apparmor", "rootflags=subvol=@"}) do assert(output:find(value, 1, true)) end
+        for _, value in ipairs({ "cryptdevice=fixture", "resume_offset=123", "lsm=apparmor", "rootflags=subvol=@" }) do
+            assert(output:find(value, 1, true))
+        end
     end)
     suite:test("snapshot command lines remain distinct", function()
-        local entries = menu:read(source("/kernel.efi", "rootflags=subvol=@") .. "//snapshot\nprotocol: efi\npath: boot():/snapshot.efi\ncmdline: rootflags=subvol=@/.snapshots/24/snapshot\n")
+        local entries = menu:read(
+            source("/kernel.efi", "rootflags=subvol=@")
+                .. "//snapshot\nprotocol: efi\npath: boot():/snapshot.efi\ncmdline: rootflags=subvol=@/.snapshots/24/snapshot\n"
+        )
         assert(#entries == 2 and entries[1].cmdline ~= entries[2].cmdline)
     end)
-    suite:test("duplicate boot fields are rejected", function() suite:reject(function() menu:read(source("/kernel.efi") .. "path: boot():/other.efi\n") end) end)
-    suite:test("parent paths cannot escape the ESP", function() suite:reject(function() menu:read(source("/../kernel.efi")) end) end)
-    suite:test("unsupported boot protocols are rejected", function() suite:reject(function() menu:read(source("/kernel.efi"):gsub("protocol: efi", "protocol: linux")) end) end)
-    suite:test("invalid digest lengths are rejected", function() suite:reject(function() menu:read(source("/kernel.efi#abc")) end) end)
-    suite:test("GRUB strings reject line injection", function() suite:reject(function() Menu.quote("line\nreboot") end) end)
+    suite:test("duplicate boot fields are rejected", function()
+        suite:reject(function()
+            menu:read(source("/kernel.efi") .. "path: boot():/other.efi\n")
+        end)
+    end)
+    suite:test("parent paths cannot escape the ESP", function()
+        suite:reject(function()
+            menu:read(source("/../kernel.efi"))
+        end)
+    end)
+    suite:test("unsupported boot protocols are rejected", function()
+        suite:reject(function()
+            menu:read(source("/kernel.efi"):gsub("protocol: efi", "protocol: linux"))
+        end)
+    end)
+    suite:test("invalid digest lengths are rejected", function()
+        suite:reject(function()
+            menu:read(source("/kernel.efi#abc"))
+        end)
+    end)
+    suite:test("GRUB strings reject line injection", function()
+        suite:reject(function()
+            Menu.quote("line\nreboot")
+        end)
+    end)
     suite:test("kernel quoted arguments survive unchanged", function()
         local command = 'root=/dev/mapper/root parameter="two words"'
         assert(menu:render(menu:read(source("/kernel.efi", command)), "ABCD-1234", policy):find(command, 1, true))
     end)
-    suite:test("GRUB quote escapes apostrophes", function() assert(Menu.quote("a'b") == "'a'\\''b'") end)
-    suite:test("fractional menu indexes are rejected", function()
-        local altered = {}; for key, value in pairs(policy) do altered[key] = value end
-        altered.default = 0.5
-        suite:reject(function() menu:render(menu:read(source("/kernel.efi")), "ABCD-1234", altered) end)
+    suite:test("GRUB quote escapes apostrophes", function()
+        assert(Menu.quote("a'b") == "'a'\\''b'")
     end)
-    local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
+    suite:test("fractional menu indexes are rejected", function()
+        local altered = {}
+        for key, value in pairs(policy) do
+            altered[key] = value
+        end
+        altered.default = 0.5
+        suite:reject(function()
+            menu:render(menu:read(source("/kernel.efi")), "ABCD-1234", altered)
+        end)
+    end)
+    local directory = process:run("temporary", { "-d" }):gsub("\n$", "")
     local image = directory .. "/kernel.efi"
     local binary = "MZ" .. string.rep("\0", 58) .. string.pack("<I4", 64) .. "PE\0\0" .. string.rep("\0", 64)
     local function write(content)
-        local file = assert(io.open(image, "wb")); assert(file:write(content)); assert(file:close())
+        local file = assert(io.open(image, "wb"))
+        assert(file:write(content))
+        assert(file:close())
     end
     write(binary)
-    local digest = process:run("digest", {image}):match("^(%x+)")
+    local digest = process:run("digest", { image }):match("^(%x+)")
     suite:test("real PE image and BLAKE digest validate", function()
         assert(#menu:verify(menu:read(source("/kernel.efi#" .. digest)), directory) == 1)
     end)
     suite:test("integrity drift is rejected with valid PE headers", function()
         write(binary .. "changed")
-        suite:reject(function() menu:verify(menu:read(source("/kernel.efi#" .. digest)), directory) end)
+        suite:reject(function()
+            menu:verify(menu:read(source("/kernel.efi#" .. digest)), directory)
+        end)
     end)
     suite:test("non PE images are rejected", function()
         write("invalid")
-        suite:reject(function() menu:verify(menu:read(source("/kernel.efi")), directory) end)
+        suite:reject(function()
+            menu:verify(menu:read(source("/kernel.efi")), directory)
+        end)
     end)
     suite:test("missing EFI images cannot render a verified menu", function()
-        suite:reject(function() menu:verify(menu:read(source("/missing.efi")), directory) end)
+        suite:reject(function()
+            menu:verify(menu:read(source("/missing.efi")), directory)
+        end)
     end)
-    suite:test("empty inventory is rejected", function() suite:reject(function() menu:verify({}, directory) end) end)
-    assert(os.remove(image)); assert(os.remove(directory))
+    suite:test("empty inventory is rejected", function()
+        suite:reject(function()
+            menu:verify({}, directory)
+        end)
+    end)
+    assert(os.remove(image))
+    assert(os.remove(directory))
 end
 suite:finish()

@@ -2,14 +2,18 @@ local File = require("core.file")
 local Documentation = require("component.documentation.catalog")
 
 return function(suite, root, process)
-    local directory = process:run("temporary", {"-d"}):gsub("\n$", "")
+    local directory = process:run("temporary", { "-d" }):gsub("\n$", "")
     local policy = File.json(root .. "/data/component/documentation/policy.json")
     local function write(language, path, content)
         local destination = directory .. "/" .. policy.directory .. "/" .. language .. "/" .. path
-        process:run("directory", {assert(destination:match("^(.*)/[^/]+$"))})
-        local file = assert(io.open(destination, "wb")); assert(file:write(content)); assert(file:close())
+        process:run("directory", { assert(destination:match("^(.*)/[^/]+$")) })
+        local file = assert(io.open(destination, "wb"))
+        assert(file:write(content))
+        assert(file:close())
     end
-    for _, language in ipairs(policy.languages) do write(language, "README.md", "# " .. language .. "\n") end
+    for _, language in ipairs(policy.languages) do
+        write(language, "README.md", "# " .. language .. "\n")
+    end
     local documentation = Documentation.new(directory, process, policy)
     suite:test("documentation coverage accepts independent translations and shared instructions", function()
         write("en", "root/AGENTS.md", "canonical instructions")
@@ -32,11 +36,13 @@ return function(suite, root, process)
     end)
     suite:test("empty documentation does not pass as a translation", function()
         write("it", "guide.md", "")
-        suite:reject(function() documentation:report() end)
+        suite:reject(function()
+            documentation:report()
+        end)
     end)
     suite:test("the actual public documentation has all configured languages", function()
         local report = Documentation.new(root, process, policy):report()
         assert(report.complete and #report.documents > 0)
     end)
-    process:run("removeDirectory", {directory})
+    process:run("removeDirectory", { directory })
 end

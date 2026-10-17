@@ -2,7 +2,7 @@ local Process = {}
 Process.__index = Process
 
 function Process.new(commands)
-    return setmetatable({commands = assert(commands)}, Process)
+    return setmetatable({ commands = assert(commands) }, Process)
 end
 
 function Process.quote(value)
@@ -13,8 +13,12 @@ end
 function Process:command(name, arguments)
     local command = assert(self.commands[name], "unknown_command")
     local words = {}
-    for _, value in ipairs(command) do words[#words + 1] = Process.quote(value) end
-    for _, value in ipairs(arguments or {}) do words[#words + 1] = Process.quote(value) end
+    for _, value in ipairs(command) do
+        words[#words + 1] = Process.quote(value)
+    end
+    for _, value in ipairs(arguments or {}) do
+        words[#words + 1] = Process.quote(value)
+    end
     return table.concat(words, " ")
 end
 

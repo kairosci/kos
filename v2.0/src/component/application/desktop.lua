@@ -5,14 +5,26 @@ local Desktop = {}
 Desktop.__index = Desktop
 
 function Desktop.new(root, paths, publisher, process, catalog, policy, environment)
-    return setmetatable({root=assert(root), paths=assert(paths), publisher=assert(publisher), process=assert(process), catalog=assert(catalog), policy=assert(policy), getenv=environment or os.getenv}, Desktop)
+    return setmetatable({
+        root = assert(root),
+        paths = assert(paths),
+        publisher = assert(publisher),
+        process = assert(process),
+        catalog = assert(catalog),
+        policy = assert(policy),
+        getenv = environment or os.getenv,
+    }, Desktop)
 end
 
 function Desktop:content(path)
-    assert(self.process:status("isLink", {path}) == 1, "redirected_managed_path")
+    assert(self.process:status("isLink", { path }) == 1, "redirected_managed_path")
     local handle, failure, code = io.open(path, "rb")
-    if not handle then assert(code == 2, failure); return nil end
-    local content = assert(handle:read("a")); assert(handle:close())
+    if not handle then
+        assert(code == 2, failure)
+        return nil
+    end
+    local content = assert(handle:read("a"))
+    assert(handle:close())
     return content
 end
 
@@ -46,7 +58,11 @@ end
 
 function Desktop:publish(entries)
     for _, entry in ipairs(entries) do
-        self.publisher:publish(self.paths:resolve(entry.root, entry.destination), File.read(self.root .. "/" .. entry.source), entry.mode)
+        self.publisher:publish(
+            self.paths:resolve(entry.root, entry.destination),
+            File.read(self.root .. "/" .. entry.source),
+            entry.mode
+        )
     end
 end
 
@@ -74,14 +90,14 @@ function Desktop:backup(backup, mode, relative)
     local destination = backup .. "/" .. relative
     if self:content(destination) then return end
     local parent = assert(destination:match("^(.*)/[^/]+$"), "invalid_backup_path")
-    self.process:run("directory", {parent})
-    self.process:run("permissions", {mode, backup})
+    self.process:run("directory", { parent })
+    self.process:run("permissions", { mode, backup })
     local directory = backup
     for segment in relative:match("^(.*)/[^/]+$"):gmatch("[^/]+") do
         directory = directory .. "/" .. segment
-        self.process:run("permissions", {mode, directory})
+        self.process:run("permissions", { mode, directory })
     end
-    self.process:run("copy", {source, destination})
+    self.process:run("copy", { source, destination })
 end
 
 function Desktop:restore()
@@ -94,14 +110,26 @@ function Desktop:restore()
     self:migrate()
     for _, file in ipairs(restore.terminalFiles) do
         self:backup(backup, restore.backupMode, file)
-        self.publisher:publish(self.paths:resolve("config", file), File.read(upstream .. "/" .. restore.upstreamConfig .. "/" .. file), "644")
+        self.publisher:publish(
+            self.paths:resolve("config", file),
+            File.read(upstream .. "/" .. restore.upstreamConfig .. "/" .. file),
+            "644"
+        )
     end
     for _, asset in ipairs(restore.brandingFiles) do
         local destination = "os/branding/" .. asset
         self:backup(backup, restore.backupMode, destination)
-        self.publisher:publish(self.paths:resolve("config", destination), File.read(self.root .. "/" .. restore.brandingSource), "644")
+        self.publisher:publish(
+            self.paths:resolve("config", destination),
+            File.read(self.root .. "/" .. restore.brandingSource),
+            "644"
+        )
     end
-    self.publisher:publish(self.paths:resolve("config", restore.fastfetchDestination), File.read(self.root .. "/" .. restore.fastfetchSource), "644")
+    self.publisher:publish(
+        self.paths:resolve("config", restore.fastfetchDestination),
+        File.read(self.root .. "/" .. restore.fastfetchSource),
+        "644"
+    )
     self:retire(policy.retiredToggles)
     io.write(self.catalog:text("recovery.terminals_ready", backup), "\n")
 end
