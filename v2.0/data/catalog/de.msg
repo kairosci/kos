@@ -184,6 +184,7 @@ power.usb_storage=USB-Speicher deaktivieren
 power.protocols=Unbenötigte Protokolle deaktivieren
 power.filesystems=Unbenötigte Dateisysteme deaktivieren
 power.firewire=FireWire deaktivieren
+power.baseline_failed=Anwendung der Sicherheitsbasis fehlgeschlagen
 
 maint.sudo=sudo härten
 maint.sudoers_invalid=sudoers.d/security ungültig, zurückgerollt

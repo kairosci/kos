@@ -184,6 +184,7 @@ power.usb_storage=Disabilitazione dell'archiviazione USB
 power.protocols=Disabilitazione dei protocolli non necessari
 power.filesystems=Disabilitazione dei filesystem non necessari
 power.firewire=Disabilitazione di FireWire
+power.baseline_failed=Applicazione della baseline di sicurezza non riuscita
 
 maint.sudo=Hardening di sudo
 maint.sudoers_invalid=sudoers.d/security non valido, ripristinato

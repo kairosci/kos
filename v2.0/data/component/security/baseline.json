@@ -14,5 +14,11 @@
   },
   "absentFiles": {
     "tpm_verity_removed": "/usr/lib/nvpcr/verity.nvpcr"
+  },
+  "sshPermissions": {
+    "directory": ["/etc/ssh", "750"],
+    "serverFiles": ["/etc/ssh/sshd_config", "/etc/ssh/sshd_config.d"],
+    "clientFiles": ["/etc/ssh/ssh_config", "/etc/ssh/ssh_config.d"],
+    "maxDepth": 2
   }
 }
